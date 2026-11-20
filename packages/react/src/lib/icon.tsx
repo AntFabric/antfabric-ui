@@ -1,6 +1,6 @@
 import * as lucide from "lucide-react";
 import type { ComponentType, CSSProperties } from "react";
-import { pascal } from "@antfabric-ui/core";
+import { pascal } from "@antfabric/ui-core";
 import { t } from "../tokens";
 
 /** A lucide icon name in kebab case: `"trash-2"`, `"chevron-right"`. */

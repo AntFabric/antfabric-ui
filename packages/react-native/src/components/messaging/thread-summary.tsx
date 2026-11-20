@@ -1,5 +1,5 @@
 import { Pressable, Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useLocale, useStrings, type KitStrings, type Person } from "@antfabric-ui/core";
+import { recipes, useControllable, useLocale, useStrings, type KitStrings, type Person } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon } from "../../lib/icon";
 import { Enter } from "../../lib/motion";

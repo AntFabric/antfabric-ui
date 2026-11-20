@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { ScrollView, Text, View } from "react-native";
-import { ListItem, RadioGroup, Switch, font, useTheme } from "@antfabric-ui/react-native";
-import { MobileHeader } from "@antfabric-ui/react-native/shell";
+import { ListItem, RadioGroup, Switch, font, useTheme } from "@antfabric/ui-react-native";
+import { MobileHeader } from "@antfabric/ui-react-native/shell";
 
 function SectionLabel({ children }: { children: string }) {
   const { t } = useTheme();

@@ -1,6 +1,6 @@
 /**
- * `@antfabric-ui/react/chat`: one opinionated conversation idiom, a Slack-style thread of messages and the box that writes them. Not part of
- * the root entry, which stays the generic set a product composes its own screens from. The same name, `@antfabric-ui/react-native/chat`, is
+ * `@antfabric/ui-react/chat`: one opinionated conversation idiom, a Slack-style thread of messages and the box that writes them. Not part of
+ * the root entry, which stays the generic set a product composes its own screens from. The same name, `@antfabric/ui-react-native/chat`, is
  * the phone's.
  *
  * It holds Message, MessageActions, Composer, ReactionPill, ThreadSummary, TypingIndicator and MessageDivider

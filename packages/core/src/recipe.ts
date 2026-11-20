@@ -1,7 +1,7 @@
 /**
  * Recipes: what each part of a component reads from the tokens, per variant, per state and per
- * platform, written once as data and read by both kits (`useRecipe` in `@antfabric-ui/react` and in
- * `@antfabric-ui/react-native`). The recipe holds the decisions a token can name (colour, size,
+ * platform, written once as data and read by both kits (`useRecipe` in `@antfabric/ui-react` and in
+ * `@antfabric/ui-react-native`). The recipe holds the decisions a token can name (colour, size,
  * radius, type, shadow, edge); what stays in the kit is behaviour (hover, press, Animated, roles)
  * and layout that no token decides (flex direction, alignment, `cursor`, a `0.97` press scale).
  *

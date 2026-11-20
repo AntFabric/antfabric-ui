@@ -1,5 +1,5 @@
 import { useEffect, type CSSProperties, type ReactNode } from "react";
-import { recipes, useControllable, useStrings, type ActionItem, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";

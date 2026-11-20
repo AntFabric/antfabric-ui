@@ -105,7 +105,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <div role=\"alertdialog\"> (confirm) or \"dialog\" (form), aria-modal, labelled by its <h2> and described by the body, on a 3px-blurred scrim; inline styles over `t`; Button and IconButton. Tab wraps inside, Esc cancels, Mod+Enter submits a form, and Cancel (a form: its first field) takes focus on open; pops in with enter(\"pop\") over a fading scrim; `loading` through useControllable",
-      import: "import { Dialog } from \"@antfabric-ui/react\"",
+      import: "import { Dialog } from \"@antfabric/ui-react\"",
       notes: [
         "The backdrop blurs 3px. With `modal` the dialog is drawn in the overlay layer of its AntFabricRoot (the theme applies, no overflow clips it): the scrim covers the window, the page behind does not scroll (the body and the box the page scrolls in) and the rest of the root is inert; only the top dialog takes Esc and a press on the scrim. Without `modal` it is drawn where it is mounted, and those belong to the host.",
         "Below 640px of viewport (a phone browser) the same component draws as the bottom sheet the phone app uses, buttons stacked full width.",
@@ -134,7 +134,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <div role=\"alertdialog\"> as web at desktop density",
-      import: "import { Dialog } from \"@antfabric-ui/react\"",
+      import: "import { Dialog } from \"@antfabric/ui-react\"",
       notes: [
         "W_MODAL = clamp(540px, 37.5vw, 960px): 540 on a 1440 laptop, growing with the screen, capped at 960. It is the one modal width in the app; a confirm (W_CONFIRM, a fixed 440) and the command palette are the documented exemptions, and a test lists them.",
         "Confirm layout: 24 / 20 / 20 padding, 20px corners, a 42px glyph tile, a display-font title, the body at 13px, and the two buttons right-aligned at equal widths (DialogActions).",
@@ -161,7 +161,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A bottom sheet: <Enter motion=\"slide-up\"> (role alertdialog or dialog, accessibilityViewIsModal) over a fading scrim, StyleSheet over useTheme(); the CTA and Cancel as full-width Buttons, IconButton to close; `loading` through useControllable",
-      import: "import { Dialog } from \"@antfabric-ui/react-native\"",
+      import: "import { Dialog } from \"@antfabric/ui-react-native\"",
       notes: [
         "Title row 16 under the handle, message 28 above the buttons, then the CTA and an outlined Cancel, both 56pt and full width — Cancel under the CTA, where the thumb rests after reading.",
         "tone danger is the red destructive button; tone primary is for an approval (granting an agent permission), which must not look like a hazard.",

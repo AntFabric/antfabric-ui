@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Animated, Easing, Platform, Pressable, ScrollView, Text, View, type ViewStyle } from "react-native";
-import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { usePress } from "../../lib/press";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

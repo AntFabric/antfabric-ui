@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from "react";
-import { recipes, useControllable, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { DIMMED, fmt, segmentsOf, seriesColors, shareOf, summarizeSegments, totalOf, type FormatSpec, type Row, type Segment, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useControllable, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { DIMMED, fmt, segmentsOf, seriesColors, shareOf, summarizeSegments, totalOf, type FormatSpec, type Row, type Segment, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
 import { box, css, enter, neg, pressable, row, text } from "../../lib/style";

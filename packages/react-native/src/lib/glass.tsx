@@ -1,6 +1,6 @@
 import type { ComponentType, ReactNode } from "react";
 import { Platform, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
-import type { NativeTokens } from "@antfabric-ui/core";
+import type { NativeTokens } from "@antfabric/ui-core";
 import { useTheme } from "../theme";
 
 /**

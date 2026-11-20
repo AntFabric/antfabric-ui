@@ -1,4 +1,4 @@
-import type { Platform } from "@antfabric-ui/core";
+import type { Platform } from "@antfabric/ui-core";
 import { DefaultsProvider } from "../preview/kit";
 import { Shot } from "../preview/ui";
 

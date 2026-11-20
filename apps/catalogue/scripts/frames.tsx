@@ -7,8 +7,8 @@
 import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { parseHTML } from "linkedom";
-import { OS_VERSIONS, PLATFORM_OS, PLATFORMS, type OS, type Platform } from "@antfabric-ui/core";
-import { registry } from "@antfabric-ui/docs";
+import { OS_VERSIONS, PLATFORM_OS, PLATFORMS, type OS, type Platform } from "@antfabric/ui-core";
+import { registry } from "@antfabric/ui-docs";
 import { DefaultsProvider, SceneNode, Stage, Thing } from "../src/preview/kit";
 import { pressables, pressTarget } from "../src/preview/press";
 import { defaultsFor, usedIds } from "../src/lib/library";
@@ -39,7 +39,7 @@ for (const flow of doc.flows ?? []) {
       const onStep = steps.some(({ i }) => i === frame.step) ? "" : "  ⚠ its step is not shown on this platform";
       console.log(`    frame ${n} → step ${frame.step}${frame.press === undefined ? "" : ` · press ${JSON.stringify(frame.press)}`}${onStep}`);
       if (frame.press !== undefined && !hit) console.log(`      ⚠ the press lands on nothing`);
-      const missing = [...html.matchAll(/([A-Z][A-Za-z0-9]*) is not in @antfabric-ui\/[a-z-]+ yet/g)].map((m) => m[1]);
+      const missing = [...html.matchAll(/([A-Z][A-Za-z0-9]*) is not in @antfabric\/ui-[a-z-]+ yet/g)].map((m) => m[1]);
       if (missing.length) console.log(`      (waiting on ${[...new Set(missing)].join(", ")})`);
       all.forEach((el, i) => {
         const owner = el.closest("[data-af]")?.getAttribute("data-af");

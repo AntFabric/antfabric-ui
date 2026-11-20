@@ -98,7 +98,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "partial",
       base: "Views and Text in StyleSheet over useTheme() tokens (fonts by file; the status bar's clock in the system face), IconButton for bell, back and actions, a Pressable around the Avatar, the kit's Spinner for Connecting…; title as accessibilityRole header. The drawn status bar is a stand-in: in the app the header sits in SafeAreaView edges={['top']} with expo-status-bar",
-      import: "import { MobileHeader } from \"@antfabric-ui/react-native/shell\"",
+      import: "import { MobileHeader } from \"@antfabric/ui-react-native/shell\"",
       notes: [
         "main is MainHeader today: the 28pt title is Figtree, not the Heading face; the bell and photo are 40pt boxes 8pt apart, 12pt under the status bar on the 12pt gutter.",
         "The bell pushes /notifications onto the root stack (ADR-9417) and rings on the tap; the photo pushes /profile (ADR-9419), named 'Settings' to VoiceOver. The unread badge on the bell is new in this spec — today the bell has no count.",

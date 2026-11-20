@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { compareTotals, lineScale, prepare, summarizeCompare, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { compareTotals, lineScale, prepare, summarizeCompare, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

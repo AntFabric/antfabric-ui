@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Dimensions, Easing, I18nManager, PanResponder, Platform, Pressable, Text, View, type ViewStyle } from "react-native";
-import { formatString, recipes, useControllable, useStrings, type ActionItem, type KitStrings } from "@antfabric-ui/core";
+import { formatString, recipes, useControllable, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon, type IconName } from "../../lib/icon";
 import { reducedMotion } from "../../lib/motion";

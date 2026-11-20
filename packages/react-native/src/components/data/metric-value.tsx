@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { Text, type TextStyle } from "react-native";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { fmt, useTween, valueParts, type FormatSpec, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { fmt, useTween, valueParts, type FormatSpec, type FormatWords } from "@antfabric/ui-core/chart";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { partId, rootProps, type RootProps } from "../../lib/root-props";
 import { useChartTokens, useReducedMotion } from "../../data/theme";

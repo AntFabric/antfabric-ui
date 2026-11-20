@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { recipes, useControllable, useDirection, useLocale, useStrings, type KitStrings, type Person } from "@antfabric-ui/core";
+import { recipes, useControllable, useDirection, useLocale, useStrings, type KitStrings, type Person } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, Text, View, type ViewStyle } from "react-native";
-import { menuItemKey, recipes, useStrings, type KitStrings, type MenuItem } from "@antfabric-ui/core";
+import { menuItemKey, recipes, useStrings, type KitStrings, type MenuItem } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon, type IconName } from "../../lib/icon";
 import { Enter } from "../../lib/motion";

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { Pressable, Text, View, type TextStyle, type ViewStyle } from "react-native";
-import { recipes, useControllable, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import {
   alignOf,
   cardLayout,
@@ -25,7 +25,7 @@ import {
   type Row,
   type TableColumn,
   type TableSort,
-} from "@antfabric-ui/core/chart";
+} from "@antfabric/ui-core/chart";
 import { createStyles, useTheme } from "../../theme";
 import { announce } from "../../lib/a11y";
 import type { PartStyle, PartStyles } from "../../lib/recipe";

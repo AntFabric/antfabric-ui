@@ -1,11 +1,11 @@
 /**
  * What the catalogue says about a component. The component itself is code, in
- * `@antfabric-ui/react` (web and desktop) and `@antfabric-ui/react-native` (mobile); this is
+ * `@antfabric/ui-react` (web and desktop) and `@antfabric/ui-react-native` (mobile); this is
  * everything around it: the props as documented and played with, examples, edge cases, how each
  * platform treats it, and its flows.
  */
 
-import type { EnterMotion, InteractionState, OS, Platform } from "@antfabric-ui/core";
+import type { EnterMotion, InteractionState, OS, Platform } from "@antfabric/ui-core";
 
 export type { EnterMotion, InteractionState, OS, Platform };
 

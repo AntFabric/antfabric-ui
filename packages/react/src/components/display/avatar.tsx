@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from "react";
-import { initials, recipes, useStrings, type AvatarIdentity, type AvatarPresence, type KitStrings } from "@antfabric-ui/core";
+import { initials, recipes, useStrings, type AvatarIdentity, type AvatarPresence, type KitStrings } from "@antfabric/ui-core";
 import { Icon } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { css, enter, text } from "../../lib/style";

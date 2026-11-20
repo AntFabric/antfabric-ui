@@ -26,7 +26,7 @@ import {
   withDefaults,
   type Platform,
 } from "../../lib/library";
-import { formatShortcut, pascal } from "@antfabric-ui/core";
+import { formatShortcut, pascal } from "@antfabric/ui-core";
 import { anatomyOf } from "../../lib/anatomy";
 import { stackOf, stackSummary } from "../../lib/stack";
 import { logoSvg } from "../../lib/logos";
@@ -81,8 +81,8 @@ const prev = order[at - 1];
 const next = order[at + 1];
 const installCmd = (p: Platform) =>
   p === "mobile"
-    ? `pnpm add @antfabric-ui/react-native @antfabric-ui/core lucide-react-native${doc.category === "data" ? " react-native-svg expo-linear-gradient" : ""}`
-    : "pnpm add @antfabric-ui/react @antfabric-ui/core lucide-react";
+    ? `pnpm add @antfabric/ui-react-native @antfabric/ui-core lucide-react-native${doc.category === "data" ? " react-native-svg expo-linear-gradient" : ""}`
+    : "pnpm add @antfabric/ui-react @antfabric/ui-core lucide-react";
 const keys = (k: string) => (k.includes("Mod") ? `${formatShortcut(k, "mac")}  ·  ${formatShortcut(k, "windows")}` : k);
 const playgroundDoc = { id: doc.id, name: doc.name, props: doc.props, platforms: doc.platforms };
 

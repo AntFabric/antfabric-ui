@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
-import { font, useTheme } from "@antfabric-ui/react-native";
-import { OsNotification } from "@antfabric-ui/react-native/shell";
-import { OS_NOTIFICATION_ACTIONS, OS_NOTIFICATION_APPROVE, OS_NOTIFICATION_DECLINE, OS_NOTIFICATION_JOIN } from "@antfabric-ui/docs/samples";
+import { font, useTheme } from "@antfabric/ui-react-native";
+import { OsNotification } from "@antfabric/ui-react-native/shell";
+import { OS_NOTIFICATION_ACTIONS, OS_NOTIFICATION_APPROVE, OS_NOTIFICATION_DECLINE, OS_NOTIFICATION_JOIN } from "@antfabric/ui-docs/samples";
 
 const fill = { width: "100%", maxWidth: "100%" } as const;
 

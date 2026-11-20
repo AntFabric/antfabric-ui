@@ -10,8 +10,8 @@ const require = createRequire(import.meta.url);
 const pkg = (name) => dirname(require.resolve(`${name}/package.json`));
 
 /**
- * The catalogue draws the real components: `@antfabric-ui/react` for web and desktop, and
- * `@antfabric-ui/react-native` for mobile, through React Native Web. So `react-native` resolves to
+ * The catalogue draws the real components: `@antfabric/ui-react` for web and desktop, and
+ * `@antfabric/ui-react-native` for mobile, through React Native Web. So `react-native` resolves to
  * react-native-web here, lucide's native icons to its DOM ones (same names, same props: a DOM
  * <svg> sits inside a React Native Web view as it would in react-native-svg), and react-native-svg
  * itself to the DOM's own elements (src/preview/stubs: every one gifted-charts draws with, not only <svg> and <path>), and the
@@ -46,6 +46,6 @@ export default defineConfig({
       include: ["react-native-web", "lucide-react"],
       rolldownOptions: { resolve: { extensions: [".web.mjs", ".web.js", ".web.ts", ".web.tsx", ".mjs", ".js", ".ts", ".tsx", ".json"] } },
     },
-    ssr: { noExternal: ["react-native-web", /^@antfabric-ui\//] },
+    ssr: { noExternal: ["react-native-web", /^@antfabric\/ui-/] },
   },
 });

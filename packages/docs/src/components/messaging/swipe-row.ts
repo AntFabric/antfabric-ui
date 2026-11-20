@@ -81,7 +81,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "PanResponder + Animated translateX over a Pressable row, StyleSheet over useTheme(); the buttons ride the row's trailing edge, `open` through useControllable, every action also an accessibility action",
-      import: "import { SwipeRow } from \"@antfabric-ui/react-native\"",
+      import: "import { SwipeRow } from \"@antfabric/ui-react-native\"",
       notes: [
         "Opens past 40pt at half drag speed (friction 2, a flick adding 0.05 s of its velocity, as gesture-handler's Swipeable does) and stops exactly at the buttons' width: 8 after the row, 88 per button, 8 between, 12 to the edge — 204 for two, 108 for one.",
         "The buttons ride the row's trailing edge (translateX = width + translation), so they slide in with it instead of fading in behind it, as iOS Mail's do.",

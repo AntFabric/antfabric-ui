@@ -72,7 +72,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "partial",
       base: "A drawing of the macOS menu-bar extra or the Windows / Linux tray and its menu, picked by usePlatform().os: a `role=\"menu\"` of `<button role=\"menuitem\">` rows, inline styles over `t`, the highlight from useInteraction, Up / Down / Right / Left handled on the menu, Liquid Glass through glass() on macOS 26, and a fade-in with enter(\"fade\"). Presses move the recorder and the pause in local state. The app builds the real one with Tauri TrayIconBuilder + muda Menu (MenuItem, IconMenuItem, Submenu, PredefinedMenuItem::separator), rebuilt on a recorder state change and retexted in place on each 250 ms tick.",
-      import: "import { TrayMenu } from \"@antfabric-ui/react/shell\"",
+      import: "import { TrayMenu } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Ships today: the status line, Start / Pause / Resume / Stop Recording, Open Recordings Folder, Show / Hide AntFabric, Quit AntFabric. New in this spec: the unread line and Pause notifications ▸.",
         "macOS: the menu-bar title is set only while recording, paused or saving (\"Recording 0:12\") — menu-bar width is shared with every other app. Idle writes an empty string explicitly, because set_title(None) is a no-op on macOS and once left \"Saving…\" there for the life of the process.",

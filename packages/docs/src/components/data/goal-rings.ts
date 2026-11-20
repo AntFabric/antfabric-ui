@@ -51,7 +51,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section>: the title and \"View as table\" (Button); a ChartFrame holding one recharts PieChart with a track Pie and a value Pie per ring (round ends, 90 degrees round to -270), MetricValue in the middle, and a list of goals (<button> rows, aria-pressed) beside it",
-      import: "import { GoalRings } from \"@antfabric-ui/react/data\"",
+      import: "import { GoalRings } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath: recharts is reached only from there. The rings are handed an explicit size, never a responsive container.",
         "Each band is `chart.ringW` thick with `chart.ringGap` between it and the next ring in; the outermost is the first goal. A ring is its value Pie over a whole track Pie, so the round end of a value sits on the track.",
@@ -67,7 +67,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same Card, recharts' PieChart and list as web, at desktop density",
-      import: "import { GoalRings } from \"@antfabric-ui/react/data\"",
+      import: "import { GoalRings } from \"@antfabric/ui-react/data\"",
       notes: ["The same chart as the web's. The pointer's hover lights a ring or a goal, and a click picks it."],
       keyboard: [
         { keys: "Tab", action: "Moves through the goals in the list, then to \"View as table\". A goal that has focus is lit, and so is its ring" },
@@ -77,7 +77,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View: the same header and Button, a ChartFrame holding one react-native-gifted-charts PieChart `donut` per ring, stacked in views as wide as each ring's outer edge (each starts at 12 o'clock), MetricValue in the middle, and the goals below as Pressable rows",
-      import: "import { GoalRings } from \"@antfabric-ui/react-native/data\"",
+      import: "import { GoalRings } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there. The rings are a little larger than the web's (`chart.ringSize` is 200pt, `chart.ringW` 15pt).",
         "gifted-charts' slices have square ends, so the rings have none of the web's round ones. The list is below the rings, full width, each goal at least 44pt tall.",

@@ -46,7 +46,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A row with role=\"heading\" (level 3) for a day or role=\"separator\" for New messages, inline styles over `t`; the sticky pill is a <button> (aria-haspopup=\"menu\") with hover, press and focus from useInteraction, and onJump opens the app's jump-to-day menu",
-      import: "import { MessageDivider } from \"@antfabric-ui/react/chat\"",
+      import: "import { MessageDivider } from \"@antfabric/ui-react/chat\"",
       notes: [
         "The sticky pill is a position: sticky band the messages scroll under; only the pill takes pointer events. Its label is the day of the topmost visible row, measured from data-day-start anchors, not per message.",
         "The first day draws no in-list divider: the sticky pill is already showing that label in the same place, and two pills on top of each other read as a glitch.",
@@ -65,7 +65,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same row as web at desktop density, inline styles over `t`; the sticky pill's onJump opens the app's jump-to-day menu (MenuSurface, 244 wide)",
-      import: "import { MessageDivider } from \"@antfabric-ui/react/chat\"",
+      import: "import { MessageDivider } from \"@antfabric/ui-react/chat\"",
       notes: [
         "\"New messages\" is a coral rule at 50% with the label at its end, and it sits above the first unread message so that message lands directly under the sticky day pill when the channel opens (data-first-unread).",
         "Today the desktop writes the year on every date past the 6-day window; this spec drops it within the current year.",
@@ -80,7 +80,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "partial",
       base: "View (accessibilityRole header for a day, role separator for New messages) with hairline Views either side of the Text, StyleSheet over useTheme(); the sticky pill is a translucent View, not a button",
-      import: "import { MessageDivider } from \"@antfabric-ui/react-native/chat\"",
+      import: "import { MessageDivider } from \"@antfabric/ui-react-native/chat\"",
       notes: [
         "Today's TimelineDivider: a hairline either side of a 12pt SemiBold faint label; \"New messages\" is the same shape in coral and is a header for VoiceOver.",
         "Gap: the phone has no sticky day pill yet. Spec: while the list is scrolling, a translucent pill shows the topmost day and fades out 1.5 s after scrolling stops (no fade under Reduce Motion — it simply hides). It is not a button on mobile; the jump-to-day menu is desktop and web only.",

@@ -1,6 +1,6 @@
 name: Release
 
-# Every push to main publishes @antfabric-ui/core, react and react-native to npm, at one shared
+# Every push to main publishes @antfabric/ui-core, ui-react and ui-react-native to npm, at one shared
 # version: the version in packages/core/package.json when npm does not have it yet and it is newer,
 # otherwise the next patch after the newest on npm (scripts/release-version.mjs). Then the commit is
 # tagged v<version> and a GitHub release is made. Nothing is committed back to main.
@@ -16,7 +16,7 @@ concurrency:
 
 permissions:
   contents: write # push the tag, create the GitHub release
-  id-token: write # npm provenance
+  id-token: write # npm trusted publishing (OIDC, no token) and provenance
 
 jobs:
   release:
@@ -33,7 +33,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
-          registry-url: https://registry.npmjs.org
+          # No registry-url: it writes an .npmrc that asks for a token, and trusted publishing uses none.
 
       - run: pnpm install --frozen-lockfile
 
@@ -45,24 +45,26 @@ jobs:
         run: node scripts/release-version.mjs
 
       - name: Build and verify the packages
+        if: steps.version.outputs.skip != 'true'
         run: pnpm build:packages && pnpm verify:packages
 
-      # pnpm (not npm) publishes: only pnpm applies publishConfig (the dist exports) and turns
-      # workspace:^ into a version range.
+      # npm trusted publishing: npmjs.com trusts this repository's release.yml for each package, so npm
+      # signs in with the job's OIDC token; there is no NPM_TOKEN. pnpm packs, npm publishes
+      # (scripts/publish-packages.mjs).
       - name: Publish to npm
-        run: >-
-          pnpm publish -r --access public --no-git-checks
-          --filter @antfabric-ui/core --filter @antfabric-ui/react --filter @antfabric-ui/react-native
+        if: steps.version.outputs.skip != 'true'
+        run: node scripts/publish-packages.mjs
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           # npm refuses provenance for a private repository, so it is on only once the repo is public.
           NPM_CONFIG_PROVENANCE: ${{ !github.event.repository.private }}
 
       - name: Tag and release on GitHub
+        if: steps.version.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          git tag "v$VERSION" "$GITHUB_SHA"
+          # Idempotent, so a re-run finishes a release whose tag or GitHub release is missing.
+          git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null || git tag "v$VERSION" "$GITHUB_SHA"
           git push origin "v$VERSION"
-          gh release create "v$VERSION" --title "v$VERSION" --generate-notes --verify-tag
+          gh release view "v$VERSION" >/dev/null 2>&1 || gh release create "v$VERSION" --title "v$VERSION" --generate-notes --verify-tag

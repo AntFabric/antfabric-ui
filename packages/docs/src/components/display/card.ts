@@ -72,7 +72,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <div> with a stretched <button> under the content as its one press target (nested controls sit above it); hover from useInteraction fills it, keyboard focus rings the whole card; inline styles over `t`",
-      import: "import { Card } from \"@antfabric-ui/react\"",
+      import: "import { Card } from \"@antfabric/ui-react\"",
       notes: [
         "An interactive card is a stretched link: one <a href> (with `href`) or <button> covers the card, and nested controls sit above it with position: relative. A <button> wrapping the whole card would make every nested button invalid HTML.",
         "A card that navigates (`href`) is an <a>, so middle-click and ⌘-click open it in a new tab.",
@@ -92,7 +92,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <div> as web: level / elevate / tint over `t` at desktop density",
-      import: "import { Card } from \"@antfabric-ui/react\"",
+      import: "import { Card } from \"@antfabric/ui-react\"",
       notes: [
         "The house treatment inside a panel is level=\"inner\" elevate=\"none\" interactive: white on white, the hairline as the whole separation, and a hover that fills to the hover surface while NOTHING moves (owner, 2026-08-28; ADR-0322). The border does not change colour on hover.",
         "A brand card hovers one step further, to brand.soft-hover — it is already soft-filled, so the plain hover would be a no-op.",
@@ -109,7 +109,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View, or a Pressable when interactive (role, label and a \"Select\" accessibility action for long-press on it), scaling to 0.99 while pressed; StyleSheet over useTheme()",
-      import: "import { Card } from \"@antfabric-ui/react-native\"",
+      import: "import { Card } from \"@antfabric/ui-react-native\"",
       notes: [
         "Radius 16, 12pt inner padding (owner, 2026-09-10: 12 is the app-wide inset) — not the 16pt screen gutter, which is a different measurement.",
         "Children are clipped to the radius (overflow: hidden) — RN does not clip on its own, and a full-bleed footer would square off past the corners.",

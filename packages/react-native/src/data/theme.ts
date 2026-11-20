@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { AccessibilityInfo, PixelRatio, Platform, type TextStyle } from "react-native";
-import type { NativeTokens } from "@antfabric-ui/core";
-import { CHART_DRAW, seriesColors } from "@antfabric-ui/core/chart";
+import type { NativeTokens } from "@antfabric/ui-core";
+import { CHART_DRAW, seriesColors } from "@antfabric/ui-core/chart";
 import { useTheme } from "../theme";
 import { fontScale } from "../lib/type";
 

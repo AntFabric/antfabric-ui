@@ -1,7 +1,7 @@
 import { Text, View, type ViewStyle } from "react-native";
 import { type RootProps, rootProps } from "../../lib/root-props";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { barScale, bySign, fmt, prepare, summarize, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { barScale, bySign, fmt, prepare, summarize, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { GiftedBars } from "../../data/bars";

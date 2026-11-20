@@ -67,7 +67,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <button>, inline styles over `t`; hover, press and keyboard focus from useInteraction",
-      import: "import { Button } from \"@antfabric-ui/react\"",
+      import: "import { Button } from \"@antfabric/ui-react\"",
       notes: [
         "A link styled as a button is <a href>, not a button with onClick — middle-click and ⌘-click must open a tab.",
         "Shortcut hints are shown only when the shortcut is NOT one the browser owns (⌘W, ⌘T, ⌘N, ⌘L are the browser's).",
@@ -86,7 +86,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <button> as the web, at desktop density; shortcut glyphs per OS from usePlatform()",
-      import: "import { Button } from \"@antfabric-ui/react\"",
+      import: "import { Button } from \"@antfabric/ui-react\"",
       notes: [
         "Today's desktop Button has no loading state; this spec adds one so a slow save no longer needs a separate spinner.",
         "Shortcut hints render with native glyphs: ⌘↩ on macOS, Ctrl+Enter on Windows and Linux.",
@@ -105,7 +105,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "Pressable + Text over createStyles(t), font(\"semibold\"), ActivityIndicator while loading; scales to 0.97 on press-in",
-      import: "import { Button } from \"@antfabric-ui/react-native\"",
+      import: "import { Button } from \"@antfabric/ui-react-native\"",
       notes: [
         "md and lg are the 56pt call-to-action used on V2; sm (34pt) is for inline actions only and gets hitSlop to reach 44pt.",
         "Light impact haptic on press-in, never on disabled.",

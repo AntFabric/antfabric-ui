@@ -63,7 +63,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A role=\"group\" <div> of the kit's Avatars, each ringed in the ground's surface colour and overlapping by a third (margin-inline-start), and a +N chip named in words; inline styles over `t`",
-      import: "import { AvatarStack } from \"@antfabric-ui/react\"",
+      import: "import { AvatarStack } from \"@antfabric/ui-react\"",
       notes: [
         "Hovering a face opens that person's hover card; hovering +N lists the hidden names (up to 12, then \"and 40 more\").",
         "When the stack is a link (a channel's members), the whole stack is one <a> with the group label — not one tab stop per face.",
@@ -78,7 +78,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <div> as web, at desktop density (22px faces)",
-      import: "import { AvatarStack } from \"@antfabric-ui/react\"",
+      import: "import { AvatarStack } from \"@antfabric/ui-react\"",
       notes: [
         "Today's Facepile: 24px faces at −7px overlap with a 2px surface ring; every ring is the surface colour, including the lead's (ADR-0389 — a coral ring on the first face read as a badge on one person).",
         "+N counts what is HIDDEN, never the total. ChannelPane's header shows the roster TOTAL beside three faces and is deliberately a different statement; it stays a separate count, not this chip.",
@@ -88,7 +88,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "One accessible View (role group) of the kit's Avatars with ground-coloured rings and a marginStart overlap, and the +N chip; StyleSheet over useTheme()",
-      import: "import { AvatarStack } from \"@antfabric-ui/react-native\"",
+      import: "import { AvatarStack } from \"@antfabric/ui-react-native\"",
       notes: [
         "Today's AvatarStack: 28pt faces overlapping by a third, default max 4. The +N is the face discs' own grey with muted SemiBold (owner, 2026-10-05, ADR-8910) — it was a beige disc with white Bold and read as a person.",
         "Faces render with expo-image's memory+disk cache; a stack inside a FlatList row never re-fetches on scroll.",

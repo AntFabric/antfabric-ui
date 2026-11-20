@@ -1,5 +1,5 @@
 import { useEffect, useRef, type KeyboardEvent, type RefObject } from "react";
-import { useDirection } from "@antfabric-ui/core";
+import { useDirection } from "@antfabric/ui-core";
 
 export interface RovingOptions {
   /** The items, as a selector inside the container: `'[role="menuitem"]'`. */

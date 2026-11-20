@@ -94,7 +94,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The ⋯ IconButton over a <div role=\"menu\"> that pops in (enter(\"pop\")): an Avatar header, <button role=\"menuitem\"> rows with Kbd hints, and a role=\"radiogroup\" Theme row of <button role=\"radio\"> segments; inline styles over `t`, hover / press / focus from useInteraction, `colorScheme` through useControllable. The kit draws the menu open; opening it from the top bar, Esc and arrow-key movement belong to the menu primitive the app wraps it in.",
-      import: "import { AppMenuBar } from \"@antfabric-ui/react/shell\"",
+      import: "import { AppMenuBar } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Deliberately NOT here: Reload, Force Reload, Zoom, Full Screen, Close Window, Quit. The browser owns every one of them and its own shortcuts (⌘R, ⌘+, ⌘W, ⌘Q) reach the browser before the page. Offering them twice teaches people a command that sometimes does something different.",
         "No History menu either: the top bar's Back / Forward are the browser's own history, so a second copy here would be a third place for one command.",
@@ -132,7 +132,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "partial",
       base: "macOS: a picture of the system menu bar over the wallpaper (role=\"menubar\", <button role=\"menuitem\"> titles, a dropdown that fades in; glass() on macOS 26) — in the app the real bar is Tauri's native Menu. Windows: the ☰ IconButton over a panel that pops in, each menu a row whose cascade fades in beside it. Linux: the same panel as a GNOME popover, the submenu sliding in place (enter(\"slide-left\")) with a ‹ back row. Rows are <button role=\"menuitem\"> with Kbd hints; inline styles over `t`, hover / press / focus from useInteraction, `openMenu` through useControllable.",
-      import: "import { AppMenuBar } from \"@antfabric-ui/react/shell\"",
+      import: "import { AppMenuBar } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Today: Tauri's Menu::default (AntFabric, File, Edit, View, Window, Help) with five items prepended into View (view_menu.rs) and Report a Problem… appended to Help (help_menu.rs). On Windows and Linux that default renders as a native menu strip under the native title bar.",
         "New in this spec: a History menu (Back ⌘[, Forward ⌘]) and AntFabric › Settings… ⌘, on macOS; the ☰ menu on Windows and Linux, which needs decorations: false (see title-bar).",

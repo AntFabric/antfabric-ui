@@ -1,5 +1,5 @@
 import { useEffect, useRef, type CSSProperties } from "react";
-import { recipes, useControllable, useDirection, useStrings, type ActionItem, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useDirection, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { useAutoFocus } from "../../platform";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";

@@ -3,7 +3,7 @@ import type { OnlyOn, StringGroups } from "./index";
 /**
  * Built-in text of the `messaging` components, keyed by component id. See `strings/index.ts`. Where a text names AntFabric or its
  * features (a "channel"), the English default is a plain sentence and the catalogue's copy is in `ANTFABRIC_STRINGS`
- * (`@antfabric-ui/docs/samples`).
+ * (`@antfabric/ui-docs/samples`).
  */
 export const messaging = {
   "message-divider": {

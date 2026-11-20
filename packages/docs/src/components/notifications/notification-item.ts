@@ -106,7 +106,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<div role=\"listitem\"> holding one full-width <button> that opens it (one accessible name for the row), Avatar with a kind badge or the glyph tile, and Mark as read / Clear buttons positioned over the row's end that fade in while `revealed`, hovered or focused within; Approve / Decline are Button. Inline styles over `t`, states from useInteraction; `read`, `revealed` and `approval` kept in local state that follows the props",
-      import: "import { NotificationItem } from \"@antfabric-ui/react\"",
+      import: "import { NotificationItem } from \"@antfabric/ui-react\"",
       notes: [
         "The row's actions mount on :hover AND :focus-within — mounting on hover alone puts nothing in the tab order for a keyboard user, and leaving them always mounted puts two buttons per row in it.",
         "Opening a row marks it read on the server and navigates with the router (a real <a href> for ⌘-click into a new tab).",
@@ -129,7 +129,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same row as web at desktop density; the hover actions mount while the pointer is on the row or focus is inside it (React state, not CSS :hover), absolutely positioned so they never reflow the text",
-      import: "import { NotificationItem } from \"@antfabric-ui/react\"",
+      import: "import { NotificationItem } from \"@antfabric/ui-react\"",
       notes: [
         "Rows today lead with a 32px glyph tile (leading=\"tile\"). The avatar lead is new; the owner should pick one for both apps.",
         "Hover actions are mounted only while the pointer is on the row (React state, not CSS :hover), absolutely positioned so appearing never reflows the text. This spec adds focus-within as a second trigger.",
@@ -155,7 +155,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "View (role listitem) with a Pressable row on an Animated.View: a PanResponder swipe left slides it open (Animated.timing on translateX, native driver; a full swipe clears) and Mark read / Clear slide in behind it with <Enter motion=\"slide-left\">; both are also accessibilityActions. Avatar or the glyph tile, Button for Approve / Decline, StyleSheet over useTheme()",
-      import: "import { NotificationItem } from \"@antfabric-ui/react-native\"",
+      import: "import { NotificationItem } from \"@antfabric/ui-react-native\"",
       notes: [
         "No hover on a phone: the same two actions are a left swipe (Mark read, Clear — Clear is destructive and calls DELETE, not dismiss) and the accessibility actions menu.",
         "Opening one swipe closes any other row that is open.",

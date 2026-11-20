@@ -56,7 +56,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A centred flex column with enter(\"fade\"): the 160 × 116 drawing as absolutely placed boxes over `t`, or a glyph in a disc; an <h2> title; the kit's Button (secondary, lg)",
-      import: "import { EmptyState } from \"@antfabric-ui/react\"",
+      import: "import { EmptyState } from \"@antfabric/ui-react\"",
       notes: [
         "Search empties are announced through the search field's own live region (\"No matches\"), not by this component.",
         "The title is an h2 inside the pane's landmark, so a screen-reader user can jump to it.",
@@ -65,7 +65,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same column as web, at desktop density",
-      import: "import { EmptyState } from \"@antfabric-ui/react\"",
+      import: "import { EmptyState } from \"@antfabric/ui-react\"",
       notes: [
         "One empty state for every data surface (ADR-0298). No container: no fill and no dotted outline (owner, 2026-08-31) — a drawing and words centred on whatever it sits on.",
         "Eight drawings, one system: near-white objects with a hairline edge and a soft shadow, layered, real UI chrome, exactly one --fg-faint accent. Every colour is an --art-* role so the set retints per theme; this catalogue approximates them with surface/border tokens because tokens.json has no art.* roles yet.",
@@ -77,7 +77,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View with <Enter motion=\"fade\">: the drawing as absolutely placed Views (the page fold is a border triangle), or a glyph in a 64pt disc; a header Text; the kit's Button (secondary, md)",
-      import: "import { EmptyState } from \"@antfabric-ui/react-native\"",
+      import: "import { EmptyState } from \"@antfabric/ui-react-native\"",
       notes: [
         "V2 (2026-10-15): a 20pt SemiBold title over a 14pt faint line as wide as the gutter allows; 56pt above and below.",
         "The action is centred (alignSelf: center) — Button defaults to flex-start, which left every empty-state action at the left edge.",

@@ -56,7 +56,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A role=\"progressbar\" <div> track (aria-valuenow, aria-busy) whose fill eases its width over duration.slow, or slides with the af-indeterminate keyframes; the upload row's Cancel / Retry is the kit's IconButton; inline styles over `t`",
-      import: "import { ProgressBar } from \"@antfabric-ui/react\"",
+      import: "import { ProgressBar } from \"@antfabric/ui-react\"",
       notes: [
         "While an upload is in flight, closing or reloading the tab asks first (beforeunload); the tab title gains nothing — the composer row is where progress lives.",
         "The indeterminate segment slides with a 1.4 s CSS animation and stops under prefers-reduced-motion.",
@@ -65,7 +65,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same as web: the fill moves by width, as the catalogue drew it",
-      import: "import { ProgressBar } from \"@antfabric-ui/react\"",
+      import: "import { ProgressBar } from \"@antfabric/ui-react\"",
       notes: [
         "The fill moves by translateX on a full-width bar, not by width and not by scaleX: width re-lays out every frame, and scaleX squashes the pill cap (at 10% the end would be visibly flatter than at 90%). The catalogue draws it with width.",
         "Uploads keep running when the window is hidden in the tray; the Dock icon (macOS) and the taskbar button (Windows) show the total with Tauri's setProgressBar, and clear it when done.",
@@ -75,7 +75,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View (accessibilityRole progressbar, accessibilityValue) with an Animated fill: the width eases on Animated.timing, the indeterminate segment loops on Animated.loop and parks mid-track under Reduce Motion; the kit's IconButton for Cancel / Retry",
-      import: "import { ProgressBar } from \"@antfabric-ui/react-native\"",
+      import: "import { ProgressBar } from \"@antfabric/ui-react-native\"",
       notes: [
         "6pt track on surface.muted. Today's API is value 0–1; the kit keeps accepting that and maps it.",
         "Uploads run in a background URLSession (iOS) / WorkManager job (Android) so locking the phone does not stop them.",

@@ -56,7 +56,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<div role=\"region\"> card with an <h2> title, inline styles over `t`; Button actions; `permission` kept in local state that follows the prop, so Turn on shows the on state at once; pops in with enter(); the blocked-in-browser hint is drawn aria-hidden. The app runs Notification.requestPermission() inside onAllow and watches navigator.permissions.query({ name: 'notifications' })",
-      import: "import { PermissionPrompt } from \"@antfabric-ui/react\"",
+      import: "import { PermissionPrompt } from \"@antfabric/ui-react\"",
       notes: [
         "Shown in the notification rail and once as a dismissible card on the home screen after the first DM or mention arrives — never as a prompt on page load.",
         "The OS prompt is requested only from the Turn on click: Safari and Firefox refuse a request without a user gesture, and Chrome switches a site that prompts on load to its quiet UI (a crossed bell in the address bar) that most people never see.",
@@ -73,7 +73,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "partial",
       base: "The same card as web at desktop density, its copy and actions per OS from usePlatform() (macOS asks; Windows and Linux read as on). The app runs UNUserNotificationCenter requestAuthorization (macOS) or tauri-plugin-notification inside onAllow, and opens x-apple.systempreferences:com.apple.Notifications-Settings.extension / ms-settings:notifications from onOpenSettings",
-      import: "import { PermissionPrompt } from \"@antfabric-ui/react\"",
+      import: "import { PermissionPrompt } from \"@antfabric/ui-react\"",
       notes: [
         "Today macOS asks at startup with no explanation, and the answer is cached; this card moves that ask behind the soft-ask on first launch, because macOS also asks only once.",
         "Windows: unpackaged apps are allowed by default; there is nothing to ask. The card only appears in Settings, as \"Notifications are on\" with a test button.",
@@ -92,7 +92,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "partial",
       base: "View (role region) over GlassSurface (Liquid Glass for the sheet on iOS 26+), StyleSheet over useTheme(); full-width Buttons in a column; <Enter> slides the sheet up and pops the card. The app calls expo-notifications requestPermissionsAsync({ ios: { allowProvisional } }) from onAllow / onQuiet and Linking.openSettings() from onOpenSettings",
-      import: "import { PermissionPrompt } from \"@antfabric-ui/react-native\"",
+      import: "import { PermissionPrompt } from \"@antfabric/ui-react-native\"",
       notes: [
         "Today the phone asks the OS the moment the notification socket first connects, with no soft-ask. This sheet goes in front of that ask, once per install.",
         "Keep the rule from 2026-09-28: a foreground resume only READS the permission (registerPushDevice({ ask: false })), never asks. Asking on resume pauses and resumes the app, which is the resume event — it looped 59 times in 7.6 s and jammed Expo's permission queue.",

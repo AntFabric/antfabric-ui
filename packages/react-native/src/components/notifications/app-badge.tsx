@@ -1,6 +1,6 @@
 import { Platform, Text, View, type ViewStyle } from "react-native";
 import Svg, { Path } from "react-native-svg";
-import { recipes, useStrings, type AppMark, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useStrings, type AppMark, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Enter } from "../../lib/motion";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

@@ -1,7 +1,7 @@
 import { ScrollView, View } from "react-native";
-import { InAppBanner, NotificationItem, SegmentedControl, SwipeRow, useTheme } from "@antfabric-ui/react-native";
-import { MobileHeader } from "@antfabric-ui/react-native/shell";
-import { swipeRowActions } from "@antfabric-ui/docs/samples";
+import { InAppBanner, NotificationItem, SegmentedControl, SwipeRow, useTheme } from "@antfabric/ui-react-native";
+import { MobileHeader } from "@antfabric/ui-react-native/shell";
+import { swipeRowActions } from "@antfabric/ui-docs/samples";
 
 /** Notifications, pushed from the bell: an approval waiting in its row, one row swiped open, and a banner from another channel. */
 export default function MobileNotifications() {

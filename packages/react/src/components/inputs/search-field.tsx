@@ -1,5 +1,5 @@
 import { useRef, type CSSProperties } from "react";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon, Spinner } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";

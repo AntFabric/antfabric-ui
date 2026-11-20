@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { type RootProps, rootProps } from "../../lib/root-props";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { lineScale, prepare, summarize, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { lineScale, prepare, summarize, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { useInteraction } from "../../lib/interaction";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { ChartCard, type ChartHeadline } from "../../data/chart-card";

@@ -35,7 +35,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <span> (no role, not focusable) with the full label as its title tooltip, on the color.tag.* roles; a transparent outline becomes its shape under forced colours; inline styles over `t`",
-      import: "import { Tag } from \"@antfabric-ui/react\"",
+      import: "import { Tag } from \"@antfabric/ui-react\"",
       notes: [
         "Not a button and not focusable. A tag that filters a list is a Chip (a pill that takes a press), never a pressable Tag.",
         "Under forced-colors (Windows High Contrast) the fill disappears, so the tag keeps its shape with a 1px outline that the browser draws in the system colour (the kit sets it transparent).",
@@ -44,7 +44,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <span> as web, at desktop density",
-      import: "import { Tag } from \"@antfabric-ui/react\"",
+      import: "import { Tag } from \"@antfabric/ui-react\"",
       notes: [
         "Reads the tag's OWN colour roles (--tag-*, ADR-5325), not the status roles. Borrowing --success-soft drew Light's dark ink on a dark slab in the dark themes, at 1.9–2.8:1.",
         "Semibold, not bold (owner, 2026-09-26) — the weight My Tasks and Rituals were already overriding every tag to.",
@@ -55,7 +55,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "View + Text (numberOfLines 1, maxFontSizeMultiplier 1.3) on the color.tag.* roles; StyleSheet over useTheme()",
-      import: "import { Tag } from \"@antfabric-ui/react-native\"",
+      import: "import { Tag } from \"@antfabric/ui-react-native\"",
       notes: [
         "Today's mobile component is called Badge and is this label. It is renamed Tag so that Badge means an unread count on every platform, as it does on the desktop.",
         "The mobile Badge's `primary` (coral) and `accent` tones fold into brand (blue) and info (purple), following the desktop Tag (owner, 2026-10-01: \"update the components based on the desktop components\").",

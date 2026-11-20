@@ -1,6 +1,6 @@
 /**
- * `@antfabric-ui/react-native/data`: the data components (KPIs, charts, panels, tables), and what they are built from. Not part of the
- * root entry, so an app that never imports it carries none of gifted-charts. The same name, `@antfabric-ui/react/data`, is the web's and desktop's.
+ * `@antfabric/ui-react-native/data`: the data components (KPIs, charts, panels, tables), and what they are built from. Not part of the
+ * root entry, so an app that never imports it carries none of gifted-charts. The same name, `@antfabric/ui-react/data`, is the web's and desktop's.
  *
  * `giftedTheme(useChartTokens(), useReducedMotion())` is the chart tokens as react-native-gifted-charts' own props, for a chart this kit does not
  * ship. One composed example, a weekly line that reads the same dashed rules, quiet axes, series colour and motion as LineChart:

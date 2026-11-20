@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import type { Platform } from "@antfabric-ui/core";
-import type { ComponentDocs, PropDoc } from "@antfabric-ui/docs";
+import type { Platform } from "@antfabric/ui-core";
+import type { ComponentDocs, PropDoc } from "@antfabric/ui-docs";
 import { osOf, usePrefs } from "../lib/prefs";
 import { usage } from "../lib/usage";
 import { DefaultsProvider, Stage, Thing } from "../preview/kit";

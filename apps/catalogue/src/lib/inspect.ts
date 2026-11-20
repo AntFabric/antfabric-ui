@@ -6,7 +6,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { components } from "@antfabric-ui/docs";
+import { components } from "@antfabric/ui-docs";
 import type { FileScan, Scan } from "./scan";
 
 export interface InspectedFile {

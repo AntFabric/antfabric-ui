@@ -91,7 +91,7 @@ const docs: ComponentDocs = {
     web: {
       status: "planned",
       base: "A labelled role=\"group\" of <button> rows (Custom… carries aria-expanded), inline styles over `t`; hover, press and focus from useInteraction; `paused`, `until` and `custom` kept in local state that follows the props; the paused line and the picker fade in, the menu pops in (the pill fades) with enter(); the pill is a role=\"status\" row with a Resume <button>",
-      import: "import { NotificationSchedule } from \"@antfabric-ui/react\"",
+      import: "import { NotificationSchedule } from \"@antfabric/ui-react\"",
       notes: [
         "Custom… is two text fields and an ink Button in the kit; in the app they become <input type=\"date\"> and <input type=\"time\">, so the picker is the browser's own and keyboard-accessible.",
       ],
@@ -109,7 +109,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "planned",
       base: "The same menu and pill as web, at desktop density; the app hangs it under RailSettings (Notification sound, Show Notifications) and in the tray menu's Pause notifications ▸",
-      import: "import { NotificationSchedule } from \"@antfabric-ui/react\"",
+      import: "import { NotificationSchedule } from \"@antfabric/ui-react\"",
       notes: [
         "New: today there is no Do-not-disturb UI in the desktop client at all, and quiet hours exist only on the server. This adds both the menu and the pill.",
         "Not the same switch as Show Notifications: that is per-machine and stops this window raising anything; Pause is per-person, server-side, and stops every device.",
@@ -130,7 +130,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "planned",
       base: "A sheet-shaped View (a labelled group) with a grabber and Pressable button rows (usePress), StyleSheet over useTheme(); Custom… is two TextInputs and an ink Button (the app opens @react-native-community/datetimepicker); the pill is a role status view and a pause starting is announced; <Enter> pops the sheet and fades the rest",
-      import: "import { NotificationSchedule } from \"@antfabric-ui/react-native\"",
+      import: "import { NotificationSchedule } from \"@antfabric/ui-react-native\"",
       notes: [
         "Reached from Profile → Push notifications and from the Notifications screen header.",
         "The OS's own Focus / Do Not Disturb is separate and still applies; a later step could offer a Focus filter so a Work Focus pauses AntFabric automatically.",

@@ -1,7 +1,7 @@
 /**
  * Sample data for the shell components (AppMenuBar, MobileHeader, NavRail, SidebarItem, SidebarSection, TabBar, TitleBar, WebTopBar,
  * WorkspaceSwitcher): what their docs' `sample`s, matrix `cases`, the screens and `RailWindow` share. AntFabric's copy for them (the search
- * labels) is in `antfabricStrings` (`@antfabric-ui/core/antfabric`).
+ * labels) is in `antfabricStrings` (`@antfabric/ui-core/antfabric`).
  */
 
 /** The rows of a sample sidebar section: channels (a `#` glyph), a private one (a lock), muted and unread. */

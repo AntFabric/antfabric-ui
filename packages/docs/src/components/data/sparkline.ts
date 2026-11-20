@@ -59,18 +59,18 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "recharts' AreaChart with no axes at an explicit width and height (never a responsive container), inside a <span role=\"img\">; a flat fill, never animated unless `animate`",
-      import: "import { Sparkline } from \"@antfabric-ui/react/data\"",
+      import: "import { Sparkline } from \"@antfabric/ui-react/data\"",
       notes: ["Shipped from the data subpath: recharts is a dependency of the React kit and is reached only from there."],
     },
     desktop: {
       status: "ready",
       base: "The same recharts AreaChart as web, at desktop density",
-      import: "import { Sparkline } from \"@antfabric-ui/react/data\"",
+      import: "import { Sparkline } from \"@antfabric/ui-react/data\"",
     },
     mobile: {
       status: "ready",
       base: "react-native-gifted-charts' LineChart with its axes, rules and labels hidden, in a View (accessibilityRole image); a flat fill, never animated unless `animate` and the person has not reduced motion",
-      import: "import { Sparkline } from \"@antfabric-ui/react-native/data\"",
+      import: "import { Sparkline } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "gifted-charts needs react-native-svg and expo-linear-gradient (or react-native-linear-gradient) in the app; the kit declares them as peers.",
         "In the catalogue (React Native Web) it never animates: its Animated values do not reach the DOM.",

@@ -19,7 +19,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "Plain flex row, inline styles over `t`; the dots are the kit's af-bounce keyframes (1.2 s, 160 ms stagger) and rest at .35 / .65 / 1 under reduced motion; the sentence is read from a visually hidden span, the dots and ellipsis are hidden",
-      import: "import { TypingIndicator } from \"@antfabric-ui/react/chat\"",
+      import: "import { TypingIndicator } from \"@antfabric/ui-react/chat\"",
       notes: [
         "A background tab still receives typing events but sends none; the dots animate only while the tab is visible (no work for a hidden tab).",
         "Two tabs on the same channel are one person: the server keys typing by participant, so you never appear twice to others.",
@@ -28,7 +28,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same row as web, inline styles over `t`, in the channel pane's status slot; dots on af-bounce",
-      import: "import { TypingIndicator } from \"@antfabric-ui/react/chat\"",
+      import: "import { TypingIndicator } from \"@antfabric/ui-react/chat\"",
       notes: [
         "Today the desktop draws a static coral \"•••\" and the sentence in italic faint caption text; this spec animates the dots.",
         "A typer lapses 8 s after their last \"started\" (TYPING_TTL_MS); senders re-arm every 4 s and send \"stopped\" after 5 s idle, on send, or on blur.",
@@ -38,7 +38,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "planned",
       base: "View labelled with the sentence, Text, StyleSheet over useTheme(); the dots with Animated.loop on the native driver, staggered 160 ms, held still under Reduce Motion",
-      import: "import { TypingIndicator } from \"@antfabric-ui/react-native/chat\"",
+      import: "import { TypingIndicator } from \"@antfabric/ui-react-native/chat\"",
       notes: [
         "The phone app does not show typing today. It sits directly above the composer, under the timeline, and does not push the list: it occupies a fixed 28pt slot that is always reserved, so the last message never jumps.",
         "The app only listens while the conversation screen is focused and in the foreground; backgrounding clears the list.",

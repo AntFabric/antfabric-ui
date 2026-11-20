@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
-import type { InteractionState, Platform } from "@antfabric-ui/core";
-import type { ComponentDocs, EdgeCase, Example } from "@antfabric-ui/docs";
+import type { InteractionState, Platform } from "@antfabric/ui-core";
+import type { ComponentDocs, EdgeCase, Example } from "@antfabric/ui-docs";
 import type { MatrixRow } from "../lib/library";
 import { usage } from "../lib/usage";
 import { DefaultsProvider } from "../preview/kit";

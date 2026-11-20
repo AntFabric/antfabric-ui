@@ -1,5 +1,5 @@
 import { useId, type CSSProperties, type MouseEvent } from "react";
-import { recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";

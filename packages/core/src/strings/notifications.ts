@@ -2,7 +2,7 @@ import type { OnlyOn, StringGroups } from "./index";
 
 /**
  * Built-in text of the `notifications` components, keyed by component id. See `strings/index.ts`. Where a text names the product or its
- * features, the English default is a plain sentence and the catalogue's copy is in `ANTFABRIC_STRINGS` (`@antfabric-ui/docs/samples`).
+ * features, the English default is a plain sentence and the catalogue's copy is in `ANTFABRIC_STRINGS` (`@antfabric/ui-docs/samples`).
  * `{app}` is the `appName` prop of AppBadge, OsNotification and TrayMenu.
  */
 export const notifications = {

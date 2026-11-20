@@ -1,6 +1,6 @@
 import { Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { clampPage, pageCountOf, pageRange, pageSlots } from "@antfabric-ui/core/chart";
+import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { clampPage, pageCountOf, pageRange, pageSlots } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { partId, rootProps, type RootProps } from "../../lib/root-props";

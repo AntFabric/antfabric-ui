@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { Area, AreaChart, YAxis } from "recharts";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { FLAT_FILL, fmt, valueDomain, type FormatSpec, type Row } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { FLAT_FILL, fmt, valueDomain, type FormatSpec, type Row } from "@antfabric/ui-core/chart";
 import { type RootProps, rootProps } from "../../lib/root-props";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { css } from "../../lib/style";

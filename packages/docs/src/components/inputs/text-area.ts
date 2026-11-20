@@ -113,7 +113,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<label for> + <textarea data-af-input rows> in a drawn box, inline styles over `t`; hover and focus from useInteraction on the box (the 2px edge is a 1px border plus a 1px inset ring, so nothing shifts); the error, the helper and the counter are tied to the textarea by aria-describedby; `value` through useControllable",
-      import: "import { TextArea } from \"@antfabric-ui/react\"",
+      import: "import { TextArea } from \"@antfabric/ui-react\"",
       notes: [
         "The textarea fills its box and carries the inset, so the resize grip sits in the box's corner. `resize=\"none\"` removes the grip.",
         "Inside a FormField the field supplies the id, aria-describedby, aria-invalid and aria-required, as it does for TextField.",
@@ -127,7 +127,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <label> + <textarea> as web, at desktop density",
-      import: "import { TextArea } from \"@antfabric-ui/react\"",
+      import: "import { TextArea } from \"@antfabric/ui-react\"",
       keyboard: [
         { keys: "Tab", action: "Moves into the field" },
         { keys: "Enter", action: "Starts a new line" },
@@ -136,7 +136,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A multiline TextInput (textAlignVertical top, font from the recipe, placeholderTextColor, maxFontSizeMultiplier fontScale.content) in a View box from the recipe; its least height is `rows` lines of the input's line height plus its inset; an error and the characters left are announced with announceForAccessibility; `value` through useControllable",
-      import: "import { TextArea } from \"@antfabric-ui/react-native\"",
+      import: "import { TextArea } from \"@antfabric/ui-react-native\"",
       notes: [
         "The field grows with its text from `rows` lines; there is no resize grip on a phone, so `resize` and `name` are web props.",
         "`mono` uses the system's monospace face (Menlo on iOS, monospace on Android) and turns off capitals and autocorrect.",

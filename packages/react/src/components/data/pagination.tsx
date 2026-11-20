@@ -1,6 +1,6 @@
 import { useEffect, useRef, type CSSProperties } from "react";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { clampPage, pageCountOf, pageRange, pageSlots } from "@antfabric-ui/core/chart";
+import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { clampPage, pageCountOf, pageRange, pageSlots } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";

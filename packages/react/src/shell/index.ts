@@ -1,6 +1,6 @@
 /**
- * `@antfabric-ui/react/shell`: one opinionated app frame, and the pictures of the native surfaces around it. Not part of the root entry,
- * which stays the generic set a product composes its own screens from. The same name, `@antfabric-ui/react-native/shell`, is the phone's.
+ * `@antfabric/ui-react/shell`: one opinionated app frame, and the pictures of the native surfaces around it. Not part of the root entry,
+ * which stays the generic set a product composes its own screens from. The same name, `@antfabric/ui-react-native/shell`, is the phone's.
  *
  * It holds AppMenuBar, TitleBar, WebTopBar, NavRail, SidebarItem, SidebarSection and WorkspaceSwitcher (`../components/shell`),
  * and AppBadge, OsNotification and TrayMenu (`../components/notifications/{app-badge,os-notification,tray-menu}`). Their files stay in

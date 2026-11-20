@@ -1,5 +1,5 @@
 import { CartesianGrid, XAxis, YAxis } from "recharts";
-import { fmt, labelWidth, type FormatSpec, type FormatWords, type Scale } from "@antfabric-ui/core/chart";
+import { fmt, labelWidth, type FormatSpec, type FormatWords, type Scale } from "@antfabric/ui-core/chart";
 import { rechartsTheme, type ChartTokens } from "./theme";
 
 type Theme = ReturnType<typeof rechartsTheme>;

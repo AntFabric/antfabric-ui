@@ -6,7 +6,7 @@
  * grouping into sections, and `rowCount()` fails the build if a token lands in none of them.
  */
 
-import { cssVarName, descriptions, tokenValues, type TokenNote, type TokenPath } from "@antfabric-ui/core";
+import { cssVarName, descriptions, tokenValues, type TokenNote, type TokenPath } from "@antfabric/ui-core";
 import { tokenLeaves, type Context, type Leaf } from "../../scripts/token-leaves";
 
 export type Platform = "web" | "desktop" | "mobile";

@@ -4,7 +4,7 @@
  * still name only a recipe's own parts, variant props and values, states, platforms, style keys and tokens.
  */
 
-import type { RecipeOverride, ThemeInput, ThemeRecipes, recipes } from "@antfabric-ui/core";
+import type { RecipeOverride, ThemeInput, ThemeRecipes, recipes } from "@antfabric/ui-core";
 
 type Button = RecipeOverride<typeof recipes.button>;
 

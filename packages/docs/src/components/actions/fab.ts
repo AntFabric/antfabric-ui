@@ -52,7 +52,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "<button> with the label as aria-label and native title tooltip, inline styles over `t`; hover, press and focus from useInteraction; on macOS 26 ink and raised draw glass() and swell under a press",
-      import: "import { Fab } from \"@antfabric-ui/react\"",
+      import: "import { Fab } from \"@antfabric/ui-react\"",
       notes: [
         "Desktop draws only raised: Home's \"What can Fabric do?\" disc, position fixed 20px from the window's right and bottom edges (the WINDOW, not the centre column), z-index 50 — above the panes, below every scrim, so the card it opens covers it.",
         "40px, --border-subtle hairline, the tertiary button's fill and --shadow-float. The shadow is part of the shape; the caller only positions it.",
@@ -73,7 +73,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "Pressable over a StyleSheet from useTheme(), scaling to 0.94 while pressed; GlassSurface on iOS 26 for ink and raised; with `wiggle` the glyph wiggles with Animated (0.8 s) and onPress fires when it ends, one pending open at a time, at once under Reduce Motion. The bottom-bar squeeze and the haptic are the caller's",
-      import: "import { Fab } from \"@antfabric-ui/react-native\"",
+      import: "import { Fab } from \"@antfabric/ui-react-native\"",
       notes: [
         "ink: 56pt ink disc (surface.inverse, ink-on-inverse 20pt pen), right on the 12pt gutter, 12pt above the bottom bar. Coral until the V2 Figma of 2026-10-16 (ADR-9406).",
         "A tap wiggles the pen (0.8 s) and opens New message when the wiggle ENDS, because the sheet covers the button. Reduce Motion plays nothing and opens at once.",

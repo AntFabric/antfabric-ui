@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useLocale } from "@antfabric-ui/core";
+import { useLocale } from "@antfabric/ui-core";
 import { View, type ViewStyle } from "react-native";
 import { BarChart as GiftedBarChart } from "react-native-gifted-charts";
-import { DIMMED, labelWidth, sparseLabels, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Scale, type Series } from "@antfabric-ui/core/chart";
+import { DIMMED, labelWidth, sparseLabels, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Scale, type Series } from "@antfabric/ui-core/chart";
 import { giftedAxis, labelScale, plotHeight, plotWidth } from "./axis";
 import { ChartTooltip } from "./tooltip";
 import { giftedTheme, type ChartTokens } from "./theme";

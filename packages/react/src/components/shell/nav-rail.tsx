@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-import { formatShortcut, recipes, useControllable, useDirection, useStrings, type KitStrings, type NavItem } from "@antfabric-ui/core";
+import { formatShortcut, recipes, useControllable, useDirection, useStrings, type KitStrings, type NavItem } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";

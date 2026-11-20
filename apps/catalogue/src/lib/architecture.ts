@@ -12,8 +12,8 @@
 
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { resolveTokens, tokenVars, tokenSource, tokens } from "@antfabric-ui/core";
-import { categories, components } from "@antfabric-ui/docs";
+import { resolveTokens, tokenVars, tokenSource, tokens } from "@antfabric/ui-core";
+import { categories, components } from "@antfabric/ui-docs";
 import { FINDINGS, type CountKey } from "./findings";
 import { stripComments, type FileScan, type Literal, type Scan } from "./scan";
 
@@ -652,10 +652,10 @@ export function ecosystemSvg(f: EcosystemFacts): string {
     productTokens: { x: 287, y: 16, w: 250, h: 70, cls: "ext", t: "@antfabric/design-tokens", s: "the product's token layer", m: "generated/tokens.json" },
     webApp: { x: 562, y: 16, w: 250, h: 70, cls: "ext", t: "AI Console / web app", s: "no app exists yet", m: "web profile is a proposal" },
     mobileApp: { x: 837, y: 16, w: 250, h: 70, cls: "ext", t: "AntFabric mobile app", s: "Expo · other repository", m: "theme/tokens.ts" },
-    core: { x: 330, y: 170, w: 440, h: 86, cls: "core", href: "#tokens", t: "@antfabric-ui/core", s: "tokens.ts · css.ts · native.ts · motion.ts", m: `${f.tokenLeaves} token leaves · ${f.themes} themes · ${f.profiles} profiles` },
-    react: { x: 20, y: 340, w: 390, h: 86, cls: "react", href: "#packages", t: "@antfabric-ui/react", s: "web + desktop · inline styles over t", m: `${f.react.components} components · ${f.react.refs} token reads` },
-    docs: { x: 440, y: 340, w: 220, h: 86, cls: "docs", href: "#packages", t: "@antfabric-ui/docs", s: "props · platforms · flows", m: `${f.docs} documented` },
-    native: { x: 690, y: 340, w: 390, h: 86, cls: "native", href: "#packages", t: "@antfabric-ui/react-native", s: "mobile · StyleSheet over useTheme().t", m: `${f.native.components} components · ${f.native.refs} token reads` },
+    core: { x: 330, y: 170, w: 440, h: 86, cls: "core", href: "#tokens", t: "@antfabric/ui-core", s: "tokens.ts · css.ts · native.ts · motion.ts", m: `${f.tokenLeaves} token leaves · ${f.themes} themes · ${f.profiles} profiles` },
+    react: { x: 20, y: 340, w: 390, h: 86, cls: "react", href: "#packages", t: "@antfabric/ui-react", s: "web + desktop · inline styles over t", m: `${f.react.components} components · ${f.react.refs} token reads` },
+    docs: { x: 440, y: 340, w: 220, h: 86, cls: "docs", href: "#packages", t: "@antfabric/ui-docs", s: "props · platforms · flows", m: `${f.docs} documented` },
+    native: { x: 690, y: 340, w: 390, h: 86, cls: "native", href: "#packages", t: "@antfabric/ui-react-native", s: "mobile · StyleSheet over useTheme().t", m: `${f.native.components} components · ${f.native.refs} token reads` },
     catalogue: { x: 250, y: 500, w: 600, h: 76, cls: "cat", href: "#components", t: "apps/catalogue (Astro)", s: "draws both kits live · react-native becomes react-native-web", m: `${f.screens} screens · scripts: check, frames, rerender, report` },
   };
   // [from, to, label, dashed, anchor on from's bottom edge, anchor on to's top edge]

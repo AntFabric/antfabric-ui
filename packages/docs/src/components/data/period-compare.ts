@@ -43,7 +43,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section>: the title and \"View as table\" (Button); a row of a column of two <figure> totals (MetricValue, Delta) and a ChartFrame holding recharts' ComposedChart: the same Area and Line the LineChart draws, the last period's Line dashed and thinner",
-      import: "import { PeriodCompare } from \"@antfabric-ui/react/data\"",
+      import: "import { PeriodCompare } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath: recharts is reached only from there. The plot is LineChart's own (the kit's `RechartsLines`), so the grid, axes, tooltip, crosshair and motion are the same, and the legend is gone because the two totals are the key: each has a short line in its series' colour, solid or dashed as the chart draws it.",
         "The two periods share one value axis, which does not start at zero (a line's height is not its value), so a gap between them is the gap in the numbers.",
@@ -60,7 +60,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same Card, totals and recharts' ComposedChart as web, at desktop density",
-      import: "import { PeriodCompare } from \"@antfabric-ui/react/data\"",
+      import: "import { PeriodCompare } from \"@antfabric/ui-react/data\"",
       notes: ["The same chart as the web's. Hover is the pointer's, so the tooltip follows it."],
       keyboard: [
         { keys: "Tab", action: "Moves into the plot, then on to \"View as table\"" },
@@ -71,7 +71,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View: the same header and Button, the two totals in a row above the chart (each its own accessible element), and a ChartFrame holding react-native-gifted-charts' LineChart (`data` and `data2`, `strokeDashArray2` and `thickness2` for the last period, `areaChart1` for the fill)",
-      import: "import { PeriodCompare } from \"@antfabric-ui/react-native/data\"",
+      import: "import { PeriodCompare } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there. The plot is LineChart's own (the kit's `GiftedLines`), with the same scale, so the phone prints the axis the web does.",
         "The totals take a row above the chart, each half the width, with a rule under them: the chart keeps the card's whole width.",

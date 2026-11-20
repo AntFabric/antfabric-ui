@@ -4,9 +4,9 @@ Every component exists twice, one file per kit, and one recipe that both kits re
 
 | Platform | Kit | File |
 | --- | --- | --- |
-| Web (TanStack Start) and desktop (Tauri) | `@antfabric-ui/react` | `packages/react/src/components/<category>/<id>.tsx` |
-| Mobile (Expo) | `@antfabric-ui/react-native` | `packages/react-native/src/components/<category>/<id>.tsx` |
-| Both (the styles) | `@antfabric-ui/core` | `packages/core/src/recipes/<category>/<id>.ts`, see Recipes |
+| Web (TanStack Start) and desktop (Tauri) | `@antfabric/ui-react` | `packages/react/src/components/<category>/<id>.tsx` |
+| Mobile (Expo) | `@antfabric/ui-react-native` | `packages/react-native/src/components/<category>/<id>.tsx` |
+| Both (the styles) | `@antfabric/ui-core` | `packages/core/src/recipes/<category>/<id>.ts`, see Recipes |
 
 What the catalogue says about it (props as documented, examples, edge cases, platform notes, flows)
 is `packages/docs/src/components/<category>/<id>.ts`. Both kits share one props API: the docs'
@@ -101,7 +101,7 @@ export const switchRecipe = defineRecipe({
   and lists it under the **docs id** as the key: `import { iconButton } from "./icon-button";` and
   `export const actions = { button, "icon-button": iconButton, … } as const;` (a one-word id is shorthand, `button`; a reserved
   word is `switch: switchRecipe`). A kit never imports the file: it reads
-  `import { recipes } from "@antfabric-ui/core"` and then `useRecipe(recipes["icon-button"], …)` (`recipes.button` for a one-word id).
+  `import { recipes } from "@antfabric/ui-core"` and then `useRecipe(recipes["icon-button"], …)` (`recipes.button` for a one-word id).
 - **Compound variants are not expressible.** A part's `variants` are chosen one prop at a time and combine only by layering, so a
   style that depends on two props together (an inset that is `paddingX` for `orientation="horizontal"` and `paddingY` for
   `"vertical"`, only while `inset` is on) cannot be one entry. `states` take a compound key (`"invalid+focus"`), but that joins
@@ -268,9 +268,9 @@ export const switchRecipe = defineRecipe({
   kit's index.
 - **Icons** are lucide names in kebab case, drawn with the kit's `<Icon name>`.
 - **Shortcuts** are written once (`Mod+Enter`) and drawn with `formatShortcut(keys, os)` from
-  `@antfabric-ui/core`.
+  `@antfabric/ui-core`.
 - **Entrances** (menus and dialogs pop, sheets slide up, banners drop, toasts rise) play on mount,
-  with the names in `MOTION` (`@antfabric-ui/core`). Reduced motion turns them off.
+  with the names in `MOTION` (`@antfabric/ui-core`). Reduced motion turns them off.
 - **Liquid Glass** is on for iOS 26+ (`useTheme().glass`) and macOS 26+ (`usePlatform().glass`), never
   elsewhere. Only the control layer gets glass: bars, floating buttons, sheets, menus, banners.
 - **Sample data** is AntFabric's own: `#platform-eng`, `#design-crit`, real-sounding names from many
@@ -351,7 +351,7 @@ const docs: ComponentDocs = {
 - **`default` and `sample`.** A prop's `default` is the component's own: what a product gets when it passes nothing, generic, often
   empty. Where the catalogue should show AntFabric's content instead (its destinations, its workspace, its menus), that value is the
   prop's `sample`: every render, the playground and the usage code start from `sample ?? default`. Shared sample data lives in
-  `packages/docs/src/samples/<category>.ts`; AntFabric's copy lives in core's opt-in `@antfabric-ui/core/antfabric` (`antfabricStrings`,
+  `packages/docs/src/samples/<category>.ts`; AntFabric's copy lives in core's opt-in `@antfabric/ui-core/antfabric` (`antfabricStrings`,
   `packages/core/src/antfabric.ts`), re-exported as `ANTFABRIC_STRINGS` and set at the root by the catalogue's `Stage`.
 - **`matrix`** draws one prop across its values (`{ prop }`, or `{ prop, values }`). A row over something that is not one prop's
   value (a removed `kind` and the props it implied) is `{ prop, cases: [{ name, props }] }`: each case drawn with `props`, captioned

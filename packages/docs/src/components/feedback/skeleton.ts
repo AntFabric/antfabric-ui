@@ -74,7 +74,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A role=\"status\" aria-busy <div> fading in with enter(\"fade\"), its shapes aria-hidden; the sweep is the af-sheen keyframes moving a linear-gradient band; inline styles over `t`",
-      import: "import { Skeleton } from \"@antfabric-ui/react\"",
+      import: "import { Skeleton } from \"@antfabric/ui-react\"",
       notes: [
         "Every shape starts at the same phase of the 1.4 s sweep (negative animation-delay from performance.now()), so a list sweeps as one surface rather than forty out-of-step bars.",
         "A background tab pauses CSS animation for free; nothing to do.",
@@ -84,7 +84,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <div> as web, at desktop density",
-      import: "import { Skeleton } from \"@antfabric-ui/react\"",
+      import: "import { Skeleton } from \"@antfabric/ui-react\"",
       notes: [
         "Today's desktop kit: a 120px band of skeleton.sheen crosses each shape every 1.4 s; under prefers-reduced-motion the keyframes end on their last frame, which parks the band off the shape — a still grey shape.",
         "Never drawn over data already on screen: the SQLite cache paints first, and a refresh is a quiet indicator, not a skeleton.",
@@ -93,7 +93,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View (role status, busy) with hidden shapes; one shared Animated.loop moves a sheen band (sliced, since React Native draws no gradient) across every shape on screen, and is off under Reduce Motion",
-      import: "import { Skeleton } from \"@antfabric-ui/react-native\"",
+      import: "import { Skeleton } from \"@antfabric/ui-react-native\"",
       notes: [
         "One Animated loop drives every shape on screen, started by the first and stopped by the last — forty rows cost one animation. An invisible group does not run it.",
         "Reduce Motion is read once (AccessibilityInfo) and shared: the shapes stop and stay grey.",

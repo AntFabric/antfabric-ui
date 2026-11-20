@@ -69,7 +69,7 @@ export function stackOf(id: string, platform: Platform, src: string): StackRow[]
   const rows: StackRow[] = [{ label: "App", items: PLATFORM_SHELL[platform] }];
 
   const styling: StackItem[] = [];
-  if (has("/lib/recipe", "useRecipe")) styling.push({ name: "Recipe", note: "useRecipe over the shared recipe in @antfabric-ui/core" });
+  if (has("/lib/recipe", "useRecipe")) styling.push({ name: "Recipe", note: "useRecipe over the shared recipe in @antfabric/ui-core" });
   if (native) {
     if (has("/theme", "createStyles")) styling.push({ name: "StyleSheet", note: "createStyles() over useTheme() tokens" });
     else if (has("/theme", "useTheme")) styling.push({ name: "useTheme()", note: "resolved tokens" });
@@ -85,8 +85,8 @@ export function stackOf(id: string, platform: Platform, src: string): StackRow[]
   if (has("/platform", "usePlatform")) behaviour.push({ name: "usePlatform", note: "OS, version and Liquid Glass" });
   if (has("/lib/press", "usePress")) behaviour.push({ name: "usePress", note: "press state and scale" });
   if (has("/lib/motion", "Enter") || has("/lib/motion", "useEnter")) behaviour.push({ name: "Enter", note: "Animated entrances" });
-  const core = (imports.get("@antfabric-ui/core") ?? []).filter((n) => n !== "recipes");
-  for (const n of core) behaviour.push({ name: n, note: "@antfabric-ui/core" });
+  const core = (imports.get("@antfabric/ui-core") ?? []).filter((n) => n !== "recipes");
+  for (const n of core) behaviour.push({ name: n, note: "@antfabric/ui-core" });
   rows.push({ label: "Behaviour", items: behaviour });
 
   const libs: StackItem[] = [];

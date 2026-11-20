@@ -10,7 +10,7 @@
 
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { tokensJson } from "@antfabric-ui/core/dtcg";
+import { tokensJson } from "@antfabric/ui-core/dtcg";
 import { componentsJson, llmsTxt } from "./agent-surface";
 
 const root = (p: string) => fileURLToPath(new URL(`../../../${p}`, import.meta.url));

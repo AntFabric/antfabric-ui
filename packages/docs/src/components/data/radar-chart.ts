@@ -48,7 +48,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section>: the title, an optional headline, \"View as table\" (Button); a ChartFrame holding recharts' RadarChart (PolarGrid, PolarAngleAxis, a hidden PolarRadiusAxis, a Radar per series); the Legend (toggle buttons) in the header beside the Button, as the reference dashboard has it",
-      import: "import { RadarChart } from \"@antfabric-ui/react/data\"",
+      import: "import { RadarChart } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath: recharts is reached only from there. The chart is handed an explicit width and height.",
         "The grid's rings and spokes, the axes' names in the chart's quiet text, the tooltip and the series colours are the same chart tokens every chart reads (`rechartsTheme()`), and no colour of the brand is.",
@@ -63,7 +63,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same Card, recharts' RadarChart and Legend as web, at desktop density",
-      import: "import { RadarChart } from \"@antfabric-ui/react/data\"",
+      import: "import { RadarChart } from \"@antfabric/ui-react/data\"",
       notes: ["The same `rechartsTheme()` as web. Hover is the pointer's, so the tooltip follows it; there is no press-and-hold."],
       keyboard: [
         { keys: "Tab", action: "Moves into the plot, then on to the legend's entries and \"View as table\"" },
@@ -73,7 +73,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View: the same header and Button, a ChartFrame holding react-native-gifted-charts' RadarChart with `dataSet` and a `polygonConfigArray`; the Legend's toggles above the plot",
-      import: "import { RadarChart } from \"@antfabric-ui/react-native/data\"",
+      import: "import { RadarChart } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there.",
         "gifted-charts' radar applies one opacity to a polygon's fill and line alike, so each series is two polygons in `dataSet`: its fill at `FLAT_FILL`, then its line over it. Its grid and polygon gradients default on and share ids across charts, which draws the wrong colours, so `showGradient` is off on every one and the fills are the tokens'.",

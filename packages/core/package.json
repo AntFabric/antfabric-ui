@@ -1,5 +1,5 @@
 {
-  "name": "@antfabric-ui/core",
+  "name": "@antfabric/ui-core",
   "version": "1.0.0",
   "type": "module",
   "description": "What both kits share: the design tokens, the themes (defineTheme, themes), the CSS variables and React Native values they produce, shortcut formatting, the entrance motions and, from /chart, the formatters and scales behind every chart.",

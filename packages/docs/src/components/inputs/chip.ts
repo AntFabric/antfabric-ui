@@ -67,7 +67,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A row holding two sibling <button>s — the chip (aria-pressed on a filter) and its ✕ — never nested; inline styles over `t`, the root taking the hover and press of either; `selected` through useControllable; Backspace / Delete on a removable chip removes it",
-      import: "import { Chip } from \"@antfabric-ui/react\"",
+      import: "import { Chip } from \"@antfabric/ui-react\"",
       notes: [
         "A single-choice filter row is a ToggleGroup (or tablist when it switches a list in place); a multi-choice row is independent Toggles with aria-pressed.",
         "The ✕ is its own button, never inside the chip's button — nested buttons are invalid HTML and the parser splits them.",
@@ -91,7 +91,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same two-button row as web, at desktop density (34px)",
-      import: "import { Chip } from \"@antfabric-ui/react\"",
+      import: "import { Chip } from \"@antfabric/ui-react\"",
       notes: [
         "suggestion is the search field's resting box, token for token: --border-subtle hairline, --radius-control, --shadow-hairline in every state. Hover moves the fill and nothing else — no coral, in hover or active (ADR-0322).",
         "Home's three suggestion chips share the row EQUALLY (flex 1 1 0, min-width fit-content), so a narrow row wraps instead of clipping. object chips do not take an equal share.",
@@ -113,7 +113,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View with a Pressable chip (togglebutton for a filter) and a Pressable ✕ with hitSlop, StyleSheet over useTheme(); the 0.96 press bounce; `selected` through useControllable. The scrolling filter row is the caller's",
-      import: "import { Chip } from \"@antfabric-ui/react-native\"",
+      import: "import { Chip } from \"@antfabric/ui-react-native\"",
       notes: [
         "A 33pt pill: a 16pt glyph and a 14pt label 8 apart, 16 either side, and a 1pt Rim drawn over the edge so it takes no room.",
         "Chosen is ink (surfaceInverse) with inverse ink; the rest are white with text.faint. Coral until the V2 Figma of 2026-10-16 (ADR-9406).",

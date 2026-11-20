@@ -119,7 +119,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A labelled role=\"group\" card that the trigger points at with aria-describedby: Avatar and two secondary Buttons, inline styles over `t`; pops in with enter(\"pop\"); Esc calls onClose and stops there. The open and close delays are the app's",
-      import: "import { HoverCard } from \"@antfabric-ui/react\"",
+      import: "import { HoverCard } from \"@antfabric/ui-react\"",
       notes: [
         "Same card, same timings and the same two buttons as desktop.",
         "Opens on hover only where (hover: hover) and (pointer: fine). Under pointer: coarse (a touch laptop, a tablet with a trackpad detached) a tap on the name or avatar opens it at once, a tap outside closes it, and a second tap on the trigger follows its own action (opens the profile).",
@@ -144,7 +144,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same card as web at desktop density",
-      import: "import { HoverCard } from \"@antfabric-ui/react\"",
+      import: "import { HoverCard } from \"@antfabric/ui-react\"",
       notes: [
         "Today the mechanism is hand-rolled in parts/HoverCard.tsx and the panel is a sibling of the trigger. The 6px gap is padding on the panel's wrapper, never a margin on the panel, so the pointer never crosses a dead zone on the way in; the panel's own mouseenter cancels the pending close.",
         "Both timers are cleared on unmount: the message list unmounts rows as it scrolls, and a timer that fires afterwards is a leak nobody sees.",

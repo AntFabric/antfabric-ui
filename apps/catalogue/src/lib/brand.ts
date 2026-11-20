@@ -3,7 +3,7 @@
  * is seen on something that is not AntFabric's coral. Nothing here is a real customer.
  */
 
-import type { BrandTokens } from "@antfabric-ui/core";
+import type { BrandTokens } from "@antfabric/ui-core";
 
 export const SAMPLE_TENANT: { name: string; brand: Partial<BrandTokens> } = {
   name: "Antagents",

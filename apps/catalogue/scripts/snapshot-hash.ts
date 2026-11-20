@@ -6,7 +6,7 @@
  * Native Web class against inline style are the same). Two renders that draw the same pixels give the same string.
  */
 import { StyleSheet } from "react-native";
-import { tokenValues, type OS, type Platform, type Theme } from "@antfabric-ui/core";
+import { tokenValues, type OS, type Platform, type Theme } from "@antfabric/ui-core";
 import { foldIds } from "./ids";
 
 const tokenTables = new Map<string, Record<string, string>>();

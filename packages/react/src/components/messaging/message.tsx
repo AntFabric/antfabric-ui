@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent, type PointerEvent } from "react";
-import { recipes, useControllable, useDirection, useStrings, type IconActionItem, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric-ui/core";
+import { recipes, useControllable, useDirection, useStrings, type IconActionItem, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

@@ -1,8 +1,8 @@
 import type { CSSProperties } from "react";
 import { type RootProps, rootProps } from "../../lib/root-props";
 import { Bar, ComposedChart, DefaultZIndexes, Line, ReferenceLine, Tooltip } from "recharts";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { barScale, prepare, summarize, tipRows, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { barScale, prepare, summarize, tipRows, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { useInteraction } from "../../lib/interaction";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css } from "../../lib/style";

@@ -76,7 +76,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A role=\"toolbar\" box with inline styles over `t`: quick reactions are <button>s with hover and press from useInteraction, the rest the kit's IconButton (square); ⋯ is a toggle IconButton that holds `menuOpen`. ← / → move focus along the bar. Tooltips are each button's title.",
-      import: "import { MessageActions } from \"@antfabric-ui/react/chat\"",
+      import: "import { MessageActions } from \"@antfabric/ui-react/chat\"",
       notes: [
         "Shown on row hover and on :focus-within, positioned absolute at top 2 / right 14 of the row so it costs the message no height and no reflow.",
         "Right-click on a message opens the same actions as a context menu, except on a link, an image or selected text, where the browser's own menu is kept (Copy link address, Save image, Look Up).",
@@ -116,7 +116,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same toolbar as web (one file): the kit's IconButton ×n in a floating card (surface.raised, shadow raise), fading in on mount; the caller opens its menu from onMenuOpenChange.",
-      import: "import { MessageActions } from \"@antfabric-ui/react/chat\"",
+      import: "import { MessageActions } from \"@antfabric/ui-react/chat\"",
       notes: [
         "Today's bar is Add a reaction, Reply in thread, Copy text and ⋯ (Edit, Forward, Pin to channel, Delete). This spec adds three quick reactions and moves Forward onto the bar; Copy text moves into ⋯.",
         "Hidden while another message's picker or menu is open, so two bars never stack; kept visible while its own popover is open.",

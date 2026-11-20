@@ -48,7 +48,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<button role=\"switch\"> with aria-checked, inline styles over `t`; the thumb slides by a CSS transform transition; hover and focus from useInteraction; `checked` through useControllable",
-      import: "import { Switch } from \"@antfabric-ui/react\"",
+      import: "import { Switch } from \"@antfabric/ui-react\"",
       notes: [
         "Use a switch only where the change applies immediately. In a form with a Save button, the same setting is a checkbox.",
         "Browser notifications: turning \"Show Notifications\" on is the moment to call Notification.requestPermission() — from the click, never on page load. If the browser says denied, the switch returns to off and the description says \"Your browser is blocking notifications for this site.\"",
@@ -68,7 +68,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "partial",
       base: "The same <button role=\"switch\"> as web: a 30×18 track with a 14px thumb that slides 12px",
-      import: "import { Switch } from \"@antfabric-ui/react\"",
+      import: "import { Switch } from \"@antfabric/ui-react\"",
       notes: [
         "Desktop has no switch today. The notification rail's ⚙ menu holds its two settings, Notification sound and Show Notifications, as menuitemcheckbox rows with the square check, and that stays: ARIA has no menu-item switch, and inside a menu the tick IS the control.",
         "This switch is for settings screens and rows outside menus (Preferences → Notifications), where the same two settings appear with the same labels.",
@@ -86,7 +86,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "Pressable (accessibilityRole switch) drawing each OS's own shape — UISwitch's 51×31 on iOS, Material's 36×14 track under a 20dp thumb on Android — not RN's Switch, so the catalogue and the app match; the thumb slides with Animated.timing; `checked` through useControllable",
-      import: "import { Switch } from \"@antfabric-ui/react-native\"",
+      import: "import { Switch } from \"@antfabric/ui-react-native\"",
       notes: [
         "On track is colors.primary — the tenant's primary — never a literal, so a white-labelled build keeps its own brand.",
         "Off track is switchTrackOff and the thumb is switchThumb (white in both themes), the nearest roles to UISwitch's own; surfaceSunken vanished on a dark card.",

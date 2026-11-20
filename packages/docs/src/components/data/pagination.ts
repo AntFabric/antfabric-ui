@@ -56,7 +56,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <nav> labelled \"Pages\" holding the summary and a list: the kit's IconButton for previous and next, its Button for each page (the current one soft)",
-      import: "import { Pagination } from \"@antfabric-ui/react/data\"",
+      import: "import { Pagination } from \"@antfabric/ui-react/data\"",
       notes: [
         "Seven page slots at most: past seven pages the first, the last and the neighbours of the current one are drawn with a gap between, so the pager is always the same width.",
         "The current page is marked on its button (aria-current), and each page button is named \"Page 3\"; this relies on the kit's Button passing `aria-label` and `aria-current` to its element.",
@@ -69,7 +69,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <nav> as web, at desktop density",
-      import: "import { Pagination } from \"@antfabric-ui/react/data\"",
+      import: "import { Pagination } from \"@antfabric/ui-react/data\"",
       keyboard: [
         { keys: "Tab", action: "Moves through previous, the pages and next" },
         { keys: "Enter", action: "Goes to the page" },
@@ -78,7 +78,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View holding the summary and the kit's IconButton and Button, at the phone's sizes",
-      import: "import { Pagination } from \"@antfabric-ui/react-native/data\"",
+      import: "import { Pagination } from \"@antfabric/ui-react-native/data\"",
       notes: ["A phone has room for the summary and the two arrows: pass `compact`, as the phone's Table does. Page buttons are there for a tablet."],
     },
   },

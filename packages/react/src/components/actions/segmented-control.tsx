@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { cap, recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { cap, recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

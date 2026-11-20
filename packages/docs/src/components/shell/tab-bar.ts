@@ -69,7 +69,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "partial",
       base: "Views and Pressables (accessibilityRole tablist / tab, accessibilityState.selected) in StyleSheet over useTheme() tokens, with Badge and Icon. The pill and the squeezed circle are GlassSurface, so iOS 26+ draws them as Liquid Glass. Each tab's capsule and width (flex-grow 1 → 1.7) move on React Native Animated; on iOS 26+ the selection lens is a PanResponder over the tabs driving an Animated GlassSurface (clear): springy lift, follows the finger, settles on release. In the app it is the tabBar of expo-router's <Tabs>, under react-native-safe-area-context's bottom inset",
-      import: "import { TabBar } from \"@antfabric-ui/react-native/shell\"",
+      import: "import { TabBar } from \"@antfabric/ui-react-native/shell\"",
       notes: [
         "Drawn over the screens (absolute), 12pt above the safe area on the 12pt gutter; a scrolling tab keeps bottomBarReserve free at its foot so the last row is never under the bar.",
         "Nothing is laid out by React: positions come from two springs on the UI thread, so on a switch the capsule stretches toward the new tab and its back edge catches up ('liquid', owner 2026-10-15). The catalogue draws the resting state.",

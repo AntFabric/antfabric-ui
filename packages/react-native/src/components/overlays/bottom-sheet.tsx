@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Animated, Dimensions, Easing, KeyboardAvoidingView, PanResponder, Platform, Pressable, ScrollView, Text, View, findNodeHandle, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { hitSlopTo, useBackHandler } from "../../lib/a11y";
 import { GlassSurface } from "../../lib/glass";

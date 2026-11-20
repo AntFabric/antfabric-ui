@@ -1,8 +1,8 @@
 import { ScrollView, View } from "react-native";
-import { useTheme } from "@antfabric-ui/react-native";
-import { Composer, Message, MessageDivider } from "@antfabric-ui/react-native/chat";
-import { MobileHeader } from "@antfabric-ui/react-native/shell";
-import { composerTools, messageBar } from "@antfabric-ui/docs/samples";
+import { useTheme } from "@antfabric/ui-react-native";
+import { Composer, Message, MessageDivider } from "@antfabric/ui-react-native/chat";
+import { MobileHeader } from "@antfabric/ui-react-native/shell";
+import { composerTools, messageBar } from "@antfabric/ui-docs/samples";
 
 /** A channel on the train: the header says it's offline, messages come from the device cache, the draft stays. */
 export default function MobileOffline() {

@@ -1,5 +1,5 @@
 import { Platform, type TextStyle } from "react-native";
-import { tokens, type NativeTokens } from "@antfabric-ui/core";
+import { tokens, type NativeTokens } from "@antfabric/ui-core";
 
 /**
  * What a component asks `font()` for. `regular` is 400 and `book` is 450; the token behind `regular` is

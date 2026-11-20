@@ -1,7 +1,7 @@
 import { ScrollView, View } from "react-native";
-import { Chip, Fab, PermissionPrompt, useTheme } from "@antfabric-ui/react-native";
-import { MobileHeader, SidebarItem, TabBar } from "@antfabric-ui/react-native/shell";
-import { TAB_BAR_ACTION, TAB_BAR_TABS } from "@antfabric-ui/docs/samples";
+import { Chip, Fab, PermissionPrompt, useTheme } from "@antfabric/ui-react-native";
+import { MobileHeader, SidebarItem, TabBar } from "@antfabric/ui-react-native/shell";
+import { TAB_BAR_ACTION, TAB_BAR_TABS } from "@antfabric/ui-docs/samples";
 
 /** The first socket connect: Messages dims and AntFabric's own sheet explains notifications before the one system prompt. */
 export default function MobilePushSoftAsk() {

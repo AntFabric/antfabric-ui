@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Animated, I18nManager, Platform, Pressable, Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable } from "@antfabric-ui/core";
+import { recipes, useControllable } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon, type IconName } from "../../lib/icon";
 import { usePress } from "../../lib/press";

@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import type { Platform } from "@antfabric-ui/core";
+import type { Platform } from "@antfabric/ui-core";
 import { osOf, usePrefs } from "../lib/prefs";
 import { Stage } from "../preview/kit";
 

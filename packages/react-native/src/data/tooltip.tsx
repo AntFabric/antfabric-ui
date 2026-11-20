@@ -1,5 +1,5 @@
 import { Text, View, type TextStyle, type ViewStyle } from "react-native";
-import type { Tip } from "@antfabric-ui/core/chart";
+import type { Tip } from "@antfabric/ui-core/chart";
 import { createStyles } from "../theme";
 import { chartFont, useChartTokens } from "./theme";
 

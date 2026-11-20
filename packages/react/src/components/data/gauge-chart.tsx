@@ -1,8 +1,8 @@
 import type { CSSProperties } from "react";
 import { type RootProps, rootProps } from "../../lib/root-props";
 import { Cell, Pie, PieChart } from "recharts";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { GAUGE_GAP_DEG, GAUGE_HOLE, fmt, gaugeState, onHalfRing, summarizeGauge, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { GAUGE_GAP_DEG, GAUGE_HOLE, fmt, gaugeState, onHalfRing, summarizeGauge, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, row, text } from "../../lib/style";

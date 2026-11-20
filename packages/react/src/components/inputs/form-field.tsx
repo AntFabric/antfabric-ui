@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useId, type CSSProperties, type ReactNode } from "react";
-import { recipes, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
 import { Icon } from "../../lib/icon";

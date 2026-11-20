@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { TextInput, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
 import { Icon, Spinner } from "../../lib/icon";
 import { useRecipe, type PartStyles } from "../../lib/recipe";

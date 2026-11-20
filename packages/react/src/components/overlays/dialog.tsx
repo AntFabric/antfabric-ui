@@ -1,5 +1,5 @@
 import { useId, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

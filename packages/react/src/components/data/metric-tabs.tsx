@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import { recipes, useControllable, useDirection, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { METRIC_KEY, barScale, fmt, metricTotal, prepare, seriesColors, summarize, useSeries, type FormatSpec, type Metric, type Row, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useControllable, useDirection, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { METRIC_KEY, barScale, fmt, metricTotal, prepare, seriesColors, summarize, useSeries, type FormatSpec, type Metric, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

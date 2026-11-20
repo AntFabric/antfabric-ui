@@ -41,7 +41,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section>: the title, an optional headline (MetricValue, Delta), the kit's Button for \"View as table\"; a ChartFrame (width measured, a fixed default on the server) holding recharts' ComposedChart with an Area for the fill and a Line per series; the Legend (toggle buttons) in the header beside the Button, as the reference dashboard has it",
-      import: "import { LineChart } from \"@antfabric-ui/react/data\"",
+      import: "import { LineChart } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath: recharts is a dependency of the React kit and is reached only from there. The chart is handed an explicit width and height, never a responsive container.",
         "Everything the chart reads from the tokens goes through `rechartsTheme(useChartTokens(), useReducedMotion())`, exported beside the chart: the dashed grid, the quiet axes, the crosshair, the target line, the series colours and the motion. A chart the kit does not ship is written with recharts and the same call: `<CartesianGrid {...theme.grid} /> <XAxis dataKey=\"week\" {...theme.axis} /> <Tooltip {...theme.tooltip} content={…ChartTooltip…} />`, and it matches.",
@@ -58,7 +58,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same Card, recharts' ComposedChart and Legend as web, at desktop density",
-      import: "import { LineChart } from \"@antfabric-ui/react/data\"",
+      import: "import { LineChart } from \"@antfabric/ui-react/data\"",
       notes: ["The same `rechartsTheme()` as web. Hover is the pointer's, so the tooltip follows it; there is no press-and-hold."],
       keyboard: [
         { keys: "Tab", action: "Moves into the plot, then on to the legend's entries and \"View as table\"" },
@@ -70,7 +70,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View: the same header and Button, a ChartFrame measured by onLayout holding react-native-gifted-charts' LineChart (`data` to `data5`, `areaChart1` for the fill, `pointerConfig` for the tooltip); the Legend's toggles above the plot",
-      import: "import { LineChart } from \"@antfabric-ui/react-native/data\"",
+      import: "import { LineChart } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there. The kit adds `expo-linear-gradient` as a peer, which gifted-charts loads at import.",
         "`giftedTheme(useChartTokens())` is the chart tokens as gifted-charts' own props (the dashed rules, the quiet axes, the target line, the pointer, the series colours), exported beside the chart, so a chart the kit does not ship matches the ones it does.",

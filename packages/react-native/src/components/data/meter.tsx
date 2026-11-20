@@ -1,9 +1,9 @@
 import { Text, View, type ViewStyle } from "react-native";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { Icon } from "../../lib/icon";
 import { type RootProps, partId, rootProps } from "../../lib/root-props";
 import { fontScale } from "../../lib/type";
-import { meterReading, meterTone, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric-ui/core/chart";
+import { meterReading, meterTone, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles, useTheme } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 

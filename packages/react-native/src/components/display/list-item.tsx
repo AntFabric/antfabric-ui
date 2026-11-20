@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Animated, Platform, Pressable, Text, View, type AccessibilityRole, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon, type IconName } from "../../lib/icon";
 import { Enter } from "../../lib/motion";

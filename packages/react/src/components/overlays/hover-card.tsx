@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, type CSSProperties, type FocusEvent, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
-import { MOTION, recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { MOTION, recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

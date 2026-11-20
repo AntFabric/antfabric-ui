@@ -76,7 +76,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A labelled region drawn from its recipe; the rows are a radiogroup of <button role=radio> with a roving tab stop, focus from useInteraction; inputs are plain <input> parts; Submit and the carets are Button and IconButton",
-      import: 'import { QuestionPanel } from "@antfabric-ui/react"',
+      import: 'import { QuestionPanel } from "@antfabric/ui-react"',
       notes: ["There is no web app yet; this is the desktop's panel at web density."],
       keyboard: [
         { keys: "1", action: "Choose the first row (1 to 9 choose rows 1 to 9). Ignored while typing in any field, the composer included; never submits." },
@@ -88,7 +88,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same panel at desktop density, docked above the composer in the assistant chat and a project space",
-      import: 'import { QuestionPanel } from "@antfabric-ui/react"',
+      import: 'import { QuestionPanel } from "@antfabric/ui-react"',
       notes: [
         "Today's desktop mounts it keyed on the question's id, so the panel that sent an answer is replaced, never reused.",
         "A gated tool call halts the SDK's tool loop and the answer resumes it; ask_user ends the model's turn and the answer is an ordinary user turn. The drawing is the same; the mechanism is not.",
@@ -102,7 +102,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View drawn from the same recipe; rows are Pressables with the radio role, fields are TextInputs, Submit and the carets are Button and IconButton. No number keys",
-      import: 'import { QuestionPanel } from "@antfabric-ui/react-native"',
+      import: 'import { QuestionPanel } from "@antfabric/ui-react-native"',
       notes: [
         "Today's phone draws two cards instead: ApprovalCard (\"Allow send mail?\", Decline and Allow side by side, the arguments in a 220pt box) and DirectiveCard (pills for a choice, No and Yes for a consent, Send for a typed answer). This kit draws the desktop's one panel on the phone; which is right is still an open question.",
         "Today's phone sends \"Yes\" and \"No\" for a consent where the desktop sends \"Yes, go ahead.\" and \"No, do not do that.\"; the app maps onSubmit's key to the sentence, so the panel does not decide this.",

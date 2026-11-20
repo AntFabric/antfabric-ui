@@ -52,18 +52,18 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "recharts' BarChart with no axes at an explicit width and height (never a responsive container), inside a <span role=\"img\">; the earlier bars are Cells at a reduced opacity, never animated unless `animate`",
-      import: "import { SparkBars } from \"@antfabric-ui/react/data\"",
+      import: "import { SparkBars } from \"@antfabric/ui-react/data\"",
       notes: ["Shipped from the data subpath: recharts is a dependency of the React kit and is reached only from there."],
     },
     desktop: {
       status: "ready",
       base: "The same recharts BarChart as web, at desktop density",
-      import: "import { SparkBars } from \"@antfabric-ui/react/data\"",
+      import: "import { SparkBars } from \"@antfabric/ui-react/data\"",
     },
     mobile: {
       status: "ready",
       base: "react-native-gifted-charts' BarChart with its axes, rules and labels hidden and `disablePress`, in a View (accessibilityRole image); the earlier bars are the colour at a reduced opacity, never animated unless `animate` and the person has not reduced motion",
-      import: "import { SparkBars } from \"@antfabric-ui/react-native/data\"",
+      import: "import { SparkBars } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "gifted-charts needs react-native-svg and expo-linear-gradient (or react-native-linear-gradient) in the app; the kit declares them as peers.",
         "In the catalogue (React Native Web) it never animates: its Animated values do not reach the DOM.",

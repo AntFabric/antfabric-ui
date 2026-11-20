@@ -117,7 +117,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A card that pops in with enter(\"pop\"): a role=\"group\" of reaction <button>s (aria-pressed) above Menu (bare) for the rows; inline styles over `t`, hover, press and focus from useInteraction; `picked` through useControllable; Esc calls onClose. Avatar for the highlighted target",
-      import: "import { ContextMenu } from \"@antfabric-ui/react\"",
+      import: "import { ContextMenu } from \"@antfabric/ui-react\"",
       notes: [
         "Only targets that have actions get our menu: a message, a sidebar row, a file, a person. Everywhere else, and always inside a text field, the browser's own menu opens.",
         "With text selected inside the message, the browser's menu wins, so Copy works on the selection and Look Up / Translate keep working.",
@@ -142,7 +142,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same card as web at desktop density, with Menu (bare) for the rows",
-      import: "import { ContextMenu } from \"@antfabric-ui/react\"",
+      import: "import { ContextMenu } from \"@antfabric/ui-react\"",
       notes: [
         "Today a right-click outside a text field does nothing: useSuppressContextMenu (no-context-menu.ts) cancels the WKWebView menu — Reload, Back, Inspect Element — in the capture phase, because every item on it is a no-op or a way to break the app. This spec puts our own menu where there are actions and keeps the suppression everywhere else.",
         "Text entry keeps the system text menu, decided by walking up from the target (input, textarea, contenteditable) — Cut, Copy, Paste, spelling and writing tools are the OS's, and nothing here reimplements them.",
@@ -167,7 +167,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "<Enter motion=\"slide-up\"> (role dialog, accessibilityViewIsModal) over GlassSurface (Liquid Glass on iOS 26+): Pressable reactions, the emoji panel, and Menu (bare) bled to the gutter; `picked` and `picking` through useControllable",
-      import: "import { ContextMenu } from \"@antfabric-ui/react-native\"",
+      import: "import { ContextMenu } from \"@antfabric/ui-react-native\"",
       notes: [
         "A sheet titled \"Message\": the quick reactions first (the commonest act), then Copy text, Reply in thread, Forward, Edit message, Pin to channel, and Delete message last in red.",
         "Copy text is first among the rows because it is the one row that cannot fail for a reason the message decides; it is dropped for a message with no text.",

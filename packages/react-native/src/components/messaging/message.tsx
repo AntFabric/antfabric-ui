@@ -1,5 +1,5 @@
 import { I18nManager, Pressable, Text, View, type AccessibilityActionEvent, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon } from "../../lib/icon";
 import { usePress } from "../../lib/press";

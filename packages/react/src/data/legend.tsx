@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { markPath, seriesMark, type Series } from "@antfabric-ui/core/chart";
+import { markPath, seriesMark, type Series } from "@antfabric/ui-core/chart";
 import { t } from "../tokens";
 import { useInteraction } from "../lib/interaction";
 import { css, pressable, row } from "../lib/style";

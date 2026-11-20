@@ -25,7 +25,7 @@ No component has `onChange` any more. Each event is declared `changes: "<prop>"`
 
 ## One shape per concept, every button fires something, shared string variables (rule 5)
 
-- AvatarStack: `people` takes core's `Person[]`; `AvatarStackPerson` is removed (import `Person` from `@antfabric-ui/react` or `@antfabric-ui/react-native`). `{ name, identity, src }` is still a valid `Person`; `agent` and `presence` on a person are ignored at stack sizes, as before.
+- AvatarStack: `people` takes core's `Person[]`; `AvatarStackPerson` is removed (import `Person` from `@antfabric/ui-react` or `@antfabric/ui-react-native`). `{ name, identity, src }` is still a valid `Person`; `agent` and `presence` on a person are ignored at stack sizes, as before.
 - BottomSheet: new `onPrimary`, fired by the primary button that `primaryLabel` draws (it fired nothing before).
 - ProgressBar: the string `cancelUpload` takes `{name}`, not `{title}`: `strings={{ "progress-bar": { cancelUpload: "Annuler l'envoi de {title}" } }}` → `{ cancelUpload: "Annuler l'envoi de {name}" }`. The default, "Cancel upload of {name}", reads the same as before. `retryUpload` still takes `{title}`.
 - Menu: no API change. Its `triggerLabel` is optional and, left out, reads the `moreActions` string ("More actions"); the docs' `default` is now that, and "More actions for #release-train" is the catalogue's `sample`.

@@ -1,8 +1,8 @@
 import { useId } from "react";
-import { useLocale } from "@antfabric-ui/core";
+import { useLocale } from "@antfabric/ui-core";
 import { LinearGradient, Stop } from "react-native-svg";
 import { LineChart as GiftedLineChart } from "react-native-gifted-charts";
-import { FLAT_FILL, seriesMark, sparseLabels, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Scale, type Series } from "@antfabric-ui/core/chart";
+import { FLAT_FILL, seriesMark, sparseLabels, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Scale, type Series } from "@antfabric/ui-core/chart";
 import { giftedAxis, labelScale, plotHeight, plotWidth } from "./axis";
 import { giftedTheme, type ChartTokens } from "./theme";
 import { ChartTooltip } from "./tooltip";

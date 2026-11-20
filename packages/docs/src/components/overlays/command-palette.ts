@@ -195,7 +195,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <div role=\"dialog\"> on a 5px-blurred scrim: a combobox <input> (aria-activedescendant) over a role=\"listbox\" of option <button>s in labelled groups, with Avatar, Icon and Kbd in the rows; inline styles over `t`; ↑ ↓ Enter and Esc in the field; `query` through useControllable(query, onQueryChange) and `filter` through useControllable(filter, onFilterChange), `selected` kept inside; pops in with enter(\"pop\")",
-      import: "import { CommandPalette } from \"@antfabric-ui/react\"",
+      import: "import { CommandPalette } from \"@antfabric/ui-react\"",
       notes: [
         "Mod+K on Windows and Linux is Ctrl+K, which Chrome and Edge bind to \"search the web\" in the address bar and Firefox to its search field. A focused page can claim it, so the web listens on window in the capture phase and calls preventDefault — but the browser still wins whenever focus is in its own chrome (address bar, devtools) or the page has not been clicked since load.",
         "So the web also opens the palette with / whenever focus is not in a text field — a key no browser binds — and the search field in the rail is always one click away. The rail's tooltip names both: \"Search (Ctrl+K or /)\".",
@@ -225,7 +225,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same dialog as web at desktop density, drawing the desktop shortcut rather than webShortcut",
-      import: "import { CommandPalette } from \"@antfabric-ui/react\"",
+      import: "import { CommandPalette } from \"@antfabric/ui-react\"",
       notes: [
         "Drops from 14vh instead of centring, so the field stays put as the result count changes under it.",
         "Width is W_MODAL, imported rather than copied — the value moved five times in two days, and a literal here would have been left behind at every step. Height caps at 70vh and the list scrolls.",

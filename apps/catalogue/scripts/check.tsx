@@ -22,7 +22,7 @@
  *            deutan vision (OKLab ΔE × 100, Machado–Oliveira–Fernandes 2009 at severity 1) and at least 15 apart in normal vision. A series
  *            under 3:1 on the card, and the last colour beside the first (where a ninth series wraps), are notes: the relief is the tooltip and
  *            "View as table" on every chart, and the lists that print each name and number (the read-aloud summary is heard, not printed)
- *   chart    the shared chart engine, `@antfabric-ui/core/chart` (`pnpm check chart`): a table of inputs and the outputs expected of the
+ *   chart    the shared chart engine, `@antfabric/ui-core/chart` (`pnpm check chart`): a table of inputs and the outputs expected of the
  *            formatters, `valueDomain`, `niceScale`, `summarize`, `chartTable`, `tipRows`, `prepare` and `lttb`
  *   agent    the files an agent reads (`pnpm check agent`): packages/docs/components.json and llms.txt equal what `pnpm tokens:build` writes now
  *            (so a docs, recipe or token change that was not rebuilt shows), they parse, every component is in components.json with its
@@ -133,17 +133,17 @@ import { renderToString } from "react-dom/server";
 import { dirname, join } from "node:path";
 import { parseHTML } from "linkedom";
 import { icons as lucide } from "lucide";
-import { BRAND_FONT_PATHS, BRAND_PATHS, OS_VERSIONS, defaultStrings, formatParts, formatString, mergeStrings, stringsFor, stringsKey, PLATFORM_OS, PLATFORMS, STYLE_KEYS, antfabric, themes, brandValues, cssVarName, defineTheme, resolveTokens, tokens, tokensCss, themeCss, pascal, isReference, primitiveAt, primitiveMeta, primitiveValue, primitiveVar, primitives, primitivesFrom, platformOf, recipeEntries, recipeFor, recipeLayers, mergeLayers, recipes, referencedPrimitives, referencePath, tokenOf, tokenSource, tokenValues, type InteractionState, type OS, type Platform, type Recipe, type RecipeContext, type Scheme, type StateKey, type StyleKey, type StyleValue, type Theme, type ThemeInput } from "@antfabric-ui/core";
-import * as Core from "@antfabric-ui/core";
-import * as ReactKit from "@antfabric-ui/react";
-import * as NativeKit from "@antfabric-ui/react-native";
-import * as ReactData from "@antfabric-ui/react/data";
-import * as NativeData from "@antfabric-ui/react-native/data";
-import * as ReactShell from "@antfabric-ui/react/shell";
-import * as NativeShell from "@antfabric-ui/react-native/shell";
-import * as ReactChat from "@antfabric-ui/react/chat";
-import * as NativeChat from "@antfabric-ui/react-native/chat";
-import { components, registry, screens, shownValue, type ComponentDocs, type Scene } from "@antfabric-ui/docs";
+import { BRAND_FONT_PATHS, BRAND_PATHS, OS_VERSIONS, defaultStrings, formatParts, formatString, mergeStrings, stringsFor, stringsKey, PLATFORM_OS, PLATFORMS, STYLE_KEYS, antfabric, themes, brandValues, cssVarName, defineTheme, resolveTokens, tokens, tokensCss, themeCss, pascal, isReference, primitiveAt, primitiveMeta, primitiveValue, primitiveVar, primitives, primitivesFrom, platformOf, recipeEntries, recipeFor, recipeLayers, mergeLayers, recipes, referencedPrimitives, referencePath, tokenOf, tokenSource, tokenValues, type InteractionState, type OS, type Platform, type Recipe, type RecipeContext, type Scheme, type StateKey, type StyleKey, type StyleValue, type Theme, type ThemeInput } from "@antfabric/ui-core";
+import * as Core from "@antfabric/ui-core";
+import * as ReactKit from "@antfabric/ui-react";
+import * as NativeKit from "@antfabric/ui-react-native";
+import * as ReactData from "@antfabric/ui-react/data";
+import * as NativeData from "@antfabric/ui-react-native/data";
+import * as ReactShell from "@antfabric/ui-react/shell";
+import * as NativeShell from "@antfabric/ui-react-native/shell";
+import * as ReactChat from "@antfabric/ui-react/chat";
+import * as NativeChat from "@antfabric/ui-react-native/chat";
+import { components, registry, screens, shownValue, type ComponentDocs, type Scene } from "@antfabric/ui-docs";
 import { DefaultsProvider, SceneNode, Stage, Thing, kitComponent, resolveProps } from "../src/preview/kit";
 import { pressTarget } from "../src/preview/press";
 import { casesFor, defaultsFor, matrixCases, usedIds, withDefaults } from "../src/lib/library";
@@ -159,9 +159,9 @@ import { placeholdersOf, readStrings, type FileStrings } from "./strings-ast";
 import { platformOnly, type PlatformOnly, type StringTemplate } from "../../../packages/core/src/strings";
 import { PART_MARKS, canonical, normalise, unknownVars, type DrawnIn } from "./snapshot-hash";
 import { citedPaths, componentsJson, llmsTxt } from "./agent-surface";
-import { tokensJson, EXTENSION, REFERENCE } from "@antfabric-ui/core/dtcg";
+import { tokensJson, EXTENSION, REFERENCE } from "@antfabric/ui-core/dtcg";
 import { tokenLeaves, tokenPaths } from "./token-leaves";
-import { barLayout, barScale, bySign, chartTable, clampScore, easeFn, cellText as coreCellText, fitLabel, fmt as coreFmt, gaugeState, labelWidth, lineScale, goalsOf, lttb, meterReading as coreMeterReading, meterTone, moved as coreMoved, nearestAxis, niceScale, onHalfRing, prepare as corePrepare, segmentAt, segmentsOf, shareOf, sparseLabels, summarize as coreSummarize, summarizeCompare as coreSummarizeCompare, summarizeGauge as coreSummarizeGauge, summarizeGoals as coreSummarizeGoals, summarizeSegments as coreSummarizeSegments, tipRows as coreTipRows, totalOf, valueDomain, valueParts as coreValueParts, withAlpha, withoutSign, type CompareWords, type FormatSpec, type FormatWords, type GaugeWords, type GoalWords, type SegmentWords, type SummaryWords } from "@antfabric-ui/core/chart";
+import { barLayout, barScale, bySign, chartTable, clampScore, easeFn, cellText as coreCellText, fitLabel, fmt as coreFmt, gaugeState, labelWidth, lineScale, goalsOf, lttb, meterReading as coreMeterReading, meterTone, moved as coreMoved, nearestAxis, niceScale, onHalfRing, prepare as corePrepare, segmentAt, segmentsOf, shareOf, sparseLabels, summarize as coreSummarize, summarizeCompare as coreSummarizeCompare, summarizeGauge as coreSummarizeGauge, summarizeGoals as coreSummarizeGoals, summarizeSegments as coreSummarizeSegments, tipRows as coreTipRows, totalOf, valueDomain, valueParts as coreValueParts, withAlpha, withoutSign, type CompareWords, type FormatSpec, type FormatWords, type GaugeWords, type GoalWords, type SegmentWords, type SummaryWords } from "@antfabric/ui-core/chart";
 import { contrast, lightnessChroma, separation } from "../src/lib/palette";
 import { rowCount } from "../src/lib/token-ref";
 
@@ -295,10 +295,10 @@ function checkPrimitives() {
       const src = stripComments(readFileSync(file, "utf8"));
       const where = file.slice(root.length + 1);
       if (/\bt\.primitives\b|\bt\["primitives"\]|--af-p-/.test(src)) err(where, "reads a primitive (t.primitives or --af-p-…); components read roles");
-      for (const m of src.matchAll(/import\s*(?:type\s*)?\{([^}]*)\}\s*from\s*"@antfabric-ui\/core"/g)) {
+      for (const m of src.matchAll(/import\s*(?:type\s*)?\{([^}]*)\}\s*from\s*"@antfabric\/ui-core"/g)) {
         const named = m[1]!.split(",").map((n) => n.trim().split(/\s+as\s+/)[0]!.replace(/^type\s+/, ""));
         const hit = named.find((n) => NAMES.includes(n));
-        if (hit) err(where, `imports ${hit} from @antfabric-ui/core; components read roles, not primitives`);
+        if (hit) err(where, `imports ${hit} from @antfabric/ui-core; components read roles, not primitives`);
       }
     }
   }
@@ -1556,10 +1556,10 @@ function checkImports() {
         if (ownKit && !kit) {
           for (const sub of SUBS) {
             if (at.startsWith(`packages/${ownKit}/src/${sub}/`) || subpath[sub][ownKit].has(file)) continue;
-            if (new RegExp(`^@antfabric-ui/(?:react|react-native)/${sub}$`).test(spec)) err(where, `imports "${spec}": a kit file outside src/${sub}/ never imports the ${sub} entry`);
+            if (new RegExp(`^@antfabric/ui-(?:react|react-native)/${sub}$`).test(spec)) err(where, `imports "${spec}": a kit file outside src/${sub}/ never imports the ${sub} entry`);
             const target = spec.startsWith(".") ? resolveSource(file, spec) : null;
             if (target && relative(target).startsWith(`packages/${ownKit}/src/${sub}/`)) err(where, `imports "${spec}": only packages/${ownKit}/src/${sub}/ and what it re-exports may import the ${sub} entry, so the root never reaches ./${sub}`);
-            else if (target && subpath[sub][ownKit].has(target)) err(where, `imports "${spec}" (${relative(target)}), which ships from @antfabric-ui/${ownKit}/${sub} (the ${WHAT[sub]}): only the ${sub} entry and the files it re-exports import it, so the root never reaches ./${sub} (take its line out of this file)`);
+            else if (target && subpath[sub][ownKit].has(target)) err(where, `imports "${spec}" (${relative(target)}), which ships from @antfabric/ui-${ownKit}/${sub} (the ${WHAT[sub]}): only the ${sub} entry and the files it re-exports import it, so the root never reaches ./${sub} (take its line out of this file)`);
           }
         }
         for (const rule of ONLY_UNDER) {
@@ -1567,12 +1567,12 @@ function checkImports() {
           if (rule.pkg.test(spec) && !under.some((u) => at.startsWith(u))) err(where, `imports "${spec}", allowed only under ${under.join(" and ")} (${rule.why})`);
         }
         const bare = !spec.startsWith(".") && !spec.startsWith("/");
-        if (inChart && bare && !/^(?:react|react-native|@antfabric-ui\/[a-z-]+)(?:\/|$)/.test(spec)) err(where, `imports "${spec}": core's chart/ engine imports nothing third-party`);
+        if (inChart && bare && !/^(?:react|react-native|@antfabric\/ui-[a-z-]+)(?:\/|$)/.test(spec)) err(where, `imports "${spec}": core's chart/ engine imports nothing third-party`);
         if (!kit) continue;
         // A template draws with its kit's public entries (the root, `data`, `shell`, `chat`) and core's, never a component file, a recipe or lib/.
         if (bare) {
-          const own = new RegExp(`^@antfabric-ui/(?:${kit}|core)(?:/[a-z.-]+)?$`);
-          if (!/^(?:react|react-native)$/.test(spec) && !own.test(spec)) err(where, `imports "${spec}": a template imports only react${kit === "react-native" ? ", react-native" : ""}, @antfabric-ui/${kit} (its root, data, shell and chat) and @antfabric-ui/core`);
+          const own = new RegExp(`^@antfabric/ui-(?:${kit}|core)(?:/[a-z.-]+)?$`);
+          if (!/^(?:react|react-native)$/.test(spec) && !own.test(spec)) err(where, `imports "${spec}": a template imports only react${kit === "react-native" ? ", react-native" : ""}, @antfabric/ui-${kit} (its root, data, shell and chat) and @antfabric/ui-core`);
         } else {
           const target = relative(join(dirname(file), spec)).replace(/\.tsx?$/, "").replace(/\/index$/, "");
           const prefix = `packages/${kit}/src`;
@@ -1823,7 +1823,7 @@ function draw(at: string, node: ReactNode): string | null {
   return html;
 }
 
-const MISSING = /([A-Z][A-Za-z0-9]*) is not in @antfabric-ui\/(react-native|react) yet/g;
+const MISSING = /([A-Z][A-Za-z0-9]*) is not in @antfabric\/ui-(react-native|react) yet/g;
 
 function waitingFor(html: string): boolean {
   let any = false;
@@ -2307,7 +2307,7 @@ function checkHelpers() {
     for (const [name, value] of Object.entries(module)) {
       const isComponent = typeof value === "function" || (typeof value === "object" && value !== null && "$$typeof" in value);
       if (!isComponent || !(name in shared) || shared[name] === value) continue;
-      err(at, `@antfabric-ui/${kit} declares its own ${name}; core exports one under the same name (re-export it from core instead)`);
+      err(at, `@antfabric/ui-${kit} declares its own ${name}; core exports one under the same name (re-export it from core instead)`);
     }
   }
 }

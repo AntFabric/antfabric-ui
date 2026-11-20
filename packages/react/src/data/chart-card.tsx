@@ -1,6 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
-import type { ChartTableInput, FormatSpec, Row } from "@antfabric-ui/core/chart";
-import { chartTable } from "@antfabric-ui/core/chart";
+import type { ChartTableInput, FormatSpec, Row } from "@antfabric/ui-core/chart";
+import { chartTable } from "@antfabric/ui-core/chart";
 import { t } from "../tokens";
 import { box, css, row, text } from "../lib/style";
 import { Button } from "../components/actions/button";

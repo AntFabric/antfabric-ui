@@ -1,5 +1,5 @@
 import { useMemo, type CSSProperties } from "react";
-import { formatShortcut, recipes, useStrings, type KitStrings, type OS } from "@antfabric-ui/core";
+import { formatShortcut, recipes, useStrings, type KitStrings, type OS } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { css, text, visuallyHidden } from "../../lib/style";

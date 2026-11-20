@@ -1,8 +1,8 @@
 import { useState, type CSSProperties } from "react";
-import { ConnectionBanner, Icon, IconButton, t } from "@antfabric-ui/react";
-import { Composer, Message, MessageDivider } from "@antfabric-ui/react/chat";
-import { NavRail, SidebarSection, TitleBar } from "@antfabric-ui/react/shell";
-import { composerTools, messageBar, NAV_RAIL_SAMPLE, TITLE_BAR_SAMPLE } from "@antfabric-ui/docs/samples";
+import { ConnectionBanner, Icon, IconButton, t } from "@antfabric/ui-react";
+import { Composer, Message, MessageDivider } from "@antfabric/ui-react/chat";
+import { NavRail, SidebarSection, TitleBar } from "@antfabric/ui-react/shell";
+import { composerTools, messageBar, NAV_RAIL_SAMPLE, TITLE_BAR_SAMPLE } from "@antfabric/ui-docs/samples";
 
 const root: CSSProperties = {
   display: "flex",

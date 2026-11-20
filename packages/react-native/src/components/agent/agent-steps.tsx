@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Animated, Easing, Platform, Text, View, type ViewStyle } from "react-native";
-import { recipes, useStrings, type AgentStep, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useStrings, type AgentStep, type KitStrings } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
 import { Icon } from "../../lib/icon";
 import { Enter, useReducedMotion } from "../../lib/motion";

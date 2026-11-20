@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type FocusEvent, type MouseEvent, type ReactNode, type RefObject } from "react";
-import { recipes, useControllable, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import {
   alignOf,
   ariaSort,
@@ -26,7 +26,7 @@ import {
   type Row,
   type TableColumn,
   type TableSort,
-} from "@antfabric-ui/core/chart";
+} from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
 import { Icon } from "../../lib/icon";

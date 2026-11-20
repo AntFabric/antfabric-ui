@@ -8,7 +8,7 @@ const { title, lead, steps } = await migrate();
 const [, ledeHtml = "", rest = ""] = lead.match(/^\s*(<p>[\s\S]*?<\/p>)([\s\S]*)$/) ?? [];
 ---
 
-<Base title="Migrate to 1.0" description="How to move an app from AntFabric UI 0.1 to 1.0: the codemod and every break by area.">
+<Base title="Migrate to 1.0" description="How to move an app from AntFabric UI 0.1 to 1.0: every break by area.">
   <div class="page-head">
     <div class="eyebrow">Migrate</div>
     <h1>{title}</h1>

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { View } from "react-native";
-import { defineTheme, themes, type Platform, type ThemeInput } from "@antfabric-ui/core";
-import type { Scene } from "@antfabric-ui/docs";
+import { defineTheme, themes, type Platform, type ThemeInput } from "@antfabric/ui-core";
+import type { Scene } from "@antfabric/ui-docs";
 import { osOf, usePrefs } from "../lib/prefs";
 import { DefaultsProvider, Stage, Thing } from "../preview/kit";
 import { Canvas, CodeBlock } from "../preview/ui";
@@ -70,7 +70,7 @@ function build(primary: string, radius: Radius, font: Font) {
     code.push("  tokens: {", ...lines, "  },");
   }
   code.push("});");
-  const head = ['import { defineTheme, themes } from "@antfabric-ui/core";'];
+  const head = ['import { defineTheme, themes } from "@antfabric/ui-core";'];
   if (font === "system") head.push("", `const SYSTEM_STACK = '${SYSTEM_STACK}';`, `const SYSTEM_FILES = { regular: "", medium: "", semibold: "", bold: "", extrabold: "" };`);
   return { theme: defineTheme(input), code: [...head, "", ...code].join("\n") };
 }

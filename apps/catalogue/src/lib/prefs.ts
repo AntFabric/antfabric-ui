@@ -5,7 +5,7 @@
  */
 
 import { useSyncExternalStore } from "react";
-import type { OS, Platform, Scheme } from "@antfabric-ui/core";
+import type { OS, Platform, Scheme } from "@antfabric/ui-core";
 
 
 export interface Prefs {

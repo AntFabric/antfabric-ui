@@ -1,5 +1,5 @@
 {
-  "name": "@antfabric-ui/react",
+  "name": "@antfabric/ui-react",
   "version": "1.0.0",
   "type": "module",
   "description": "A generic, themeable component kit for React: the web and the desktop (Tauri). Inline styles over the token variables.",
@@ -63,7 +63,7 @@
     }
   },
   "dependencies": {
-    "@antfabric-ui/core": "workspace:^",
+    "@antfabric/ui-core": "workspace:^",
     "recharts": "3.10.1"
   },
   "peerDependencies": {

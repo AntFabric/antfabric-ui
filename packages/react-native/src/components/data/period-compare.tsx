@@ -1,6 +1,6 @@
 import { Text, View, type ViewStyle } from "react-native";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { compareTotals, fmt, lineScale, moved, prepare, summarizeCompare, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { compareTotals, fmt, lineScale, moved, prepare, summarizeCompare, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { partId, rootProps, type RootProps } from "../../lib/root-props";

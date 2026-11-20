@@ -10,7 +10,7 @@ export * from "./types";
 // AntFabric's copy (`ANTFABRIC_STRINGS`, the catalogue's root `strings`) and the sample data its docs, screens and RailWindow share.
 export * from "./samples";
 // Every component's recipe lives in core (both kits read it); the catalogue reads it from here, with the docs.
-export { recipes, recipeEntries, tokenOf, STYLE_KEYS, type Recipe, type RecipeEntry, type PartRecipe, type StyleKey } from "@antfabric-ui/core";
+export { recipes, recipeEntries, tokenOf, STYLE_KEYS, type Recipe, type RecipeEntry, type PartRecipe, type StyleKey } from "@antfabric/ui-core";
 export { screens } from "./screens";
 export { features } from "./platforms/features";
 export { notifications } from "./platforms/notifications";

@@ -1,5 +1,5 @@
 import { type CSSProperties, type Ref } from "react";
-import { recipes } from "@antfabric-ui/core";
+import { recipes } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { useCoarsePointer, useInteraction } from "../../lib/interaction";

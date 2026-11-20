@@ -10,7 +10,7 @@
  *     export const iconButton = defineRecipe({ parts: [...], styles: { ... } });   // camelCase of the id; a reserved word takes `Recipe` (`switchRecipe`)
  *   its line in `recipes/<category>/index.ts`:  import { iconButton } from "./icon-button";  ...  { button, "icon-button": iconButton } as const
  *   (the key is the docs id) and the kit reads it, never imports the file:
- *     import { recipes } from "@antfabric-ui/core";   useRecipe(recipes["icon-button"], ...)     // `recipes.button` for a one-word id
+ *     import { recipes } from "@antfabric/ui-core";   useRecipe(recipes["icon-button"], ...)     // `recipes.button` for a one-word id
  * A STATIC component (a divider, a spacer, a heading) has no hover, press or focus: drop `useInteraction`, `{...ui.handlers}`, `data-af-press` and the `<button>`, every `state` in the
  * recipe and in `useRecipe` (pass only `variants`), `useControllable` and the `onX` props. It still marks every part, takes `style`, and has docs
  * and a recipe. A separator is `role="separator"` (plus `aria-orientation="vertical"` when vertical); a decorative element is `aria-hidden`.
@@ -21,7 +21,7 @@
  * `pnpm describe button` shows a finished component.
  */
 import type { CSSProperties } from "react";
-import { defineRecipe, useControllable, type RecipePart } from "@antfabric-ui/core";
+import { defineRecipe, useControllable, type RecipePart } from "@antfabric/ui-core";
 import { t } from "./src/tokens";
 import { Icon, type IconName } from "./src/lib/icon";
 import { useInteraction } from "./src/lib/interaction";
@@ -123,9 +123,9 @@ const docs: ComponentDocs = {
     onDismiss: { type: "event" },
   },
   platforms: {
-    web: { status: "ready", base: "A <div role=status> drawn from its recipe; toggle hover and focus from useInteraction", import: 'import { Example } from "@antfabric-ui/react"' },
-    desktop: { status: "ready", base: "The same <div> at desktop density", import: 'import { Example } from "@antfabric-ui/react"' },
-    mobile: { status: "ready", base: "View and Text drawn from the same recipe", import: 'import { Example } from "@antfabric-ui/react-native"' },
+    web: { status: "ready", base: "A <div role=status> drawn from its recipe; toggle hover and focus from useInteraction", import: 'import { Example } from "@antfabric/ui-react"' },
+    desktop: { status: "ready", base: "The same <div> at desktop density", import: 'import { Example } from "@antfabric/ui-react"' },
+    mobile: { status: "ready", base: "View and Text drawn from the same recipe", import: 'import { Example } from "@antfabric/ui-react-native"' },
   },
   a11y: { role: "status", notes: ["The toggle sets aria-expanded; Dismiss is a labelled IconButton."] },
   examples: [{ name: "Info", props: { message: "Fabric summarised #platform-eng while you were out." } }],

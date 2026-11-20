@@ -1,6 +1,6 @@
 import { useMemo, type ReactNode } from "react";
 import { View } from "react-native";
-import { defineTheme, themes, type BrandTokens, type Platform, type Theme } from "@antfabric-ui/core";
+import { defineTheme, themes, type BrandTokens, type Platform, type Theme } from "@antfabric/ui-core";
 import { osOf, usePrefs } from "../lib/prefs";
 import { BRAND_SAMPLE } from "../lib/brand";
 import { DefaultsProvider, Stage, Thing } from "../preview/kit";

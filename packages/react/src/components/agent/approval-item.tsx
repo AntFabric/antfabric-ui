@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, type CSSProperties, type MutableRefObject, type ReactNode } from "react";
-import { recipes, useControllable, useStrings, type Approval, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type Approval, type KitStrings } from "@antfabric/ui-core";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, pressable, row, text, truncate } from "../../lib/style";
 import { announce } from "../../lib/announce";

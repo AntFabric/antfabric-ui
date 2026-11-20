@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { Animated, I18nManager, PanResponder, Pressable, ScrollView, Text, View, type ViewStyle } from "react-native";
-import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { GlassSurface } from "../../lib/glass";
 import { usePress } from "../../lib/press";

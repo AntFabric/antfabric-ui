@@ -1,6 +1,6 @@
 import { useRef, useState, type ReactNode } from "react";
 import { Modal, Pressable, View, type LayoutRectangle, type ViewStyle } from "react-native";
-import { recipes, useControllable } from "@antfabric-ui/core";
+import { recipes, useControllable } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Enter } from "../../lib/motion";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

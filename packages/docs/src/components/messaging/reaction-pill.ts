@@ -67,7 +67,7 @@ const docs: ComponentDocs = {
     web: {
       status: "partial",
       base: "A <button aria-pressed> with inline styles over `t`; hover, press and focus from useInteraction. The who-reacted card is a role=\"tooltip\" box: in flow above the pill with showReactors, floating above it after a 500 ms hover or at once on keyboard focus.",
-      import: "import { ReactionPill } from \"@antfabric-ui/react/chat\"",
+      import: "import { ReactionPill } from \"@antfabric/ui-react/chat\"",
       notes: [
         "The who-reacted card opens on hover after the app's tooltip delay and on keyboard focus with none, flips below the pill when it would leave the top of the timeline (96px margin), and is capped at 420px wide.",
         "pointer: coarse (a touch laptop or tablet browser): no hover card; press and hold for 500 ms opens it instead, and the pill grows to 32px.",
@@ -87,7 +87,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <button aria-pressed> as web (one file, usePlatform), 22px from the desktop density tokens; the who-reacted card opens on a 500 ms hover or keyboard focus, or with showReactors.",
-      import: "import { ReactionPill } from \"@antfabric-ui/react/chat\"",
+      import: "import { ReactionPill } from \"@antfabric/ui-react/chat\"",
       notes: [
         "22px tall, 9 radius, 11/12px SemiBold — today's ReactionChip. Yours is brand/soft with the brand/soft edge.",
         "The hover card is an inverse card with the emoji above the sentence, exactly as the desktop draws it today; the add pill is new in this spec.",
@@ -107,7 +107,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "Pressable with onLongPress, StyleSheet over useTheme() tokens (32pt pill, 1pt edge); usePress for the pressed fill; pops in with <Enter motion=\"pop\">.",
-      import: "import { ReactionPill } from \"@antfabric-ui/react-native/chat\"",
+      import: "import { ReactionPill } from \"@antfabric/ui-react-native/chat\"",
       notes: [
         "A 32pt pill: \"👍 3\" as one 14pt SemiBold run in the text colour whoever reacted; yours is primarySoft with the borderBrand edge (V2 Figma).",
         "No hover exists, so who reacted is the Reactions sheet on long-press, and the accessible name says so.",

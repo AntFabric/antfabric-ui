@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useForcedState } from "@antfabric-ui/core";
+import { useForcedState } from "@antfabric/ui-core";
 
 export interface Press {
   pressed: boolean;

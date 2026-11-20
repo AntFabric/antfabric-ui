@@ -48,7 +48,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A drawing of the browser's tab strip: `<div role=\"img\">`, inline styles over `t`, the favicon dot pops in with enter(\"pop\"). What the app sets is document.title (\"(3) AntFabric\") and a canvas-drawn favicon on <link rel=\"icon\">, plus navigator.setAppBadge(n) when installed as an app (Chrome, Edge, Safari web apps).",
-      import: "import { AppBadge } from \"@antfabric-ui/react/shell\"",
+      import: "import { AppBadge } from \"@antfabric/ui-react/shell\"",
       notes: [
         "The title count is mentions and DMs; the favicon dot is drawn for any unread. Both update in a background tab — that is when they matter.",
         "Every open tab shows the same number: the count is server-owned and each tab applies the same read-state event.",
@@ -58,7 +58,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "partial",
       base: "A drawing of the macOS Dock, the Windows taskbar or a Linux launcher, picked by usePlatform().os: `<div role=\"img\">`, inline styles over `t`, the badge pops in with enter(\"pop\"). What the app calls is Tauri getCurrentWindow().setBadgeCount() (macOS Dock, Linux launcher), setBadgeLabel() on macOS for \"99+\" and \"•\", setOverlayIcon() on Windows.",
-      import: "import { AppBadge } from \"@antfabric-ui/react/shell\"",
+      import: "import { AppBadge } from \"@antfabric/ui-react/shell\"",
       notes: [
         "0 clears the badge with setBadgeCount(undefined) — never setBadgeCount(0), which can leave an empty red dot on macOS (ADR-0354: a badge nobody can clear is never raised).",
         "The count is clamped and NaN-proofed, and written only when it changes, to save an IPC round trip per event.",
@@ -70,7 +70,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A drawing of the home-screen icon: a View with accessibilityRole \"image\", StyleSheet over useTheme() tokens, the wallpaper gradient through experimental_backgroundImage, the badge or dot popping in with <Enter motion=\"pop\">. What the app calls is expo-notifications setBadgeCountAsync; APNs aps.badge set by notification-service keeps the number right while the app is killed.",
-      import: "import { AppBadge } from \"@antfabric-ui/react-native/shell\"",
+      import: "import { AppBadge } from \"@antfabric/ui-react-native/shell\"",
       notes: [
         "iOS draws a number only (no dot); Android launchers draw a dot from the notifications in the tray (Samsung One UI draws the number), and long-press shows \"3 notifications\".",
         "In the catalogue the badge (not the icon) pops in when it first appears and on Replay, as the system badge does when a count arrives.",

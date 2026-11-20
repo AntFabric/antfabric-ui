@@ -48,18 +48,18 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "recharts' PieChart at an explicit size: a whole-ring Pie in the track colour under the value's Pie, whose ends are rounded (cornerRadius); the middle is a <span> in the chart font",
-      import: "import { ProgressRing } from \"@antfabric-ui/react/data\"",
+      import: "import { ProgressRing } from \"@antfabric/ui-react/data\"",
       notes: ["Shipped from the data subpath: recharts is a dependency of the React kit and is reached only from there."],
     },
     desktop: {
       status: "ready",
       base: "The same recharts PieChart as web, at desktop density",
-      import: "import { ProgressRing } from \"@antfabric-ui/react/data\"",
+      import: "import { ProgressRing } from \"@antfabric/ui-react/data\"",
     },
     mobile: {
       status: "ready",
       base: "react-native-gifted-charts' PieChart as a donut with two slices (the value, then the track), starting at 12 o'clock and running clockwise, with a Text over its hole",
-      import: "import { ProgressRing } from \"@antfabric-ui/react-native/data\"",
+      import: "import { ProgressRing } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "gifted-charts' slices have no round ends, so the phone's ring ends square where the web's is round.",
         "The hole is the card's colour: a ring on a tinted surface shows its edge.",

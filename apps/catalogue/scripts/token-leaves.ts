@@ -16,7 +16,7 @@
  * same leaves with each reference replaced by its value, for anything that compares values (the drift report).
  */
 
-import { tokens, tokenSource } from "@antfabric-ui/core";
+import { tokens, tokenSource } from "@antfabric/ui-core";
 
 /** Where a leaf has a value: `shared`, a theme, or a platform profile. */
 export type Context = "shared" | "light" | "dark" | "web" | "desktop" | "mobile";

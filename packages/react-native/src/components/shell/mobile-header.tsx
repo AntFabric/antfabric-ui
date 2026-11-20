@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Platform, Pressable, Text, View, type TextStyle, type ViewStyle } from "react-native";
-import { recipes, useStrings, type IconActionItem, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useStrings, type IconActionItem, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon, Spinner, type IconName } from "../../lib/icon";
 import { usePress } from "../../lib/press";

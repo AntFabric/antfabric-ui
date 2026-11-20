@@ -23,7 +23,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<kbd>, inline styles over `t`; glyphs from formatShortcut for the OS in usePlatform(), accessible name in words",
-      import: "import { Kbd } from \"@antfabric-ui/react\"",
+      import: "import { Kbd } from \"@antfabric/ui-react\"",
       notes: [
         "OS comes from navigator.userAgentData.platform (fallback navigator.platform). iPadOS reports as Mac — correct, its keyboards have ⌘.",
       ],
@@ -31,7 +31,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <kbd> as web; ⌘⇧K glyphs with caps tracking on macOS, Ctrl+Shift+K on Windows and Linux",
-      import: "import { Kbd } from \"@antfabric-ui/react\"",
+      import: "import { Kbd } from \"@antfabric/ui-react\"",
       notes: ["OS comes from Tauri's @tauri-apps/plugin-os platform(), not the user agent."],
     },
     mobile: {

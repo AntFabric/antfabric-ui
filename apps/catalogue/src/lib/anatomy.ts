@@ -4,8 +4,8 @@
  * tables; every token links to its row on `/foundations`. Nothing here is typed by hand: the rows are the recipe's entries.
  */
 
-import { cssVarName } from "@antfabric-ui/core";
-import { recipeEntries, recipes, tokenOf, type Recipe, type RecipeEntry } from "@antfabric-ui/docs";
+import { cssVarName } from "@antfabric/ui-core";
+import { recipeEntries, recipes, tokenOf, type Recipe, type RecipeEntry } from "@antfabric/ui-docs";
 import { OS_LABEL, PLATFORM_META, type OS, type Platform } from "./library";
 
 export interface AnatomyRow {

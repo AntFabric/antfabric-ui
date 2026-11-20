@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, findNodeHandle, Platform, Pressable, ScrollView, Text, TextInput, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings, type QuestionOption, type ToolArg } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type KitStrings, type QuestionOption, type ToolArg } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
 import { announce } from "../../lib/a11y";
 import { usePress } from "../../lib/press";

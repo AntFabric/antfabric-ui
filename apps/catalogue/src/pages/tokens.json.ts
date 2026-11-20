@@ -4,6 +4,6 @@
  */
 
 import type { APIRoute } from "astro";
-import { tokensJson } from "@antfabric-ui/core/dtcg";
+import { tokensJson } from "@antfabric/ui-core/dtcg";
 
 export const GET: APIRoute = () => new Response(tokensJson(), { headers: { "Content-Type": "application/json; charset=utf-8" } });

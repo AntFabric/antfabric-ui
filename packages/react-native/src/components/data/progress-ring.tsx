@@ -1,9 +1,9 @@
 import { Text, View, type ViewStyle } from "react-native";
 import { PieChart } from "react-native-gifted-charts";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { type RootProps, partId, rootProps } from "../../lib/root-props";
 import { fontScale } from "../../lib/type";
-import { fmt, type FormatWords } from "@antfabric-ui/core/chart";
+import { fmt, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { chartFont, giftedAnimated, useChartTokens, useReducedMotion } from "../../data/theme";

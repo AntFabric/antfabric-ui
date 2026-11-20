@@ -157,7 +157,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <button role=\"combobox\"> trigger over a role=\"listbox\" panel drawn in flow under it (column-reverse above), inline styles over `t`; the active row is aria-activedescendant, moved by the arrow keys, Home / End, type-ahead and pointer hover; searchable pins a SearchField; `value`, `open`, `activeKey` and `query` through useControllable. A phone-sized browser gets a native <select>",
-      import: "import { Select } from \"@antfabric-ui/react\"",
+      import: "import { Select } from \"@antfabric/ui-react\"",
       notes: [
         "The panel is drawn in flow under the trigger, exactly its width, and flips above a trigger on screen when its rows would not fit below. It is not portalled: a select inside a clipping container (a scrolling table) needs room for it.",
         "On a phone-sized browser (pointer: coarse and under 600px wide) the web kit renders a native <select>, so the phone's own picker opens — the custom listbox is a desktop-pointer answer.",
@@ -198,7 +198,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same combobox trigger and listbox panel as web — the kit's own, never a native <select>; Escape is captured (stopPropagation) so it does not also close the pane behind",
-      import: "import { Select } from \"@antfabric-ui/react\"",
+      import: "import { Select } from \"@antfabric/ui-react\"",
       notes: [
         "A native <select> cannot be styled: the OS draws its popup outside the page — a dark translucent menu on macOS, a flat white list on Windows. The owner: \"I want the dropdown to be like this.\"",
         "The panel is EXACTLY the trigger's width, left-aligned to it (\"MAKE THE DROPDOWN ALIGNED WITH THE SELECTOR WITH SAME WIDTH AS THE SELECTOR\"). Long options ellipsize. link gets a 200px floor; an icon-only trigger passes a panel width.",
@@ -235,7 +235,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A Pressable trigger (the text field's 48pt box) and a sheet drawn under it that slides up through <Enter motion=\"slide-up\">: grabber, title, an optional SearchField, then Pressable radio rows in a ScrollView capped at 90% of the screen; `value`, `open` and `query` through useControllable. The sheet is not a Modal: the screen places the Select where its sheet should appear, and the backdrop and focus return are the screen's",
-      import: "import { Select } from \"@antfabric-ui/react-native\"",
+      import: "import { Select } from \"@antfabric/ui-react-native\"",
       notes: [
         "No dropdown on the phone: a 48pt trigger (the text field's box) opens a bottom sheet. A popover anchored to a field is too small to tap reliably and lands under the keyboard.",
         "The sheet: a grabber, the label as its title, then 52pt rows with the leading icon or avatar, the label, supportingText as a second line, and the same coral dot on the chosen row.",

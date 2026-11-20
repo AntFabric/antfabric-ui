@@ -1,4 +1,4 @@
-import { tokenVars } from "@antfabric-ui/core";
+import { tokenVars } from "@antfabric/ui-core";
 
 /**
  * Every token as a CSS variable: `t.brand.default` is `"var(--af-brand-default)"`.

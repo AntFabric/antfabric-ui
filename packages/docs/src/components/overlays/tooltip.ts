@@ -54,7 +54,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <div> wrapping the control (`children`) with a role=\"tooltip\" bubble that the control is aria-describedby; it opens after a 320 ms rest on hover and at once on :focus-visible, closes on Esc, blur, press and leave, and the bubble itself is hoverable; inline styles over `t`, Kbd (inverse) for the shortcut; fades in with enter(\"fade\"); `open` through useControllable(open, onOpenChange). With no children it draws a built-in IconButton and the bubble in flow",
-      import: "import { Tooltip } from \"@antfabric-ui/react\"",
+      import: "import { Tooltip } from \"@antfabric/ui-react\"",
       notes: [
         "Hover opens it only where (hover: hover) holds and the pointer is not touch — a phone browser or a tap on a tablet never flashes one.",
         "The kit does not remove a `title` the control carries: leave it off a control that has a Tooltip, or the browser draws a second bubble.",
@@ -75,7 +75,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same bubble as web at desktop density, with ⌘ glyphs on macOS",
-      import: "import { Tooltip } from \"@antfabric-ui/react\"",
+      import: "import { Tooltip } from \"@antfabric/ui-react\"",
       notes: [
         "The trigger is the Tooltip's `children`: the first button, link, field or [role=button] in it takes aria-describedby and aria-keyshortcuts.",
         "320 ms delay; labels wrap at the recipe's 260px max width with a 1.35 line height.",

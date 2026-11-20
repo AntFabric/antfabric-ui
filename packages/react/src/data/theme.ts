@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
-import { MOTION, resolveTokens, type NativeTokens } from "@antfabric-ui/core";
-import { CHART_DRAW, CHART_GLIDE, seriesColors } from "@antfabric-ui/core/chart";
+import { MOTION, resolveTokens, type NativeTokens } from "@antfabric/ui-core";
+import { CHART_DRAW, CHART_GLIDE, seriesColors } from "@antfabric/ui-core/chart";
 import { usePlatform } from "../platform";
 
 /**

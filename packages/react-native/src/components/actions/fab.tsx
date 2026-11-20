@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Animated, Easing, Image, Platform, Pressable, View, type ViewStyle } from "react-native";
-import { recipes } from "@antfabric-ui/core";
+import { recipes } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { GlassSurface } from "../../lib/glass";
 import { Icon, type IconName } from "../../lib/icon";

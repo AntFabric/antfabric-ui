@@ -1,5 +1,5 @@
 import { Platform, Text, View, type ViewStyle } from "react-native";
-import { recipes, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, partId, type RootProps } from "../../lib/root-props";

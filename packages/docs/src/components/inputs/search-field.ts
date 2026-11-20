@@ -78,7 +78,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<input type=\"text\" role=\"searchbox\" data-af-input> in a drawn box, inline styles over `t`; hover and focus-within from useInteraction; the ✕ is IconButton and the hint is Kbd, faded in on hover and focus while it holds its box; Escape clears then blurs, Enter calls onSubmit; launcher is a <button aria-haspopup=\"dialog\"> laid over the whole field; `value` through useControllable",
-      import: "import { SearchField } from \"@antfabric-ui/react\"",
+      import: "import { SearchField } from \"@antfabric/ui-react\"",
       notes: [
         "type=\"text\" with role=\"searchbox\", NOT type=\"search\": WebKit draws its own cancel ✕ beside ours as a shadow pseudo-element the kit cannot style (the owner: \"I see two close icons\").",
         "Mod+K is not browser-reserved — a page may claim it, as Slack, GitHub and Linear do — so the web keeps ⌘K/Ctrl+K. It only works while the page has focus; from the address bar the browser keeps it.",
@@ -111,7 +111,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same field as web, one geometry (36px, --radius-control); the rail launcher is the same <button> drawn as this field",
-      import: "import { SearchField } from \"@antfabric-ui/react\"",
+      import: "import { SearchField } from \"@antfabric/ui-react\"",
       notes: [
         "ONE geometry since 2026-09-25 (owner: \"All the search field should have same height and same bg fill\"): 36px, --radius-control, 16px glass inset 12px, 13px medium text. The old sm/lg sizes resolve to it.",
         "Rest is --hover-surface and hover LIFTS to --surface-raised (the owner swapped them the same day). Focus is a 2px border.active edge and no halo; the hairline shadow is under every state, so the field never appears to lift on focus.",
@@ -139,7 +139,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "TextInput with returnKeyType=\"search\" (onSubmitEditing → onSubmit) in a View over a StyleSheet from useTheme(); focus is a 1pt inset boxShadow ring over the 1pt edge; the ✕ is IconButton; `value` through useControllable. No shortcut hint or launcher on the phone",
-      import: "import { SearchField } from \"@antfabric-ui/react-native\"",
+      import: "import { SearchField } from \"@antfabric/ui-react-native\"",
       notes: [
         "V2's search box: 44pt, 12pt corners, a hairline Rim and NO shadow, filled surface.hover; a 20pt glass in text.faint; 16pt medium text. Focus is the same 2pt border.active edge.",
         "This spec adds the clear ✕ on the phone (32pt box with hitSlop to 44pt) — today's SearchInput has none.",

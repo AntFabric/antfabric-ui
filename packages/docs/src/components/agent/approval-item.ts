@@ -53,12 +53,12 @@ const docs: ComponentDocs = {
     onAnswer: { type: "event", description: "An agent's question: the app opens it to be answered." },
   },
   platforms: {
-    web: { status: "ready", base: "An <article> named by its subject, drawn from its recipe; Tag for the source and outcome, Button for the actions", import: 'import { ApprovalItem } from "@antfabric-ui/react"', notes: ["There is no approvals screen on any platform yet; this is a proposal from the phone's data model."] },
-    desktop: { status: "ready", base: "The same card", import: 'import { ApprovalItem } from "@antfabric-ui/react"', notes: ["The desktop has no approvals list today; its only approval is the question panel's gated tool call."] },
+    web: { status: "ready", base: "An <article> named by its subject, drawn from its recipe; Tag for the source and outcome, Button for the actions", import: 'import { ApprovalItem } from "@antfabric/ui-react"', notes: ["There is no approvals screen on any platform yet; this is a proposal from the phone's data model."] },
+    desktop: { status: "ready", base: "The same card", import: 'import { ApprovalItem } from "@antfabric/ui-react"', notes: ["The desktop has no approvals list today; its only approval is the question panel's gated tool call."] },
     mobile: {
       status: "ready",
       base: "A View drawn from the same recipe; Reject and Approve share the row equally",
-      import: 'import { ApprovalItem } from "@antfabric-ui/react-native"',
+      import: 'import { ApprovalItem } from "@antfabric/ui-react-native"',
       notes: [
         "The phone's Inbox tab is blank until it is designed (owner, 2026-10-15), and the approval route its activity rows link to does not exist yet; this is the card those would draw.",
         "The identity check is the app's: the service takes whether it happened as a flag. The card only says one will be asked for.",
