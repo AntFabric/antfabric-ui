@@ -1,6 +1,6 @@
 {
   "name": "@antfabric-ui/react",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "description": "A generic, themeable component kit for React: the web and the desktop (Tauri). Inline styles over the token variables.",
   "license": "MIT",
