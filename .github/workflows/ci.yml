@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # parity compares against the commit in reports/parity.json
+
+      - uses: pnpm/action-setup@v4 # version from packageManager in package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check and build the catalogue
+        run: pnpm build
+
+      - name: Verify the packed packages
+        run: pnpm verify:packages
+
+      - name: Publish dry run
+        run: pnpm release:dry
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: catalogue
+          path: apps/catalogue/dist
+          retention-days: 3

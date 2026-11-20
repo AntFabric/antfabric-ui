@@ -1,0 +1,331 @@
+---
+import Base from "../layouts/Base.astro";
+import Preview from "../islands/Preview";
+import VersionPick from "../components/VersionPick.astro";
+import { notifications as n } from "@antfabric-ui/docs";
+import { defaultsFor, iconSvg, OS_LABEL, PLATFORM_META, registry, usedIds, type OS, type Platform } from "../lib/library";
+
+
+const osRow: { platform: Platform; os: OS }[] = [
+  { platform: "desktop", os: "mac" },
+  { platform: "desktop", os: "windows" },
+  { platform: "desktop", os: "linux" },
+  { platform: "web", os: "browser" },
+  { platform: "mobile", os: "ios" },
+  { platform: "mobile", os: "android" },
+];
+const has = (id: string) => Boolean(registry[id]);
+const renderPinned = (id: string, platform: Platform, os: OS, props?: Record<string, unknown>) =>
+  has(id) && registry[id]!.platforms[platform].status !== "not-applicable" ? true : null;
+
+const banners = osRow.map((r) => ({ ...r, html: renderPinned("os-notification", r.platform, r.os) }));
+const badges = osRow.map((r) => ({ ...r, html: renderPinned("app-badge", r.platform, r.os) }));
+const prompts = (["web", "desktop", "mobile"] as Platform[]).map((p) => ({ p, html: renderPinned("permission-prompt", p, p === "desktop" ? "mac" : p === "mobile" ? "ios" : "browser") }));
+const inApp = (["web", "desktop", "mobile"] as Platform[]).map((p) => ({ p, html: renderPinned("in-app-banner", p, p === "desktop" ? "mac" : p === "mobile" ? "ios" : "browser") }));
+const feed = (["desktop", "mobile"] as Platform[]).map((p) => ({ p, html: renderPinned("notification-item", p, p === "desktop" ? "mac" : "ios") }));
+const schedule = (["desktop", "mobile"] as Platform[]).map((p) => ({ p, html: renderPinned("notification-schedule", p, p === "desktop" ? "mac" : "ios") }));
+
+const ids = ["os-notification", "app-badge", "permission-prompt", "in-app-banner", "notification-item", "notification-schedule"].filter(has);
+const surfaceIcon: Record<string, string> = { os: "bell-ring", "in-app": "panel-top", feed: "list", badge: "circle-dot", sound: "volume-2", email: "mail" };
+---
+
+<Base title="Notifications">
+  <div class="page-head">
+    <div class="eyebrow">Notifications</div>
+    <h1>Reaching someone who isn't looking</h1>
+    <p class="lede">
+      A notification can surface in six places: an OS banner, an in-app banner, the activity feed, a badge, a sound or an email. Each platform offers a different set of those places, with different rules. This page covers which surface fires, when, and how it looks on each OS. All of it is in <code class="mono">packages/docs/src/platforms/notifications.ts</code>, and the previews are the notification components themselves.
+    </p>
+  </div>
+
+  <section class="section">
+    <h2>Principles</h2>
+    <div class="grid c3">
+      {
+        n.principles.map((p, i) => (
+          <div class="card">
+            <div class="eyebrow" style="color:var(--af-fg-faint)">0{i + 1}</div>
+            <b style="display:block;margin-top:8px;color:var(--af-fg-strong)">{p.title}</b>
+            <p class="muted" style="margin-top:6px;font-size:13px">{p.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>The same message, as each OS draws it</h2>
+    <p class="sub">
+      One <code class="mono">OsNotification</code>, pinned to each OS. A browser notification can't carry an inline reply, and Android shows its action buttons under the text. Lock-screen privacy hides the body.
+    </p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:-4px 0 16px">
+      <VersionPick for="mac" mode="always" label />
+      <VersionPick for="ios" mode="always" label />
+    </div>
+    {
+      banners.every((b) => !b.html) ? (
+        <div class="callout"><span set:html={iconSvg("loader", 16)} /><span>OsNotification is still being written.</span></div>
+      ) : (
+        <div class="grid c3">
+          {banners.map((b) => (
+            <div>
+              {b.html ? (
+                <Preview client:only="react" id="os-notification" platform={b.platform} os={b.os} className={b.platform === "mobile" ? "wallpaper ios" : "wallpaper"} defaults={defaultsFor(usedIds(registry["os-notification"]!), b.platform as Platform)} />
+              ) : (
+                <div class="na-panel">Not available</div>
+              )}
+              <div class="cap">
+                <b>{OS_LABEL[b.os]}</b>
+                <span class="faint">{PLATFORM_META[b.platform].label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )
+    }
+  </section>
+
+  <section class="section">
+    <h2>Every surface, per platform</h2>
+    <div class="card" style="padding:4px 6px;overflow-x:auto">
+      <table class="t" style="min-width:860px">
+        <thead>
+          <tr>
+            <th style="width:170px">Surface</th>
+            <th>Web</th>
+            <th>Desktop</th>
+            <th>Mobile</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            n.surfaces.map((s) => (
+              <tr>
+                <td>
+                  <b style="display:flex;gap:8px;align-items:center;color:var(--af-fg-strong)">
+                    <Fragment set:html={iconSvg(surfaceIcon[s.id] ?? "bell", 15)} />
+                    {s.name}
+                  </b>
+                  {s.component && has(s.component) && (
+                    <a class="mono" style="font-size:11.5px;color:var(--af-link-default)" href={`/components/${s.component}`}>
+                      {s.component}
+                    </a>
+                  )}
+                </td>
+                <td>{s.web}</td>
+                <td>{s.desktop}</td>
+                <td>{s.mobile}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Which surface fires</h2>
+    <p class="sub">The server resolves recipients and preferences, then routes. The first rule that matches wins.</p>
+    <ol class="steps">
+      {
+        n.routing.map((r) => (
+          <li>
+            <div>
+              <b>{r.when}</b>
+              <p>{r.then}</p>
+              {r.surfaces.length > 0 && (
+                <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap">
+                  {r.surfaces.map((s) => (
+                    <span class="chip">{n.surfaces.find((x) => x.id === s)?.name ?? s}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  {
+    inApp.some((x) => x.html) && (
+      <section class="section">
+        <h2>While the app is open</h2>
+        <p class="sub">The in-app banner replaces the OS banner when AntFabric is focused. It is suppressed for the conversation already on screen.</p>
+        <div class="grid c3">
+          {inApp.map((x) =>
+            x.html ? (
+              <div>
+                <Preview client:only="react" id="in-app-banner" platform={x.p} className="plain" defaults={defaultsFor(usedIds(registry["in-app-banner"]!), x.p as Platform)} />
+                <div class="cap">
+                  <b>{PLATFORM_META[x.p].label}</b>
+                </div>
+              </div>
+            ) : null,
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <h2>Kinds and defaults</h2>
+    <div class="card" style="padding:4px 6px">
+      <table class="t">
+        <thead>
+          <tr>
+            <th>Kind</th>
+            <th>Default</th>
+            <th>Banner</th>
+            <th>Sound</th>
+            <th>Actions</th>
+            <th>Grouped</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            n.kinds.map((k) => (
+              <tr>
+                <td>
+                  <b style="color:var(--af-fg-strong)">{k.kind}</b>
+                </td>
+                <td>{k.default}</td>
+                <td>
+                  <span class={`mark ${k.banner ? "yes" : "no"}`}>{k.banner ? "✓" : "–"}</span>
+                </td>
+                <td>
+                  <span class={`mark ${k.sound ? "yes" : "no"}`}>{k.sound ? "✓" : "–"}</span>
+                </td>
+                <td>{k.actions}</td>
+                <td class="muted">{k.group}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {
+    (feed.some((x) => x.html) || schedule.some((x) => x.html)) && (
+      <section class="section">
+        <h2>The feed and pausing</h2>
+        <div class="grid c2">
+          {feed.map((x) =>
+            x.html ? (
+              <div>
+                <Preview client:only="react" id="notification-item" platform={x.p} width={x.p === "mobile" ? 375 : 420} className="plain stretch" defaults={defaultsFor(usedIds(registry["notification-item"]!), x.p as Platform)} />
+                <div class="cap">
+                  <b>Feed row · {PLATFORM_META[x.p].label}</b>
+                </div>
+              </div>
+            ) : null,
+          )}
+          {schedule.map((x) =>
+            x.html ? (
+              <div>
+                <Preview client:only="react" id="notification-schedule" platform={x.p} className="plain" defaults={defaultsFor(usedIds(registry["notification-schedule"]!), x.p as Platform)} />
+                <div class="cap">
+                  <b>Pause notifications · {PLATFORM_META[x.p].label}</b>
+                </div>
+              </div>
+            ) : null,
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <h2>Asking for permission</h2>
+    <p class="sub">Always ask softly first, and only after there is something worth being told.</p>
+    <div class="grid c3">
+      {
+        n.permission.map((p) => {
+          const preview = prompts.find((x) => x.p === p.platform);
+          return (
+            <div class="card">
+              <b style="color:var(--af-fg-strong);display:flex;gap:8px;align-items:center">
+                <Fragment set:html={iconSvg(PLATFORM_META[p.platform as Platform].icon, 15)} />
+                {PLATFORM_META[p.platform as Platform].label}
+              </b>
+              {preview?.html && (
+                <div style="margin-top:12px">
+                  <Preview client:only="react" id="permission-prompt" platform={p.platform as Platform} className="plain tight" defaults={defaultsFor(usedIds(registry["permission-prompt"]!), p.platform as Platform)} />
+                </div>
+              )}
+              <ol style="margin:12px 0 0;padding-left:18px;display:grid;gap:6px;font-size:13px">
+                {p.steps.map((s) => (
+                  <li>{s}</li>
+                ))}
+              </ol>
+            </div>
+          );
+        })
+      }
+    </div>
+  </section>
+
+  {
+    badges.some((b) => b.html) && (
+      <section class="section">
+        <h2>The count outside the app</h2>
+        <div class="grid c3">
+          {badges.map((b) =>
+            b.html ? (
+              <div>
+                <Preview client:only="react" id="app-badge" platform={b.platform} os={b.os} className="plain" defaults={defaultsFor(usedIds(registry["app-badge"]!), b.platform as Platform)} />
+                <div class="cap">
+                  <b>{OS_LABEL[b.os]}</b>
+                </div>
+              </div>
+            ) : null,
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <h2>Edge cases</h2>
+    <div class="grid c2">
+      {
+        n.edgeCases.map((e) => (
+          <div class="card">
+            <b style="color:var(--af-fg-strong)">{e.title}</b>
+            <p class="muted" style="margin-top:6px;font-size:13px">{e.handling}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Gaps in today's apps</h2>
+    <p class="sub">Found while reading the current desktop and mobile apps. Each one is fixed by a component or rule in this library.</p>
+    <div class="card" style="padding:4px 6px">
+      <table class="t">
+        <thead>
+          <tr>
+            <th style="width:90px">App</th>
+            <th>Today</th>
+            <th>In this library</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            n.gaps.map((g) => (
+              <tr>
+                <td>
+                  <span class="chip">{g.where}</span>
+                </td>
+                <td>{g.what}</td>
+                <td class="muted">{g.fix}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</Base>

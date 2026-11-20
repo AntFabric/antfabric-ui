@@ -1,0 +1,78 @@
+---
+/**
+ * One table of tokens: a row each, with the name the docs use, the CSS variable, the value in every mode
+ * that applies, what it is for, and a button that copies the variable. Static HTML; the buttons are wired
+ * by the script on the Foundations page.
+ */
+import type { Row } from "../lib/token-ref";
+
+interface Props {
+  rows: Row[];
+  /** Names the table for screen readers: "Colour: surface". */
+  caption: string;
+}
+const { rows, caption } = Astro.props;
+const heads = rows[0]!.cells.map((c) => c.label);
+const px = (v: string) => Math.min(parseFloat(v) || 0, 56);
+---
+
+<div class="tok-scroll" tabindex="0" role="region" aria-label={caption}>
+  <table class="tok">
+    <caption class="sr-only">{caption}</caption>
+    <thead>
+      <tr>
+        <th scope="col">Token</th>
+        {heads.map((h) => <th scope="col">{h}</th>)}
+        <th scope="col">What it is for</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((r) => (
+          <tr id={r.cssVar.slice(2)} data-token={r.path} class={r.differs ? "differs" : undefined}>
+            <th scope="row" class="tok-name">
+              <code>{r.path}</code>
+              <span class="tok-var">{r.cssVar}</span>
+              <button type="button" class="tok-copy" data-copy-text={r.cssVar} aria-label={`Copy ${r.cssVar}`} />
+            </th>
+            {r.cells.map((c) => (
+              <td class="tok-val">
+                <span class="tok-v">
+                  {r.look === "colour" && (
+                    <span class="sw">
+                      <i style={`background:${c.value}`} />
+                    </span>
+                  )}
+                  {r.look === "shadow" && <span class="sh" style={`box-shadow:${c.value}`} />}
+                  {r.look === "bar" && <span class="bar" style={`width:${px(c.value)}px`} />}
+                  {r.look === "radius" && <span class="rd" style={`border-radius:${c.value}`} />}
+                  {r.look === "family" && <span class="aa" style={`font-family:${c.value}`}>Aa</span>}
+                  {r.look === "weight" && <span class="aa" style={`font-weight:${c.value}`}>Aa</span>}
+                  {r.look === "tracking" && <span class="aa" style={`letter-spacing:${c.value}`}>Aa</span>}
+                  <span class="mono">{c.value}</span>
+                </span>
+                {c.ref && <span class="tok-ref mono">→ {c.ref}</span>}
+                {c.same && <span class="tok-ref">same as light, on purpose</span>}
+                {c.os && <span class="tok-ref mono">{c.os}</span>}
+                {r.override && r.cells.length === 1 && <span class="tok-ref mono">mobile: {r.override}</span>}
+              </td>
+            ))}
+            <td class="tok-desc">
+              <span>{r.text}</span>
+              {r.mobile && (
+                <span class="tok-plat">
+                  <b>Mobile.</b> {r.mobile}
+                </span>
+              )}
+              {r.web && (
+                <span class="tok-plat">
+                  <b>Web.</b> {r.web}
+                </span>
+              )}
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

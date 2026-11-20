@@ -1,0 +1,184 @@
+---
+import Base from "../layouts/Base.astro";
+import VersionPick from "../components/VersionPick.astro";
+import Code from "../components/Code.astro";
+import Trio from "../islands/Trio";
+import { byDataGroup, byLevel, components, defaultsFor, iconSvg, PLATFORM_META, PLATFORMS, registry, supportCounts, usedIds } from "../lib/library";
+import { version as kitVersion } from "../../../../packages/core/package.json";
+
+// The release the three packages carry, as major.minor ("1.0"), so the eyebrow follows `pnpm version-packages`.
+const kitRelease = kitVersion.split(".").slice(0, 2).join(".");
+const counts = supportCounts();
+const edgeCount = components.reduce((n, c) => n + (c.edgeCases?.length ?? 0), 0);
+const flowCount = components.reduce((n, c) => n + (c.flows?.length ?? 0), 0);
+const groups = byLevel();
+const dataCount = byDataGroup().reduce((n, g) => n + g.items.length, 0);
+
+const showcase = [
+  { id: "button", props: { label: "Send invite", iconLeading: "send", shortcut: "Mod+Enter" } },
+  { id: "sidebar-item", props: { name: "release-train", unread: true, mentions: 2 } },
+  { id: "message", wide: true, props: { reactions: [{ emoji: "🎉", count: 3, mine: true, reactors: "You, Marcus Chen and Aisha Bello reacted" }] } },
+  { id: "title-bar", wide: true, props: {} },
+].filter((s) => registry[s.id]);
+
+const strip = showcase.map((s) => {
+  const doc = registry[s.id]!;
+  return {
+    ...s,
+    cells: PLATFORMS.map((p) => ({
+      platform: p,
+      label: PLATFORM_META[p].label,
+      caption: p === "mobile" ? "@antfabric-ui/react-native" : "@antfabric-ui/react",
+      na: doc.platforms[p].status === "not-applicable" ? doc.platforms[p].alternative?.split(".")[0] : undefined,
+      defaults: defaultsFor(usedIds(doc), p),
+    })),
+  };
+});
+
+const reactUse = `import { Button } from "@antfabric-ui/react";
+
+// The web app and the desktop app
+<Button label="Send invite" iconLeading="send"
+        shortcut="Mod+Enter" onPress={send} />`;
+const nativeUse = `import { Button } from "@antfabric-ui/react-native";
+
+// The phone app
+<Button label="Send invite" iconLeading="send"
+        onPress={send} />`;
+---
+
+<Base title="Overview">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">AntFabric UI · v{kitRelease}</div>
+      <h1 style="margin-top:14px">One component, in <em>React</em> for web and desktop and <em>React Native</em> for the phone.</h1>
+      <p class="lede">
+        Every component is written twice, by hand: once in React, which the web app and the desktop app share, and once in React Native for the phone. Both take the same props. This catalogue draws the real components, live, on each platform's tab, and shows how each one works inside the apps, step by step.
+      </p>
+      <div class="grid c4" style="margin-top:28px;max-width:560px">
+        <div class="stat"><b>{components.length}</b><span>components</span></div>
+        <div class="stat"><b>{counts.web}</b><span>on web</span></div>
+        <div class="stat"><b>{counts.desktop}</b><span>on desktop</span></div>
+        <div class="stat"><b>{counts.mobile}</b><span>on mobile</span></div>
+      </div>
+      <p class="faint" style="margin-top:14px;font-size:12.5px">{edgeCount} edge cases written down, each on the platforms it applies to, and {flowCount} flows.</p>
+      <div class="hero-cta">
+        <a class="btn primary" href="/components">Browse components<Fragment set:html={iconSvg("arrow-right", 15)} /></a>
+        <a class="btn" href="/install">Install</a>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="grid c2">
+        <Code code={reactUse} title="Web and desktop · @antfabric-ui/react" />
+        <Code code={nativeUse} title="Phone · @antfabric-ui/react-native" />
+      </div>
+      <div class="arrow" set:html={iconSvg("arrow-down", 18)} />
+      <div class="targets">
+        {
+          PLATFORMS.map((p) => (
+            <div>
+              <b>
+                <Fragment set:html={iconSvg(PLATFORM_META[p].icon, 14)} />
+                {PLATFORM_META[p].label}
+              </b>
+              <span>{PLATFORM_META[p].stack}</span>
+              <span class="mono" style="font-size:11px">{PLATFORM_META[p].kit}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Same props, three platforms</h2>
+    <p class="sub">
+      Each row is one component given the same props on each platform: the React component on the web and the desktop, the React Native one on the phone. The tokens give desktop 34px controls and the phone 44pt touch targets, and each component draws OS-specific parts only where the OS calls for them. Switch the OS here and the desktop and mobile cells redraw.
+    </p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:-4px 0 16px">
+      <div class="seg sm" role="group" aria-label="Desktop OS">
+        <button type="button" data-set-os="desktop:mac" aria-pressed="true">macOS</button>
+        <button type="button" data-set-os="desktop:windows" aria-pressed="false">Windows</button>
+        <button type="button" data-set-os="desktop:linux" aria-pressed="false">Linux</button>
+      </div>
+      <VersionPick for="mac" mode="inline" />
+      <div class="seg sm" role="group" aria-label="Mobile OS">
+        <button type="button" data-set-os="mobile:ios" aria-pressed="true">iOS</button>
+        <button type="button" data-set-os="mobile:android" aria-pressed="false">Android</button>
+      </div>
+      <VersionPick for="ios" mode="inline" />
+    </div>
+    <div class="grid">
+      {
+        strip.map((row) => (
+          <div class="card" style="padding:14px">
+            <div class="cap" style="margin:0 0 12px">
+              <b>
+                <a href={`/components/${row.id}`}>{registry[row.id]!.name}</a>
+              </b>
+              <span class="faint mono">{row.id}.tsx</span>
+            </div>
+            <Trio client:only="react" id={row.id} props={row.props} wide={row.wide} cells={row.cells} />
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Find your way</h2>
+    <div class="grid c3">
+      <a class="tile" href="/platforms">
+        <div class="meta"><b>Web vs desktop vs mobile</b><Fragment set:html={iconSvg("layers", 16)} /></div>
+        <p>Where each platform differs, Slack-style: menu bar, title bar, tray, badges, closing the window, shortcuts the browser reserves, offline.</p>
+      </a>
+      <a class="tile" href="/notifications">
+        <div class="meta"><b>Notifications</b><Fragment set:html={iconSvg("bell-ring", 16)} /></div>
+        <p>Every surface that can tell someone something, the rules that decide which one fires, permission flows and the gaps in today's apps.</p>
+      </a>
+      <a class="tile" href="/foundations">
+        <div class="meta"><b>Foundations</b><Fragment set:html={iconSvg("palette", 16)} /></div>
+        <p>Colour, type, space and size tokens, and how the three platform profiles diverge from one token file.</p>
+      </a>
+      <a class="tile" href="/screens">
+        <div class="meta"><b>Screens</b><Fragment set:html={iconSvg("app-window", 16)} /></div>
+        <p>Whole screens composed from the components, in a browser, a desktop window and a phone, based on today's desktop and mobile apps.</p>
+      </a>
+      <a class="tile" href="/components">
+        <div class="meta"><b>All components</b><Fragment set:html={iconSvg("component", 16)} /></div>
+        <p>{[...groups.map((g) => `${g.name} (${g.items.length})`), ...(dataCount ? [`Data (${dataCount})`] : [])].join(" · ")}</p>
+      </a>
+      <div class="tile" style="cursor:default">
+        <div class="meta"><b>Write a component</b><Fragment set:html={iconSvg("file-code", 16)} /></div>
+        <p>
+          <code class="mono">AUTHORING.md</code>, then <code class="mono">pnpm check</code>. It type-checks both kits, holds each kit's props to the docs, and renders every example, state, edge case and flow frame on every OS.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>What lives where</h2>
+    <div class="grid c2">
+      <div class="card">
+        <b style="color:var(--af-fg-strong)">In each kit</b>
+        <ul class="notes" style="margin-top:10px">
+          <li><code class="mono">@antfabric-ui/react</code>: one file per component for the web app and the desktop app, styled inline over the token variables; the OS, density and Liquid Glass come from <code class="mono">usePlatform()</code></li>
+          <li><code class="mono">@antfabric-ui/react-native</code>: one file per component for the phone, StyleSheet over <code class="mono">useTheme()</code> tokens, fonts by file, motion with Animated</li>
+          <li>The same props on both, typed, with events that report what changed</li>
+          <li>Interaction states, entrances, accessibility roles and labels</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b style="color:var(--af-fg-strong)">In the docs</b>
+        <ul class="notes" style="margin-top:10px">
+          <li>Each prop as documented, with its default and the platforms it applies to</li>
+          <li>Examples, variants and states, drawn by the kits on this site</li>
+          <li>Edge cases, keyboard and gesture behaviour, per platform</li>
+          <li>Flows: where the data comes from, what each press fires, and what moves</li>
+        </ul>
+        <p class="muted" style="margin-top:12px;font-size:13px"><code class="mono">pnpm check</code> holds the two together: a prop in one and not the other fails.</p>
+      </div>
+    </div>
+  </section>
+</Base>

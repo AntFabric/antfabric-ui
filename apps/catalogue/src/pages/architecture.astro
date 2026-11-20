@@ -1,0 +1,537 @@
+---
+import Base from "../layouts/Base.astro";
+import ComponentInspector from "../islands/ComponentInspector";
+import { components, screens } from "../lib/library";
+import { repoRoot, scan } from "../lib/scan";
+import { FINDINGS } from "../lib/findings";
+import {
+  EXAMPLE_COMPONENT,
+  README_NOTE,
+  buttonDifferences,
+  compareComponent,
+  componentFiles,
+  countOf,
+  ecosystemSvg,
+  helpers,
+  kitMatrix,
+  packages,
+  provenance,
+  refOf,
+  tokenPath,
+  tokenStructure,
+} from "../lib/architecture";
+
+// Everything on this page is computed here, at build, from the repository: the same `scan()` that
+// `pnpm report` prints, the token object, the package manifests. What is
+// written by hand (the notes, the steps, the Button differences) is in `lib/architecture.ts`, and
+// each of its lines is found by pattern, so a moved line follows and a deleted one fails the build.
+const root = repoRoot();
+const s = scan(root);
+const [reactKit, nativeKit] = s.kits;
+const structure = tokenStructure();
+const prov = provenance(root);
+const pkgs = packages(root);
+const path = tokenPath(root);
+const help = helpers(root, s);
+const matrix = kitMatrix(s);
+const button = compareComponent(s, EXAMPLE_COMPONENT);
+const differences = buttonDifferences(root);
+const example = componentFiles(root, s, EXAMPLE_COMPONENT);
+const readme = refOf(root, README_NOTE);
+
+const t = s.tokens;
+const nameList = (xs: string[]) => xs.join(", ");
+const svg = ecosystemSvg({
+  tokenLeaves: t.total,
+  themes: structure.themes.length,
+  profiles: structure.profiles.length,
+  react: { components: reactKit!.totals.files, refs: reactKit!.totals.tokenRefs },
+  native: { components: nativeKit!.totals.files, refs: nativeKit!.totals.tokenRefs },
+  docs: components.length,
+  screens: screens.length,
+});
+
+// The five words, in a sentence each, with what the repository says today.
+const words = [
+  {
+    word: "Token",
+    def: "A named design decision with a value, a type and a description.",
+    today: `${t.total} leaves in tokens.ts. ${structure.references} of its ${t.tiers.values} values point at a primitive of the product's Tier 1 and ${t.tiers.literals} are literals. ${t.total - t.withoutDescription.length} leaves have a description, kept in descriptions.ts.`,
+    target: "Every token has a value, a type, a description and a recorded source.",
+  },
+  {
+    word: "Tier",
+    def: "How far a token is from a raw value: primitives, roles, component tokens.",
+    today: `Two tiers: ${t.tiers.primitivesReferenced} of the product's ${t.tiers.primitivesMirrored} primitives (mirrored in primitives.ts) are pointed at by a leaf and no component reads one; components read the leaves, and ${t.total - t.unread.length} of the ${t.total} are read by at least one.`,
+    target: "Primitives that no component reads, semantic roles that components read, and component tokens such as switch.track.width.",
+  },
+  {
+    word: "Mode",
+    def: "The condition a token's value depends on.",
+    today: `Theme (${nameList(structure.themes)}) and platform profile (${nameList(structure.profiles)}). ${t.inThemes} leaves vary by theme, ${t.inProfiles} by profile, and ${t.sameLightDark.length + t.sameInDarkByDesign.length} are identical in light and dark (${t.sameInDarkByDesign.length} marked as deliberate).`,
+    target: "The same two axes, named in the file instead of implied by where a leaf sits.",
+  },
+  {
+    word: "Part",
+    def: "A named piece of a component: root, label, track, thumb.",
+    today: "Not modelled. A part is whatever a component's style object calls it in that file.",
+    target: "Each component names its parts once, and both kits use the same names.",
+  },
+  {
+    word: "Recipe",
+    def: "Which token each style property of each part reads, by variant, state and platform.",
+    today: `Written twice, by hand. ${matrix.summary.both} components are in both kits, each with its own mapping, and Button's already differ (see Kit comparison).`,
+    target: "One recipe per component, read by both kits and checked against both.",
+  },
+];
+
+const px = (v: string) => (/^-?\d+(\.\d+)?$/.test(v) ? `${v}px` : v);
+const label = (set: string) => (set === "shared" ? "shared" : set === "themes" ? "themes" : "profiles");
+
+// Which kit uses which token in the Button's group table.
+const kitTag = (r: boolean, n: boolean) => (r && n ? "" : r ? "React only" : "React Native only");
+
+const topics = [
+  { id: "packages", name: "Packages" },
+  { id: "tokens", name: "Tokens" },
+  { id: "components", name: "Components" },
+  { id: "kits", name: "The two kits" },
+  { id: "checks", name: "Checks" },
+] as const;
+const countNow = (f: (typeof FINDINGS)[number]) => (f.count ? countOf(s, f.count.key) : null);
+const tagCounts = (["verified", "inferred", "unknown"] as const).map((tag) => ({ tag, n: FINDINGS.filter((f) => f.tag === tag).length }));
+const counted = FINDINGS.filter((f) => f.count);
+const confirmed = counted.filter((f) => countNow(f) === f.count!.claimed).length;
+---
+
+<Base title="Architecture">
+  <div class="page-head">
+    <div class="eyebrow">Architecture</div>
+    <h1>How the system and a component are put together</h1>
+    <p class="lede">
+      This page is drawn from the repository every time the catalogue is built, so it cannot go stale: the numbers come from the same scan that <code class="mono">pnpm report</code> prints, from the token file and from each <code class="mono">package.json</code>. Each section says whether it is scanned or written by hand.
+    </p>
+  </div>
+
+  <section class="section">
+    <h2 id="five-words">Five words</h2>
+    <p class="sub">The design system is described in five words: token, tier, mode, part, recipe. Below, each one with what the repository has today and where it is going.</p>
+    <div class="src-row"><span class="src scanned">Scanned at build</span><span class="src hand">Written by hand: the definitions and targets</span></div>
+    <div class="grid c3 words">
+      {
+        words.map((w) => (
+          <div class="card word">
+            <h3>{w.word}</h3>
+            <p class="def">{w.def}</p>
+            <dl>
+              <div>
+                <dt>Today</dt>
+                <dd>{w.today}</dd>
+              </div>
+              <div>
+                <dt>Target</dt>
+                <dd>{w.target}</dd>
+              </div>
+            </dl>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 id="ecosystem">Ecosystem</h2>
+    <p class="sub">The five packages in this repository, and the product repositories around them. Solid arrows are imports. Dashed arrows are values copied by hand, or an import that does not exist yet.</p>
+    <div class="src-row"><span class="src scanned">Scanned at build: the counts in each box</span><span class="src hand">Written by hand: the boxes and arrows</span></div>
+    <div class="card eco-wrap" set:html={svg} />
+    <p class="muted" style="margin-top:12px;font-size:13px">
+      Nothing outside this repository consumes the kits yet, and the catalogue is the only reader. <code class="mono">{readme}</code>
+    </p>
+  </section>
+
+  <section class="section">
+    <h2 id="packages">Packages</h2>
+    <p class="sub">What each package is for, what it depends on and who depends on it, and the files to read first. Packages export their TypeScript source directly, so there is no build step between them.</p>
+    <div class="src-row"><span class="src scanned">Scanned at build: description, dependencies, file counts</span><span class="src hand">Written by hand: notes and key files</span></div>
+    <div class="grid c2">
+      {
+        pkgs.map((p) => (
+          <div class="card pkg">
+            <div>
+              <h3>{p.name}</h3>
+              <div class="faint mono" style="font-size:11.5px;margin-top:2px">
+                {p.dir} · v{p.version} · {p.sourceFiles} source files
+              </div>
+            </div>
+            <p class="role">{p.description}</p>
+            <dl>
+              <dt>Depends on</dt>
+              <dd>
+                <div class="tags">
+                  {p.dependsOn.map((d) => <span class={`tag-chip${d.workspace ? " ws" : ""}${d.peer ? " peer" : ""}`} title={d.peer ? "peer dependency" : d.workspace ? "workspace package" : "external package"}>{d.name}</span>)}
+                  {p.dependsOn.length === 0 && <span class="faint">nothing</span>}
+                </div>
+              </dd>
+              <dt>Used by</dt>
+              <dd>
+                <div class="tags">
+                  {p.consumedBy.map((n) => <span class="tag-chip ws">{n}</span>)}
+                  {p.consumedBy.length === 0 && <span class="faint">no package in this repository</span>}
+                </div>
+              </dd>
+              <dt>Key files</dt>
+              <dd>
+                <ul class="files">
+                  {
+                    p.keyFiles.map((k) => (
+                      <li>
+                        <code>{k.ref}</code>
+                        <span class="muted">{k.what}</span>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </dd>
+            </dl>
+            <p class="hand-note"><b>Note (written by hand).</b> {p.note}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 id="tokens">Tokens</h2>
+    <p class="sub">
+      <code class="mono">packages/core/src/tokens.ts</code> is one object with three sets: <b>shared</b> (the same everywhere), <b>themes</b> (colour and shadow, by light or dark) and <b>profiles</b> (size and type, by platform). A leaf that is in both themes, or on all three profiles, counts once: {t.total} leaves in all, {t.inShared} shared, {t.inThemes} by theme and {t.inProfiles} by profile.
+    </p>
+    <div class="src-row"><span class="src scanned">Scanned at build: structure, counts, provenance</span><span class="src hand">Written by hand: the two routes to an element</span></div>
+
+    <h3>Structure</h3>
+    <div class="card" style="padding:6px 8px;overflow-x:auto">
+      <table class="t">
+        <thead>
+          <tr><th>Set</th><th>Mode</th><th class="num">Leaves</th><th>Groups (leaves in each)</th></tr>
+        </thead>
+        <tbody>
+          {
+            structure.rows.map((r) => (
+              <tr>
+                <td>{label(r.set)}</td>
+                <td><code>{r.mode}</code></td>
+                <td class="num">{r.leaves}</td>
+                <td>
+                  <div class="groups">{r.groups.map((g) => <span><code>{g.name}</code><b>{g.count}</b></span>)}</div>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Where the values came from</h3>
+    <p class="sub">Each leaf is recorded in <code class="mono">packages/core/tokens.map.json</code>: the product token it was copied from, the phone's own token, a proposal, or unmapped with a reason.</p>
+    <div class="grid c4" style="margin-bottom:14px">
+      <div class="card stat"><b>{prov.product}</b><span>mapped to a product token name</span></div>
+      <div class="card stat"><b>{prov.mobile}</b><span>mapped to the phone's own tokens</span></div>
+      <div class="card stat"><b>{prov.proposal}</b><span>proposals with no app to copy from</span></div>
+      <div class="card stat"><b>{prov.unmapped}</b><span>unmapped, each with a reason</span></div>
+    </div>
+    <h3>From tokens.ts to an element</h3>
+    <p class="sub">
+      Both kits start from the same object and end at a component's style, by different routes. As an example, <code class="mono">{path.example.path}</code> is
+      <code class="mono">{path.example.react}</code> to the React kit, and{" "}
+      {Object.entries(path.example.css).map(([name, value], i) => <><code class="mono">{px(value)}</code> on {name}{i < 2 ? ", " : ""}</>)}{" "}
+      once the browser resolves it. The React Native kit receives <code class="mono">{path.example.native}</code> directly.
+    </p>
+    <div class="grid c2">
+      <div class="card">
+        <div class="cap" style="margin:0 0 14px"><b>React: web and desktop</b><span class="faint">CSS variables, resolved by the browser</span></div>
+        <ol class="trail">
+          {
+            path.react.map((st) => (
+              <li>
+                <b>{st.title}</b>
+                <p>{st.text}</p>
+                {st.ref && <span class="ref">{st.ref}</span>}
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <div class="card">
+        <div class="cap" style="margin:0 0 14px"><b>React Native: mobile</b><span class="faint">plain values, resolved at module load</span></div>
+        <ol class="trail">
+          {
+            path.native.map((st) => (
+              <li>
+                <b>{st.title}</b>
+                <p>{st.text}</p>
+                {st.ref && <span class="ref">{st.ref}</span>}
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 id="components">Components</h2>
+    <p class="sub">
+      A component is three files and one line in each kit's category index: the React file, the React Native file and its docs. Props are documented once, and <code class="mono">pnpm check</code> fails when either kit's props differ from the docs. Everything else, the styles and the states, is written separately in each kit.
+    </p>
+    <div class="src-row"><span class="src scanned">Scanned at build: helper use, files</span><span class="src hand">Written by hand: the helper descriptions</span></div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="cap" style="margin:0 0 10px"><b>The files of one component: {EXAMPLE_COMPONENT}</b><span class="faint">found by scan</span></div>
+      <table class="t">
+        <tbody>
+          <tr><td style="width:150px">React kit</td><td><code>{example.react}</code></td></tr>
+          <tr><td>React Native kit</td><td><code>{example.native}</code></td></tr>
+          <tr><td>Docs</td><td><code>{example.docs}</code></td></tr>
+          <tr><td>Exported from</td><td><code>{example.reactIndex}</code> and <code>{example.nativeIndex}</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="padding:6px 8px;overflow-x:auto">
+      <table class="t" style="min-width:760px">
+        <thead>
+          <tr>
+            <th>What a component needs</th>
+            <th>React</th>
+            <th class="num">Files of {help.files.react}</th>
+            <th>React Native</th>
+            <th class="num">Files of {help.files.native}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            help.rows.map((r) => (
+              <tr>
+                <td>{r.what}</td>
+                <td>{r.react ? <><code>{r.react.name}</code><div class="ref">{r.react.ref}</div></> : <span class="faint">not needed</span>}</td>
+                <td class={`num${r.react ? "" : " zero"}`}>{r.react ? r.react.files : "–"}</td>
+                <td>{r.native ? <><code>{r.native.name}</code><div class="ref">{r.native.ref}</div></> : <span class="faint">not needed</span>}</td>
+                <td class={`num${r.native ? "" : " zero"}`}>{r.native ? r.native.files : "–"}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid c2" style="margin-top:14px">
+      <div class="card">
+        <b style="color:var(--af-fg-strong)">The React kit</b>
+        <ul class="notes" style="margin-top:10px">
+          <li>Every value is read as <code class="mono">t.…</code>, which is a CSS variable, so density and theme come from the attributes above the component.</li>
+          <li>Styles are inline objects, so hover, press and focus are state from <code class="mono">useInteraction()</code>, never CSS <code class="mono">:hover</code>.</li>
+          <li>Web and desktop share the file. What differs by OS comes from <code class="mono">usePlatform()</code>.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b style="color:var(--af-fg-strong)">The React Native kit</b>
+        <ul class="notes" style="margin-top:10px">
+          <li>Every value is read from <code class="mono">t</code> as a number or colour, once per scheme, through <code class="mono">createStyles()</code>.</li>
+          <li>There is no hover, so state is pressed and focused from <code class="mono">usePress()</code>.</li>
+          <li>Every <code class="mono">Text</code> sets its own colour, size and <code class="mono">font()</code>, because nothing is inherited.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Worked example</h3>
+    <p class="sub">Pick any component to see what each kit's file reads: token paths by group, the literal colours and sizes with the line they are on, the platform branches and the files it imports. This is read from the same scan, so it never disagrees with the matrix below.</p>
+    <ComponentInspector client:only="react" src="/inspector.json" initial="button" />
+  </section>
+
+  <section class="section">
+    <h2 id="kit-comparison">Kit comparison</h2>
+    <p class="sub">
+      Every documented component against both kits: whether the kit has it, how many token references its file holds, and the colour and size literals and platform branches in it. Of {matrix.summary.documented} documented components, {matrix.summary.both} are in both kits, {matrix.summary.onlyReact} are only in React and {matrix.summary.onlyNative} only in React Native. Rows tinted amber are in one kit only.
+    </p>
+    <div class="src-row"><span class="src scanned">Scanned at build: every number in this section</span><span class="src hand">Written by hand: the Button differences</span></div>
+    <div class="card" style="padding:6px 8px;overflow-x:auto">
+      <table class="t" style="min-width:880px">
+        <thead>
+          <tr>
+            <th rowspan="2">Component</th>
+            <th class="grp" colspan="5">React (web and desktop)</th>
+            <th class="grp" colspan="5">React Native (mobile)</th>
+          </tr>
+          <tr>
+            <th>In kit</th><th class="num">Token refs</th><th class="num">Colours</th><th class="num">Sizes</th><th class="num">Branches</th>
+            <th>In kit</th><th class="num">Token refs</th><th class="num">Colours</th><th class="num">Sizes</th><th class="num">Branches</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            matrix.rows.map((r) => (
+              <tr class={r.react.present !== r.native.present ? "one-kit" : undefined}>
+                <td>
+                  <a href={`/components/${r.id}`} style="color:var(--af-fg-strong);font-weight:600;text-decoration:none">{r.name}</a>
+                  <div class="faint" style="font-size:11.5px">{r.category}</div>
+                </td>
+                {[r.react, r.native].map((c) => (
+                  <>
+                    <td>{c.present ? <span class="mark yes" title="present">✓</span> : c.na ? <span class="faint" title="not applicable on these platforms">n/a</span> : <span class="mark no" title="not written yet">–</span>}</td>
+                    <td class={`num${c.present ? "" : " zero"}`}>{c.present ? c.refs : "–"}</td>
+                    <td class={`num${c.present && c.colours ? "" : " zero"}`}>{c.present ? c.colours : "–"}</td>
+                    <td class={`num${c.present && c.dimensions ? "" : " zero"}`}>{c.present ? c.dimensions : "–"}</td>
+                    <td class={`num${c.present && c.branches ? "" : " zero"}`}>{c.present ? c.branches : "–"}</td>
+                  </>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Total</td>
+            <td class="num">{reactKit!.totals.files}</td>
+            <td class="num">{reactKit!.totals.tokenRefs}</td>
+            <td class="num">{reactKit!.totals.colours}</td>
+            <td class="num">{reactKit!.totals.dimensions}</td>
+            <td class="num">{reactKit!.totals.platformBranches}</td>
+            <td class="num">{nativeKit!.totals.files}</td>
+            <td class="num">{nativeKit!.totals.tokenRefs}</td>
+            <td class="num">{nativeKit!.totals.colours}</td>
+            <td class="num">{nativeKit!.totals.dimensions}</td>
+            <td class="num">{nativeKit!.totals.platformBranches}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="sub" style="margin-top:8px">
+      Not in the Colours and Sizes columns: {reactKit!.totals.annotated} in React and {nativeKit!.totals.annotated} in React Native sit on a line marked <code>/* structural: why */</code>,
+      a demo stage's size or a 1px optical nudge. <code>pnpm report --json</code> lists each one with its reason.
+    </p>
+
+    <h3>Button, side by side</h3>
+    <p class="sub">The same component, with the same props, written twice. The token paths each file reads are below, grouped; a path only one kit reads is marked.</p>
+    <div class="diff-cols" style="margin-bottom:14px">
+      {
+        ([["React", button.react], ["React Native", button.native]] as const).map(([name, b]) => (
+          <div class="card">
+            <div class="cap" style="margin:0 0 10px"><b>{name}</b><span class="faint mono">{b?.file.replace(/^packages\//, "")}</span></div>
+            {
+              b && (
+                <>
+                  <table class="t">
+                    <tbody>
+                      <tr><td>Token references</td><td class="num">{b.refs}</td></tr>
+                      <tr><td>Distinct token paths</td><td class="num">{b.distinct}</td></tr>
+                      <tr><td>Colour literals</td><td class="num">{b.colours.length}</td></tr>
+                      <tr><td>Size literals</td><td class="num">{b.dimensions.length}</td></tr>
+                      <tr><td>Platform branches</td><td class="num">{b.branches}</td></tr>
+                    </tbody>
+                  </table>
+                  <ul class="lits" style="margin-top:10px">
+                    {b.colours.map((l) => <li><span>line {l.line}</span> colour {l.value}</li>)}
+                    {b.dimensions.map((l) => <li><span>line {l.line}</span> {l.prop}: {l.value}</li>)}
+                  </ul>
+                </>
+              )
+            }
+          </div>
+        ))
+      }
+    </div>
+    <div class="card" style="padding:6px 8px;overflow-x:auto">
+      <table class="t">
+        <thead>
+          <tr><th style="width:130px">Token group</th><th>Paths read by the Button file</th></tr>
+        </thead>
+        <tbody>
+          {
+            button.rows.map((g) => (
+              <tr>
+                <td><code>{g.group}</code></td>
+                <td>
+                  <div class="tags">
+                    {
+                      g.tokens.map((k) => (
+                        <span class={`tag-chip${k.react && k.native ? "" : " only"}`} title={kitTag(k.react, k.native) || "both kits"}>
+                          {k.path.slice(g.group.length + (k.path === g.group ? 0 : 1)) || k.path}
+                          {!(k.react && k.native) && <> · {k.react ? "React" : "RN"}</>}
+                        </span>
+                      ))
+                    }
+                  </div>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Where the two Buttons differ</h3>
+    <p class="sub">Each row is a place the two files make a different decision. The values in the sentences are read from the token file for each platform profile.</p>
+    <div class="card" style="padding:6px 8px;overflow-x:auto">
+      <table class="t" style="min-width:760px">
+        <thead>
+          <tr><th style="width:120px">Difference</th><th>React</th><th>React Native</th></tr>
+        </thead>
+        <tbody>
+          {
+            differences.map((d) => (
+              <tr>
+                <td><b style="color:var(--af-fg-strong)">{d.what}</b></td>
+                <td>{d.react.says}<div class="ref">{d.react.ref}</div></td>
+                <td>{d.native.says}<div class="ref">{d.native.ref}</div></td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 id="findings">Findings</h2>
+    <p class="sub">
+      What was read in the code, what follows from it, and what this repository cannot settle, each with the file and line it rests on. <b>{tagCounts[0]!.n}</b> verified, <b>{tagCounts[1]!.n}</b> inferred, <b>{tagCounts[2]!.n}</b> unknown. {counted.length > 0 ? `${confirmed} of ${counted.length} that quote a number match the scan now.` : ""}
+    </p>
+    <div class="src-row"><span class="src hand">Written by hand: the statements and their references</span><span class="src scanned">Scanned at build: the counts they quote</span></div>
+    {
+      FINDINGS.length === 0 ? (
+        <div class="callout"><span>No findings are recorded yet.</span></div>
+      ) : (
+        topics.map((topic) => {
+          const items = FINDINGS.filter((f) => f.topic === topic.id);
+          return (
+            items.length > 0 && (
+              <div class="find-group" style="margin-bottom:22px">
+                <h3 style="margin:0;font-size:15px">{topic.name}</h3>
+                {
+                  items.map((f) => {
+                    const now = countNow(f);
+                    return (
+                      <div class="find" id={`finding-${f.id}`}>
+                        <div class="find-head">
+                          <span class={`chip ${f.tag === "verified" ? "ready" : f.tag === "inferred" ? "partial" : "not-applicable"}`}>{f.tag}</span>
+                          {
+                            f.count && (
+                              <span class={`cnt ${now === f.count.claimed ? "ok" : "now"}`} title={`${f.count.key}: the finding says ${f.count.claimed}`}>
+                                {f.count.key} {now === f.count.claimed ? `${now} ✓` : `claimed ${f.count.claimed}, now ${now}`}
+                              </span>
+                            )
+                          }
+                        </div>
+                        <p>{f.text}</p>
+                        <div class="refs">{f.refs.map((r) => <code class="ref">{r}</code>)}</div>
+                      </div>
+                    );
+                  })
+                }
+              </div>
+            )
+          );
+        })
+      )
+    }
+  </section>
+</Base>

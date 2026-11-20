@@ -1,0 +1,17 @@
+{
+  "name": "@antfabric-ui/docs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "What the catalogue says about each component: props, examples, edge cases, platform notes and flows. The components themselves live in the React and React Native kits.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./samples": "./src/samples/index.ts"
+  },
+  "dependencies": {
+    "@antfabric-ui/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

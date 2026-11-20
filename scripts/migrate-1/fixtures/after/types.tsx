@@ -1,0 +1,20 @@
+import type { Person, NavItem, NavRailKey } from '@antfabric-ui/react';
+import type { Attachment, MobileHeaderAction, OsNotificationKind, SidebarItemKind, NavItem } from '@antfabric-ui/react-native';
+import * as Kit from '@antfabric-ui/react';
+import type { Scheme, Scheme as CoreTheme } from '@antfabric-ui/core';
+import type { MobileHeaderProps } from '@antfabric-ui/react-native/shell';
+
+export type Dest = NavItem;
+export type Key = NavRailKey;
+export const scheme: Scheme = 'dark';
+export type Who = Person | Person;
+export type Tab = NavItem;
+export type Att = Attachment;
+export type Action = MobileHeaderAction;
+export type Kinds = [OsNotificationKind, SidebarItemKind];
+export type Spaced = Kit.NavItem;
+export type FromCore = CoreTheme;
+export type Header = Omit<MobileHeaderProps, 'statusBar' | 'clock'>;
+export type Time = MobileHeaderProps['clock'];
+export type Actions = MobileHeaderProps['actions'];
+export { Scheme as ExportedTheme } from '@antfabric-ui/core';

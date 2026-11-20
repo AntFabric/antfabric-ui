@@ -1,0 +1,2631 @@
+{
+  "$description": "Where each token in src/tokens.ts came from. Keyed by leaf path (the path inside shared, themes.light|dark or profiles.web|desktop|mobile, so a colour in both themes and a size on every platform are one entry). source: the product's Tier 2 name (--fg-body); mobile:<path> for a token in the phone's tokens.ts; proposal; or unmapped. mobile: the phone's own token for the mobile profile or palette when it differs from source. The source of a profile leaf is the desktop's; the web profile is a proposal for every leaf. Drafted by apps/catalogue/scripts/tokens-map.mts and hand-checked; drift against the product is printed by tokens-map.mts --drift.",
+  "accent.default": {
+    "source": "unmapped",
+    "note": "the product has one accent, coral (--brand); desktop.css refuses `--accent` as a name. Ours is a lavender, used by the notification-schedule component"
+  },
+  "accent.soft": {
+    "source": "unmapped",
+    "note": "see accent.default"
+  },
+  "agentSteps.icon": {
+    "source": "unmapped",
+    "note": "ours: the done tick and the failed cross, 16 on both apps"
+  },
+  "agentSteps.marker": {
+    "source": "unmapped",
+    "note": "ours: a step's state marker box, 14 in the desktop app and ThoughtLine.tsx"
+  },
+  "avatar.lg": {
+    "source": "--avatar-lg"
+  },
+  "avatar.md": {
+    "source": "--avatar-md"
+  },
+  "avatar.sm": {
+    "source": "--avatar-sm"
+  },
+  "avatar.xl": {
+    "source": "unmapped",
+    "note": "56: the product's avatars end at --avatar-lg (40)"
+  },
+  "avatar.xs": {
+    "source": "unmapped",
+    "note": "20: the product's avatars start at --avatar-sm (22)"
+  },
+  "banner.warningBorder": {
+    "source": "--banner-warning-border",
+    "note": "the product's only warning border, for the offline banner (--af-warning-200); ours is a lighter step"
+  },
+  "border.active": {
+    "source": "--border-active",
+    "mobile": "mobile:palette.borderActive"
+  },
+  "border.brand": {
+    "source": "--border-brand",
+    "mobile": "mobile:palette.borderBrand"
+  },
+  "border.default": {
+    "source": "--border-default",
+    "mobile": "mobile:palette.buttonSecondaryBorder",
+    "note": "the phone's secondary-button border; same in light, a different dark"
+  },
+  "border.inverse": {
+    "source": "unmapped",
+    "note": "ours: the edge of a key cap drawn on surface.inverse; light is white at 18%, dark the page ink at 16% (--charcoal-950-alpha-16)"
+  },
+  "border.muted": {
+    "source": "--border-muted",
+    "mobile": "mobile:palette.borderStrong",
+    "note": "the phone calls the same #dedede `borderStrong`"
+  },
+  "border.strong": {
+    "source": "--border-strong"
+  },
+  "border.subtle": {
+    "source": "--border-subtle",
+    "mobile": "mobile:palette.border"
+  },
+  "border.wHairline": {
+    "source": "--border-w-hairline",
+    "note": "the product keeps it in its desktop profile (raw 1); ours is shared, 1px everywhere. Its Tier 1 --af-border-hairline is 0.5px, which is not this"
+  },
+  "border.wThick": {
+    "source": "--border-w-thick",
+    "note": "the product keeps it in its desktop profile (raw 2); ours is shared"
+  },
+  "brand.active": {
+    "source": "--brand-active"
+  },
+  "brand.default": {
+    "source": "--brand"
+  },
+  "brand.hover": {
+    "source": "--brand-hover"
+  },
+  "brand.soft": {
+    "source": "--brand-soft"
+  },
+  "brand.softHover": {
+    "source": "--brand-soft-hover"
+  },
+  "brand.tint": {
+    "source": "unmapped",
+    "note": "#fde8e8 (the phone's tab bar and FAB fill) has no product token; the product's coral washes are --brand-soft (#fff1ee), --brand-soft-hover and --brand-soft-deep"
+  },
+  "breadcrumb.h": {
+    "source": "--breadcrumb-h",
+    "note": "44. The product's --topbar-h is 68 and has no consumer (the desktop has no top bar since ADR-0177); its only horizontal chrome is the 44px --breadcrumb-h strip. A role judgement"
+  },
+  "breadcrumbs.crumbMaxW": {
+    "source": "unmapped",
+    "note": "ours: widest a crumb grows before its label truncates"
+  },
+  "breadcrumbs.recordingDot": {
+    "source": "unmapped",
+    "note": "ours: diameter of the dot in the recording pill"
+  },
+  "breadcrumbs.recordingGap": {
+    "source": "unmapped",
+    "note": "ours: gap between the recording pill's dot and its label"
+  },
+  "button.iconLg": {
+    "source": "unmapped",
+    "note": "the product's buttons have no icon-size tokens; 12/14/14 on desktop and web, the phone's 20 for every size"
+  },
+  "button.iconMd": {
+    "source": "unmapped",
+    "note": "the product's buttons have no icon-size tokens; 12/14/14 on desktop and web, the phone's 20 for every size"
+  },
+  "button.iconSm": {
+    "source": "unmapped",
+    "note": "the product's buttons have no icon-size tokens; 12/14/14 on desktop and web, the phone's 20 for every size"
+  },
+  "button.labelLg": {
+    "source": "unmapped",
+    "note": "the product's buttons (--button-*) have colour tokens and no sizes; the label size is the kit's per button size, 12/12/13 on desktop and web and 16 on the phone"
+  },
+  "button.labelMd": {
+    "source": "unmapped",
+    "note": "the product's buttons (--button-*) have colour tokens and no sizes; the label size is the kit's per button size, 12/12/13 on desktop and web and 16 on the phone"
+  },
+  "button.labelSm": {
+    "source": "unmapped",
+    "note": "the product's buttons (--button-*) have colour tokens and no sizes; the label size is the kit's per button size, 12/12/13 on desktop and web and 16 on the phone"
+  },
+  "chart.activeRing": {
+    "source": "proposal",
+    "note": "prototype WebLine active dot (section 4)"
+  },
+  "chart.axis": {
+    "source": "proposal",
+    "note": "proposal: the value of border.strong in each theme (a neutral, so it follows the kit); the prototype's --af-chart-axis"
+  },
+  "chart.axisH": {
+    "source": "proposal",
+    "note": "prototype LineChart and BarChart axes"
+  },
+  "chart.barGap": {
+    "source": "proposal",
+    "note": "the reference dashboard's thin, round-topped bars (10 November 2026); desktop and web share one set, the phone has its own"
+  },
+  "chart.barH": {
+    "source": "proposal",
+    "note": "the chart prototype's geometry; desktop and web share one set, the phone has its own"
+  },
+  "chart.barMaxW": {
+    "source": "proposal",
+    "note": "the reference dashboard's round-topped bars, then a little wider at the user's ask (10 November 2026): the radius is half the width; desktop and web share one set, the phone has its own"
+  },
+  "chart.barMinW": {
+    "source": "proposal",
+    "note": "prototype PhoneBars (section 5)"
+  },
+  "chart.barRadius": {
+    "source": "proposal",
+    "note": "the reference dashboard's round-topped bars, then a little wider at the user's ask (10 November 2026): the radius is half the width; desktop and web share one set, the phone has its own"
+  },
+  "chart.barSoloW": {
+    "source": "proposal",
+    "note": "the user's ask (10 November 2026): a bar alone in its category grows wider than a grouped one; desktop and web share one set, the phone has its own"
+  },
+  "chart.crosshair": {
+    "source": "proposal",
+    "note": "proposal: the value of border.strong in each theme (a neutral, so it follows the kit); the prototype's --af-chart-crosshair"
+  },
+  "chart.donutSize": {
+    "source": "proposal",
+    "note": "prototype DonutChart: size 200"
+  },
+  "chart.edge": {
+    "source": "proposal",
+    "note": "prototype PhoneLine (section 5)"
+  },
+  "chart.endLabelRoom": {
+    "source": "proposal",
+    "note": "prototype BarChart, horizontal with value labels (section 4)"
+  },
+  "chart.fileBold": {
+    "source": "proposal",
+    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric-ui/core/fonts"
+  },
+  "chart.fileMedium": {
+    "source": "proposal",
+    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric-ui/core/fonts"
+  },
+  "chart.fileRegular": {
+    "source": "proposal",
+    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric-ui/core/fonts"
+  },
+  "chart.fileSemibold": {
+    "source": "proposal",
+    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric-ui/core/fonts"
+  },
+  "chart.font": {
+    "source": "proposal",
+    "note": "proposal: Geist for chart text (the user, 6 November 2026), then font.sans"
+  },
+  "chart.gaugeCap": {
+    "source": "proposal",
+    "note": "prototype GaugeChart, cornerRadius 8 (section 6)"
+  },
+  "chart.gaugeW": {
+    "source": "proposal",
+    "note": "prototype GaugeChart: 280 on desktop and web, 220 on the phone (section 6)"
+  },
+  "chart.grid": {
+    "source": "proposal",
+    "note": "proposal: the value of border.subtle in each theme (a neutral, so it follows the kit); the prototype's --af-chart-grid"
+  },
+  "chart.gridDash": {
+    "source": "proposal",
+    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+  },
+  "chart.gridGap": {
+    "source": "proposal",
+    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+  },
+  "chart.keyW": {
+    "source": "proposal",
+    "note": "prototype PeriodCompare, .key width 14px (section 7)"
+  },
+  "chart.label": {
+    "source": "proposal",
+    "note": "proposal: the value of fg.faint in each theme (a neutral, so it follows the kit; it was fg.muted until the chart type pass of 10 November 2026); the prototype's --af-chart-label"
+  },
+  "chart.labelBand": {
+    "source": "proposal",
+    "note": "prototype PhoneLine and PhoneBars (section 5)"
+  },
+  "chart.labelSize": {
+    "source": "proposal",
+    "note": "the chart prototype's geometry; desktop and web share one set, the phone has its own"
+  },
+  "chart.lineW": {
+    "source": "proposal",
+    "note": "the chart prototype's geometry; desktop and web share one set, the phone has its own"
+  },
+  "chart.listMinW": {
+    "source": "proposal",
+    "note": "proposal: the least the donut's list needs beside the ring, so it wraps under it on a narrow card"
+  },
+  "chart.other": {
+    "source": "proposal",
+    "note": "proposal: the value of chart.previous in each theme; the grey a donut's folded Other segment is drawn in"
+  },
+  "chart.partMinW": {
+    "source": "proposal",
+    "note": "prototype Breakdown, .split-list minmax(150px, 1fr) (section 7)"
+  },
+  "chart.plotMinW": {
+    "source": "proposal",
+    "note": "prototype PhoneLine and PhoneBars (section 5)"
+  },
+  "chart.pointR": {
+    "source": "proposal",
+    "note": "the chart prototype's geometry; desktop and web share one set, the phone has its own"
+  },
+  "chart.previous": {
+    "source": "proposal",
+    "note": "the reference dashboard's light blue for the last period (10 November 2026); a deep muted blue in dark"
+  },
+  "chart.previousW": {
+    "source": "proposal",
+    "note": "prototype PeriodCompare: the previous period's line is the chart's line less 0.75 (section 7)"
+  },
+  "chart.reference": {
+    "source": "proposal",
+    "note": "proposal: the value of fg.subtle in each theme (a neutral, so it follows the kit); the prototype's --af-chart-reference"
+  },
+  "chart.referenceDash": {
+    "source": "proposal",
+    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+  },
+  "chart.referenceGap": {
+    "source": "proposal",
+    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+  },
+  "chart.ringGap": {
+    "source": "proposal",
+    "note": "prototype GoalRings: 5 between bands (section 7)"
+  },
+  "chart.ringSize": {
+    "source": "proposal",
+    "note": "prototype GoalRings: 188 on desktop and web, 200 on the phone"
+  },
+  "chart.ringW": {
+    "source": "proposal",
+    "note": "prototype GoalRings: a band 14 wide, 15 on the phone (section 7)"
+  },
+  "chart.ruleH": {
+    "source": "proposal",
+    "note": "prototype MetricTabs, the selected tab's 2px rule, and PeriodCompare's .key line (section 7)"
+  },
+  "chart.series1": {
+    "source": "proposal",
+    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+  },
+  "chart.series2": {
+    "source": "proposal",
+    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+  },
+  "chart.series3": {
+    "source": "proposal",
+    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+  },
+  "chart.series4": {
+    "source": "proposal",
+    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+  },
+  "chart.series5": {
+    "source": "proposal",
+    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+  },
+  "chart.series6": {
+    "source": "proposal",
+    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+  },
+  "chart.series7": {
+    "source": "proposal",
+    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+  },
+  "chart.series8": {
+    "source": "proposal",
+    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+  },
+  "chart.seriesDash": {
+    "source": "proposal",
+    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+  },
+  "chart.seriesGap": {
+    "source": "proposal",
+    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+  },
+  "chart.sideW": {
+    "source": "proposal",
+    "note": "prototype PeriodCompare, .compare's 180px column of totals (section 7)"
+  },
+  "chart.signedRadius": {
+    "source": "proposal",
+    "note": "prototype BarChart with negatives (sections 4 and 5)"
+  },
+  "chart.sliceGap": {
+    "source": "proposal",
+    "note": "prototype DonutChart, the phone's strokeWidth 2.5 (section 6)"
+  },
+  "chart.sliceLift": {
+    "source": "proposal",
+    "note": "prototype DonutChart, extraRadius 4 and the 4px the outer radius is held in (section 6)"
+  },
+  "chart.sliceRadius": {
+    "source": "proposal",
+    "note": "prototype DonutChart, cornerRadius 5 (section 6)"
+  },
+  "chart.sparkW": {
+    "source": "proposal",
+    "note": "the chart prototype's geometry; desktop and web share one set, the phone has its own"
+  },
+  "chart.splitGap": {
+    "source": "proposal",
+    "note": "prototype Breakdown, .split gap 2px (section 7)"
+  },
+  "chart.splitH": {
+    "source": "proposal",
+    "note": "prototype Breakdown, .split height 12 (section 7)"
+  },
+  "chart.splitMinW": {
+    "source": "proposal",
+    "note": "prototype Breakdown, .split i min-width 4px (section 7)"
+  },
+  "chart.stackGap": {
+    "source": "proposal",
+    "note": "prototype WebBars and PhoneBars stacks (sections 4 and 5)"
+  },
+  "chart.tabMinW": {
+    "source": "proposal",
+    "note": "prototype MetricTabs, .mtab min-width 140px (section 7)"
+  },
+  "chart.tickOver": {
+    "source": "proposal",
+    "note": "prototype GaugeChart target tick, 4 past the ring (section 6)"
+  },
+  "chart.tickW": {
+    "source": "proposal",
+    "note": "prototype GaugeChart target tick, strokeWidth 2.5 (section 6)"
+  },
+  "chart.tipBaseH": {
+    "source": "proposal",
+    "note": "prototype PhoneLine pointerConfig (section 5)"
+  },
+  "chart.tipRowH": {
+    "source": "proposal",
+    "note": "prototype PhoneLine pointerConfig (section 5)"
+  },
+  "chart.tipW": {
+    "source": "proposal",
+    "note": "prototype PhoneLine pointerConfig (section 5)"
+  },
+  "chart.tooltip": {
+    "source": "proposal",
+    "note": "the reference dashboard's dark tooltip (10 November 2026); dark keeps the raised charcoal it had"
+  },
+  "chart.tooltipMuted": {
+    "source": "proposal",
+    "note": "the reference dashboard's dark tooltip (10 November 2026): its text and edge, light on the dark card"
+  },
+  "chart.tooltipRule": {
+    "source": "proposal",
+    "note": "the reference dashboard's dark tooltip (10 November 2026): its text and edge, light on the dark card"
+  },
+  "chart.tooltipText": {
+    "source": "proposal",
+    "note": "the reference dashboard's dark tooltip (10 November 2026): its text and edge, light on the dark card"
+  },
+  "chart.track": {
+    "source": "proposal",
+    "note": "proposal: the value of surface.muted in each theme (a neutral, so it follows the kit); the prototype's --af-chart-track"
+  },
+  "checkbox.radius": {
+    "source": "unmapped",
+    "note": "ours: a checkbox's corner radius, 4 on web and desktop, 5 on the phone"
+  },
+  "checkbox.size": {
+    "source": "unmapped",
+    "note": "ours: a checkbox's box, 15 on web and desktop, 20 on the phone; the product has no checkbox tokens"
+  },
+  "checkbox.tickSize": {
+    "source": "unmapped",
+    "note": "ours: the tick inside a checked checkbox, 9 on web and desktop, 12 on the phone"
+  },
+  "chip.h": {
+    "source": "unmapped",
+    "note": "ours: a chip's height; web and desktop equal control.hMd (36, 34), the phone draws 33; the product has no chip tokens"
+  },
+  "chip.maxW": {
+    "source": "unmapped",
+    "note": "ours: the widest a chip grows before its label truncates"
+  },
+  "chip.padX": {
+    "source": "unmapped",
+    "note": "ours: a chip's label padding, 13 on web and desktop, 16 on the phone"
+  },
+  "chip.removeSize": {
+    "source": "unmapped",
+    "note": "ours: a chip's remove cross, 20 on web and desktop, 24 on the phone"
+  },
+  "choice.dotSize": {
+    "source": "unmapped",
+    "note": "ours: the dot of a chosen radio or select option, 8 on web and desktop, 10 on the phone"
+  },
+  "choice.gap": {
+    "source": "unmapped",
+    "note": "ours: gap between a checkbox, radio or switch and its label, 9 on web and desktop, 12 on the phone; the product has no choice tokens"
+  },
+  "choice.padY": {
+    "source": "unmapped",
+    "note": "ours: vertical padding of a checkbox or radio row, 4 on web and desktop, 11 on the phone"
+  },
+  "choice.pillGap": {
+    "source": "unmapped",
+    "note": "ours: gap between the pills of a pill radio group"
+  },
+  "choice.ringNudge": {
+    "source": "unmapped",
+    "note": "ours: the 1px optical drop of a radio ring onto its label's first line"
+  },
+  "choice.ringSize": {
+    "source": "unmapped",
+    "note": "ours: a radio ring's diameter, 16 on web and desktop, 20 on the phone"
+  },
+  "choice.ringW": {
+    "source": "unmapped",
+    "note": "ours: a radio ring's stroke, 1.5, between --border-w-hairline and --border-w-thick"
+  },
+  "connectionBanner.actionH": {
+    "source": "unmapped",
+    "note": "ours: height of the Retry link in the connection banner; control.hXxs is 24 on web and 22 on desktop, so it is not that"
+  },
+  "connectionBanner.padY": {
+    "source": "unmapped",
+    "note": "ours: vertical padding of the connection banner"
+  },
+  "contextMenu.sceneOffset": {
+    "source": "unmapped",
+    "note": "ours: how far the demo scene pushes the menu in, to sit under the message it belongs to"
+  },
+  "control.hIcon": {
+    "source": "--control-h-icon",
+    "mobile": "mobile:control.iconHeight"
+  },
+  "control.hIconSm": {
+    "source": "--control-h-icon-sm"
+  },
+  "control.hInput": {
+    "source": "--control-h-input"
+  },
+  "control.hLg": {
+    "source": "--control-h-lg",
+    "note": "36; the desktop's SearchInput is t.control.hLg"
+  },
+  "control.hMd": {
+    "source": "--control-h-md"
+  },
+  "control.hSm": {
+    "source": "--control-h-sm",
+    "note": "32, the toolbar button and the 32px input (desktop.css, --radius-control)"
+  },
+  "control.hXl": {
+    "source": "--control-h-xl",
+    "mobile": "mobile:ctaHeight",
+    "note": "42, the primary CTA; was size.control.lg. Realigned by value (G2): the product's hLg is 36 and is our search field."
+  },
+  "control.hXs": {
+    "source": "--control-h-xs",
+    "note": "26; was size.control.sm. Realigned by value (G2): the product's hXs is 26."
+  },
+  "control.hXxs": {
+    "source": "unmapped",
+    "note": "22 has no product token; was size.control.xs. The product's scale starts at hXs (26), so this is hXxs, below it."
+  },
+  "control.hit": {
+    "source": "unmapped",
+    "note": "minimum target (24 web and desktop, 44 phone): WCAG 2.5.8 and Apple's HIG, not a product token"
+  },
+  "danger.default": {
+    "source": "--danger",
+    "mobile": "mobile:palette.danger"
+  },
+  "danger.fg": {
+    "source": "--danger-fg"
+  },
+  "danger.hover": {
+    "source": "--danger-hover"
+  },
+  "danger.soft": {
+    "source": "--danger-soft",
+    "mobile": "mobile:palette.dangerSoft",
+    "note": "the phone's soft status fill is its tag background (our tag.dangerBg), a different value from the desktop's"
+  },
+  "danger.solid": {
+    "source": "--danger",
+    "mobile": "mobile:palette.buttonDestructiveBg",
+    "note": "the solid destructive fill (ADR-0302); the product has no separate token and its --danger does not change in dark"
+  },
+  "danger.solidHover": {
+    "source": "--danger-hover"
+  },
+  "data.accent": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "data.accentSoft": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "data.negative": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "data.negativeSoft": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "data.onAccentSoft": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "data.onNegative": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "data.onPositive": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "data.onWarning": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "data.positive": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "data.positiveSoft": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "data.warning": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "data.warningSoft": {
+    "source": "proposal",
+    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+  },
+  "dialog.actionMinW": {
+    "source": "unmapped",
+    "note": "ours: narrowest a dialog's confirm and cancel buttons are, so the pair reads as a pair"
+  },
+  "dialog.bodyGap": {
+    "source": "unmapped",
+    "note": "ours: space under the body text of the phone's dialog, before the buttons; off the space scale on purpose"
+  },
+  "dialog.bodyMaxH": {
+    "source": "unmapped",
+    "note": "ours: tallest a dialog's body grows before it scrolls"
+  },
+  "dialog.icon": {
+    "source": "unmapped",
+    "note": "ours: side of the icon tile at the head of a dialog. Not control.hXl, which is 44 on web"
+  },
+  "dialog.w": {
+    "source": "unmapped",
+    "note": "ours: width of the dialog on web and desktop"
+  },
+  "dialog.wForm": {
+    "source": "unmapped",
+    "note": "ours: width of the form dialog, the one with a header rule and a footer bar"
+  },
+  "dot.size": {
+    "source": "unmapped",
+    "note": "ours: 8, the indicator dot; the product has no dot tokens"
+  },
+  "dot.sizeSm": {
+    "source": "unmapped",
+    "note": "ours: 6, the small indicator dot; the product has no dot tokens"
+  },
+  "duration.base": {
+    "source": "--duration-base"
+  },
+  "duration.fast": {
+    "source": "--duration-fast"
+  },
+  "duration.quick": {
+    "source": "--duration-quick"
+  },
+  "duration.slow": {
+    "source": "--duration-slow"
+  },
+  "ease.nudge": {
+    "source": "--ease-nudge"
+  },
+  "ease.out": {
+    "source": "--ease-out"
+  },
+  "ease.standard": {
+    "source": "--ease-standard"
+  },
+  "emoji.grid": {
+    "source": "unmapped",
+    "note": "ours: font size of the emoji grid in the phone's picker, with its letter spacing and line height taken from it"
+  },
+  "emoji.size": {
+    "source": "unmapped",
+    "note": "ours: font size of an emoji in the context menu's quick reactions on web and desktop; the phone uses text.lead"
+  },
+  "fab.markSize": {
+    "source": "unmapped",
+    "note": "ours: the brand mark's side inside the FAB; the product has no FAB tokens"
+  },
+  "fab.size": {
+    "source": "unmapped",
+    "note": "ours: the floating action button's disc, 40 on web and desktop, 56 on the phone; the product has no FAB tokens"
+  },
+  "fg.body": {
+    "source": "--fg-body",
+    "mobile": "mobile:palette.textBody"
+  },
+  "fg.faint": {
+    "source": "--fg-faint",
+    "mobile": "mobile:palette.textFaint"
+  },
+  "fg.muted": {
+    "source": "--fg-muted",
+    "mobile": "mobile:palette.textMuted"
+  },
+  "fg.onBrand": {
+    "source": "--fg-on-brand"
+  },
+  "fg.onBrandSoft": {
+    "source": "--fg-on-brand-soft",
+    "note": "the product names text on a coral-tinted surface `--fg-on-brand-soft` (a foreground), not a brand shade"
+  },
+  "fg.onInverse": {
+    "source": "--fg-on-inverse",
+    "mobile": "mobile:palette.textInverse"
+  },
+  "fg.placeholder": {
+    "source": "--fg-faint",
+    "note": "the product has no placeholder token; its placeholders use --fg-faint. Ours was #8a8f98 (3.25:1 on white) until 2026-11-03, raised to faint's value for AA"
+  },
+  "fg.strong": {
+    "source": "--fg-strong",
+    "mobile": "mobile:palette.text"
+  },
+  "fg.subtle": {
+    "source": "--fg-subtle"
+  },
+  "focus.ring": {
+    "source": "--focus-ring"
+  },
+  "font.accent": {
+    "source": "--font-accent",
+    "note": "same family; the product's fallback adds Times New Roman"
+  },
+  "font.display": {
+    "source": "--font-display",
+    "note": "same family, shorter fallback stack"
+  },
+  "font.fileDisplayBold": {
+    "source": "mobile:displayFamily.bold"
+  },
+  "font.fileDisplayExtrabold": {
+    "source": "mobile:displayFamily.extrabold"
+  },
+  "font.fileDisplayMedium": {
+    "source": "mobile:displayFamily.medium"
+  },
+  "font.fileDisplayRegular": {
+    "source": "mobile:displayFamily.regular"
+  },
+  "font.fileDisplaySemibold": {
+    "source": "mobile:displayFamily.semibold",
+    "note": "Satoshi ships no SemiBold, so the phone maps it to its Medium file"
+  },
+  "font.fileSansBold": {
+    "source": "mobile:bodyFamily.bold"
+  },
+  "font.fileSansExtrabold": {
+    "source": "mobile:bodyFamily.extrabold"
+  },
+  "font.fileSansMedium": {
+    "source": "mobile:bodyFamily.medium"
+  },
+  "font.fileSansRegular": {
+    "source": "mobile:bodyFamily.regular",
+    "note": "the phone's weights have no 450; book (450) reads this file too"
+  },
+  "font.fileSansSemibold": {
+    "source": "mobile:bodyFamily.semibold"
+  },
+  "font.mono": {
+    "source": "unmapped",
+    "note": "the product has no monospace family token; ours is for code and shortcuts in the catalogue and components"
+  },
+  "font.sans": {
+    "source": "--font-sans",
+    "note": "same family, shorter fallback stack (ui-sans-serif, system-ui here; -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Arial in the product)"
+  },
+  "font.weightBlack": {
+    "source": "--font-weight-black"
+  },
+  "font.weightBold": {
+    "source": "--font-weight-bold",
+    "mobile": "mobile:fontWeight.bold"
+  },
+  "font.weightMedium": {
+    "source": "--font-weight-medium",
+    "mobile": "mobile:fontWeight.medium"
+  },
+  "font.weightNormal": {
+    "source": "mobile:fontWeight.regular",
+    "note": "400, was weight.regular. The product's --font-weight-regular is 450 (Book, an owner decision in desktop.css) and is font.weightRegular here; its Tier 1 --af-weight-regular is 400."
+  },
+  "font.weightRegular": {
+    "source": "--font-weight-regular",
+    "note": "450: the product's Regular (was weight.book). The product's web profile has 400 here; ours keeps 400 as font.weightNormal."
+  },
+  "font.weightSemibold": {
+    "source": "--font-weight-semibold",
+    "mobile": "mobile:fontWeight.semibold"
+  },
+  "glass.bg": {
+    "source": "unmapped",
+    "note": "the Liquid Glass material is this repository's; neither the product nor the phone has it"
+  },
+  "glass.blur": {
+    "source": "unmapped",
+    "note": "the Liquid Glass material is this repository's; neither the product nor the phone has it"
+  },
+  "glass.clear": {
+    "source": "unmapped",
+    "note": "the Liquid Glass material is this repository's; neither the product nor the phone has it"
+  },
+  "glass.edge": {
+    "source": "unmapped",
+    "note": "the Liquid Glass material is this repository's; neither the product nor the phone has it"
+  },
+  "glass.saturate": {
+    "source": "unmapped",
+    "note": "the Liquid Glass material is this repository's; neither the product nor the phone has it"
+  },
+  "glass.solid": {
+    "source": "unmapped",
+    "note": "the Liquid Glass material is this repository's; neither the product nor the phone has it"
+  },
+  "glass.tinted": {
+    "source": "unmapped",
+    "note": "the Liquid Glass material is this repository's; neither the product nor the phone has it"
+  },
+  "gutter.page": {
+    "source": "--gutter-page"
+  },
+  "gutter.pane": {
+    "source": "--gutter-pane",
+    "mobile": "mobile:gutter",
+    "note": "12 on desktop and phone. The product's --gutter-pane is 10 (desktop.css chose 10 from the design's 9-10); the phone's gutter is 12"
+  },
+  "homeIndicator.h": {
+    "source": "unmapped",
+    "note": "iOS home indicator inset (34pt); a platform constant, zero elsewhere"
+  },
+  "hover.surface": {
+    "source": "--hover-surface",
+    "mobile": "mobile:palette.surfaceHover",
+    "note": "the product groups hover under `hover.*`, not `surface.*`"
+  },
+  "hoverCard.avatar": {
+    "source": "unmapped",
+    "note": "ours: side of the avatar in the hover card, one step over Avatar's lg"
+  },
+  "hoverCard.guestH": {
+    "source": "unmapped",
+    "note": "ours: height of the Guest chip beside a name in the hover card"
+  },
+  "hoverCard.guestPadX": {
+    "source": "unmapped",
+    "note": "ours: side padding of the Guest chip"
+  },
+  "hoverCard.headGap": {
+    "source": "unmapped",
+    "note": "ours: gap between the person's avatar and their name in the hover card"
+  },
+  "hoverCard.presenceDot": {
+    "source": "unmapped",
+    "note": "ours: diameter of the presence dot in the hover card"
+  },
+  "hoverCard.w": {
+    "source": "unmapped",
+    "note": "ours: width of the hover card. The tooltip's widest is also 260, a separate role"
+  },
+  "icon.size": {
+    "source": "--icon-size",
+    "mobile": "mobile:icon.size",
+    "note": "16 on desktop, 20 on the phone: the default icon"
+  },
+  "icon.sizeLg": {
+    "source": "unmapped",
+    "note": "20 on desktop and 24 on the phone: no larger icon step in the product or the phone"
+  },
+  "icon.sizeMd": {
+    "source": "--icon-size-md",
+    "mobile": "mobile:icon.sizeMd",
+    "note": "14 on desktop, 16 on the phone"
+  },
+  "icon.sizeSm": {
+    "source": "--icon-size-sm",
+    "mobile": "mobile:icon.sizeSm",
+    "note": "12. The product's default is --icon-size (our icon.size), its -md is our sizeMd, its -sm is our sizeSm."
+  },
+  "icon.stroke": {
+    "source": "mobile:icon.stroke",
+    "note": "1.5 on the phone. Desktop 2.25 is a code constant in the desktop app's icons, not a token; web 2 is a proposal"
+  },
+  "icon.strokeBold": {
+    "source": "unmapped",
+    "note": "ours: stroke of a small bold glyph, such as a notification's kind mark or a window's close cross, where icon.stroke would be too light to read"
+  },
+  "icon.strokeThin": {
+    "source": "unmapped",
+    "note": "ours: stroke of the Windows caption glyphs, Fluent's thin line"
+  },
+  "icon.strokeTick": {
+    "source": "unmapped",
+    "note": "ours: the checkbox tick's heavy stroke, 3.4 on web and desktop, 3 on the phone; the product has one icon stroke only on the phone"
+  },
+  "iconButton.badgeRight": {
+    "source": "unmapped",
+    "note": "ours: the count badge's hang past an icon button; the product has no icon-button tokens"
+  },
+  "iconButton.badgeTop": {
+    "source": "unmapped",
+    "note": "ours: the count badge's hang above an icon button; the product has no icon-button tokens"
+  },
+  "identity.agent": {
+    "source": "--identity-agent"
+  },
+  "identity.green": {
+    "source": "--identity-green"
+  },
+  "identity.indigo": {
+    "source": "--identity-indigo"
+  },
+  "identity.ink": {
+    "source": "--identity-ink"
+  },
+  "identity.ochre": {
+    "source": "--identity-ochre"
+  },
+  "identity.red": {
+    "source": "--identity-red"
+  },
+  "inAppBanner.dismissInset": {
+    "source": "unmapped",
+    "note": "ours: right padding that leaves room for the banner's close button"
+  },
+  "inAppBanner.w": {
+    "source": "unmapped",
+    "note": "ours: width of the banner: 361pt, a phone card, on the phone; 380 on web and desktop. The kits differ"
+  },
+  "info.default": {
+    "source": "--info",
+    "mobile": "mobile:palette.info"
+  },
+  "info.soft": {
+    "source": "--info-soft",
+    "mobile": "mobile:palette.infoSoft",
+    "note": "the phone's soft status fill is its tag background (our tag.infoBg), a different value from the desktop's"
+  },
+  "kpi.cardTrendH": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.chipSize": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.loadL": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.loadLineH": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.loadM": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.loadS": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.loadValueH": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.loadXl": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.meterCompactW": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.meterH": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.meterMinW": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.ringMinW": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.ringSize": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.sparkBarMaxW": {
+    "source": "proposal",
+    "note": "the reference dashboard's thin KPI bars (10 November 2026): chart.barMaxW's value before BarChart's bars were widened, kept for SparkBars alone"
+  },
+  "kpi.sparkBarRadius": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.tileBarsW": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.tileTrendH": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "kpi.tileTrendW": {
+    "source": "proposal",
+    "note": "prototype KPI pieces"
+  },
+  "link.default": {
+    "source": "--link"
+  },
+  "menu.rowHCoarse": {
+    "source": "unmapped",
+    "note": "ours: height of a menu row when the pointer is coarse, a touch laptop"
+  },
+  "menu.w": {
+    "source": "unmapped",
+    "note": "ours: width of the menu sheet on the phone; web and desktop take the menu's width prop"
+  },
+  "menu.wContext": {
+    "source": "unmapped",
+    "note": "ours: width of the context menu on web and desktop. Not rail.wSidebar, a different role that is 260 on web"
+  },
+  "mobileHeader.largeTitleLine": {
+    "source": "unmapped",
+    "note": "ours: line height of the large title, 4 more than text.h1Line, so the 28 title breathes"
+  },
+  "mobileHeader.rowMinH": {
+    "source": "unmapped",
+    "note": "ours: minimum height of the header's title row on the phone; the same number as row.h, but it is the header, not a list row"
+  },
+  "mobileHeader.titleInset": {
+    "source": "unmapped",
+    "note": "ours: space each side of the header's centred title that is left for the leading and trailing controls"
+  },
+  "navRail.badgeLeft": {
+    "source": "unmapped",
+    "note": "ours: how far in from the item's left edge a rail item's corner badge starts"
+  },
+  "navRail.badgeTop": {
+    "source": "unmapped",
+    "note": "ours: how far a rail item's corner badge sits above the item"
+  },
+  "navRail.chipH": {
+    "source": "unmapped",
+    "note": "ours: height of the chip beside a rail item's label"
+  },
+  "navRail.item": {
+    "source": "unmapped",
+    "note": "ours: side of a rail item and of the workspace tiles in the same column"
+  },
+  "navRail.logo": {
+    "source": "unmapped",
+    "note": "ours: side of the logo mark at the head of the expanded rail"
+  },
+  "navRail.logoGlyph": {
+    "source": "unmapped",
+    "note": "ours: font size of the letter in the logo mark"
+  },
+  "navRail.logoRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the logo mark"
+  },
+  "navRail.wOpen": {
+    "source": "unmapped",
+    "note": "ours: width of the expanded rail. rail.wSidebar is 260 on web; the expanded rail keeps 248 on both, so the kits' values are not merged"
+  },
+  "notificationItem.kindBadge": {
+    "source": "unmapped",
+    "note": "ours: side of the badge on a notification's avatar that says what kind it is"
+  },
+  "notificationItem.kindBadgeRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the kind badge on a notification's avatar"
+  },
+  "notificationItem.metaGap": {
+    "source": "unmapped",
+    "note": "ours: gap between a notification's time and its unread dot"
+  },
+  "notificationItem.textGap": {
+    "source": "unmapped",
+    "note": "ours: gap between a notification's title and its body"
+  },
+  "notificationItem.tile": {
+    "source": "unmapped",
+    "note": "ours: side of the icon tile of a notification that has no person's avatar"
+  },
+  "notificationSchedule.noteMaxW": {
+    "source": "unmapped",
+    "note": "ours: widest the schedule's explanatory note grows before it wraps"
+  },
+  "notificationSchedule.w": {
+    "source": "unmapped",
+    "note": "ours: width of the schedule menu: the full 361pt card on the phone; 264 on web and desktop. The kits differ"
+  },
+  "opacity.disabled": {
+    "source": "unmapped",
+    "note": "no opacity tokens in the product's tokens.json"
+  },
+  "opacity.muted": {
+    "source": "unmapped",
+    "note": "no opacity tokens in the product's tokens.json"
+  },
+  "opacity.secondary": {
+    "source": "proposal",
+    "note": "the 0.7 the kits wrote inline on Chip's count and Button's shortcut, named so a theme can lift it"
+  },
+  "os.badge": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.browserChrome": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.browserTab": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.iosLabelShadow": {
+    "source": "unmapped",
+    "note": "ours: shadow under the iOS home-screen label so white text reads on any wallpaper; the same in both themes"
+  },
+  "os.island": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.macAccent": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.macClose": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.macLightEdge": {
+    "source": "unmapped",
+    "note": "ours: hairline around a macOS traffic-light button, the same in both themes because the lights are the OS's own"
+  },
+  "os.macMax": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.macMin": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.notificationBg": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.notificationFg": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.statusFg": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.wallpaper": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.winClose": {
+    "source": "unmapped",
+    "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.winClosePressed": {
+    "source": "unmapped",
+    "note": "ours: fill of the Windows close button while pressed, darker than os.winClose; the same in both themes"
+  },
+  "osBadge.androidDot": {
+    "source": "unmapped",
+    "note": "ours: diameter of the Android launcher dot"
+  },
+  "osBadge.androidDotInset": {
+    "source": "unmapped",
+    "note": "ours: how far the Android launcher dot sits in from the tile's right edge"
+  },
+  "osBadge.browserFavicon": {
+    "source": "unmapped",
+    "note": "ours: side of the favicon in the browser tab"
+  },
+  "osBadge.browserFaviconLabel": {
+    "source": "unmapped",
+    "note": "ours: font size of the letter in the favicon"
+  },
+  "osBadge.browserFaviconRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the favicon in the browser tab"
+  },
+  "osBadge.browserHang": {
+    "source": "unmapped",
+    "note": "ours: how far the browser favicon's dot sits past the favicon's top right corner"
+  },
+  "osBadge.browserStripRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the browser's tab strip"
+  },
+  "osBadge.browserStripW": {
+    "source": "unmapped",
+    "note": "ours: width of the browser's tab strip drawn around the favicon badge"
+  },
+  "osBadge.browserTabH": {
+    "source": "unmapped",
+    "note": "ours: height of the browser tab that carries the favicon badge"
+  },
+  "osBadge.browserTabRadius": {
+    "source": "unmapped",
+    "note": "ours: radius of the browser tab's two top corners"
+  },
+  "osBadge.browserTabW": {
+    "source": "unmapped",
+    "note": "ours: width of the browser tab that carries the favicon badge"
+  },
+  "osBadge.iosHangX": {
+    "source": "unmapped",
+    "note": "ours: how far the iOS badge sits past the tile's right edge"
+  },
+  "osBadge.iosHangY": {
+    "source": "unmapped",
+    "note": "ours: how far the iOS badge sits above the tile's top edge"
+  },
+  "osBadge.iosLabel": {
+    "source": "unmapped",
+    "note": "ours: font size and line height of the count in the iOS badge"
+  },
+  "osBadge.iosPadX": {
+    "source": "unmapped",
+    "note": "ours: side padding of the iOS badge"
+  },
+  "osBadge.iosSize": {
+    "source": "unmapped",
+    "note": "ours: minimum width and height of the iOS badge"
+  },
+  "osBadge.iosTilePadX": {
+    "source": "unmapped",
+    "note": "ours: side padding of the iOS home-screen tile around the app icon"
+  },
+  "osBadge.iosTilePadY": {
+    "source": "unmapped",
+    "note": "ours: top and bottom padding of the iOS home-screen tile around the app icon"
+  },
+  "osBadge.iosTileRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the iOS home-screen tile, the system's own squircle and not radius.tray"
+  },
+  "osBadge.linuxDockRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the Linux dock strip the app icon sits on"
+  },
+  "osBadge.linuxH": {
+    "source": "unmapped",
+    "note": "ours: height of the Linux dock badge"
+  },
+  "osBadge.linuxHangX": {
+    "source": "unmapped",
+    "note": "ours: how far the Linux dock badge sits past the icon's right edge"
+  },
+  "osBadge.linuxHangY": {
+    "source": "unmapped",
+    "note": "ours: how far the Linux dock badge sits above the icon's top edge"
+  },
+  "osBadge.linuxLabel": {
+    "source": "unmapped",
+    "note": "ours: font size of the count in the Linux dock badge"
+  },
+  "osBadge.linuxMinW": {
+    "source": "unmapped",
+    "note": "ours: minimum width of the Linux dock badge"
+  },
+  "osBadge.linuxPadX": {
+    "source": "unmapped",
+    "note": "ours: side padding of the Linux dock badge"
+  },
+  "osBadge.macDockRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the macOS dock strip the app icon sits on"
+  },
+  "osBadge.macHangX": {
+    "source": "unmapped",
+    "note": "ours: how far the macOS dock badge sits past the icon's right edge"
+  },
+  "osBadge.macHangY": {
+    "source": "unmapped",
+    "note": "ours: how far the macOS dock badge sits above the icon's top edge"
+  },
+  "osBadge.macIconRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the app icon in the macOS dock"
+  },
+  "osBadge.macIconSize": {
+    "source": "unmapped",
+    "note": "ours: side of the app icon in the macOS dock"
+  },
+  "osBadge.macRunDot": {
+    "source": "unmapped",
+    "note": "ours: diameter of the dot under a running app in the macOS dock"
+  },
+  "osBadge.macSize": {
+    "source": "unmapped",
+    "note": "ours: minimum width and height of the macOS dock badge"
+  },
+  "osBadge.winBarH": {
+    "source": "unmapped",
+    "note": "ours: height of the bar under a running app on the Windows taskbar"
+  },
+  "osBadge.winBarW": {
+    "source": "unmapped",
+    "note": "ours: width of the bar under a running app on the Windows taskbar"
+  },
+  "osBadge.winButtonRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the app's button on the Windows taskbar"
+  },
+  "osBadge.winButtonSize": {
+    "source": "unmapped",
+    "note": "ours: side of the app's button on the Windows taskbar"
+  },
+  "osBadge.winDot": {
+    "source": "unmapped",
+    "note": "ours: size of the Windows taskbar badge when it is a dot with no count"
+  },
+  "osBadge.winHangX": {
+    "source": "unmapped",
+    "note": "ours: how far the Windows taskbar badge sits past the button's right edge"
+  },
+  "osBadge.winHangY": {
+    "source": "unmapped",
+    "note": "ours: how far the Windows taskbar badge sits below the button's bottom edge"
+  },
+  "osBadge.winLabel": {
+    "source": "unmapped",
+    "note": "ours: font size of the count in the Windows taskbar badge"
+  },
+  "osBadge.winPadX": {
+    "source": "unmapped",
+    "note": "ours: side padding of the Windows taskbar badge"
+  },
+  "osBadge.winSize": {
+    "source": "unmapped",
+    "note": "ours: minimum width and height of the Windows taskbar badge"
+  },
+  "osBadge.winTaskbarH": {
+    "source": "unmapped",
+    "note": "ours: height of the Windows taskbar"
+  },
+  "osHeader.androidHomeBarH": {
+    "source": "unmapped",
+    "note": "ours: height of Android's gesture pill"
+  },
+  "osHeader.androidHomeBarW": {
+    "source": "unmapped",
+    "note": "ours: width of Android's gesture pill"
+  },
+  "osHeader.androidNavH": {
+    "source": "unmapped",
+    "note": "ours: height of Android's gesture-navigation strip under the tab bar"
+  },
+  "osHeader.iosHomeBarH": {
+    "source": "unmapped",
+    "note": "ours: height of iOS's home indicator pill"
+  },
+  "osHeader.iosHomeBarW": {
+    "source": "unmapped",
+    "note": "ours: width of iOS's home indicator pill"
+  },
+  "osHeader.islandH": {
+    "source": "unmapped",
+    "note": "ours: height of the iPhone's Dynamic Island"
+  },
+  "osHeader.islandTop": {
+    "source": "unmapped",
+    "note": "ours: how far the iPhone's Dynamic Island sits below the top edge"
+  },
+  "osHeader.islandW": {
+    "source": "unmapped",
+    "note": "ours: width of the iPhone's Dynamic Island"
+  },
+  "osHeader.punchSize": {
+    "source": "unmapped",
+    "note": "ours: diameter of an Android camera punch-hole"
+  },
+  "osHeader.punchTop": {
+    "source": "unmapped",
+    "note": "ours: how far an Android camera punch-hole sits below the top edge"
+  },
+  "osMenu.browserMenuW": {
+    "source": "unmapped",
+    "note": "ours: width of the browser's overflow menu"
+  },
+  "osMenu.linuxDropW": {
+    "source": "unmapped",
+    "note": "ours: width of a GNOME menu"
+  },
+  "osMenu.linuxItemH": {
+    "source": "unmapped",
+    "note": "ours: height of a title in the GNOME top bar"
+  },
+  "osMenu.macBarH": {
+    "source": "unmapped",
+    "note": "ours: height of the macOS menu bar"
+  },
+  "osMenu.macDropPad": {
+    "source": "unmapped",
+    "note": "ours: padding between a macOS dropdown's edge and its rows"
+  },
+  "osMenu.macDropRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a macOS dropdown"
+  },
+  "osMenu.macDropTop": {
+    "source": "unmapped",
+    "note": "ours: how far below the menu bar's top a macOS dropdown opens"
+  },
+  "osMenu.macDropW": {
+    "source": "unmapped",
+    "note": "ours: width of a macOS dropdown"
+  },
+  "osMenu.macGlassRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a macOS 26 dropdown on Liquid Glass"
+  },
+  "osMenu.macItemH": {
+    "source": "unmapped",
+    "note": "ours: height of a title in the macOS menu bar at rest"
+  },
+  "osMenu.macTitleH": {
+    "source": "unmapped",
+    "note": "ours: height of a macOS menu title's pill when it is open"
+  },
+  "osMenu.macTitlePadX": {
+    "source": "unmapped",
+    "note": "ours: side padding of a macOS menu title"
+  },
+  "osMenu.winDropW": {
+    "source": "unmapped",
+    "note": "ours: width of a Windows menu"
+  },
+  "osMenu.winFlyoutLeft": {
+    "source": "unmapped",
+    "note": "ours: how far a Windows flyout starts from its parent menu's left edge"
+  },
+  "osMenu.winFlyoutTop": {
+    "source": "unmapped",
+    "note": "ours: how far a Windows flyout sits above the row that opened it"
+  },
+  "osMenu.winFlyoutW": {
+    "source": "unmapped",
+    "note": "ours: width of a Windows flyout"
+  },
+  "osMenu.winRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a Windows menu and its flyout"
+  },
+  "osNotification.androidFieldH": {
+    "source": "unmapped",
+    "note": "ours: height of the Android notification's reply field"
+  },
+  "osNotification.androidFieldRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the Android notification's reply field"
+  },
+  "osNotification.androidIconSize": {
+    "source": "unmapped",
+    "note": "ours: side of the small app icon in an Android notification's header"
+  },
+  "osNotification.androidRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of an Android notification"
+  },
+  "osNotification.appIconRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the app icon in a macOS or iOS notification"
+  },
+  "osNotification.badgeEdge": {
+    "source": "unmapped",
+    "note": "ours: width of the ring that separates the app badge from the avatar under it"
+  },
+  "osNotification.badgeRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the app badge on a notification's avatar"
+  },
+  "osNotification.badgeSize": {
+    "source": "unmapped",
+    "note": "ours: side of the app badge on a notification's avatar, macOS and iOS"
+  },
+  "osNotification.browserActionH": {
+    "source": "unmapped",
+    "note": "ours: height of a browser notification's action button"
+  },
+  "osNotification.browserRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a browser notification"
+  },
+  "osNotification.closeHang": {
+    "source": "unmapped",
+    "note": "ours: how far the macOS close button overhangs the banner's top left corner"
+  },
+  "osNotification.controlRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the small controls on Windows and GNOME notifications: buttons, the reply field, the send and close buttons"
+  },
+  "osNotification.fieldH": {
+    "source": "unmapped",
+    "note": "ours: height of the macOS reply field"
+  },
+  "osNotification.iconLabel": {
+    "source": "unmapped",
+    "note": "ours: font size of the letter in the app's small mark"
+  },
+  "osNotification.iconSize": {
+    "source": "unmapped",
+    "note": "ours: side of the app's small mark beside its name in a notification's header"
+  },
+  "osNotification.iosActionRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of an iOS notification's action button"
+  },
+  "osNotification.iosBody": {
+    "source": "unmapped",
+    "note": "ours: font size of the iOS notification's title and body"
+  },
+  "osNotification.iosControlH": {
+    "source": "unmapped",
+    "note": "ours: height of the iOS notification's reply field and action rows"
+  },
+  "osNotification.iosFieldRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the iOS notification's reply field"
+  },
+  "osNotification.iosHairline": {
+    "source": "unmapped",
+    "note": "ours: width of the iOS menu's divider, a true half pixel"
+  },
+  "osNotification.iosHeader": {
+    "source": "unmapped",
+    "note": "ours: font size of the iOS notification's app name"
+  },
+  "osNotification.iosIconSize": {
+    "source": "unmapped",
+    "note": "ours: side of the app icon in an iOS notification"
+  },
+  "osNotification.iosLine": {
+    "source": "unmapped",
+    "note": "ours: line height of the iOS notification's title and body"
+  },
+  "osNotification.iosMenuRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the iOS long-press menu"
+  },
+  "osNotification.iosMenuW": {
+    "source": "unmapped",
+    "note": "ours: width of the iOS long-press menu under a notification"
+  },
+  "osNotification.iosRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of an iOS notification"
+  },
+  "osNotification.iosTime": {
+    "source": "unmapped",
+    "note": "ours: font size of the time on an iOS notification"
+  },
+  "osNotification.linuxActionH": {
+    "source": "unmapped",
+    "note": "ours: height of a GNOME notification's action button"
+  },
+  "osNotification.linuxActionRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a GNOME notification's action button"
+  },
+  "osNotification.linuxRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a GNOME notification"
+  },
+  "osNotification.macActionH": {
+    "source": "unmapped",
+    "note": "ours: height of a macOS notification's action button"
+  },
+  "osNotification.macActionRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a macOS notification's action button and reply field"
+  },
+  "osNotification.macIconLabel": {
+    "source": "unmapped",
+    "note": "ours: font size of the letter in the macOS notification's app icon"
+  },
+  "osNotification.macIconSize": {
+    "source": "unmapped",
+    "note": "ours: side of the app icon on a macOS notification that has no avatar"
+  },
+  "osNotification.macRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a macOS notification banner"
+  },
+  "osNotification.sendSize": {
+    "source": "unmapped",
+    "note": "ours: diameter of the macOS send button"
+  },
+  "osNotification.sliverFarH": {
+    "source": "unmapped",
+    "note": "ours: height of the farther stacked-notification sliver"
+  },
+  "osNotification.sliverFarRadius": {
+    "source": "unmapped",
+    "note": "ours: bottom corner radius of the farther sliver"
+  },
+  "osNotification.sliverH": {
+    "source": "unmapped",
+    "note": "ours: height of the nearer stacked-notification sliver under an iOS banner"
+  },
+  "osNotification.sliverRadius": {
+    "source": "unmapped",
+    "note": "ours: bottom corner radius of the nearer sliver"
+  },
+  "osNotification.w": {
+    "source": "unmapped",
+    "note": "ours: width of an iOS or Android notification: a phone card, 393 less 16 each side"
+  },
+  "osNotification.winRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a Windows toast"
+  },
+  "osNotification.winSendSize": {
+    "source": "unmapped",
+    "note": "ours: side of the Windows send button"
+  },
+  "osTray.glyph": {
+    "source": "unmapped",
+    "note": "ours: side of the tray glyph's box in the Windows taskbar and GNOME bar"
+  },
+  "osTray.glyphRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the tray glyph's box"
+  },
+  "osTray.linuxBarH": {
+    "source": "unmapped",
+    "note": "ours: height of the GNOME top bar that holds the tray's icon"
+  },
+  "osTray.linuxRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the GNOME tray menu"
+  },
+  "osTray.linuxRowH": {
+    "source": "unmapped",
+    "note": "ours: height of a row in the GNOME tray menu"
+  },
+  "osTray.linuxRowRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a row in the GNOME tray menu"
+  },
+  "osTray.liquidRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the macOS 26 tray menu on Liquid Glass"
+  },
+  "osTray.macRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the macOS menu-bar menu"
+  },
+  "osTray.macRowH": {
+    "source": "unmapped",
+    "note": "ours: height of a row in the macOS menu-bar menu"
+  },
+  "osTray.macRowRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a row in the macOS menu-bar menu"
+  },
+  "osTray.sheetW": {
+    "source": "unmapped",
+    "note": "ours: width of the open submenu"
+  },
+  "osTray.statusBarH": {
+    "source": "unmapped",
+    "note": "ours: height of the macOS menu bar that holds the tray's status item"
+  },
+  "osTray.statusBarRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the macOS menu bar strip in the tray demo"
+  },
+  "osTray.statusGap": {
+    "source": "unmapped",
+    "note": "ours: gap between the tray's glyph and its label in the status item"
+  },
+  "osTray.statusItemH": {
+    "source": "unmapped",
+    "note": "ours: height of the tray's status item in the menu bar"
+  },
+  "osTray.statusItemLiquidRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the tray's status item on Liquid Glass"
+  },
+  "osTray.statusItemRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the tray's status item"
+  },
+  "osTray.submenuTop": {
+    "source": "unmapped",
+    "note": "ours: how far the open submenu sits above its parent row"
+  },
+  "osTray.winRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the Windows tray flyout"
+  },
+  "osTray.winRowH": {
+    "source": "unmapped",
+    "note": "ours: height of a row in the Windows tray flyout"
+  },
+  "osTray.winRowRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a row in the Windows tray flyout"
+  },
+  "osTray.winTaskbarH": {
+    "source": "unmapped",
+    "note": "ours: height of the Windows taskbar that holds the tray's icon"
+  },
+  "osTray.winTaskbarRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the Windows taskbar strip in the tray demo"
+  },
+  "osWindow.linuxCaption": {
+    "source": "unmapped",
+    "note": "ours: diameter of a GNOME caption button"
+  },
+  "osWindow.macLight": {
+    "source": "unmapped",
+    "note": "ours: diameter of a macOS traffic-light button"
+  },
+  "osWindow.macLightsInset": {
+    "source": "unmapped",
+    "note": "ours: room the breadcrumb strip keeps at its start for the three macOS traffic lights and their gaps"
+  },
+  "osWindow.macLightsW": {
+    "source": "unmapped",
+    "note": "ours: room the title bar reserves at its start for the three macOS traffic lights, a different role from the breadcrumb strip's inset"
+  },
+  "osWindow.winCaptionW": {
+    "source": "unmapped",
+    "note": "ours: width of a Windows caption button"
+  },
+  "palette.fieldPadY": {
+    "source": "unmapped",
+    "note": "ours: vertical padding of the palette's search field"
+  },
+  "palette.listMaxH": {
+    "source": "unmapped",
+    "note": "ours: tallest the results list grows before it scrolls"
+  },
+  "palette.optionPadX": {
+    "source": "unmapped",
+    "note": "ours: side padding of a result row, and of the loading and empty rows, in the command palette"
+  },
+  "palette.slot": {
+    "source": "unmapped",
+    "note": "ours: side of the cell that holds a result's avatar or icon"
+  },
+  "palette.w": {
+    "source": "unmapped",
+    "note": "ours: width of the command palette"
+  },
+  "permissionPrompt.addressH": {
+    "source": "unmapped",
+    "note": "ours: height of the browser's address chip that shows the page asking"
+  },
+  "permissionPrompt.lock": {
+    "source": "unmapped",
+    "note": "ours: side of the lock disc inside the browser's address chip"
+  },
+  "permissionPrompt.tile": {
+    "source": "unmapped",
+    "note": "ours: side of the icon tile at the head of the permission card: 44pt on the phone, 40 on web and desktop"
+  },
+  "permissionPrompt.w": {
+    "source": "unmapped",
+    "note": "ours: width of the permission card: the 361pt phone card on the phone; 400 on web and desktop. The kits differ"
+  },
+  "phone.cardW": {
+    "source": "unmapped",
+    "note": "ours: width of a card on the phone: a 393pt screen less 16 each side"
+  },
+  "presence.active": {
+    "source": "unmapped",
+    "note": "no presence (online/away/offline) tokens in the product or the phone"
+  },
+  "presence.away": {
+    "source": "unmapped",
+    "note": "no presence (online/away/offline) tokens in the product or the phone"
+  },
+  "presence.dnd": {
+    "source": "unmapped",
+    "note": "no presence (online/away/offline) tokens in the product or the phone; do-not-disturb is --danger's value today"
+  },
+  "presence.offline": {
+    "source": "unmapped",
+    "note": "no presence (online/away/offline) tokens in the product or the phone"
+  },
+  "questionPanel.argKeyMinW": {
+    "source": "unmapped",
+    "note": "ours: the argument key column, 84 in AgentApproval.tsx, 88 on the phone (ApprovalCard.tsx)"
+  },
+  "questionPanel.argsMaxH": {
+    "source": "unmapped",
+    "note": "ours: the argument list's height cap, 240 in AgentApproval.tsx, 220 on the phone (ApprovalCard.tsx)"
+  },
+  "questionPanel.confirmInset": {
+    "source": "unmapped",
+    "note": "ours: how far the confirm field sits in under its row, 19 in the desktop app"
+  },
+  "questionPanel.detailsMaxH": {
+    "source": "unmapped",
+    "note": "ours: the consent intent's height cap, 180 in AgentDirective.tsx"
+  },
+  "questionPanel.elbowH": {
+    "source": "unmapped",
+    "note": "ours: the type-to-confirm elbow's height, 22 in the desktop app"
+  },
+  "questionPanel.elbowRadius": {
+    "source": "unmapped",
+    "note": "ours: the elbow's rounded corner, 6 in the desktop app"
+  },
+  "questionPanel.elbowW": {
+    "source": "unmapped",
+    "note": "ours: the type-to-confirm elbow's width, 12 in the desktop app"
+  },
+  "questionPanel.keySize": {
+    "source": "unmapped",
+    "note": "ours: the number-key box beside a row, 20 in the desktop app"
+  },
+  "questionPanel.maxW": {
+    "source": "--content-w-composer",
+    "note": "the product clamps it between 680 and 880 over 34vw; ours holds the laptop value, 680"
+  },
+  "radioGroup.cardMinW": {
+    "source": "proposal",
+    "note": "proposal: 220, a card wide enough for a small preview picture and a label with a tag"
+  },
+  "radius.card": {
+    "source": "--radius-card",
+    "mobile": "mobile:radii.xl",
+    "note": "phone's Card uses radii.xl (16): the phone's card corner is 4 larger than the desktop's"
+  },
+  "radius.circle": {
+    "source": "--radius-circle"
+  },
+  "radius.control": {
+    "source": "--radius-control",
+    "mobile": "mobile:radii.control"
+  },
+  "radius.input": {
+    "source": "--radius-input",
+    "mobile": "mobile:radii.input"
+  },
+  "radius.none": {
+    "source": "mobile:radii.none",
+    "note": "0 is a literal in the product; the phone names it"
+  },
+  "radius.panel": {
+    "source": "--radius-panel"
+  },
+  "radius.pill": {
+    "source": "--radius-pill",
+    "mobile": "mobile:radii.pill"
+  },
+  "radius.rail": {
+    "source": "--radius-rail",
+    "mobile": "mobile:radii.rail"
+  },
+  "radius.row": {
+    "source": "--radius-row"
+  },
+  "radius.sheet": {
+    "source": "--radius-sheet"
+  },
+  "radius.tag": {
+    "source": "--radius-tag",
+    "mobile": "mobile:radii.tag"
+  },
+  "radius.tray": {
+    "source": "--radius-tray"
+  },
+  "rail.wNav": {
+    "source": "--rail-w-nav"
+  },
+  "rail.wSidebar": {
+    "source": "--rail-w-sidebar",
+    "note": "the product's is fluid, clamp(248px, 16.4vw, 400px); ours is its floor"
+  },
+  "row.h": {
+    "source": "unmapped",
+    "note": "list-row height: no row-height token in the product's tokens.json"
+  },
+  "row.hLg": {
+    "source": "unmapped",
+    "note": "tall list-row height: no row-height token in the product's tokens.json"
+  },
+  "row.textGap": {
+    "source": "unmapped",
+    "note": "ours: gap between a row's label and its sublabel"
+  },
+  "scrim.default": {
+    "source": "--scrim",
+    "mobile": "mobile:palette.overlay"
+  },
+  "scrim.light": {
+    "source": "--scrim-light"
+  },
+  "scrim.strong": {
+    "source": "--scrim-strong"
+  },
+  "segmentedControl.cardInset": {
+    "source": "unmapped",
+    "note": "ours: -1, the chosen card covering the segment's own 1px transparent edge"
+  },
+  "segmentedControl.countSize": {
+    "source": "unmapped",
+    "note": "ours: the count pill's minimum size inside a segment"
+  },
+  "segmentedControl.h": {
+    "source": "unmapped",
+    "note": "ours: the segmented control's height, 32 on web and desktop, 36 on the phone; the product has no segmented-control tokens"
+  },
+  "segmentedControl.padX": {
+    "source": "unmapped",
+    "note": "ours: a segment's side padding, 13 on web and desktop, 16 on the phone"
+  },
+  "select.chipH": {
+    "source": "unmapped",
+    "note": "ours: the chip-variant select's height"
+  },
+  "select.chipPadLeft": {
+    "source": "unmapped",
+    "note": "ours: the chip-variant select's left padding"
+  },
+  "select.dotGap": {
+    "source": "unmapped",
+    "note": "ours: space between a chosen option's dot and its label"
+  },
+  "select.linkH": {
+    "source": "unmapped",
+    "note": "ours: the link-variant select's height"
+  },
+  "select.linkPadX": {
+    "source": "unmapped",
+    "note": "ours: the link-variant select's side padding"
+  },
+  "select.padLeftSm": {
+    "source": "unmapped",
+    "note": "ours: the compact select's left padding; the product has no select tokens"
+  },
+  "select.panelMaxH": {
+    "source": "unmapped",
+    "note": "ours: the open list's tallest height before it scrolls"
+  },
+  "select.panelMinW": {
+    "source": "unmapped",
+    "note": "ours: the open list's narrowest width under an inline link select"
+  },
+  "select.panelPad": {
+    "source": "unmapped",
+    "note": "ours: padding between the open list's edge and its rows"
+  },
+  "select.triggerGap": {
+    "source": "unmapped",
+    "note": "ours: gap between the value and the caret in the chip and link selects"
+  },
+  "sessionState.proseMaxW": {
+    "source": "unmapped",
+    "note": "ours: widest the explanation under a session-state title grows before it wraps"
+  },
+  "sessionState.tile": {
+    "source": "unmapped",
+    "note": "ours: side of the disc at the head of the session-state card: 84pt on the phone; 56 on web and desktop. The kits differ"
+  },
+  "sessionState.w": {
+    "source": "unmapped",
+    "note": "ours: width of the session-state card: the 361pt phone card on the phone; 380 on web and desktop. The kits differ"
+  },
+  "shadow.card": {
+    "source": "--shadow-card"
+  },
+  "shadow.float": {
+    "source": "--shadow-float"
+  },
+  "shadow.focus": {
+    "source": "--focus-ring",
+    "note": "a composite: 0 0 0 var(--focus-ring-w) var(--focus-ring); the product keeps the width and the colour apart"
+  },
+  "shadow.glass": {
+    "source": "unmapped",
+    "note": "the Liquid Glass material is this repository's"
+  },
+  "shadow.glassContrast": {
+    "source": "unmapped",
+    "note": "the Liquid Glass material under Increase Contrast; this repository's"
+  },
+  "shadow.hairline": {
+    "source": "--shadow-hairline"
+  },
+  "shadow.menu": {
+    "source": "--shadow-menu"
+  },
+  "shadow.modal": {
+    "source": "--shadow-modal"
+  },
+  "shadow.none": {
+    "source": "unmapped",
+    "note": "the CSS keyword `none`; nothing to map"
+  },
+  "shadow.pill": {
+    "source": "--shadow-pill"
+  },
+  "shadow.raise": {
+    "source": "--shadow-raise"
+  },
+  "shadow.tooltip": {
+    "source": "--shadow-tooltip"
+  },
+  "sheet.contentMin": {
+    "source": "unmapped",
+    "note": "ours: shortest the sheet's content area is, so a sheet with little in it still looks like a sheet"
+  },
+  "sheet.glassRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the iOS 26 inset glass sheet, on all four corners"
+  },
+  "sheet.grabberH": {
+    "source": "unmapped",
+    "note": "ours: 5, UIKit's sheet grab handle; the product has no sheet tokens"
+  },
+  "sheet.grabberW": {
+    "source": "unmapped",
+    "note": "ours: 36, UIKit's sheet grab handle; the product has no sheet tokens"
+  },
+  "sheet.titleLine": {
+    "source": "unmapped",
+    "note": "ours: line height of a sheet or dialog title on the phone; text.leadLine is 28 there and these titles keep 24"
+  },
+  "sheet.w": {
+    "source": "unmapped",
+    "note": "ours: width of a side sheet (Sheet) on web and desktop"
+  },
+  "sidebar.hashW": {
+    "source": "unmapped",
+    "note": "ours: width of the # that marks a channel row, so every channel name starts on one edge"
+  },
+  "sidebar.sectionGap": {
+    "source": "unmapped",
+    "note": "ours: gap between a section's disclosure chevron and its title"
+  },
+  "sidebar.sectionHeaderH": {
+    "source": "unmapped",
+    "note": "ours: minimum height of a sidebar section's header"
+  },
+  "sidebar.sectionPadTop": {
+    "source": "unmapped",
+    "note": "ours: space above a sidebar section's header"
+  },
+  "skeleton.fill": {
+    "source": "--skeleton-fill",
+    "mobile": "mobile:palette.skeletonFill"
+  },
+  "skeleton.sheen": {
+    "source": "--skeleton-sheen",
+    "mobile": "mobile:palette.skeletonSheen"
+  },
+  "space.2xl": {
+    "source": "--space-2xl",
+    "mobile": "mobile:space.2xl"
+  },
+  "space.2xs": {
+    "source": "--space-2xs",
+    "mobile": "mobile:space.xs",
+    "note": "same 4; the phone calls it xs, the product and this repo call it 2xs (and have a 6 `xs`)"
+  },
+  "space.3xl": {
+    "source": "--space-3xl",
+    "mobile": "mobile:space.3xl",
+    "note": "ours is 32, the phone's 3xl; the desktop's is 34 (--af-raw-34), off the 4pt grid"
+  },
+  "space.3xs": {
+    "source": "--space-3xs"
+  },
+  "space.4xl": {
+    "source": "mobile:space.4xl",
+    "note": "no 4xl in the product (its scale stops at 3xl)"
+  },
+  "space.5xl": {
+    "source": "mobile:space.5xl",
+    "note": "no 5xl in the product (its scale stops at 3xl)"
+  },
+  "space.lg": {
+    "source": "--space-lg",
+    "mobile": "mobile:space.lg"
+  },
+  "space.lgXl": {
+    "source": "unmapped",
+    "note": "ours: 18, between --space-lg (16) and --space-xl (20); the product has the 18 as a raw step and no space token for it"
+  },
+  "space.md": {
+    "source": "--space-md",
+    "mobile": "mobile:space.md"
+  },
+  "space.mdLg": {
+    "source": "unmapped",
+    "note": "ours: 14, between --space-md (12) and --space-lg (16); the product has the 14 as a raw step and no space token for it"
+  },
+  "space.none": {
+    "source": "mobile:space.none",
+    "note": "0 is a literal in the product; the phone names it"
+  },
+  "space.sm": {
+    "source": "--space-sm",
+    "mobile": "mobile:space.sm"
+  },
+  "space.smMd": {
+    "source": "unmapped",
+    "note": "ours: 10, between --space-sm (8) and --space-md (12); the product has the 10 as a raw step and no space token for it"
+  },
+  "space.xl": {
+    "source": "--space-xl",
+    "mobile": "mobile:space.xl"
+  },
+  "space.xs": {
+    "source": "--space-xs"
+  },
+  "statusbar.h": {
+    "source": "unmapped",
+    "note": "iOS status bar height (47pt); a platform constant, zero elsewhere"
+  },
+  "statusbar.hAndroid": {
+    "source": "unmapped",
+    "note": "ours: height of Android's status bar; the iOS bar is statusbar.h. Only the phone reads it"
+  },
+  "success.default": {
+    "source": "--success",
+    "mobile": "mobile:palette.success"
+  },
+  "success.soft": {
+    "source": "--success-soft",
+    "mobile": "mobile:palette.successSoft",
+    "note": "the phone's soft status fill is its tag background (our tag.successBg), a different value from the desktop's"
+  },
+  "surface.app": {
+    "source": "mobile:palette.bg",
+    "note": "white page in light, #161618 in dark: the phone's `bg`. The product's page is the ash --surface-page (surface.page); no product token is white in light and #161618 in dark"
+  },
+  "surface.card": {
+    "source": "--surface-card",
+    "mobile": "mobile:palette.surface",
+    "note": "the product calls the default pane/card surface `card`"
+  },
+  "surface.chrome": {
+    "source": "--surface-chrome"
+  },
+  "surface.inverse": {
+    "source": "--surface-inverse",
+    "mobile": "mobile:palette.surfaceInverse"
+  },
+  "surface.inverseHover": {
+    "source": "unmapped",
+    "note": "ours: the hover wash on a control drawn on surface.inverse (an active filter chip's remove cross); the product has no inverse washes. Light is white at 16%; dark is the page ink (--charcoal-950-alpha-16), since inverse turns near-white there"
+  },
+  "surface.inverseWash": {
+    "source": "unmapped",
+    "note": "ours: the resting wash on surface.inverse (an inverse key cap); light is white at 12%, dark the page ink at 12% (--charcoal-950-alpha-12), since inverse turns near-white there"
+  },
+  "surface.muted": {
+    "source": "--surface-muted",
+    "mobile": "mobile:palette.surfaceSunken"
+  },
+  "surface.overlay": {
+    "source": "unmapped",
+    "note": "a translucent glass-like overlay (white at 86%); the product's nearest, --surface-veil, is white at 60% and a different material"
+  },
+  "surface.page": {
+    "source": "--surface-page"
+  },
+  "surface.raised": {
+    "source": "--surface-raised"
+  },
+  "surface.recessed": {
+    "source": "--surface-recessed",
+    "mobile": "mobile:palette.surfaceAlt"
+  },
+  "surface.selected": {
+    "source": "--surface-selected",
+    "mobile": "mobile:palette.surfaceSelected"
+  },
+  "surface.sidebar": {
+    "source": "--surface-sidebar"
+  },
+  "surface.unread": {
+    "source": "--surface-unread"
+  },
+  "switch.thumb": {
+    "source": "unmapped",
+    "note": "the product has no switch tokens; the phone's switch thumb is white"
+  },
+  "switch.thumbShadow": {
+    "source": "unmapped",
+    "note": "see switch.trackW: web and desktop's one layer is the kit's own, iOS's two are UISwitch's, Android's one is Material's"
+  },
+  "switch.thumbSize": {
+    "source": "unmapped",
+    "note": "see switch.trackW: 14 on web and desktop, 27 on iOS, 20 on Android"
+  },
+  "switch.thumbTravel": {
+    "source": "unmapped",
+    "note": "derived: track width, minus twice the padding, minus the thumb, per platform and OS"
+  },
+  "switch.trackH": {
+    "source": "unmapped",
+    "note": "see switch.trackW: 18 on web and desktop, 31 on iOS, 14 on Android"
+  },
+  "switch.trackOff": {
+    "source": "mobile:palette.switchTrackOff",
+    "note": "the product has no switch tokens"
+  },
+  "switch.trackPad": {
+    "source": "unmapped",
+    "note": "see switch.trackW: 2 everywhere except Android, 0"
+  },
+  "switch.trackW": {
+    "source": "unmapped",
+    "note": "the product has no switch tokens. Web and desktop 30 are the kits' own; mobile 51 is UISwitch's, and os.android overrides it with Material's 36"
+  },
+  "tab.countSize": {
+    "source": "unmapped",
+    "note": "ours: minimum width and height of the count pill beside a tab's label: 20pt on the phone, 18 on web and desktop"
+  },
+  "tab.indicatorRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of the line under the chosen tab"
+  },
+  "tabBar.badgeX": {
+    "source": "unmapped",
+    "note": "ours: how far in from a tab's left edge its badge sits"
+  },
+  "tabBar.itemH": {
+    "source": "unmapped",
+    "note": "ours: height of one tab inside the tab bar, which is tabbar.h tall"
+  },
+  "tabBar.itemSqueezed": {
+    "source": "unmapped",
+    "note": "ours: side of a tab when the lens squeezes many tabs into the bar"
+  },
+  "tabBar.labelLine": {
+    "source": "unmapped",
+    "note": "ours: line height of a tab's label, tighter than text.captionLine so two lines of icon and label fit"
+  },
+  "tabBar.labelMaxW": {
+    "source": "unmapped",
+    "note": "ours: widest a tab's label grows before it truncates"
+  },
+  "tabbar.h": {
+    "source": "mobile:shell.bar.height",
+    "note": "56, the V2 bottom bar; the V1 tabBar.height was 58. Zero on desktop and web"
+  },
+  "table.cellX": {
+    "source": "proposal",
+    "note": "proposal: space.md's value"
+  },
+  "table.checkW": {
+    "source": "proposal",
+    "note": "prototype Table"
+  },
+  "table.denseRowH": {
+    "source": "proposal",
+    "note": "prototype Table"
+  },
+  "table.divider": {
+    "source": "proposal",
+    "note": "proposal: the value of border.subtle in each theme"
+  },
+  "table.headH": {
+    "source": "proposal",
+    "note": "prototype Table"
+  },
+  "table.cardsBelow": {
+    "source": "proposal",
+    "note": "proposal: 600, the width a grid of five or more columns stops fitting; the phone's card per row below it"
+  },
+  "table.headRadius": {
+    "source": "proposal",
+    "note": "proposal: 0, square ends; a product's theme rounds the header bar"
+  },
+  "table.header": {
+    "source": "proposal",
+    "note": "proposal: the value of surface.recessed in each theme"
+  },
+  "table.loadCardL": {
+    "source": "proposal",
+    "note": "prototype Table"
+  },
+  "table.loadCardS": {
+    "source": "proposal",
+    "note": "prototype Table"
+  },
+  "table.loadH": {
+    "source": "proposal",
+    "note": "prototype Table"
+  },
+  "table.loadL": {
+    "source": "proposal",
+    "note": "prototype Table"
+  },
+  "table.loadM": {
+    "source": "proposal",
+    "note": "prototype Table"
+  },
+  "table.loadS": {
+    "source": "proposal",
+    "note": "prototype Table"
+  },
+  "table.rowH": {
+    "source": "proposal",
+    "note": "proposal: 44 on desktop and web, 52 on the phone (the prototype's --af-table-row-h)"
+  },
+  "table.rowHover": {
+    "source": "proposal",
+    "note": "proposal: the value of hover.surface in each theme"
+  },
+  "table.rowSelected": {
+    "source": "proposal",
+    "note": "data.accentSoft's value: a selected row in the data accent's soft fill"
+  },
+  "table.sparkH": {
+    "source": "proposal",
+    "note": "prototype Table"
+  },
+  "table.sparkW": {
+    "source": "proposal",
+    "note": "prototype Table"
+  },
+  "tabs.track": {
+    "source": "--tabs-track",
+    "mobile": "mobile:palette.tabsTrack"
+  },
+  "tag.brandBg": {
+    "source": "--tag-brand-bg"
+  },
+  "tag.brandFg": {
+    "source": "--tag-brand-fg"
+  },
+  "tag.dangerBg": {
+    "source": "--tag-danger-bg",
+    "mobile": "mobile:palette.dangerSoft",
+    "note": "the phone uses its tag background for every soft status fill"
+  },
+  "tag.dangerFg": {
+    "source": "--tag-danger-fg",
+    "mobile": "mobile:palette.tagDangerFg"
+  },
+  "tag.infoBg": {
+    "source": "--tag-info-bg",
+    "mobile": "mobile:palette.infoSoft",
+    "note": "the phone uses its tag background for every soft status fill"
+  },
+  "tag.infoFg": {
+    "source": "--tag-info-fg",
+    "mobile": "mobile:palette.tagInfoFg"
+  },
+  "tag.neutralBg": {
+    "source": "--tag-neutral-bg",
+    "mobile": "mobile:palette.tagNeutralBg"
+  },
+  "tag.neutralFg": {
+    "source": "--tag-neutral-fg",
+    "mobile": "mobile:palette.tagNeutralFg"
+  },
+  "tag.successBg": {
+    "source": "--tag-success-bg",
+    "mobile": "mobile:palette.successSoft",
+    "note": "the phone uses its tag background for every soft status fill"
+  },
+  "tag.successFg": {
+    "source": "--tag-success-fg",
+    "mobile": "mobile:palette.tagSuccessFg"
+  },
+  "tag.warningBg": {
+    "source": "--tag-warning-bg",
+    "mobile": "mobile:palette.warningSoft",
+    "note": "the phone uses its tag background for every soft status fill"
+  },
+  "tag.warningFg": {
+    "source": "--tag-warning-fg",
+    "mobile": "mobile:palette.tagWarningFg"
+  },
+  "text.body": {
+    "source": "--text-body",
+    "mobile": "mobile:fontSize.md"
+  },
+  "text.bodyLine": {
+    "source": "unmapped",
+    "note": "the product has no per-step line height: its leading is unitless ratios (--leading-tight 1, -snug 1.2, -body 1.5, -relaxed 1.6); the phone has none either (desktop body 21 = 14 x --leading-body 1.5)"
+  },
+  "text.bodySm": {
+    "source": "--text-body-sm",
+    "mobile": "mobile:fontSize.sm"
+  },
+  "text.bodySmLine": {
+    "source": "unmapped",
+    "note": "the product has no per-step line height: its leading is unitless ratios (--leading-tight 1, -snug 1.2, -body 1.5, -relaxed 1.6); the phone has none either"
+  },
+  "text.caption": {
+    "source": "--text-caption",
+    "mobile": "mobile:fontSize.xs"
+  },
+  "text.captionLine": {
+    "source": "unmapped",
+    "note": "the product has no per-step line height: its leading is unitless ratios (--leading-tight 1, -snug 1.2, -body 1.5, -relaxed 1.6); the phone has none either"
+  },
+  "text.display": {
+    "source": "--text-display",
+    "mobile": "mobile:fontSize.3xl"
+  },
+  "text.displayLine": {
+    "source": "unmapped",
+    "note": "the product has no per-step line height: its leading is unitless ratios (--leading-tight 1, -snug 1.2, -body 1.5, -relaxed 1.6); the phone has none either"
+  },
+  "text.h1": {
+    "source": "--text-h1",
+    "mobile": "mobile:shell.largeTitle",
+    "note": "the phone's 28 is its large title; its fontSize scale has 24 and 30"
+  },
+  "text.h1Line": {
+    "source": "unmapped",
+    "note": "the product has no per-step line height: its leading is unitless ratios (--leading-tight 1, -snug 1.2, -body 1.5, -relaxed 1.6); the phone has none either"
+  },
+  "text.h2": {
+    "source": "--text-h2",
+    "mobile": "mobile:fontSize.xl"
+  },
+  "text.h2Line": {
+    "source": "unmapped",
+    "note": "the product has no per-step line height: its leading is unitless ratios (--leading-tight 1, -snug 1.2, -body 1.5, -relaxed 1.6); the phone has none either"
+  },
+  "text.h3": {
+    "source": "--text-h3",
+    "mobile": "mobile:fontSize.lg"
+  },
+  "text.h3Line": {
+    "source": "unmapped",
+    "note": "the product has no per-step line height: its leading is unitless ratios (--leading-tight 1, -snug 1.2, -body 1.5, -relaxed 1.6); the phone has none either"
+  },
+  "text.largeTitle": {
+    "source": "unmapped",
+    "note": "ours: a header's large title, such as a sheet's. The same 28 on every platform; text.h1 is 26 on web and desktop"
+  },
+  "text.lead": {
+    "source": "--text-lead",
+    "mobile": "mobile:fontSize.lg"
+  },
+  "text.leadLine": {
+    "source": "unmapped",
+    "note": "the product has no per-step line height: its leading is unitless ratios (--leading-tight 1, -snug 1.2, -body 1.5, -relaxed 1.6); the phone has none either"
+  },
+  "text.micro": {
+    "source": "unmapped",
+    "note": "ours: 11 on every platform, below --text-caption (12); the product has the 11 as a raw font size (--text-raw-11) and a --text-micro of 14 that is not this"
+  },
+  "text.title": {
+    "source": "--text-title",
+    "mobile": "mobile:fontSize.md"
+  },
+  "text.titleLine": {
+    "source": "unmapped",
+    "note": "the product has no per-step line height: its leading is unitless ratios (--leading-tight 1, -snug 1.2, -body 1.5, -relaxed 1.6); the phone has none either"
+  },
+  "textField.prefixPull": {
+    "source": "unmapped",
+    "note": "ours: pull-in of a prefix against the text, -4 on web and desktop, -8 on the phone; the product has no text-field tokens"
+  },
+  "textField.tagPadX": {
+    "source": "unmapped",
+    "note": "ours: side padding of the tag beside a field's label"
+  },
+  "textField.trailingPull": {
+    "source": "unmapped",
+    "note": "ours: pull-out of a trailing control onto the field's inner edge"
+  },
+  "thinking.cell": {
+    "source": "unmapped",
+    "note": "ours: one lattice cell, 6 in the desktop app and ThoughtLine.tsx"
+  },
+  "thinking.cellRadius": {
+    "source": "unmapped",
+    "note": "ours: a cell's corner, a quarter of the cell (1.5) on both apps"
+  },
+  "thinking.markW": {
+    "source": "unmapped",
+    "note": "ours: the mark's column, 32 on the desktop, 30 on the phone (the avatar column less the head gap)"
+  },
+  "thinking.maxW": {
+    "source": "unmapped",
+    "note": "ours: the indicator's widest, 480 in the desktop app"
+  },
+  "tooltip.kbdH": {
+    "source": "unmapped",
+    "note": "ours: height of the key cap shown inside a tooltip, smaller than the standalone Kbd's 20"
+  },
+  "tooltip.kbdLabel": {
+    "source": "unmapped",
+    "note": "ours: font size of the key cap inside a tooltip"
+  },
+  "tooltip.maxW": {
+    "source": "unmapped",
+    "note": "ours: widest a tooltip grows before its text wraps"
+  },
+  "tooltip.padX": {
+    "source": "unmapped",
+    "note": "ours: side padding of a tooltip"
+  },
+  "tooltip.padY": {
+    "source": "unmapped",
+    "note": "ours: vertical padding of a tooltip"
+  },
+  "topbar.h": {
+    "source": "unmapped",
+    "note": "ours: the window top bar (title bar, app menu bar, web top bar), 44 like the product's --breadcrumb-h strip. The product's --topbar-h is 68 and has no consumer (ADR-0177). Split from breadcrumb.h on 2026-11-03"
+  },
+  "topbar.searchMaxW": {
+    "source": "unmapped",
+    "note": "ours: widest the search slot in the title bar and the web top bar grows"
+  },
+  "topbar.searchMinW": {
+    "source": "unmapped",
+    "note": "ours: narrowest the search slot shrinks to: 220 in the web top bar, 240 in the desktop title bar. The kits differ"
+  },
+  "tracking.caps": {
+    "source": "--tracking-caps"
+  },
+  "tracking.normal": {
+    "source": "--tracking-normal"
+  },
+  "tracking.tight": {
+    "source": "--tracking-tight"
+  },
+  "updateBanner.bannerW": {
+    "source": "unmapped",
+    "note": "ours: width of the update banner on web"
+  },
+  "updateBanner.button": {
+    "source": "unmapped",
+    "note": "ours: side of the round icon button that opens the update"
+  },
+  "updateBanner.cardPadX": {
+    "source": "unmapped",
+    "note": "ours: side padding of the update card on desktop"
+  },
+  "updateBanner.cardPadY": {
+    "source": "unmapped",
+    "note": "ours: vertical padding of the update card on desktop, off the space scale to match the card's 40pt height"
+  },
+  "updateBanner.cardW": {
+    "source": "unmapped",
+    "note": "ours: width of the update card on desktop"
+  },
+  "updateBanner.dotInset": {
+    "source": "unmapped",
+    "note": "ours: how far in from the button's top right corner the status dot sits"
+  },
+  "updateBanner.versionTile": {
+    "source": "unmapped",
+    "note": "ours: side of the version tile in the phone's update banner"
+  },
+  "warning.default": {
+    "source": "--warning",
+    "mobile": "mobile:palette.warning"
+  },
+  "warning.soft": {
+    "source": "--warning-soft",
+    "mobile": "mobile:palette.warningSoft",
+    "note": "the phone's soft status fill is its tag background (our tag.warningBg), a different value from the desktop's"
+  },
+  "workspace.badgeRight": {
+    "source": "unmapped",
+    "note": "ours: how far the unread badge sits past a workspace tile's right edge"
+  },
+  "workspace.badgeTop": {
+    "source": "unmapped",
+    "note": "ours: how far the unread badge sits above a workspace tile"
+  },
+  "workspace.markerRadius": {
+    "source": "unmapped",
+    "note": "ours: radius of the marker's right corners"
+  },
+  "workspace.markerTop": {
+    "source": "unmapped",
+    "note": "ours: how far down the rail item the active-workspace marker starts"
+  },
+  "workspace.markerW": {
+    "source": "unmapped",
+    "note": "ours: width of the active-workspace marker on the rail's edge"
+  },
+  "workspace.menuRowH": {
+    "source": "unmapped",
+    "note": "ours: minimum height of a workspace row in the menu: 64pt on the phone, 44 on web and desktop. The kits differ"
+  },
+  "workspace.menuW": {
+    "source": "unmapped",
+    "note": "ours: width of the workspace menu on web and desktop; the phone's fills the screen"
+  },
+  "workspace.tileEdge": {
+    "source": "unmapped",
+    "note": "ours: width of the ring around the current workspace's tile on the phone"
+  },
+  "workspace.tileRadius": {
+    "source": "unmapped",
+    "note": "ours: corner radius of a workspace tile. Not radius.card, which is 16 on the phone"
+  },
+  "z.menu": {
+    "source": "unmapped",
+    "note": "no z-index scale in the product's tokens.json"
+  },
+  "z.modal": {
+    "source": "unmapped",
+    "note": "no z-index scale in the product's tokens.json"
+  },
+  "z.popover": {
+    "source": "unmapped",
+    "note": "no z-index scale in the product's tokens.json"
+  },
+  "z.rail": {
+    "source": "unmapped",
+    "note": "no z-index scale in the product's tokens.json"
+  },
+  "z.sticky": {
+    "source": "unmapped",
+    "note": "no z-index scale in the product's tokens.json"
+  },
+  "z.toast": {
+    "source": "unmapped",
+    "note": "no z-index scale in the product's tokens.json"
+  },
+  "z.tooltip": {
+    "source": "unmapped",
+    "note": "no z-index scale in the product's tokens.json"
+  }
+}

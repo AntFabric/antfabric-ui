@@ -1,0 +1,109 @@
+---
+import Base from "../../layouts/Base.astro";
+import Code from "../../components/Code.astro";
+import Frame from "../../components/Frame.astro";
+import VersionPick from "../../components/VersionPick.astro";
+import ScreenView from "../../islands/ScreenView";
+import { components, OS_LABEL, PLATFORM_META, PLATFORM_OS, screens } from "../../lib/library";
+import { pascal } from "@antfabric-ui/core";
+
+export function getStaticPaths() {
+  return screens.map((s) => ({ params: { id: s.id } }));
+}
+
+const sources = import.meta.glob<string>("../../screens/*.tsx", { query: "?raw", import: "default", eager: true });
+
+const { id } = Astro.params as { id: string };
+const screen = screens.find((s) => s.id === id)!;
+const source = sources[`../../screens/${id}.tsx`];
+// The kit components the screen imports, by their exported names.
+const imported = new Set([...(source ?? "").matchAll(/import\s*\{([^}]*)\}\s*from\s*"@antfabric-ui\/react(?:-native)?"/g)].flatMap((m) => m[1]!.split(",").map((n) => n.trim().split(/\s+as\s+/)[0]!)));
+const used = components.filter((c) => imported.has(pascal(c.id))).map((c) => c.id);
+const others = screens.filter((s) => s.id !== id);
+---
+
+<Base title={screen.name} description={screen.description}>
+  <div class="page-head">
+    <div class="eyebrow">Screen · {PLATFORM_META[screen.platform].label}</div>
+    <h1>{screen.name}</h1>
+    <p class="lede">{screen.description}</p>
+  </div>
+
+  {
+    screen.platform !== "web" && (
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
+        <span class="muted" style="font-size:13px">OS</span>
+        <div class="seg sm" role="group" aria-label="OS">
+          {PLATFORM_OS[screen.platform].map((os, i) => (
+            <button type="button" data-set-os={`${screen.platform}:${os}`} aria-pressed={i === 0 ? "true" : "false"}>
+              {OS_LABEL[os]}
+            </button>
+          ))}
+        </div>
+        {screen.platform === "desktop" && <VersionPick for="mac" mode="inline" />}
+        {screen.platform === "mobile" && <VersionPick for="ios" mode="inline" />}
+      </div>
+    )
+  }
+
+  <div class="screen-stage">
+    <Frame frame={screen.frame} width={screen.width} height={screen.height} tab={screen.tab} url={screen.url} wallpaper={screen.wallpaper}>
+      <ScreenView client:only="react" id={screen.id} platform={screen.platform} />
+    </Frame>
+  </div>
+
+  {
+    screen.notes?.length ? (
+      <section class="section">
+        <h2>What to notice</h2>
+        <div class="card">
+          <ul class="notes">
+            {screen.notes.map((n) => (
+              <li>{n}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ) : null
+  }
+
+  <section class="section">
+    <h2>Composed from</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      {
+        used.map((u) => (
+          <a class="chip brand" href={`/components/${u}`} style="text-decoration:none">
+            {u}
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    source && (
+      <section class="section">
+        <h2>{screen.platform === "mobile" ? "React Native" : "React"}</h2>
+        <p class="sub">
+          <code class="mono">apps/catalogue/src/screens/{screen.id}.tsx</code> — the catalogue's own composition; no kit ships it.
+        </p>
+        <Code code={source} />
+      </section>
+    )
+  }
+
+  {
+    others.length > 0 && (
+      <section class="section">
+        <h2>Other screens</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          {others.map((s) => (
+            <a class="chip" href={`/screens/${s.id}`} style="text-decoration:none">
+              {s.name}
+            </a>
+          ))}
+        </div>
+      </section>
+    )
+  }
+</Base>

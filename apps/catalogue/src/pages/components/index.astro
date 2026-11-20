@@ -1,0 +1,70 @@
+---
+import Base from "../../layouts/Base.astro";
+import TileGrid from "../../components/TileGrid.astro";
+import { byDataGroup, byLevel, categories, components, dataSection, defaultsFor, iconSvg, PLATFORM_META, PLATFORMS, usedIds, type ComponentDocs } from "../../lib/library";
+
+const categoryName = Object.fromEntries(categories.map((c) => [c.id, c.name]));
+const tiles = (items: ComponentDocs[]) =>
+  items.map((c) => ({
+    c,
+    ex: c.examples[0],
+    cells: PLATFORMS.map((p) => ({
+      platform: p,
+      label: PLATFORM_META[p].label,
+      defaults: c.platforms[p].status === "not-applicable" ? null : defaultsFor(usedIds(c), p),
+    })),
+  }));
+const groups = byLevel().map((g) => ({ ...g, items: tiles(g.items) }));
+// The Data section comes after the three levels, in its own groups: KPIs, Charts, Panels, Tables (an empty one is not shown).
+const dataGroups = byDataGroup().map((g) => ({ ...g, items: tiles(g.items) }));
+const dataCount = dataGroups.reduce((n, g) => n + g.items.length, 0);
+---
+
+<Base title="Components">
+  <div class="page-head">
+    <div class="eyebrow">Library</div>
+    <h1>All components</h1>
+    <p class="lede">
+      {components.length} components, each written in React for web and desktop and in React Native for mobile, from the smallest up: atoms, the molecules built from them, and the organisms built from both, then the Data section: KPIs, charts, panels and tables. Pick a platform to see each one as it draws there. Dots show support on web, desktop and mobile. A hollow dot means that platform uses something else instead, and the component's page says what.
+    </p>
+  </div>
+  <div class="platform-bar">
+    <div class="seg" role="group" aria-label="Platform">
+      {
+        PLATFORMS.map((p) => (
+          <button type="button" data-set-platform={p} aria-pressed={p === "web" ? "true" : "false"}>
+            <Fragment set:html={iconSvg(PLATFORM_META[p].icon, 15)} />
+            <span>{PLATFORM_META[p].label}</span>
+          </button>
+        ))
+      }
+    </div>
+    {PLATFORMS.map((p) => <span class="stack" data-for-platform={p}>{PLATFORM_META[p].stack}</span>)}
+  </div>
+  {
+    groups.map((g) => (
+      <section class="section">
+        <h2 id={g.name.toLowerCase()}>{g.name} <span class="count">{g.items.length}</span></h2>
+        <p class="sub">{g.description}</p>
+        <TileGrid items={g.items} {categoryName} />
+      </section>
+    ))
+  }
+  {
+    dataCount > 0 && (
+      <section class="section">
+        <h2 id="data">
+          {dataSection.name} <span class="count">{dataCount}</span>
+        </h2>
+        <p class="sub">{dataSection.description}</p>
+        {dataGroups.map((g) => (
+          <>
+            <h3 id={`data-${g.id}`}>{g.name}</h3>
+            <p class="sub">{g.description}</p>
+            <TileGrid items={g.items} {categoryName} />
+          </>
+        ))}
+      </section>
+    )
+  }
+</Base>

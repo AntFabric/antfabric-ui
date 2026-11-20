@@ -1,0 +1,524 @@
+---
+import Base from "../../layouts/Base.astro";
+import Code from "../../components/Code.astro";
+import VersionPick from "../../components/VersionPick.astro";
+import Playground from "../../islands/Playground";
+import Flows from "../../islands/Flows";
+import Gallery from "../../islands/Gallery";
+import { usage } from "../../lib/usage";
+import {
+  casesFor,
+  categories,
+  levels,
+  components,
+  defaultsFor,
+  iconSvg,
+  ICON_CHOICES,
+  listingOrder,
+  placeOf,
+  OS_LABEL,
+  PLATFORM_META,
+  PLATFORM_OS,
+  PLATFORMS,
+  registry,
+  STATUS_LABEL,
+  usedIds,
+  withDefaults,
+  type Platform,
+} from "../../lib/library";
+import { formatShortcut, pascal } from "@antfabric-ui/core";
+import { anatomyOf } from "../../lib/anatomy";
+import { stackOf, stackSummary } from "../../lib/stack";
+import { logoSvg } from "../../lib/logos";
+
+export function getStaticPaths() {
+  return components.map((c) => ({ params: { id: c.id } }));
+}
+
+/** The kits' sources, so the page shows the component exactly as an app imports it. */
+const reactSources = import.meta.glob<string>("../../../../../packages/react/src/components/**/*.tsx", { query: "?raw", import: "default", eager: true });
+const nativeSources = import.meta.glob<string>("../../../../../packages/react-native/src/components/**/*.tsx", { query: "?raw", import: "default", eager: true });
+const sourceOf = (all: Record<string, string>, id: string) => {
+  const hit = Object.entries(all).find(([path]) => path.endsWith(`/${id}.tsx`));
+  return hit ? { path: hit[0].replace(/^(\.\.\/)+/, ""), code: hit[1] } : null;
+};
+
+const { id } = Astro.params as { id: string };
+const doc = registry[id]!;
+const category = categories.find((c) => c.id === doc.category)!;
+const ids = usedIds(doc);
+const pascalName = pascal(doc.id);
+
+const panels = PLATFORMS.map((p) => {
+  const ps = doc.platforms[p];
+  if (ps.status === "not-applicable") return { p, ps, na: true as const };
+  const initial = Object.fromEntries(Object.entries(withDefaults(doc)).filter(([k]) => !doc.props[k]?.platforms || doc.props[k]!.platforms!.includes(p)));
+  const cases = casesFor(doc, p);
+  const flows = (doc.flows ?? []).filter((f) => f.platforms.includes(p));
+  return {
+    p,
+    ps,
+    na: false as const,
+    initial,
+    width: doc.examples.find((e) => e.width)?.width,
+    source: sourceOf(p === "mobile" ? nativeSources : reactSources, doc.id),
+    stack: (() => {
+      const src = sourceOf(p === "mobile" ? nativeSources : reactSources, doc.id);
+      return src ? stackOf(doc.id, p, src.code) : [];
+    })(),
+    flows,
+    cases,
+    defaults: defaultsFor(ids, p),
+  };
+});
+
+const anatomy = anatomyOf(doc.id, doc.category);
+const level = levels.find((l) => l.id === doc.level)!;
+// The sidebar's order: atoms, then molecules, then organisms, then the Data section's groups.
+const order = listingOrder();
+const at = order.findIndex((c) => c.id === doc.id);
+const prev = order[at - 1];
+const next = order[at + 1];
+const installCmd = (p: Platform) =>
+  p === "mobile"
+    ? `pnpm add @antfabric-ui/react-native @antfabric-ui/core lucide-react-native${doc.category === "data" ? " react-native-svg expo-linear-gradient" : ""}`
+    : "pnpm add @antfabric-ui/react @antfabric-ui/core lucide-react";
+const keys = (k: string) => (k.includes("Mod") ? `${formatShortcut(k, "mac")}  ·  ${formatShortcut(k, "windows")}` : k);
+const playgroundDoc = { id: doc.id, name: doc.name, props: doc.props, platforms: doc.platforms };
+
+/**
+ * The height each client-only island takes once drawn, near enough, so its placeholder holds the
+ * page still while it loads. Measured off the layout at desktop width: a demo's title row 44, a
+ * playground stage 382, a Customize row 50 at three to a row, an example stage 222.
+ */
+const EDITABLE = ["string", "number", "boolean", "enum", "icon"];
+const holdPlayground = (p: Platform) => {
+  const n = Object.values(doc.props).filter((d) => EDITABLE.includes(d.type) && (!d.platforms || d.platforms.includes(p))).length;
+  return 44 + 382 + (n ? 16 + 50 + 24 + Math.ceil(n / 3) * 50 - 8 : 0);
+};
+const holdGallery = (c: ReturnType<typeof casesFor>) =>
+  (c.examples.length ? 105 + c.examples.reduce((h, e) => h + 306 + (e.description ? 30 : 0), 0) : 0) +
+  (c.matrix.length ? 135 + c.matrix.length * 230 : 0) +
+  (c.states.length ? 135 + 200 : 0) +
+  (c.edge.length ? 135 + c.edge.reduce((h, e) => h + (e.example ? 200 : 130), 0) : 0);
+/** Flows stack on this column's width: the stage and its step above the chart, a row per step; several flows are tabs. */
+const holdFlows = (flows: { steps: unknown[] }[]) => (flows.length > 1 ? 50 : 0) + 700 + Math.max(...flows.map((f) => f.steps.length)) * 170;
+---
+
+<Base title={doc.name} description={doc.description}>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="/components">Components</a>
+    <Fragment set:html={iconSvg("chevron-right", 14)} />
+    <span>{doc.category === "data" ? placeOf(doc) : level.name}</span>
+  </nav>
+  <div class="page-head">
+    <div class="ph-row">
+      <h1>{doc.name}</h1>
+      <div class="ph-tools">
+        <span class="chip" title={category.description}>{category.name}</span>
+        <span class:list={["chip", doc.status === "stable" ? "ready" : "planned"]}><span class="dot"></span>{doc.status}</span>
+        {prev ? <a class="icon-btn sq" href={`/components/${prev.id}`} aria-label={`Previous: ${prev.name}`} title={prev.name} set:html={iconSvg("arrow-left", 15)} /> : null}
+        {next ? <a class="icon-btn sq" href={`/components/${next.id}`} aria-label={`Next: ${next.name}`} title={next.name} set:html={iconSvg("arrow-right", 15)} /> : null}
+      </div>
+    </div>
+    <p class="lede">{doc.description}</p>
+  </div>
+
+  <div class="platform-bar">
+    <div class="ptabs" role="group" aria-label="Platform">
+      {
+        PLATFORMS.map((p) => (
+          <button type="button" data-set-platform={p} aria-pressed={p === "web" ? "true" : "false"} title={`${PLATFORM_META[p].label}: ${STATUS_LABEL[doc.platforms[p].status]}`}>
+            <Fragment set:html={iconSvg(PLATFORM_META[p].icon, 15)} />
+            <span>{PLATFORM_META[p].label}</span>
+            <i class:list={["st", doc.platforms[p].status]} />
+          </button>
+        ))
+      }
+    </div>
+    <div class="pb-end">
+      <div class="seg sm os-pick" data-for="desktop" role="group" aria-label="Desktop OS">
+        {PLATFORM_OS.desktop.map((os) => <button type="button" data-set-os={`desktop:${os}`} aria-pressed={os === "mac" ? "true" : "false"}>{OS_LABEL[os]}</button>)}
+      </div>
+      <div class="seg sm os-pick" data-for="mobile" role="group" aria-label="Mobile OS">
+        {PLATFORM_OS.mobile.map((os) => <button type="button" data-set-os={`mobile:${os}`} aria-pressed={os === "ios" ? "true" : "false"}>{OS_LABEL[os]}</button>)}
+      </div>
+      <VersionPick for="mac" />
+      <VersionPick for="ios" />
+    </div>
+  </div>
+
+  {
+    panels.map((panel) => (
+      <section data-for-platform={panel.p}>
+        {panel.na ? (
+          <div class="section">
+            <h2 class="sr-only">Not on {PLATFORM_META[panel.p].label.toLowerCase()}</h2>
+            <div class="na-panel">
+              <h3 data-toc="off">Not part of the {PLATFORM_META[panel.p].label} kit</h3>
+              <p class="muted">{panel.ps.alternative}</p>
+              {panel.ps.notes && <ul class="notes" style="margin-top:12px">{panel.ps.notes.map((n) => <li>{n}</li>)}</ul>}
+            </div>
+          </div>
+        ) : (
+          <>
+            <div class="section first">
+              {panel.stack.length > 0 && (
+                <div class="stack-strip">
+                  <span class="stack-label">Stack</span>
+                  <ul class="stack-logos">
+                    {stackSummary(panel.stack).map((i) => (
+                      <li>
+                        <span class="stack-logo" tabindex="0" role="img" aria-label={i.note ? `${i.name}: ${i.note}` : i.name} data-tip={i.name}>
+                          {i.logo ? <Fragment set:html={logoSvg(i.logo, 18)} /> : <span class="stack-logo-text">{i.name.slice(0, 2)}</span>}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <a class="stack-more" href={`#${panel.p}-tech-stack`}>
+                    Full stack
+                    <Fragment set:html={iconSvg("arrow-down", 13)} />
+                  </a>
+                </div>
+              )}
+              <h2 class="sr-only">Playground</h2>
+              <Playground client:only="react" doc={playgroundDoc} platform={panel.p} initial={panel.initial} width={panel.width} iconChoices={ICON_CHOICES} defaults={panel.defaults}>
+                <div slot="fallback" class="island-hold" style={`height:${holdPlayground(panel.p)}px`} />
+              </Playground>
+              <p class="hint">
+                The {panel.p === "mobile" ? "React Native" : "React"} component itself, live{panel.p === "mobile" ? " through React Native Web" : ""}. Change a prop under Customize and the preview and its code follow; an event
+                the component fires shows under the preview.
+              </p>
+            </div>
+
+            <div class="section">
+              <h2>Installation</h2>
+              <p class="sub">
+                {panel.p === "mobile" ? "The phone kit, for the Expo app." : "The React kit serves the web app and the desktop app."} The packages are on npm: <a href="/install">Install</a> sets up the
+                root once per app.
+              </p>
+              <Code code={installCmd(panel.p)} title="Terminal" />
+            </div>
+
+            <div class="section">
+              <h2>Usage</h2>
+              <Code code={usage(doc, panel.initial, panel.p)} title={`${pascalName}.tsx`} />
+            </div>
+
+            <Gallery
+              client:only="react"
+              id={doc.id}
+              doc={playgroundDoc}
+              platform={panel.p}
+              examples={panel.cases.examples}
+              matrix={panel.cases.matrix}
+              states={panel.cases.states}
+              edge={panel.cases.edge}
+              edgeTotal={(doc.edgeCases ?? []).length}
+              defaults={panel.defaults}
+            >
+              <div slot="fallback" class="section" style={`height:${holdGallery(panel.cases) - 56}px`}>
+                <div class="island-hold" style="height:100%" />
+              </div>
+            </Gallery>
+
+            {panel.flows.length > 0 && (
+              <div class="section">
+                <h2>Flows</h2>
+                <p class="sub">
+                  How data moves through the component, one touch point at a time: from the person, through the component, the app's state and the server or OS, and back to what the person sees. Each node shows the code at that point.
+                  {panel.p === "web" && " There is no AntFabric web app yet, so the web flows are a proposal."} Press Play to walk the path on the live stage, or pick a node.
+                </p>
+                <Flows client:only="react" id={doc.id} name={doc.name} platform={panel.p} flows={panel.flows} defaults={panel.defaults}>
+                  <div slot="fallback" class="island-hold" style={`height:${holdFlows(panel.flows)}px`} />
+                </Flows>
+              </div>
+            )}
+
+            <div class="section">
+              <h2>On {PLATFORM_META[panel.p].label.toLowerCase()}</h2>
+              <p class="sub">{PLATFORM_META[panel.p].stack}.</p>
+              {panel.stack.length > 0 && (
+                <>
+                  <h3 id={`${panel.p}-tech-stack`}>Tech stack</h3>
+                  <p class="sub">
+                    Read from <code>{panel.source!.path}</code> when the site builds: what {doc.name} imports on {PLATFORM_META[panel.p].label.toLowerCase()}, and the app it runs in.
+                  </p>
+                  <div class="table-wrap stack-table">
+                    <table class="t">
+                      <tbody>
+                        {panel.stack.map((r) => (
+                          <tr>
+                            <th scope="row">{r.label}</th>
+                            <td>
+                              <ul class="stack-items">
+                                {r.items.map((i) => (
+                                  <li>
+                                    {i.logo && <span class="stack-item-logo" set:html={logoSvg(i.logo, 14)} />}
+                                    {i.href ? <a href={i.href}><code>{i.name}</code></a> : <code>{i.name}</code>}
+                                    {i.note && <span>{i.note}</span>}
+                                  </li>
+                                ))}
+                              </ul>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <h3>Platform notes</h3>
+                </>
+              )}
+              <div class="grid c2">
+                <div class="card">
+                  <dl class="kv">
+                    <dt>Built on</dt>
+                    <dd>{panel.ps.base ?? "—"}</dd>
+                    <dt>Import</dt>
+                    <dd>
+                      <code class="mono">{panel.ps.import ?? "—"}</code>
+                    </dd>
+                    <dt>Status</dt>
+                    <dd>
+                      <span class:list={["chip", panel.ps.status]}>{STATUS_LABEL[panel.ps.status]}</span>
+                    </dd>
+                  </dl>
+                  {panel.ps.notes && <ul class="notes" style="margin-top:14px">{panel.ps.notes.map((n) => <li>{n}</li>)}</ul>}
+                </div>
+                <div class="card">
+                  {panel.ps.keyboard?.length ? (
+                    <table class="t">
+                      <thead>
+                        <tr>
+                          <th>Keys</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {panel.ps.keyboard.map((k) => (
+                          <tr>
+                            <td>
+                              <code>{keys(k.keys)}</code>
+                            </td>
+                            <td>{k.action}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : null}
+                  {panel.ps.gestures?.length ? (
+                    <table class="t">
+                      <thead>
+                        <tr>
+                          <th>Gesture</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {panel.ps.gestures.map((g) => (
+                          <tr>
+                            <td>
+                              <b>{g.gesture}</b>
+                            </td>
+                            <td>{g.action}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : null}
+                  {!panel.ps.keyboard?.length && !panel.ps.gestures?.length && <p class="muted">No keyboard or gesture behaviour beyond the platform default.</p>}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </section>
+    ))
+  }
+
+  <div class="section">
+    <h2>API reference</h2>
+    <p class="sub">One API on every platform. A prop limited to some platforms is not in the other kit's props.</p>
+    <div class="table-wrap">
+      <table class="t props">
+        <thead>
+          <tr>
+            <th>Prop</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            Object.entries(doc.props).map(([name, d]) => (
+              <tr>
+                <td>
+                  <code class="prop">{name}</code>
+                  {d.required && <span class="req" title="Required">*</span>}
+                </td>
+                <td class="mono type">{d.type === "enum" ? d.options!.map((o) => `"${o}"`).join(" | ") : d.type === "event" ? `(${d.args ?? ""}) => void` : d.type === "node" ? "ReactNode" : d.type}</td>
+                <td class="mono">{d.default === undefined || d.default === "" ? "—" : JSON.stringify(d.default).slice(0, 40)}</td>
+                <td>
+                  {d.description ?? ""}
+                  {d.platforms && <span class="faint"> Only on {d.platforms.join(", ")}.</span>}
+                  {d.sample !== undefined && d.type !== "node" && <span class="faint"> The previews here pass <code class="mono">{JSON.stringify(d.sample).slice(0, 60)}</code>.</span>}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {
+    anatomy && (
+      <div class="section" id="anatomy">
+        <h2>Anatomy and tokens</h2>
+        <p class="sub">
+          The parts <code class="mono">{doc.id}</code> is drawn from, and every token each part reads, written once in <code class="mono">{anatomy.file}</code> and read by both kits. Each row says when it applies: always,
+          for one value of a prop, in a state, or on one platform where the phone differs from the web. A part's own state wins over a variant's, and a platform's entry over both. Each token links to its row on Foundations. The kit
+          also reads <code class="mono">space</code>, <code class="mono">duration</code> and <code class="mono">ease</code> tokens to lay parts out and move them.
+        </p>
+        <div class="card anat">
+          <p class="parts">
+            <b>Parts</b>
+            {anatomy.parts.map((p) => (
+              <a class="chip mono" href={`#anatomy-${p.name}`}>{p.name}</a>
+            ))}
+          </p>
+          {anatomy.parts.map((p) => (
+            <>
+              <h3 id={`anatomy-${p.name}`} data-toc="off">
+                <code>{p.name}</code>
+                {p.only && <span class="faint"> · only on {p.only.map((x) => PLATFORM_META[x].label).join(" and ")}</span>}
+              </h3>
+              {p.rows.length ? (
+                <table class="t">
+                  <caption class="sr-only">{`${doc.name}: tokens read by the ${p.name} part`}</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">When</th>
+                      <th scope="col">Property</th>
+                      <th scope="col">Token</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {p.rows.map((r) => (
+                      <tr>
+                        <td>{r.when}</td>
+                        <td><code>{r.key}</code></td>
+                        <td>{r.href ? <a href={r.href}><code>{r.value}</code></a> : <code>{r.value}</code>}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p class="muted">Layout only: no token decides anything on this part.</p>
+              )}
+            </>
+          ))}
+          {anatomy.reads.length > 0 && (
+            <>
+              <h3 data-toc="off">Read for behaviour</h3>
+              <p class="muted">Not a style: the kit reads these to move a part.</p>
+              <p class="parts">
+                {anatomy.reads.map((r) => (
+                  <a class="chip mono" href={r.href}>{r.value}</a>
+                ))}
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  {
+    doc.a11y && (
+      <div class="section">
+        <h2>Accessibility</h2>
+        <div class="card">
+          <dl class="kv">
+            {doc.a11y.role && (
+              <>
+                <dt>Role</dt>
+                <dd>
+                  <code class="mono">{doc.a11y.role}</code>
+                </dd>
+              </>
+            )}
+            {doc.a11y.label && (
+              <>
+                <dt>Label</dt>
+                <dd>
+                  <code class="mono">{doc.a11y.label}</code>
+                </dd>
+              </>
+            )}
+          </dl>
+          {doc.a11y.notes && <ul class="notes" style="margin-top:12px">{doc.a11y.notes.map((n) => <li>{n}</li>)}</ul>}
+        </div>
+      </div>
+    )
+  }
+
+  {
+    panels.map((panel) =>
+      panel.na ? null : (
+        <section data-for-platform={panel.p}>
+          <div class="section">
+            <h2>Source</h2>
+            {panel.source ? (
+              <>
+                <p class="sub">
+                  <code class="mono">{panel.source.path}</code> · {panel.source.code.split("\n").length} lines
+                  {panel.p !== "mobile" && ". The same file serves the web app and the desktop app; what differs comes from usePlatform()."}
+                </p>
+                <Code code={panel.source.code} title={`${pascalName}.tsx · ${panel.p === "mobile" ? "React Native" : "React"}`} collapse />
+              </>
+            ) : (
+              <p class="sub">Not written yet.</p>
+            )}
+          </div>
+        </section>
+      ),
+    )
+  }
+
+  {
+    doc.related?.length ? (
+      <div class="section">
+        <h2>Related</h2>
+        <div class="related">
+          {doc.related.map((r) =>
+            registry[r] ? (
+              <a class="related-link" href={`/components/${r}`}>
+                <b>{registry[r]!.name}</b>
+                <span>{registry[r]!.description}</span>
+              </a>
+            ) : (
+              <span class="chip">{r}</span>
+            ),
+          )}
+        </div>
+      </div>
+    ) : null
+  }
+
+  <nav class="pager" aria-label="More components">
+    {prev ? (
+      <a class="pager-link" href={`/components/${prev.id}`}>
+        <span>Previous</span>
+        <b><Fragment set:html={iconSvg("arrow-left", 14)} />{prev.name}</b>
+      </a>
+    ) : <span />}
+    {next ? (
+      <a class="pager-link next" href={`/components/${next.id}`}>
+        <span>Next</span>
+        <b>{next.name}<Fragment set:html={iconSvg("arrow-right", 14)} /></b>
+      </a>
+    ) : null}
+  </nav>
+</Base>

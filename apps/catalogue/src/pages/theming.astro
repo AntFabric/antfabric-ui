@@ -1,0 +1,241 @@
+---
+import Base from "../layouts/Base.astro";
+import Code from "../components/Code.astro";
+import ThemePlayground from "../islands/ThemePlayground";
+import { defaultsFor, iconSvg } from "../lib/library";
+import { slug } from "../lib/search";
+
+const PRESETS = [
+  { name: "neutral", label: "Neutral", note: "Zinc greys, a near-black primary, small radii, Geist.", use: "The default. Pass nothing to get it; a theme with no extends starts from it." },
+  { name: "antfabric", label: "AntFabric", note: "Coral, navy ink, Figtree, rounder corners: the 0.1 look.", use: "themes.antfabric, for AntFabric's own apps." },
+];
+const TOPICS = ["What a theme is", "Defining one", "Theme playground", "Layers", "Recipe overrides", "Per-instance styles", "Built-in text", "Passing it"];
+
+const primitiveRef = '"{primitives.color.neutral.900}"';
+const cssOff = "css={false}";
+
+const PLAYGROUND = ["button", "text-field", "switch", "card", "tag", "inline-banner"];
+
+const defining = `import { defineTheme, themes } from "@antfabric-ui/core";
+
+export const antagents = defineTheme({
+  name: "antagents",
+  // Start from a preset. Left out, it is themes.neutral. themes.antfabric is AntFabric's look; null is the raw schema.
+  extends: themes.neutral,
+
+  // The tenant input: one primary and an accent, and every tint follows from them.
+  brand: { primary: "#0f766e", accent: "#f59e0b" },
+
+  // A family by name. On the phone, a file per weight (Inter-Regular, -Medium, -SemiBold, -Bold).
+  fonts: { sans: "Inter", display: "Inter" },
+
+  tokens: {
+    // What every platform and scheme share: radius, space, motion, font stacks.
+    shared: { radius: { control: 4, input: 4, card: 6, panel: 8 } },
+    // Colours and shadows, per scheme.
+    schemes: {
+      light: { surface: { page: "#fbfbfa" } },
+      dark: { surface: { page: "#0b0f0e" } },
+    },
+    // Sizes and type, per platform: a control is 34px on desktop and 44pt on the phone.
+    profiles: { mobile: { radius: { card: 8 } } },
+    // One OS's differences, laid over its platform's profile.
+    os: { android: { radius: { card: 6 } } },
+  },
+
+  // Per component, part, variant and state.
+  recipes: {
+    button: { root: { base: { radius: "$radius.control", weight: "$font.weightBold" } } },
+  },
+});`;
+
+const layers = `shared (base, then theme)
+  → scheme   (base, then theme)   light or dark
+  → profile  (base, then theme)   web, desktop or mobile
+  → OS       (base, then theme)   mac, windows, linux, browser, ios or android`;
+
+const layerPhone = `tokens: {
+  shared: { radius: { card: 10 } },
+  // Without this the phone keeps its own card radius (16), because the profile layer comes after the shared one.
+  profiles: { mobile: { radius: { card: 12 } } },
+}`;
+
+const recipe = `recipes: {
+  button: {
+    root: {
+      // Every button, on every platform.
+      base: { radius: "$radius.control", weight: "$font.weightBold" },
+      // One variant, in one state.
+      variants: { variant: { primary: { states: { hover: { bg: "$brand.active" } } } } },
+      // One platform (or one OS) only.
+      platforms: { mobile: { base: { weight: "$font.weightSemibold" } } },
+    },
+    // Another part of the same recipe.
+    shortcut: { base: { size: "$text.caption" } },
+  },
+}`;
+
+const instance = `<Button label="Send invite" styles={{ root: { borderRadius: 4 }, icon: { opacity: 0.6 } }} />`;
+
+const strings = `// Web and desktop: the root sets the language and replaces built-in text, by component id and key.
+<AntFabricRoot locale="fr" strings={{
+  "text-field": { required: "Obligatoire", copied: "Copié" },
+}}>
+  {/* One instance: its own strings win over the root's. */}
+  <TextField label="Nom" required strings={{ required: "Requis" }} value={name} onValueChange={setName} />
+</AntFabricRoot>
+
+// Phone: the same two props on ThemeProvider.
+<ThemeProvider locale="fr" strings={{ "text-field": { required: "Obligatoire" } }}>{children}</ThemeProvider>
+
+// A string can hold {placeholders}, and can be a plural chosen by \`count\` (Intl.PluralRules for the locale).
+{ characterCount: "{current}/{max}" }
+{ replies: { one: "{count} reply", other: "{count} replies" } }`;
+
+const passing = `import { AntFabricRoot } from "@antfabric-ui/react";
+import { ThemeProvider } from "@antfabric-ui/react-native";
+import { antagents } from "./theme";
+
+// Web and desktop
+<AntFabricRoot platform="web" theme={antagents} scheme="dark">{children}</AntFabricRoot>
+
+// Phone
+<ThemeProvider theme={antagents} scheme="dark">{children}</ThemeProvider>
+
+// A host that loads the kit's base sheet once for the page, and draws several themes on it:
+<AntFabricRoot platform="web" theme={antagents} scheme={scheme} css="theme">{children}</AntFabricRoot>`;
+---
+
+<Base title="Theming" description="A theme is an override set over the kit's tokens and recipes. Define one with defineTheme, pass it to the root, and the whole kit follows on web, desktop and phone.">
+  <div class="page-head">
+    <div class="eyebrow">Theming</div>
+    <h1>Theming</h1>
+    <p class="lede">
+      The kit draws a neutral look until you give it a theme. A theme is a small set of overrides: change a colour, a radius or a font, and every component on web, desktop and phone follows. The switch in the top bar draws this whole catalogue in each theme below.
+    </p>
+    <nav class="toc" aria-label="On this page">
+      {TOPICS.map((t) => <a href={`#${slug(t)}`}>{t}</a>)}
+    </nav>
+  </div>
+
+  <section class="section first">
+    <h2 id={slug("What a theme is")}>What a theme is</h2>
+    <p class="sub">
+      A theme is an override set laid over the kit's tokens and component recipes. It names only what it changes; everything else stays as the kit has it. A theme is built once with <code class="mono">defineTheme</code>, checked when it is built (a misspelt token path throws, naming the theme and the path), and frozen.
+    </p>
+    <div class="grid c3">
+      {
+        PRESETS.map((t) => (
+          <div class="card">
+            <b style="color:var(--doc-fg)">{t.label}</b>
+            <p class="muted" style="font-size:13px;margin-top:6px">{t.note}</p>
+            <p class="faint mono" style="font-size:12px;margin-top:8px">{t.use}</p>
+          </div>
+        ))
+      }
+    </div>
+    <p class="sub" style="margin-top:16px">
+      Two presets ship: <code class="mono">neutral</code> is the default, and <code class="mono">antfabric</code> is what AntFabric's own apps pass.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Defining one")}>Defining one</h2>
+    <p class="sub">
+      Every key is optional. Layers apply in this order, a later one replacing the same leaf of an earlier one: <code class="mono">extends</code>, then <code class="mono">brand</code>, then <code class="mono">fonts</code>, then <code class="mono">tokens</code>, then <code class="mono">recipes</code>. A value is a literal (<code class="mono">"#18181b"</code>, <code class="mono">6</code>) or a reference to one of the kit's primitives (<code class="mono">{primitiveRef}</code>).
+    </p>
+    <Code code={defining} title="theme.ts" />
+    <p class="sub" style="margin-top:16px">
+      Token paths are the ones on <a href="/foundations">Foundations</a>: <code class="mono">radius.card</code>, <code class="mono">surface.page</code>, <code class="mono">brand.default</code>. <code class="mono">extends</code> defaults to <code class="mono">themes.neutral</code>, so a theme that names nothing else draws neutral. <code class="mono">extends: themes.antfabric</code> gives AntFabric's look. <code class="mono">extends: null</code> starts from the raw schema (<code class="mono">tokens.ts</code>, which holds AntFabric's values), and only the presets need it.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Theme playground")}>Theme playground</h2>
+    <p class="sub">
+      Pick a primary, a radius scale and a font. The page builds a theme from them with <code class="mono">defineTheme</code>, draws a small set of components with it on web and on the phone, and writes the call under the previews. The previews follow the light and dark switch in the top bar.
+    </p>
+    <ThemePlayground client:only="react" web={defaultsFor(PLAYGROUND, "web")} mobile={defaultsFor(PLAYGROUND, "mobile")} />
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Layers")}>Layers</h2>
+    <p class="sub">
+      A theme's tokens sit in four sets, and the kit draws them one layer at a time. At each layer the kit's own value goes down first and the theme's goes on top of it, and the next layer then goes over both.
+    </p>
+    <Code code={layers} />
+    <ul class="how" style="margin-top:16px">
+      <li><b>Shared</b> (<code class="mono">tokens.shared</code>): radius, borders, space, motion and font stacks, the same on every platform and scheme.</li>
+      <li><b>Scheme</b> (<code class="mono">tokens.schemes.light</code>, <code class="mono">.dark</code>): colours and shadows.</li>
+      <li><b>Profile</b> (<code class="mono">tokens.profiles.web</code>, <code class="mono">.desktop</code>, <code class="mono">.mobile</code>): sizes and type. This is how a control is 34px on desktop and 44pt on a phone.</li>
+      <li><b>OS</b> (<code class="mono">tokens.os.android</code>, <code class="mono">.windows</code> and the rest): one OS's differences, laid over its platform's profile.</li>
+    </ul>
+    <div class="callout brand" style="margin-top:16px;max-width:760px">
+      <Fragment set:html={iconSvg("info", 16)} />
+      <div>
+        Layers never cross. The base's Android switch still beats a theme's mobile-profile switch unless the theme sets <code class="mono">os.android</code> itself. The phone has its own <code class="mono">radius.card</code> (16, where the web's is 12), so a theme that sets <code class="mono">shared.radius.card</code> alone moves every platform but the phone. Set <code class="mono">profiles.mobile</code> too.
+      </div>
+    </div>
+    <Code code={layerPhone} />
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Recipe overrides")}>Recipe overrides</h2>
+    <p class="sub">
+      Tokens change a value everywhere; a recipe override changes one component. Every component draws from a recipe: its parts, and for each part a base style, a style per variant value, and a style per state. A theme overrides any of those cells, typed against the recipe, so a misspelt part, variant or state does not compile and throws at build.
+    </p>
+    <Code code={recipe} />
+    <ul class="how" style="margin-top:16px">
+      <li>A key you write replaces the recipe's key at the same part, layer, variant value, state and platform. Everything you do not write stays.</li>
+      <li>Values are token references (<code class="mono">"$brand.active"</code>) or literals. A reference follows the theme, the scheme and the platform; a literal does not.</li>
+      <li><code class="mono">"none"</code> removes a key, including one an earlier layer set.</li>
+      <li>A theme cannot add a part, a variant prop or a variant value. Use <code class="mono">styles</code> below for a one-off.</li>
+      <li>A theme that extends another keeps the parent's recipe overrides and replaces them cell by cell.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Per-instance styles")}>Per-instance styles</h2>
+    <p class="sub">
+      A component takes <code class="mono">styles</code>, an object keyed by part, for the one instance you are drawing. It is on every component, on both kits. The part names are the recipe's.
+    </p>
+    <Code code={instance} />
+    <p class="sub" style="margin-top:16px">What wins, from the weakest to the strongest:</p>
+    <ol class="how" style="margin-top:8px">
+      <li><b>The recipe</b>: the kit's own values.</li>
+      <li><b>The theme's recipe override</b>.</li>
+      <li><b>The kit's own inline styles</b> for the part: what a component sets for a prop or a state, such as a disabled button's cursor or a full-width button's width.</li>
+      <li><b><code class="mono">styles</code></b> for the part: the escape hatch, so it wins over everything the kit computes for that part.</li>
+      <li><b><code class="mono">style</code></b>: the component's outer element, over everything.</li>
+    </ol>
+    <p class="sub" style="margin-top:16px">
+      So nothing the kit sets for a part is out of <code class="mono">styles</code>' reach: a <code class="mono">cursor</code> or <code class="mono">width</code> you give a part replaces the one the kit would have set for its state. Give a key to <code class="mono">style</code> when it is the outer element's, not a part's.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Built-in text")}>Built-in text</h2>
+    <p class="sub">
+      Some words come from the kit, not from you: a text field's "Required", a dialog's "Close", a banner's "Dismiss". They are strings you can replace and translate. Give the root a <code class="mono">locale</code> for plurals, a <code class="mono">strings</code> object to replace any of the kit's text by component id and key, and a component its own <code class="mono">strings</code> to change it for that one instance. Text you pass as a prop (a button's <code class="mono">label</code>) is yours and is never touched.
+    </p>
+    <ul class="how" style="margin:16px 0">
+      <li>A key is looked up in this order: the instance's <code class="mono">strings</code>, the nearest root's for that component, the root's <code class="mono">common</code>, then the kit's English default. A root inside another merges its own over its parent's, key by key.</li>
+      <li>Every component's keys and English defaults are in <code class="mono">packages/core/src/strings/</code>, one file per category. The kit ships English only; your app supplies other languages.</li>
+      <li>The kit's copy is generic. AntFabric's own wording ships from an opt-in entry: <code class="mono">import &#123; antfabricStrings &#125; from "@antfabric-ui/core/antfabric"</code> and pass it as <code class="mono">strings</code> beside <code class="mono">theme=&#123;themes.antfabric&#125;</code>, on <code class="mono">AntFabricRoot</code> or <code class="mono">ThemeProvider</code>.</li>
+    </ul>
+    <Code code={strings} />
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Passing it")}>Passing it</h2>
+    <p class="sub">
+      A theme goes on the root of each kit, with the scheme beside it: <code class="mono">AntFabricRoot</code> for web and desktop, <code class="mono">ThemeProvider</code> for the phone. Everything under the root follows. A nested root with no <code class="mono">theme</code> takes its parent's.
+    </p>
+    <Code code={passing} />
+    <ul class="how" style="margin-top:16px">
+      <li><code class="mono">scheme</code> is <code class="mono">"light"</code> or <code class="mono">"dark"</code>. The kit does not read <code class="mono">prefers-color-scheme</code>; your app decides.</li>
+      <li>By default <code class="mono">AntFabricRoot</code> ships the kit's stylesheet and the theme's with the tree. <code class="mono">css="theme"</code> is for a host that loads the base sheet once for the page and wants only the theme's sheet to come with the tree, as this catalogue does. <code class="mono">{cssOff}</code> is for an app whose own stylesheet already carries both.</li>
+      <li>The phone has no sheet: <code class="mono">ThemeProvider</code> resolves the theme to numbers and colour strings for the scheme and OS, once per theme.</li>
+    </ul>
+  </section>
+</Base>

@@ -1,0 +1,239 @@
+---
+import "../styles/site.css";
+import { byDataGroup, byLevel, dataSection, iconSvg, kitStyles, PAGES, type ComponentDocs } from "../lib/library";
+
+interface Props {
+  title: string;
+  description?: string;
+  /** The "On this page" rail, built from the page's headings. */
+  toc?: boolean;
+}
+
+const { title, description = "AntFabric UI — the component library for web and desktop (React) and mobile (React Native).", toc = true } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const groups = byLevel();
+const dataGroups = byDataGroup();
+const current = (href: string) => (path === href ? "page" : undefined);
+/** The top bar's sections; a component page counts as Components. */
+const TOP = [
+  { href: "/", label: "Docs", on: path === "/" || path === "/install" || path === "/migrate" || path === "/architecture" || path === "/platforms" || path === "/notifications" },
+  { href: "/components", label: "Components", on: path.startsWith("/components") },
+  { href: "/foundations", label: "Foundations", on: path === "/foundations" },
+  { href: "/theming", label: "Theming", on: path === "/theming" },
+  { href: "/screens", label: "Screens", on: path.startsWith("/screens") },
+];
+const na = (c: ComponentDocs) =>
+  (Object.entries(c.platforms) as [string, { status: string }][])
+    .filter(([, p]) => p.status === "not-applicable")
+    .map(([k]) => k)
+    .join(" ");
+/** The sidebar's groups: the catalogue's own pages, then the components by level, atoms first, then the Data section's groups. */
+const SIDE = [
+  { id: "start", name: "Getting started", flat: true, items: PAGES.map((p) => ({ href: p.href, label: p.label, na: "" })) },
+  ...groups.map((g) => ({ id: g.id, name: g.name, flat: false, items: g.items.map((c) => ({ href: `/components/${c.id}`, label: c.name, na: na(c) })) })),
+  ...dataGroups.map((g) => ({ id: `data-${g.id}`, name: `${dataSection.name} · ${g.name}`, flat: false, items: g.items.map((c) => ({ href: `/components/${c.id}`, label: c.name, na: na(c) })) })),
+];
+---
+
+<!doctype html>
+<html lang="en" data-platform="web" data-scheme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · AntFabric UI</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/brand/antfabric-mark.svg" type="image/svg+xml" />
+    <script is:inline>
+      // Before first paint, so the remembered platform and scheme never flash. (A visitor from before themes stored the scheme as "theme".)
+      try {
+        var p = JSON.parse(localStorage.getItem("af-ui-prefs") || "null");
+        var h = document.documentElement;
+        var stored = p && (p.scheme || (p.theme === "dark" || p.theme === "light" ? p.theme : ""));
+        var dark = stored ? stored === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        h.dataset.scheme = dark ? "dark" : "light";
+        if (p && p.platform) h.dataset.platform = p.platform;
+        if (p && p.os) { h.dataset.osDesktop = p.os.desktop; h.dataset.osMobile = p.os.mobile; }
+      } catch (e) {}
+    </script>
+    <style is:inline set:html={kitStyles}></style>
+    <link rel="preload" href="/fonts/geist/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+  <body data-af-platform="web" data-af-theme="light">
+    <a class="skip" href="#content">Skip to content</a>
+    <header class="site-top">
+      <div class="top-in">
+        <button class="icon-btn nav-toggle" type="button" data-nav-toggle aria-label="Open navigation" aria-expanded="false" aria-controls="side" set:html={iconSvg("menu", 18)} />
+        <a class="brand" href="/">
+          <img src="/brand/antfabric-mark.svg" alt="" />
+          <b>AntFabric UI</b>
+        </a>
+        <nav class="top-nav" aria-label="Sections">
+          {
+            TOP.map((t) => (
+              <a href={t.href} aria-current={t.on ? "page" : undefined}>
+                {t.label}
+              </a>
+            ))
+          }
+        </nav>
+        <div class="top-end">
+          <div class="search" data-search>
+            <label class="search-box">
+              <Fragment set:html={iconSvg("search", 15)} />
+              <input
+                type="search"
+                role="combobox"
+                aria-label="Search the catalogue"
+                aria-expanded="false"
+                aria-controls="search-results"
+                aria-autocomplete="list"
+                placeholder="Search documentation"
+                autocomplete="off"
+                spellcheck="false"
+                enterkeyhint="go"
+              />
+              <kbd class="search-key" data-search-key>⌘K</kbd>
+            </label>
+            <div class="search-pop" hidden>
+              <div class="search-list" id="search-results" role="listbox" aria-label="Search results"></div>
+              <p class="search-empty" hidden></p>
+              <p class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to move</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>esc</kbd> to close</span>
+              </p>
+            </div>
+          </div>
+          <span class="top-sep" aria-hidden="true"></span>
+          <a class="icon-btn" href="https://github.com/AntFabric/antfabric-ui" aria-label="Repository" title="Repository on GitHub" set:html={iconSvg("git-branch", 17)} />
+          <button class="icon-btn" type="button" data-set-scheme="toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+            <span class="theme-icon-light" set:html={iconSvg("moon", 17)} />
+            <span class="theme-icon-dark" set:html={iconSvg("sun", 17)} />
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="site">
+      <nav class="side" id="side" aria-label="Catalogue">
+        {
+          SIDE.map((g) => (
+            <div class:list={["side-group", { flat: g.flat }]} data-group={g.id}>
+              <button class="side-head" type="button" aria-expanded="true" aria-controls={`side-${g.id}`} data-side-toggle={g.id}>
+                <span>{g.name}</span>
+                <Fragment set:html={iconSvg("chevron-down", 14)} />
+              </button>
+              <div class="side-fold" id={`side-${g.id}`}>
+                <div class="side-rows">
+                  {g.items.map((it) => (
+                    <a href={it.href} aria-current={current(it.href)} data-na={it.na || undefined}>
+                      {it.label}
+                      {it.na && <span class="na">n/a</span>}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))
+        }
+      </nav>
+      <div class="side-scrim" data-nav-toggle aria-hidden="true"></div>
+      <script is:inline>
+        // Before first paint: fold the groups the visitor folded (never the one holding this page),
+        // trace the path to this page's row (drawing in, and retracting the row we came from, when
+        // we arrived from another page), then put the sidebar back where it was scrolled, since
+        // every link is a full page load. If the page we landed on isn't in view (arrived from a
+        // link in the content), bring it in.
+        (function () {
+          var side = document.querySelector(".side");
+          if (!side) return;
+          var KEY = "af-side-folded";
+          var folded = [];
+          try {
+            folded = JSON.parse(localStorage.getItem(KEY) || "[]");
+          } catch (e) {}
+          var set = function (group, open) {
+            group.toggleAttribute("data-collapsed", !open);
+            group.querySelector(".side-head").setAttribute("aria-expanded", String(open));
+            group.querySelector(".side-fold").inert = !open;
+          };
+          side.querySelectorAll(".side-group").forEach(function (g) {
+            if (folded.indexOf(g.dataset.group) >= 0 && !g.querySelector('[aria-current="page"]')) set(g, false);
+          });
+          side.addEventListener("click", function (e) {
+            var head = e.target.closest("[data-side-toggle]");
+            if (!head) return;
+            var g = head.closest(".side-group");
+            var open = g.hasAttribute("data-collapsed");
+            set(g, open);
+            var id = g.dataset.group;
+            folded = folded.filter(function (x) { return x !== id; });
+            if (!open) folded.push(id);
+            try {
+              localStorage.setItem(KEY, JSON.stringify(folded));
+            } catch (e) {}
+          });
+          var path = location.pathname.replace(/\/$/, "") || "/";
+          var from = null;
+          try {
+            from = sessionStorage.getItem("af-side-from");
+          } catch (e) {}
+          var moved = from !== null && from !== path;
+          var curve = parseFloat(getComputedStyle(side).getPropertyValue("--curve")) || 6;
+          var trace = function (row, run) {
+            if (!row || row.closest(".side-group.flat") || row.closest("[data-collapsed]")) return;
+            var t = document.createElement("span");
+            t.className = "side-trace";
+            t.setAttribute("aria-hidden", "true");
+            t.style.setProperty("--to", row.offsetTop + row.offsetHeight / 2 - curve + "px");
+            if (run) t.dataset.run = run;
+            t.innerHTML = '<span class="tt"></span><span class="te"><i></i></span>';
+            row.parentElement.appendChild(t);
+            if (run === "retract") setTimeout(function () { t.remove(); }, 600);
+          };
+          var current = side.querySelector('[aria-current="page"]');
+          trace(current, moved ? "draw" : null);
+          if (moved) {
+            var left = side.querySelector('.side-rows a[href="' + from + '"]');
+            if (left !== current) trace(left, "retract");
+          }
+          try {
+            var y = sessionStorage.getItem("af-side-scroll");
+            if (y !== null) side.scrollTop = +y;
+          } catch (e) {}
+          var here = side.querySelector('[aria-current="page"]');
+          if (here) {
+            var r = here.getBoundingClientRect();
+            var box = side.getBoundingClientRect();
+            if (r.top < box.top || r.bottom > box.bottom) side.scrollTop += r.top - box.top - side.clientHeight / 2 + here.offsetHeight / 2;
+          }
+          addEventListener("pagehide", function () {
+            try {
+              sessionStorage.setItem("af-side-scroll", String(side.scrollTop));
+              sessionStorage.setItem("af-side-from", path);
+            } catch (e) {}
+          });
+          // Folding animates only once the page is up, so a restored fold never plays on load.
+          setTimeout(function () { side.setAttribute("data-ready", ""); }, 120);
+        })();
+      </script>
+      <main class="main" id="content">
+        <div class="doc">
+          <slot />
+        </div>
+        <aside class="toc-rail" aria-label="On this page" hidden={!toc}>
+          <div class="toc-in" data-toc-rail hidden>
+            <p class="toc-title">On this page</p>
+            <ol></ol>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script>
+      import "../lib/runtime";
+      import "../lib/toc";
+      import "../lib/search-box";
+    </script>
+  </body>
+</html>

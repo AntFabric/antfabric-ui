@@ -1,0 +1,33 @@
+{
+  "name": "@antfabric-ui/catalogue",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --port 4321",
+    "build": "astro build",
+    "preview": "astro preview --port 4321",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@antfabric-ui/core": "workspace:*",
+    "@antfabric-ui/docs": "workspace:*",
+    "@antfabric-ui/react": "workspace:*",
+    "@antfabric-ui/react-native": "workspace:*",
+    "@astrojs/react": "7.1.2",
+    "astro": "7.3.8",
+    "lucide": "1.50.0",
+    "lucide-react": "1.50.0",
+    "react": "19.1.10",
+    "react-dom": "19.1.10",
+    "react-native-web": "0.21.4"
+  },
+  "devDependencies": {
+    "@happy-dom/global-registrator": "20.0.11",
+    "@types/react": "19.1.17",
+    "@types/react-dom": "19.1.11",
+    "happy-dom": "20.0.11",
+    "linkedom": "0.18.12",
+    "typescript": "5.9.3"
+  }
+}

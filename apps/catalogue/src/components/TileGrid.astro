@@ -1,0 +1,36 @@
+---
+import Tile from "../islands/Tile";
+import { PLATFORM_META, PLATFORMS, type ComponentDocs, type Platform } from "../lib/library";
+
+interface Props {
+  /** The components to draw, each with its first example and what each platform's preview needs. */
+  items: { c: ComponentDocs; ex: ComponentDocs["examples"][number] | undefined; cells: { platform: Platform; label: string; defaults: Record<string, Record<string, unknown>> | null }[] }[];
+  /** A component's category, by id, as the tile names it. */
+  categoryName: Record<string, string>;
+}
+
+const { items, categoryName } = Astro.props;
+---
+
+<div class="grid fill">
+  {
+    items.map(({ c, ex, cells }) => (
+      <div class="tile">
+        {/* A thumbnail, not a control: inert, and outside the link, since a preview can hold links of its own. */}
+        <Tile client:only="react" id={c.id} example={ex} cells={cells} />
+        <div class="meta">
+          <a class="tile-link" href={`/components/${c.id}`}>
+            <b>{c.name}</b>
+          </a>
+          <span class="dots" title={PLATFORMS.map((p) => `${PLATFORM_META[p].label}: ${c.platforms[p].status}`).join(" · ")}>
+            {PLATFORMS.map((p) => (
+              <i class={c.platforms[p].status} />
+            ))}
+          </span>
+        </div>
+        <p class="tile-kind">{categoryName[c.category]}</p>
+        <p>{c.description}</p>
+      </div>
+    ))
+  }
+</div>

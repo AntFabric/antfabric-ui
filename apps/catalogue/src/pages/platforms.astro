@@ -1,0 +1,157 @@
+---
+import Base from "../layouts/Base.astro";
+import Preview from "../islands/Preview";
+import VersionPick from "../components/VersionPick.astro";
+import { features } from "@antfabric-ui/docs";
+import { defaultsFor, iconSvg, OS_LABEL, registry, usedIds, type OS, type Platform } from "../lib/library";
+
+
+type Cell = [string, string];
+const MARK: Record<string, string> = { yes: "✓", partial: "◐", planned: "…", no: "–" };
+const cls = (s: string) => (s === "yes" ? "yes" : s === "no" ? "no" : "partial");
+
+// The shell, side by side per OS: the same component with the OS pinned on each preview.
+const chrome: { title: string; note: string; id: string; platform: Platform; os: OS; width: number }[] = [
+  { title: "macOS — native menu bar", note: "The application menu lives in the system menu bar. Our window starts with the traffic lights.", id: "app-menu-bar", platform: "desktop", os: "mac", width: 760 },
+  { title: "Windows — ☰ menu in our title bar", note: "No system menu bar, so the same menus open from ☰, as Slack does on Windows.", id: "app-menu-bar", platform: "desktop", os: "windows", width: 760 },
+  { title: "Web — a ⋯ menu that only holds what a tab can do", note: "No Reload, Zoom or Quit: the browser already has them. Download and Open in desktop app are here instead.", id: "app-menu-bar", platform: "web", os: "browser", width: 760 },
+  { title: "Desktop title bar · macOS", note: "Overlay title bar, 96px reserved for the traffic lights, history arrows and search.", id: "title-bar", platform: "desktop", os: "mac", width: 960 },
+  { title: "Desktop title bar · Windows", note: "☰ app menu, then history and search, then minimise, maximise and close.", id: "title-bar", platform: "desktop", os: "windows", width: 960 },
+  { title: "Desktop title bar · Linux", note: "As Windows, with GNOME-style round controls.", id: "title-bar", platform: "desktop", os: "linux", width: 960 },
+  { title: "Web top bar", note: "Inside the browser's own chrome: history wired to the browser's, search on Mod+K or /, and Open in desktop app.", id: "web-top-bar", platform: "web", os: "browser", width: 960 },
+];
+const shown = chrome
+  .filter((c) => registry[c.id] && registry[c.id]!.platforms[c.platform].status !== "not-applicable")
+  .map((c) => ({ ...c, html: true }));
+---
+
+<Base title="Web vs desktop vs mobile">
+  <div class="page-head">
+    <div class="eyebrow">Platforms</div>
+    <h1>Web vs desktop vs mobile</h1>
+    <p class="lede">
+      Slack ships one product as a browser tab, a desktop app and a phone app. Each version gets what its host allows: the desktop app has a real menu bar, a tray, a Dock badge and keeps running when you close it, while the browser tab has to leave the browser's shortcuts and menus alone. This page does the same exercise for AntFabric, starting from today's desktop and mobile apps.
+    </p>
+  </div>
+
+  <section class="section">
+    <h2>The frame each platform draws</h2>
+    <p class="sub">The menu bar is where web and desktop differ most visibly. These previews are the shell components themselves, each pinned to one OS. On macOS 26 the menu bar and title bar take Liquid Glass; switch the version to compare.</p>
+    <div style="margin:-4px 0 16px"><VersionPick for="mac" mode="always" label /></div>
+    {
+      shown.length === 0 ? (
+        <div class="callout">
+          <span set:html={iconSvg("loader", 16)} />
+          <span>The shell components are still being written; previews appear here as soon as they land in the kits.</span>
+        </div>
+      ) : (
+        <div class="grid">
+          {shown.map((c) => (
+            <div class="card" style="padding:14px">
+              <div class="cap" style="margin:0 0 4px">
+                <b>{c.title}</b>
+                <a class="faint mono" href={`/components/${c.id}`}>
+                  {c.id}.tsx · {OS_LABEL[c.os]}
+                </a>
+              </div>
+              <p class="muted" style="font-size:13px;margin-bottom:12px">{c.note}</p>
+              <Preview client:only="react" id={c.id} platform={c.platform} os={c.os} width={c.width} className="plain stretch top" defaults={defaultsFor(usedIds(registry[c.id]!), c.platform as Platform)} />
+            </div>
+          ))}
+        </div>
+      )
+    }
+  </section>
+
+  {
+    features.groups.map((g) => (
+      <section class="section">
+        <h2>{g.name}</h2>
+        <p class="sub">{g.description}</p>
+        <div class="card" style="padding:4px 6px;overflow-x:auto">
+          <table class="t fm" style="min-width:980px">
+            <thead>
+              <tr>
+                <th style="width:170px">Feature</th>
+                {features.columns.map((c) => (
+                  <th>
+                    {c.label}
+                    <div style="font-weight:500;text-transform:none;letter-spacing:0">{c.sub}</div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {g.features.map((f) => (
+                <tr>
+                  <td>
+                    <b style="color:var(--af-fg-strong)">{f.name}</b>
+                    {f.component && registry[f.component] && (
+                      <div>
+                        <a class="mono" style="font-size:11.5px;color:var(--af-link-default)" href={`/components/${f.component}`}>
+                          {f.component}
+                        </a>
+                      </div>
+                    )}
+                  </td>
+                  {features.columns.map((c) => {
+                    const cell = (f.support as Record<string, Cell>)[c.id]!;
+                    return (
+                      <td>
+                        <span class={`mark ${cls(cell[0])}`} title={cell[0]}>
+                          {MARK[cell[0]]}
+                        </span>
+                        <div class="note">{cell[1]}</div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section">
+    <h2>Rules that follow from this</h2>
+    <div class="grid c2">
+      <div class="card">
+        <b style="color:var(--af-fg-strong)">Web is a guest in the browser</b>
+        <ul class="notes" style="margin-top:10px">
+          <li>Never bind ⌘W, ⌘T, ⌘N, ⌘L, ⌘R or ⌘1–9. The web alternative goes in the shortcut's hint.</li>
+          <li>Every place is a URL. Back means the browser's back, and ⌘-click opens a new tab.</li>
+          <li>Several tabs are normal. One leader tab owns sound and notifications.</li>
+          <li>Never prompt for notifications on load. Ask in response to a click.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b style="color:var(--af-fg-strong)">Desktop owns its window</b>
+        <ul class="notes" style="margin-top:10px">
+          <li>macOS uses the system menu bar. Windows and Linux use ☰ in our title bar, with the same items.</li>
+          <li>Close hides the window, so notifications keep arriving. Quit is explicit.</li>
+          <li>The Dock or taskbar badge, the tray and launch at login belong here and nowhere else.</li>
+          <li>Links come in by <code class="mono">antfabric://</code>, and one running instance takes them.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b style="color:var(--af-fg-strong)">Mobile has no hover and no pointer</b>
+        <ul class="notes" style="margin-top:10px">
+          <li>Every hover affordance on desktop has a long-press, swipe or visible-button twin.</li>
+          <li>Touch targets are at least 44pt, and the React Native kit has no hover styles.</li>
+          <li>The OS owns the chrome: safe areas, the status bar, the home indicator and the back gesture.</li>
+          <li>Push is the only way in when the app is closed, so the payload is ids only and the device writes the text.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b style="color:var(--af-fg-strong)">Same component, same props</b>
+        <ul class="notes" style="margin-top:10px">
+          <li>A component's props API is identical on all three platforms, and <code class="mono">pnpm check</code> holds both kits to the documented <code class="mono">props</code>.</li>
+          <li>A prop that only makes sense on some platforms (such as <code class="mono">shortcut</code>) says so, and the other platforms' kits ignore it.</li>
+          <li>When a platform genuinely has no such thing, its docs say <code class="mono">not-applicable</code> and name the alternative.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>

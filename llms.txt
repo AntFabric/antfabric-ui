@@ -1,0 +1,89 @@
+# AntFabric UI
+
+> One component library for AntFabric's web (TanStack Start), desktop (Tauri) and mobile (Expo) apps, written as real components. Two kits take the same props: `@antfabric-ui/react` draws web and desktop, `@antfabric-ui/react-native` draws the phone. 90 components in 12 categories (84 on web, 85 on desktop, 79 on mobile), 90 recipes, 669 design tokens, 17 sample screens.
+
+Paths are relative to the repository root. A path that starts with `/` is on the catalogue site, a static Astro site (`apps/catalogue`) that draws every component live on each platform.
+
+## Packages
+
+- `@antfabric-ui/react`: web and desktop. Peers: `react` and `react-dom` 19.1+, `lucide-react`. Wrap the app in `AntFabricRoot` (`platform`, `os`, `osVersion`, `scheme`, `theme`). With no `theme` it draws `themes.neutral`; AntFabric's own look is `themes.antfabric`.
+- `@antfabric-ui/react-native`: the phone. Peers: `react` 19.1+, `react-native` 0.81+, `react-native-svg`, `lucide-react-native`, optionally `expo-glass-effect`. Wrap the app in `ThemeProvider` (`scheme`, `theme`).
+- `@antfabric-ui/core`: tokens, recipes, themes (`defineTheme`, `themes`), the stylesheet, the Figtree font files. Both kits depend on it.
+- Each kit has three more entries, not part of its root, so an app that never imports one carries none of it: `./data` (KPIs, charts, panels and tables; brings recharts or gifted-charts), `./shell` (the app frame and the pictures of native surfaces: title bars, menus, rails, sidebar, tab bar, OS notification, tray menu, app badge) and `./chat` (the conversation idiom: Message, Composer, ReactionPill, ThreadSummary, TypingIndicator, MessageDivider and, on the web, MessageActions; the agent components stay in the root). Import from `@antfabric-ui/react/data`, `@antfabric-ui/react/shell` or `@antfabric-ui/react/chat`, and the same three names under `@antfabric-ui/react-native`; each component's `platforms.<p>.import` in `/components.json` is its exact line.
+- Install, `.npmrc`, fonts, setup and tenant branding: `/install.md` (`CONSUMING.md` in the repository; `/install` on the catalogue is the same guide for a person). How a component is written: `AUTHORING.md`.
+- Moving an app from 0.1 to 1.0: `/migrate.md` (`MIGRATION.md` in the repository; `/migrate` on the catalogue is the same guide for a person): the codemod, and every break by area.
+
+## The data
+
+- `/tokens.json` (`packages/core/tokens.json`): the 669 design tokens in the W3C Design Tokens format. Each has `$type`, `$value` (light theme, desktop profile), `$description` (when to use it), and every mode under `$extensions["com.antfabric"].modes` (`{ light, dark }` or `{ web, desktop, mobile }`). A token's path is its name in recipes (`$fg.muted`) and its CSS variable is `--af-fg-muted`. 90 groups: the foundations (`fg`, `surface`, `brand`, `border`, `space`, `radius`, `text`, `font`, `control`, `shadow`, `duration`) and one group per component's own decisions (`button`, `switch`, `dialog`...).
+- `/components.json` (`packages/docs/components.json`): all 90 components. Per component: `props` (type, default, the catalogue's sample value where there is one, options, required, platforms, event args and the prop an event changes), `parts`, `recipe` (each part's `$token` references by variant, state and platform), `a11y`, `examples`, `platforms` notes, `related`, and `files`: the paths of both kits, the docs and the recipe.
+- `pnpm tokens:build` generates three committed files: `packages/core/tokens.json`, `packages/docs/components.json` and this `llms.txt`. `pnpm check` fails when one is stale. Never edit them by hand; run it after any change to the docs, a recipe or a token.
+- `pnpm describe` lists components by category; `pnpm describe <id>` prints one component's props, parts, recipe table, a11y, examples, states, edge cases, matrix, source, flows, related and its four file paths; `pnpm describe tokens` lists the token groups; `pnpm describe tokens <group>` prints each token's path, CSS variable, value per mode, reference and description. Add `--json` to any of them. Run it instead of reading six files.
+
+## Writing a component
+
+1. Two files, one API. Every component is `packages/react/src/components/<category>/<id>.tsx` (web and desktop) and `packages/react-native/src/components/<category>/<id>.tsx` (phone). Both take the props the docs declare for their platforms, plus `style` on the root, and nothing else. Export each from its category's `index.ts`, or from the kit's `src/data/`, `src/shell/` or `src/chat/` entry when it ships from `./data`, `./shell` or `./chat`.
+2. The docs file is the contract: `packages/docs/src/components/<category>/<id>.ts` (props, platforms, a11y, examples, edge cases, flows), listed in `packages/docs/src/components/index.ts`. Write it first. Its `level` is `atom` (one control or mark), `molecule` (a few atoms doing one job) or `organism` (a whole region of a screen); a component may import only components at its own level or below, and `pnpm check` holds that. Sample data is AntFabric's own (`#platform-eng`, real names, the AI agent "Fabric"), never lorem ipsum.
+3. Styles are a recipe, written once as data: `packages/core/src/recipes/<category>/<id>.ts` with `defineRecipe({ parts, styles })`, added to the category's `index.ts` there. Each part has `base`, `variants` (prop, then value; the docs' `options`), `states` (`hover`, `pressed`, `focus`, `disabled`, `on`, ...), and `platforms` for where the phone differs. Both kits read it through `useRecipe`. The file imports `defineRecipe` from `"../../recipe"` and exports the camelCase of the id (`icon-button` is `iconButton`; a reserved word takes a suffix, `switchRecipe`); the category `index.ts` lists it under the docs id (`"icon-button": iconButton`); a kit reads `import { recipes } from "@antfabric-ui/core"` then `useRecipe(recipes["icon-button"], ...)`. A style that depends on two props together cannot be written (variants layer one prop at a time); `AUTHORING.md`, Recipes, gives the workaround.
+4. Tokens only. A recipe value is `"$group.leaf"` (`"$brand.default"`), `"transparent"` or `"none"`; a typo fails `pnpm typecheck`. No hex, no px, no `calc`. A size or colour with no token gets a token first (`packages/core/src/tokens.ts` and `descriptions.ts`), then the recipe reads it. Unitless ratios (`scale: 0.97`) stay in the kit.
+5. The kit file keeps behaviour and layout, not style: hover, press and focus, roles, `Animated`, flex direction, `cursor`. It may read `t.space`, `t.duration` and `t.ease`; a style written as `t.something` outside the recipe fails `pnpm check`.
+6. Mark every part. Web and desktop: `data-af-part="<part>"` (an `Icon` or `Spinner` takes `part`). Phone: `testID="<id>.<part>"`. A part with no mark fails `pnpm check recipes`. A static component (a divider, a heading) drops `useInteraction` / `usePress`, the handlers, the recipe's `states` and the `state` passed to `useRecipe`, but still marks its parts; for a separator use `role="separator"` on the web, and on the phone (`accessibilityRole` has no separator value) hide a decorative line with `accessibilityElementsHidden` and `importantForAccessibility="no-hide-descendants"`.
+7. Events are props named `onX`, called with the documented `args` and nothing else: `onClick={() => onPress?.()}`, never `onClick={onPress}`. A prop a press changes (`checked`, `open`, `value`) goes through `useControllable(value, onEvent)`, and the docs declare that event with `changes: "<prop>"`.
+8. React kit: states come from `useInteraction()`, never CSS `:hover`; borders are longhands (`borderWidth`, `borderStyle`, `borderColor`), never the `border` shorthand. React Native kit: `usePress()`, no hover; every `Text` takes its type from the recipe (`r.<part>.text`), every `Icon` gets a `color`, fonts by file through `font(weight)`; never `{str && <X />}` with a string or number.
+9. Import sibling components from their files (`../actions/button`), never from the kit's index. Icons are lucide names in kebab case. Shortcuts are written `Mod+Enter` and drawn with `formatShortcut(keys, os)`.
+10. Accessibility: every icon-only control has a label; the docs' `a11y` says the role and the label.
+11. Run `pnpm check <id>` until it passes: it type-checks both kits, checks the docs, the recipe and the props parity, renders every example, variant, state and edge case on every OS, and re-renders through every state. `pnpm check` runs everything. `pnpm frames <id>` shows where flow presses land.
+12. Status: a component's own `status` in the docs is `"stable"`, `"beta"` or `"draft"` (a new one is `draft`); each platform's `platforms.<p>.status` is `"ready"`, `"partial"`, `"planned"` or `"not-applicable"` (with an `alternative`).
+13. Decisions that are the owner's (a value that differs between the kits, a new token name) go in a GitHub issue, stating what the components do now and naming the component. Do not publish by hand; releases go through the Changesets pipeline (`RELEASING.md`).
+
+## Copy these
+
+Button is the canonical component. Read these four, change what differs:
+
+- docs: `packages/docs/src/components/actions/button.ts`
+- recipe: `packages/core/src/recipes/actions/button.ts`
+- react kit: `packages/react/src/components/actions/button.tsx`
+- react-native kit: `packages/react-native/src/components/actions/button.tsx`
+
+Templates, each a complete `Example` component with its recipe inline as a `defineRecipe` constant and the docs file's shape in a comment:
+
+- `packages/react/TEMPLATE.tsx`
+- `packages/react-native/TEMPLATE.tsx`
+
+Their header comments show the recipe file's exact shape, what a static component (no states, no press) drops, and the accessibility roles for a separator or decorative element.
+
+## Adding a component
+
+In this order; `AUTHORING.md` has the same list under "Adding a component: the checklist".
+
+1. Copy both templates to `packages/<kit>/src/components/<category>/<id>.tsx`; rename `Example`; change the `./src/` imports to `../../`.
+2. Move the recipe to `packages/core/src/recipes/<category>/<id>.ts` and add its line to that category's `index.ts`.
+3. Write `packages/docs/src/components/<category>/<id>.ts` and add its line to `packages/docs/src/components/index.ts`.
+4. Export the component and its props type from each kit's category `index.ts` (or from its `./data`, `./shell` or `./chat` entry).
+5. `pnpm tokens:build`: regenerates `tokens.json`, `components.json` and `llms.txt`.
+6. `pnpm check <id>` until it passes.
+7. `pnpm check --update-snapshot`: accepts the new component's render-snapshot keys (`reports/renders.snapshot.json`). Read the diff: only new keys for `<id>`; never use it to hide a change to another component.
+8. The full `pnpm check`, green.
+
+## Components
+
+Ids by category. `/components/<id>` is the component's page on the site.
+
+- Actions (Things you press): button, fab, icon-button, segmented-control
+- Inputs (Things you type into, pick from or switch): checkbox, chip, form-field, radio-group, search-field, select, switch, text-area, text-field
+- Display (People, counts, labels and containers): avatar, avatar-stack, badge, card, divider, kbd, list-item, tag
+- Feedback (Progress, loading and the app talking back): empty-state, inline-banner, progress-bar, skeleton, toast, toast-region
+- Overlays (Anything that floats above the page): bottom-sheet, command-palette, context-menu, dialog, hover-card, menu, popover, sheet, tooltip
+- Navigation (Moving between places inside a screen): breadcrumbs, tabs
+- App shell (The frame each platform draws around the product: title bars, menus, rails, tab bars): app-menu-bar, mobile-header, nav-rail, sidebar-item, sidebar-section, tab-bar, title-bar, web-top-bar, workspace-switcher
+- Messaging (The conversation surface: messages, threads, the composer): attachment-card, composer, message, message-actions, message-divider, reaction-pill, swipe-row, thread-summary, typing-indicator
+- Notifications (How the product reaches someone who isn't looking — on every surface each platform offers): app-badge, in-app-banner, notification-item, notification-schedule, os-notification, permission-prompt, tray-menu
+- System states (Offline, updating, signed out, permission denied: the app's own condition): connection-banner, session-state, update-banner
+- Human in the loop (An agent working on someone's behalf and stopping to ask: its questions, the approvals it waits for, and what it is doing): agent-steps, approval-item, question-panel, thinking-indicator
+- Data (Numbers and the charts and tables that show them: a value and its change, a trend, a chart, a table): bar-chart, breakdown, combo-chart, delta, donut-chart, gauge-chart, goal-rings, kpi-card, line-chart, meter, metric-tabs, metric-value, pagination, period-compare, progress-ring, radar-chart, spark-bars, sparkline, stat-tile, table
+
+Ids by level, smallest first: the order the site's sidebar lists them in. A component imports only components at its own level or below.
+
+- Atoms (One control or mark that does not break down further: a button, a badge, a checkbox): app-badge, avatar, badge, button, card, checkbox, chip, delta, divider, fab, form-field, icon-button, kbd, message-divider, meter, metric-value, progress-bar, progress-ring, reaction-pill, skeleton, spark-bars, sparkline, switch, tag, text-area, text-field, tooltip, typing-indicator
+- Molecules (A few atoms doing one job together: a search field, a list item, a menu): agent-steps, approval-item, attachment-card, avatar-stack, breadcrumbs, connection-banner, context-menu, empty-state, hover-card, in-app-banner, inline-banner, kpi-card, list-item, menu, message-actions, notification-item, os-notification, pagination, permission-prompt, popover, radio-group, search-field, segmented-control, select, sidebar-item, stat-tile, swipe-row, tabs, thinking-indicator, thread-summary, toast, toast-region, update-banner
+- Organisms (A whole region of a screen, built from molecules and atoms: a dialog, the composer, the nav rail): app-menu-bar, bar-chart, bottom-sheet, breakdown, combo-chart, command-palette, composer, dialog, donut-chart, gauge-chart, goal-rings, line-chart, message, metric-tabs, mobile-header, nav-rail, notification-schedule, period-compare, question-panel, radar-chart, session-state, sheet, sidebar-section, tab-bar, table, title-bar, tray-menu, web-top-bar, workspace-switcher

@@ -1,0 +1,27 @@
+---
+import Base from "../layouts/Base.astro";
+import { install } from "../lib/install";
+
+// The page is CONSUMING.md, read when the site builds (lib/install.ts): what it says is what the page says.
+const { title, lead, steps } = await install();
+// The first paragraph is the lede; the rest of the lead (a table of what to install) follows the steps list.
+const [, ledeHtml = "", rest = ""] = lead.match(/^\s*(<p>[\s\S]*?<\/p>)([\s\S]*)$/) ?? [];
+---
+
+<Base title="Install" description="How to install AntFabric UI in a web, desktop, plugin or phone app, step by step: the registry, the setup, fonts, tokens and imports.">
+  <div class="page-head">
+    <div class="eyebrow">Install</div>
+    <h1>{title}</h1>
+    <div class="lede md" set:html={ledeHtml} />
+    <nav class="toc" aria-label="Steps">
+      {steps.map((s) => <a href={`#${s.id}`}>{s.text}</a>)}
+    </nav>
+    <p class="install-agent">
+      For an agent: this page as Markdown is at <a href="/install.md"><code class="mono">/install.md</code></a>, and the entry point is <a href="/llms.txt"><code class="mono">/llms.txt</code></a>.
+    </p>
+  </div>
+
+  {rest.trim() && <div class="md" set:html={rest} />}
+
+  {steps.map((s) => <section class="section md" set:html={s.html} />)}
+</Base>

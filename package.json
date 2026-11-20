@@ -1,0 +1,46 @@
+{
+  "name": "antfabric-ui",
+  "private": true,
+  "description": "AntFabric UI: React components for web and desktop, React Native components for mobile, catalogued in Astro.",
+  "packageManager": "pnpm@11.18.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @antfabric-ui/catalogue dev",
+    "build": "pnpm check && pnpm --filter @antfabric-ui/catalogue build",
+    "preview": "pnpm --filter @antfabric-ui/catalogue preview",
+    "typecheck": "pnpm --filter @antfabric-ui/catalogue exec astro sync && tsc -p packages/core && tsc -p packages/docs && tsc -p packages/react && tsc -p packages/react-native && tsc --noEmit -p apps/catalogue",
+    "check": "pnpm typecheck && tsx --tsconfig apps/catalogue/scripts/tsconfig.json --import ./apps/catalogue/scripts/native.mjs apps/catalogue/scripts/check.tsx",
+    "build:packages": "node scripts/build-packages.mjs",
+    "verify:packages": "node scripts/verify-packages.mjs",
+    "frames": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json --import ./apps/catalogue/scripts/native.mjs apps/catalogue/scripts/frames.tsx",
+    "describe": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/describe.mts",
+    "tokens:build": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/tokens-build.mts",
+    "report": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/report.mts",
+    "literals:tighten": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/report.mts --tighten",
+    "primitives": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/primitives.mts",
+    "primitives:check": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/primitives.mts --check",
+    "rerender": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json --import ./apps/catalogue/scripts/native.mjs apps/catalogue/scripts/rerender.tsx",
+    "migrate:1": "tsx scripts/migrate-1.mts",
+    "migrate:1:test": "tsx scripts/migrate-1/test.mts",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build:packages && changeset publish",
+    "release:dry": "pnpm build:packages && pnpm publish -r --access public --no-git-checks --dry-run --filter @antfabric-ui/core --filter @antfabric-ui/react --filter @antfabric-ui/react-native"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "0.5.1",
+    "@changesets/cli": "2.29.7",
+    "@types/node": "26.6.6",
+    "esbuild": "0.27.7",
+    "linkedom": "0.18.12",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AntFabric/antfabric-ui.git"
+  }
+}

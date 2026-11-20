@@ -1,0 +1,12 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+allowBuilds:
+  # tsx and Astro's Vite both bundle esbuild, whose postinstall places the platform binary.
+  esbuild: true
+  # Astro's image service; unused by the catalogue today, but Astro installs it and asks.
+  sharp: true
+
+# The kits declare expo-glass-effect as an optional peer; without this pnpm installs it (and Expo with it) into the workspace.
+autoInstallPeers: false

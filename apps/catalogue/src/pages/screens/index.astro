@@ -1,0 +1,43 @@
+---
+import Base from "../../layouts/Base.astro";
+import { iconSvg, PLATFORM_META, PLATFORMS, screens } from "../../lib/library";
+
+const groups = (["desktop", "web", "mobile"] as const)
+  .filter((p) => PLATFORMS.includes(p))
+  .map((p) => ({ p, items: screens.filter((s) => s.platform === p) }))
+  .filter((g) => g.items.length);
+const frameLabel = { window: "Desktop window", browser: "Browser tab", phone: "Phone" } as const;
+---
+
+<Base title="Screens">
+  <div class="page-head">
+    <div class="eyebrow">Screens</div>
+    <h1>Whole screens, composed from the kits</h1>
+    <p class="lede">
+      Each screen is a React (web, desktop) or React Native (mobile) composition in <code class="mono">apps/catalogue/src/screens/</code> that places the kit's components in a layout, drawn inside the device it belongs to. They are based on today's desktop and mobile apps and show the components working together, including the states that are easy to forget: offline, signed out, a pause menu, a long-press. They are not shipped by any kit.
+    </p>
+  </div>
+  {
+    groups.map((g) => (
+      <section class="section">
+        <h2 style="display:flex;align-items:center;gap:10px">
+          <Fragment set:html={iconSvg(PLATFORM_META[g.p].icon, 18)} />
+          {PLATFORM_META[g.p].label}
+          <span class="chip">{g.items.length}</span>
+        </h2>
+        <p class="sub">{PLATFORM_META[g.p].stack}</p>
+        <div class="grid fill">
+          {g.items.map((s) => (
+            <a class="tile" href={`/screens/${s.id}`}>
+              <div class="meta">
+                <b>{s.name.replace(/ · (desktop|web|mobile)$/i, "")}</b>
+                <span class="faint" style="font-size:11.5px">{frameLabel[s.frame]}</span>
+              </div>
+              <p style="-webkit-line-clamp:4">{s.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</Base>

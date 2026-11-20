@@ -1,0 +1,30 @@
+---
+/**
+ * Switch an OS between its Liquid Glass release (26) and the release before it.
+ *
+ *   context  shown only while that OS is the chosen one on the chosen platform (top bars)
+ *   inline   shown while that OS is the chosen OS of its platform (a screen page)
+ *   always   always shown (pages that pin previews to several OSes)
+ */
+import { OS_VERSIONS } from "@antfabric-ui/core";
+
+interface Props {
+  for: "ios" | "mac";
+  mode?: "context" | "inline" | "always";
+  label?: boolean;
+}
+
+const { for: os, mode = "context", label = false } = Astro.props;
+const v = OS_VERSIONS[os]!;
+const name = os === "ios" ? "iOS" : "macOS";
+---
+
+<div class="seg sm ver-pick" data-for={os} data-mode={mode} role="group" aria-label={`${name} version`}>
+  {label && <span class="ver-label">{name}</span>}
+  <button type="button" data-set-version={`${os}:${v.glass}`} aria-pressed="true" title={`${name} ${v.glass} and later: Liquid Glass`}>
+    <span class="ver-dot glass"></span>Liquid Glass · {v.glass}
+  </button>
+  <button type="button" data-set-version={`${os}:${v.before}`} aria-pressed="false" title={`${name} ${v.before} and earlier: the blur look`}>
+    <span class="ver-dot blur"></span>Blur · {v.before}
+  </button>
+</div>

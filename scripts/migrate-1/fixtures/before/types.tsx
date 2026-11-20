@@ -1,0 +1,20 @@
+import type { AvatarStackPerson, NavRailDestination, NavRailKey, ThreadSummaryParticipant } from '@antfabric-ui/react';
+import type { MessageAttachment, MobileHeaderAction, OsNotificationKind, SidebarItemKind, TabBarTab } from '@antfabric-ui/react-native';
+import * as Kit from '@antfabric-ui/react';
+import type { Theme, Theme as CoreTheme } from '@antfabric-ui/core';
+import type { MobileHeaderProps } from '@antfabric-ui/react-native';
+
+export type Dest = NavRailDestination;
+export type Key = NavRailKey;
+export const scheme: Theme = 'dark';
+export type Who = AvatarStackPerson | ThreadSummaryParticipant;
+export type Tab = TabBarTab;
+export type Att = MessageAttachment;
+export type Action = MobileHeaderAction;
+export type Kinds = [OsNotificationKind, SidebarItemKind];
+export type Spaced = Kit.NavRailSection;
+export type FromCore = CoreTheme;
+export type Header = Omit<MobileHeaderProps, 'statusBar' | 'time'>;
+export type Time = MobileHeaderProps['time'];
+export type Actions = MobileHeaderProps['actions'];
+export { Theme as ExportedTheme } from '@antfabric-ui/core';

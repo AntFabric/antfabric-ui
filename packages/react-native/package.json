@@ -1,0 +1,90 @@
+{
+  "name": "@antfabric-ui/react-native",
+  "version": "1.1.0",
+  "type": "module",
+  "description": "A generic, themeable component kit for React Native and Expo. StyleSheet over useTheme() tokens.",
+  "license": "MIT",
+  "author": "GeekyAnts",
+  "homepage": "https://github.com/AntFabric/antfabric-ui#readme",
+  "bugs": {
+    "url": "https://github.com/AntFabric/antfabric-ui/issues"
+  },
+  "keywords": [
+    "antfabric",
+    "react-native",
+    "expo",
+    "components",
+    "ui-kit",
+    "design-system"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AntFabric/antfabric-ui.git",
+    "directory": "packages/react-native"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./data": "./src/data/index.ts",
+    "./shell": "./src/shell/index.ts",
+    "./chat": "./src/chat/index.ts"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "./data": {
+        "types": "./dist/data/index.d.ts",
+        "import": "./dist/data/index.js",
+        "default": "./dist/data/index.js"
+      },
+      "./shell": {
+        "types": "./dist/shell/index.d.ts",
+        "import": "./dist/shell/index.js",
+        "default": "./dist/shell/index.js"
+      },
+      "./chat": {
+        "types": "./dist/chat/index.d.ts",
+        "import": "./dist/chat/index.js",
+        "default": "./dist/chat/index.js"
+      }
+    }
+  },
+  "dependencies": {
+    "@antfabric-ui/core": "workspace:^",
+    "react-native-gifted-charts": "1.4.81",
+    "gifted-charts-core": "0.1.83"
+  },
+  "peerDependencies": {
+    "react": ">=19.1.0",
+    "react-native": ">=0.81.0",
+    "react-native-svg": ">=15.0.0",
+    "lucide-react-native": ">=1.42.0",
+    "expo-glass-effect": ">=0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "expo-glass-effect": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "19.1.17",
+    "react": "19.1.10",
+    "react-native": "0.81.6",
+    "react-native-svg": "15.12.1",
+    "typescript": "5.9.3",
+    "lucide-react-native": "1.50.0"
+  }
+}

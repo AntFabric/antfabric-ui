@@ -1,0 +1,27 @@
+---
+import Base from "../layouts/Base.astro";
+import { migrate } from "../lib/install";
+
+// The page is MIGRATION.md, read when the site builds (lib/install.ts): what it says is what the page says.
+const { title, lead, steps } = await migrate();
+// The first paragraph is the lede; the rest of the lead follows the sections list.
+const [, ledeHtml = "", rest = ""] = lead.match(/^\s*(<p>[\s\S]*?<\/p>)([\s\S]*)$/) ?? [];
+---
+
+<Base title="Migrate to 1.0" description="How to move an app from AntFabric UI 0.1 to 1.0: the codemod and every break by area.">
+  <div class="page-head">
+    <div class="eyebrow">Migrate</div>
+    <h1>{title}</h1>
+    <div class="lede md" set:html={ledeHtml} />
+    <nav class="toc" aria-label="Sections">
+      {steps.map((s) => <a href={`#${s.id}`}>{s.text}</a>)}
+    </nav>
+    <p class="install-agent">
+      For an agent: this page as Markdown is at <a href="/migrate.md"><code class="mono">/migrate.md</code></a>, and the entry point is <a href="/llms.txt"><code class="mono">/llms.txt</code></a>.
+    </p>
+  </div>
+
+  {rest.trim() && <div class="md" set:html={rest} />}
+
+  {steps.map((s) => <section class="section md" set:html={s.html} />)}
+</Base>

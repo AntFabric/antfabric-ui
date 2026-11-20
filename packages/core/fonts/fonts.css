@@ -1,0 +1,17 @@
+/* Figtree, the kit's body face, for the web and the desktop: `import "@antfabric-ui/core/fonts.css"` once, beside AntFabricRoot.
+   The family is named `Figtree`, which the `font.sans` stack asks for. Satoshi (headlines) is not here: its licence does not let
+   the files be passed on, so `font.display` falls back to Figtree unless an AntFabric app loads Satoshi itself (CONSUMING.md, Fonts). */
+
+@font-face { font-family: "Figtree"; src: url("./Figtree-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Figtree"; src: url("./Figtree-Medium.ttf") format("truetype"); font-weight: 450 500; font-display: swap; }
+@font-face { font-family: "Figtree"; src: url("./Figtree-SemiBold.ttf") format("truetype"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Figtree"; src: url("./Figtree-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Figtree"; src: url("./Figtree-ExtraBold.ttf") format("truetype"); font-weight: 800 900; font-display: swap; }
+
+/* Geist, neutral's face for body text and headlines and the face for chart text (the `chart.font` token). Vercel's, SIL OFL 1.1
+   (Geist-OFL.txt). The web and the desktop load one variable file, so every weight from 100 to 900 draws as asked (a 450 is a 450,
+   not a 500 snapped to the nearest static file). The static per-weight files of the `geist` npm package, version 1.9.1
+   (dist/fonts/geist-sans), still ship beside it: the .ttf files for the phone, which loads one file per weight (`font.file*`,
+   `chart.fileRegular`…) and cannot read woff2, and the static .woff2 files for a host that names them itself; this sheet loads neither. */
+
+@font-face { font-family: "Geist"; src: url("./Geist-Variable.woff2") format("woff2-variations"), url("./Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }

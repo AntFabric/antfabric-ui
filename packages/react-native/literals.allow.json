@@ -1,0 +1,19 @@
+{
+  "packages/react-native/src/components/display/avatar.tsx": { "colours": 2, "dimensions": 6, "text": 0 },
+  "packages/react-native/src/components/display/badge.tsx": { "colours": 0, "dimensions": 3, "text": 0 },
+  "packages/react-native/src/components/display/card.tsx": { "colours": 0, "dimensions": 2, "text": 0 },
+  "packages/react-native/src/components/display/list-item.tsx": { "colours": 0, "dimensions": 2, "text": 0 },
+  "packages/react-native/src/components/feedback/empty-state.tsx": { "colours": 0, "dimensions": 2, "text": 0 },
+  "packages/react-native/src/components/feedback/inline-banner.tsx": { "colours": 0, "dimensions": 2, "text": 0 },
+  "packages/react-native/src/components/feedback/progress-bar.tsx": { "colours": 0, "dimensions": 3, "text": 0 },
+  "packages/react-native/src/components/feedback/skeleton.tsx": { "colours": 0, "dimensions": 10, "text": 0 },
+  "packages/react-native/src/components/feedback/toast.tsx": { "colours": 0, "dimensions": 3, "text": 0 },
+  "packages/react-native/src/components/messaging/attachment-card.tsx": { "colours": 0, "dimensions": 17, "text": 0 },
+  "packages/react-native/src/components/messaging/composer.tsx": { "colours": 0, "dimensions": 7, "text": 0 },
+  "packages/react-native/src/components/messaging/message-divider.tsx": { "colours": 0, "dimensions": 1, "text": 0 },
+  "packages/react-native/src/components/messaging/message.tsx": { "colours": 0, "dimensions": 6, "text": 0 },
+  "packages/react-native/src/components/messaging/swipe-row.tsx": { "colours": 0, "dimensions": 6, "text": 0 },
+  "packages/react-native/src/components/messaging/thread-summary.tsx": { "colours": 0, "dimensions": 1, "text": 0 },
+  "packages/react-native/src/components/messaging/typing-indicator.tsx": { "colours": 0, "dimensions": 2, "text": 0 },
+  "packages/react-native/src/components/overlays/context-menu.tsx": { "colours": 0, "dimensions": 2, "text": 0 }
+}

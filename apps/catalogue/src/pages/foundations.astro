@@ -1,0 +1,411 @@
+---
+import Base from "../layouts/Base.astro";
+import Preview from "../islands/Preview";
+import BrandPreview from "../islands/BrandPreview";
+import TokenTable from "../components/TokenTable.astro";
+import { defaultsFor, OS_VERSIONS, PLATFORM_META, PLATFORMS, registry, usedIds, type OS, type Platform } from "../lib/library";
+import { slug } from "../lib/search";
+import { groups, refCount, rowCount, valueOf } from "../lib/token-ref";
+import { BRAND_PATHS, kebab, MOTION, tokens } from "@antfabric-ui/core";
+import { BRAND_SAMPLE, SAMPLE_TENANT } from "../lib/brand";
+
+// Materials: the same component at the Liquid Glass release and the one before it, side by side.
+const materialRows: { title: string; note: string; id: string; platform: Platform; os: OS; props?: Record<string, unknown>; cls: string; width?: number }[] = [
+  { title: "iOS notification", note: "Drawn by iOS.", id: "os-notification", platform: "mobile", os: "ios", cls: "wallpaper ios" },
+  { title: "iOS tab bar", note: "Our V2 floating bar, drawn through GlassView on 26+.", id: "tab-bar", platform: "mobile", os: "ios", cls: "wallpaper ios", width: 375 },
+  { title: "macOS menu bar and menu", note: "Drawn by macOS.", id: "app-menu-bar", platform: "desktop", os: "mac", cls: "plain", width: 620 },
+];
+const materials = materialRows.map((r) => {
+  const v = OS_VERSIONS[r.os]!;
+  return { ...r, cells: [v.glass, v.before].map((ver) => ({ ver, html: true })) };
+});
+
+const count = rowCount();
+const refs = refCount();
+const profileNote = (p: Platform) => String((tokens.profiles[p] as { $description?: string }).$description ?? "");
+const caption = (section: string, g: string) => `${section}: ${g}`;
+const TOPICS = ["Colour", "Tenant branding", "Type", "Space", "Radius", "Size", "Components", "Data", "Elevation", "Motion", "Layers and opacity", "Materials: Liquid Glass and blur"];
+const textRoles = groups("type")[0]!.rows.filter((r) => !r.path.endsWith("Line")).map((r) => r.path.slice("text.".length));
+const brandIds = BRAND_SAMPLE.map((s) => s.id);
+const brandUse = `import { defineTheme, themes } from "@antfabric-ui/core";
+
+// A product's brand is a theme: the preset it starts from, and the brand on top
+export const antagents = defineTheme({
+  name: "${SAMPLE_TENANT.name}",
+  extends: themes.neutral,   // or themes.antfabric
+  brand: { primary: "${SAMPLE_TENANT.brand.primary}", accent: "${SAMPLE_TENANT.brand.accent}" },
+});
+
+// Phone: the provider takes it
+<ThemeProvider theme={antagents}>…</ThemeProvider>
+
+// Web and desktop: the root takes it, and writes its scoped sheet and data-af-theme-id
+<AntFabricRoot theme={antagents}>…</AntFabricRoot>`;
+// Data: the palette and the status colours as swatches in each theme, the plot's geometry per platform as marks; the tables below carry every token.
+const SERIES = Array.from({ length: 8 }, (_, i) => `chart.series${i + 1}`);
+const STATUS = [["accent", "onAccentSoft"], ["positive", "onPositive"], ["negative", "onNegative"], ["warning", "onWarning"]] as const;
+const THEME_OF = (t: "light" | "dark") => ({ card: valueOf("surface.card", "desktop", t), border: valueOf("border.subtle", "desktop", t), ink: valueOf("fg.strong", "desktop", t), muted: valueOf("fg.muted", "desktop", t) });
+const dataTitles: Record<string, [title: string, note: string]> = {
+  "chart-theme": ["Chart colours", "The eight series and the neutrals a chart draws with. The series are a palette of their own, after the reference dashboard (blue, orange, purple, teal first); the neutrals are the kit's, so a chart follows the theme."],
+  "data-theme": ["Data status colours", "A fill, a soft wash and the ink that reads on it, for each of the data components' four meanings. These are not brand, success, danger or warning: no data component reads those."],
+  "chart-profile": ["Chart geometry", "Line, point and bar sizes per platform. The phone's are its own: bars are narrower and lines a little heavier."],
+  "chart-shared": ["Chart text and dashes", "Geist for chart text, and the dash patterns of the grid, target lines and dashed series."],
+  "chart-files": ["Chart font files on the phone", "The file the phone loads for Geist at each weight."],
+  "table-theme": ["Table colours", "Header, hover, selected and divider: kit neutrals, and the data accent's wash for the selected row."],
+  "table-profile": ["Table size", "Row height per platform."],
+  "table-shared": ["Table padding", "The cell's side padding."],
+};
+const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r === "title" ? "semibold" : "normal");
+---
+
+<Base title="Foundations" description={`Every design token in AntFabric UI, one row each: name, CSS variable, value in light and dark or on web, desktop and mobile, and what it is for. ${count} tokens across colour, type, space, radius, size, components, elevation, motion, layers and materials.`}>
+  <div class="page-head">
+    <div class="eyebrow">Foundations</div>
+    <h1>Foundations</h1>
+    <p class="lede">
+      The {count} design tokens every component reads, one row each: its name, its CSS variable, its value in each mode, and what it is for.
+      The same tokens are a W3C Design Tokens file at <a href="/tokens.json"><code class="mono">/tokens.json</code></a>.
+      The values live in <code class="mono">packages/core/src/tokens.ts</code> and each row's description in <code class="mono">packages/core/src/descriptions.ts</code>.
+    </p>
+    <nav class="toc" aria-label="On this page">
+      {TOPICS.map((t) => <a href={`#${slug(t)}`}>{t.split(":")[0]}</a>)}
+    </nav>
+  </div>
+
+  <section class="section">
+    <h2 id={slug("How tokens are named")}>How tokens are named</h2>
+    <p class="sub">
+      A token's <b>name</b> is its path in <code class="mono">tokens.ts</code>, like <code class="mono">fg.muted</code>. The React kit reads it as <code class="mono">t.fg.muted</code>, a CSS variable.
+      The <b>variable</b> is <code class="mono">--af-</code> and the path with dots as hyphens and every capital split: <code class="mono">fg.onBrand</code> is <code class="mono">--af-fg-on-brand</code>, <code class="mono">control.hMd</code> is <code class="mono">--af-control-h-md</code>.
+      The copy button on a row copies the variable.
+    </p>
+    <ul class="how">
+      <li><b>Modes.</b> Colours and shadows switch by theme, so they have a Light and a Dark value on every platform. Sizes and type switch by platform, so they have a Web, Desktop and Mobile value; a token only one platform reads (the phone's font files) has just that one, and where an OS changes a platform's value (Android's switch) a line under it says so. A scale has one value; where the phone has its own, a line under the value says so.</li>
+      <li><b>Highlighted rows</b> have a value that differs between platforms. The web profile is a proposal: there is no AntFabric web app to copy values from yet.</li>
+      <li><b>Aliases.</b> A value with an arrow, like <code class="mono">→ {"{primitives.color.neutral.900}"}</code>, is a token that points at another one; the value beside it is what it resolves to.{refs === 0 ? " No token is an alias yet." : ` ${refs} tokens are aliases.`}</li>
+      <li><b>Descriptions</b> say when to use a token, not what it is. Where a platform's use differs, a Mobile or Web note follows.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Colour")}>Colour</h2>
+    <p class="sub">Semantic roles only. A component never names a hex value. Coral (<code class="mono">brand.default</code>) means it needs you. Colours are the same on every platform and switch by theme.</p>
+    {
+      groups("colour").map((g) => (
+        <>
+          <h3 id={`colour-${kebab(g.name)}`}>{g.name}</h3>
+          <TokenTable rows={g.rows} caption={caption("Colour", g.name)} />
+        </>
+      ))
+    }
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Tenant branding")}>Tenant branding</h2>
+    <p class="sub">
+      A white-label tenant retints the brand family through its theme, as the product's phone does at runtime: <code class="mono">{"defineTheme({ name, extends, brand })"}</code>. Give a <code class="mono">primary</code> (and an <code class="mono">accent</code>) and the hover, pressed, soft, link and unread tints follow from it; a hand-picked <code class="mono">soft</code>, <code class="mono">softHover</code>, <code class="mono">onSoft</code> or <code class="mono">tint</code> per theme replaces its derived value. The previews below are a made-up tenant, {SAMPLE_TENANT.name}, beside the <code class="mono">neutral</code> theme it extends, drawn by the same components.
+    </p>
+    <h3 id="tenant-branding-phone">Phone</h3>
+    <BrandPreview client:only="react" platform="mobile" brand={SAMPLE_TENANT.brand} tenant={SAMPLE_TENANT.name} defaults={defaultsFor(brandIds, "mobile")} />
+    <h3 id="tenant-branding-web">Web and desktop</h3>
+    <BrandPreview client:only="react" platform="web" brand={SAMPLE_TENANT.brand} tenant={SAMPLE_TENANT.name} defaults={defaultsFor(brandIds, "web")} />
+    <h3 id="tenant-branding-how">How a host applies it</h3>
+    <div class="code"><pre>{brandUse}</pre></div>
+    <p class="sub" style="margin-top:12px">
+      A brand sets only these tokens: {BRAND_PATHS.map((p, i) => <><code class="mono">{p}</code>{i < BRAND_PATHS.length - 1 ? ", " : "."}</>)}
+      Neutrals, status colours and the identity colours (<code class="mono">identity.agent</code> is Fabric, never a tenant) stay as they are; <code class="mono">fg.onBrand</code> follows the primary, white while white reads on it and ink on a light one. A theme's sheet is scoped by <code class="mono">data-af-theme-id</code>, so several themes can sit on one page; a host that skips <code class="mono">AntFabricRoot</code> writes that attribute and <code class="mono">themeCss(theme)</code> itself.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Type")}>Type</h2>
+    <p class="sub">Figtree for text and Satoshi for display, on every platform. The scale is one step larger on mobile: body is 14 on desktop and 16 on a phone.</p>
+    <h3 id="type-scale">Scale</h3>
+    <div class="tok-scroll" tabindex="0" role="region" aria-label="Type scale specimens">
+      <table class="tok">
+        <caption class="sr-only">Type scale specimens on web, desktop and mobile</caption>
+        <thead>
+          <tr>
+            <th scope="col">Role</th>
+            {PLATFORMS.map((p) => <th scope="col">{PLATFORM_META[p].label}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            textRoles.map((r) => (
+              <tr>
+                <th scope="row" class="tok-name">
+                  <code>text.{r}</code>
+                </th>
+                {PLATFORMS.map((p) => (
+                  <td class="tok-val">
+                    <div class="spec" style={`font-size:${valueOf(`text.${r}`, p)};line-height:${valueOf(`text.${r}Line`, p)};font-family:var(--af-font-${r.startsWith("h") || r === "display" ? "display" : "sans"});font-weight:var(--af-font-weight-${weight(r)})`}>
+                      {r === "display" ? "Fabric" : r.startsWith("h") ? "Release train" : "Priya shared the deck"}
+                    </div>
+                    <div class="faint mono">
+                      {valueOf(`text.${r}`, p)} / {valueOf(`text.${r}Line`, p)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    {
+      groups("type").map((g) => (
+        <>
+          <h3 id={`type-${kebab(g.name)}`}>{g.name === "text" ? "Size and line height" : g.name === "font" ? "Families and weights" : g.name === "fontFiles" ? "Font files on the phone" : "Letter spacing"}</h3>
+          <TokenTable rows={g.rows} caption={caption("Type", g.name)} />
+        </>
+      ))
+    }
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Space")}>Space</h2>
+    <p class="sub">One scale for padding, gaps and margins. The gutters are the profile's own: the space between panes and the margin of a page.</p>
+    {
+      groups("space").map((g) => (
+        <>
+          <h3 id={`space-${kebab(g.name)}`}>{g.name === "space" ? "Scale" : "Gutters"}</h3>
+          <TokenTable rows={g.rows} caption={caption("Space", g.name)} />
+        </>
+      ))
+    }
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Radius")}>Radius</h2>
+    <p class="sub">Named for the thing that wears it, not for its size. The phone rounds cards and tags more than the desktop does.</p>
+    {groups("radius").map((g) => <TokenTable rows={g.rows} caption={caption("Radius", g.name)} />)}
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Size")}>Size</h2>
+    <p class="sub">Controls, rows, bars, avatars and icons. This is how a control is 34px on desktop and 44pt on a phone: the component reads one token and the platform profile decides.</p>
+    <div class="grid c3" style="margin-bottom:6px">
+      {
+        PLATFORMS.map((p) => (
+          <div class="card">
+            <b style="color:var(--af-fg-strong)">{PLATFORM_META[p].label}</b>
+            <p class="muted" style="font-size:13px;margin-top:6px">{profileNote(p)}</p>
+          </div>
+        ))
+      }
+    </div>
+    {
+      groups("size").map((g) => (
+        <>
+          <h3 id={`size-${kebab(g.name)}`}>{g.name}</h3>
+          <TokenTable rows={g.rows} caption={caption("Size", g.name)} />
+        </>
+      ))
+    }
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Components")}>Components</h2>
+    <p class="sub">
+      Decisions that belong to one component and change by mode: a switch's track and thumb, a button's label and icon size per size. The phone's switch is also drawn per OS:
+      a value with <code class="mono">android</code> under it is what Android changes from the iOS value shown, through the <code class="mono">os.android</code> set.
+    </p>
+    {
+      groups("components").map((g) => (
+        <>
+          <h3 id={`components-${kebab(g.name)}`}>{g.name}</h3>
+          <TokenTable rows={g.rows} caption={caption("Components", g.name)} />
+        </>
+      ))
+    }
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Data")}>Data</h2>
+    <p class="sub">
+      What charts, KPIs and tables draw with. Series colours are a palette of their own, after the reference dashboard, fixed for every tenant (a brand does not move them); only neutrals come from the kit.
+      They are tested in both themes: lightness in a band, chroma above a floor, neighbours kept apart under protan and deutan vision. In light, several sit under 3:1 against the card, so every chart also has a tooltip, a read-aloud summary and a view as a table.
+      Chart text is set in Geist, which ships with <code class="mono">@antfabric-ui/core</code>.
+    </p>
+    <h3 id="data-palette">Palette in both themes</h3>
+    <div class="grid c2">
+      {
+        (["light", "dark"] as const).map((t) => {
+          const c = THEME_OF(t);
+          return (
+            <div class="card" style={`padding:14px;background:${c.card};border-color:${c.border}`}>
+              <div style={`display:flex;gap:6px;margin-bottom:12px`}>
+                {SERIES.map((p, i) => (
+                  <div style="flex:1;min-width:0;text-align:center">
+                    <i style={`display:block;height:36px;border-radius:6px;background:${valueOf(p, "desktop", t)}`} />
+                    <span class="mono" style={`display:block;margin-top:4px;font-size:11px;color:${c.muted}`}>{i + 1}</span>
+                  </div>
+                ))}
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                {STATUS.map(([k, ink]) => (
+                  <span style={`display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px 0 6px;border-radius:999px;background:${valueOf(`data.${k}Soft`, "desktop", t)};color:${valueOf(`data.${ink}`, "desktop", t)};font-size:12px;font-weight:600`}>
+                    <i style={`width:10px;height:10px;border-radius:50%;background:${valueOf(`data.${k}`, "desktop", t)}`} />
+                    {k}
+                  </span>
+                ))}
+              </div>
+              <div class="cap" style="margin:12px 0 0"><b style={`color:${c.ink}`}>{t === "light" ? "Light" : "Dark"}</b></div>
+            </div>
+          );
+        })
+      }
+    </div>
+    <h3 id="data-geometry">Geometry per platform</h3>
+    <div class="grid c3">
+      {
+        PLATFORMS.map((p) => (
+          <div class="card" style="padding:14px">
+            <b style="color:var(--af-fg-strong)">{PLATFORM_META[p].label}</b>
+            <div style={`display:flex;align-items:flex-end;gap:14px;margin-top:12px;color:${valueOf("fg.muted", p)};font-family:${valueOf("chart.font", p)};font-size:${valueOf("chart.labelSize", p)}`}>
+              <div style={`width:${valueOf("chart.barMaxW", p)};height:56px;border-radius:${valueOf("chart.barRadius", p)} ${valueOf("chart.barRadius", p)} 0 0;background:${valueOf("chart.series1", p)}`} />
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+                <div style={`height:${valueOf("chart.barH", p)};width:70%;border-radius:${valueOf("chart.barRadius", p)};background:${valueOf("chart.series3", p)}`} />
+                <div style="display:flex;align-items:center">
+                  <i style={`flex:1;height:0;border-top:${valueOf("chart.lineW", p)} solid ${valueOf("chart.series2", p)}`} />
+                  <i style={`width:calc(2 * ${valueOf("chart.pointR", p)});height:calc(2 * ${valueOf("chart.pointR", p)});border-radius:50%;background:${valueOf("chart.series2", p)}`} />
+                </div>
+                <i style={`display:block;height:0;border-top:${valueOf("chart.sparkW", p)} solid ${valueOf("chart.series6", p)}`} />
+              </div>
+            </div>
+            <div style={`margin-top:10px;font-family:${valueOf("chart.font", p)};font-size:${valueOf("chart.labelSize", p)};color:${valueOf("chart.label", p)}`}>Jan Feb Mar · 12.4k</div>
+          </div>
+        ))
+      }
+    </div>
+    {
+      groups("data").map((g) => (
+        <>
+          <h3 id={`data-${kebab(g.name)}`}>{dataTitles[g.name]![0]}</h3>
+          <p class="sub">{dataTitles[g.name]![1]}</p>
+          <TokenTable rows={g.rows} caption={caption("Data", g.name)} />
+        </>
+      ))
+    }
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Elevation")}>Elevation</h2>
+    <p class="sub">Desktop surfaces are flat. Shadows are only for things that float: menus, tooltips, dialogs and toasts. The box beside each value is drawn with it.</p>
+    {groups("elevation").map((g) => <TokenTable rows={g.rows} caption={caption("Elevation", g.name)} />)}
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Motion")}>Motion</h2>
+    <p class="sub">Durations and curves, the same on every platform. Reduced motion is honoured everywhere, as both apps do today: skeleton sheen, typing dots and spinners slow down or stop, and slides become fades. On mobile the same durations and curves drive entrances, and springs drive the tab bar's lens, sheets and swipe rows.</p>
+    {
+      groups("motion").map((g) => (
+        <>
+          <h3 id={`motion-${kebab(g.name)}`}>{g.name === "duration" ? "Durations" : "Curves"}</h3>
+          <TokenTable rows={g.rows} caption={caption("Motion", g.name)} />
+        </>
+      ))
+    }
+    <h3 id="motion-entrances">Entrances</h3>
+    <p class="sub">What a component plays when it mounts, by the name <code class="mono">MOTION</code> in <code class="mono">@antfabric-ui/core</code> gives it. These are not tokens: each one is built from a duration and a curve.</p>
+    <div class="tok-scroll" tabindex="0" role="region" aria-label="Entrances">
+      <table class="tok">
+        <caption class="sr-only">Entrances: where each starts, and how long it takes</caption>
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Starts</th>
+            <th scope="col">Duration</th>
+            <th scope="col">Curve</th>
+            <th scope="col">On mobile</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            Object.entries(MOTION).map(([name, m]) => (
+              <tr>
+                <th scope="row" class="tok-name">
+                  <code>{name}</code>
+                </th>
+                <td class="tok-val">{m.from}</td>
+                <td class="tok-val mono">{m.duration}ms</td>
+                <td class="tok-val mono">{m.easing}</td>
+                <td class="tok-desc">{m.native}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Layers and opacity")}>Layers and opacity</h2>
+    <p class="sub">A higher layer draws over a lower one. Opacity is for disabled and de-emphasised content only; a surface that needs to be translucent has its own colour.</p>
+    {
+      groups("layers").map((g) => (
+        <>
+          <h3 id={`layers-${kebab(g.name)}`}>{g.name === "z" ? "Layers" : "Opacity"}</h3>
+          <TokenTable rows={g.rows} caption={caption("Layers and opacity", g.name)} />
+        </>
+      ))
+    }
+  </section>
+
+  <section class="section">
+    <h2 id={slug("Materials: Liquid Glass and blur")}>Materials: Liquid Glass and blur</h2>
+    <p class="sub">
+      iOS 26+ and macOS 26+ use Liquid Glass. Earlier iOS and macOS keep the blur look. Android, Windows, Linux and the web never change.
+      A component reads <code class="mono">glass</code> from <code class="mono">usePlatform()</code> or <code class="mono">useTheme()</code> and draws the material on its control layer.
+      The glass colours are in Colour, and the glass shadows in Elevation; these two set how the blur is drawn.
+    </p>
+    {groups("materials").map((g) => <TokenTable rows={g.rows} caption={caption("Materials", g.name)} />)}
+    <h3 id="materials-previews">Side by side</h3>
+    <p class="sub">Each row is one component at both versions.</p>
+    <div class="grid">
+      {
+        materials.map((m) => (
+          <div class="card" style="padding:14px">
+            <div class="cap" style="margin:0 0 12px">
+              <b>{m.title}</b>
+              <span class="faint">{m.note}</span>
+            </div>
+            <div class="grid c2">
+              {m.cells.map((c) => (
+                <div>
+                  <Preview client:only="react" id={m.id} platform={m.platform} os={m.os} osVersion={c.ver} props={m.props} width={m.width} className={[m.cls, m.width && "stretch"].filter(Boolean).join(" ")} defaults={defaultsFor(usedIds(registry[m.id]!), m.platform as Platform)} />
+                  <div class="cap">
+                    <b>{c.ver >= 26 ? "Liquid Glass" : "Blur"}</b>
+                    <span class="faint">{m.os === "ios" ? "iOS" : "macOS"} {c.ver}{c.ver >= 26 ? "+" : " and earlier"}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<script>
+  // The copy button on a token row copies its CSS variable.
+  document.addEventListener("click", (e) => {
+    const b = (e.target as Element).closest<HTMLButtonElement>("[data-copy-text]");
+    if (!b) return;
+    const text = b.dataset.copyText ?? "";
+    const label = b.getAttribute("aria-label");
+    navigator.clipboard?.writeText(text).then(
+      () => {
+        b.dataset.copied = "true";
+        b.setAttribute("aria-label", `Copied ${text}`);
+        setTimeout(() => {
+          delete b.dataset.copied;
+          if (label) b.setAttribute("aria-label", label);
+        }, 1400);
+      },
+      () => {},
+    );
+  });
+</script>

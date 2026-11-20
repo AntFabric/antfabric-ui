@@ -1,0 +1,21 @@
+---
+import { highlight } from "../lib/highlight";
+
+interface Props {
+  code: string;
+  usage?: boolean;
+  /** A file name or language shown in the block's header. */
+  title?: string;
+  /** Long code starts folded behind an Expand button. */
+  collapse?: boolean;
+}
+const { code, usage = false, title, collapse = false } = Astro.props;
+const folds = collapse && code.split("\n").length > 18;
+---
+
+<div class="code" data-code data-usage={usage ? "" : undefined} data-collapsed={folds ? "true" : undefined}>
+  {title && <div class="code-head"><span>{title}</span></div>}
+  <button class="copy" type="button" data-copy aria-label="Copy code">Copy</button>
+  <pre><code set:html={highlight(code)} /></pre>
+  {folds && <button class="code-expand" type="button" data-expand>Expand</button>}
+</div>
