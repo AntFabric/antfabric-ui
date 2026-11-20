@@ -8,7 +8,7 @@ AntFabric UI is one component library for AntFabric's web (TanStack Start), desk
 
 ## Commands
 
-Node 24 (`.nvmrc`), pnpm pinned through `packageManager` in `package.json`. Run from the repository root:
+Node 26 (`.nvmrc`), pnpm pinned through `packageManager` in `package.json`. Run from the repository root:
 
 ```bash
 pnpm install
