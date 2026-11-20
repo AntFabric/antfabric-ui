@@ -278,7 +278,7 @@ Six things to know:
 The three packages share one version, tagged in git per package (`@antfabric-ui/core@<version>`), with a `CHANGELOG.md` each. Pin the
 version you have tested. From 1.0 a rename or a removal is a major; a minor adds, a patch fixes. 1.0 itself
 broke 0.1 once, for every consumer: [`MIGRATION.md`](MIGRATION.md) (the page `/migrate`) is the upgrade
-guide, with a codemod, and each release's changes are in the kits' `CHANGELOG.md`. Releases go through Changesets
-and GitHub Actions: [`RELEASING.md`](RELEASING.md).
+guide, with a codemod, and each release's changes are in the kits' `CHANGELOG.md`. Every push to
+the library's `main` publishes a new version from GitHub Actions: [`RELEASING.md`](RELEASING.md).
 
 **Check:** `pnpm ls @antfabric-ui/core @antfabric-ui/react` (or `react-native`) prints one version for every package, and it is the one you tested.

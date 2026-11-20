@@ -1,48 +1,48 @@
 # Releasing
 
 `@antfabric-ui/core`, `@antfabric-ui/react` and `@antfabric-ui/react-native` are published to npm by
-GitHub Actions, from `main`, with [Changesets](https://github.com/changesets/changesets). The three
-share one version (`fixed` in `.changeset/config.json`). Nobody publishes from a laptop.
+GitHub Actions on **every push to `main`**. The three share one version. Nobody publishes from a
+laptop.
 
 ## How a change ships
 
-1. **On your branch**, with the change, run `pnpm changeset`: pick any of the three packages, the bump
-   (`major` breaks a consumer, `minor` adds, `patch` fixes) and one or two sentences for the changelog.
-   Commit the `.changeset/*.md` it writes. Skip it for changes no consumer can see (the catalogue,
-   the docs, the scripts). [`.changeset/README.md`](.changeset/README.md) has the details.
-2. **Open a pull request.** `ci.yml` runs on every pull request: `pnpm build` (which runs `pnpm check`), `pnpm verify:packages`
+1. **Open a pull request.** `ci.yml` runs `pnpm build` (which runs `pnpm check`), `pnpm verify:packages`
    and `pnpm release:dry`, a `pnpm publish --dry-run` of the three packages.
-3. **Merge it.** `release.yml` runs on `main`: `pnpm check`, `pnpm build:packages`,
-   `pnpm verify:packages`, then `changesets/action`, which opens or updates a pull request titled
-   **chore: version packages**. It bumps the three versions and writes each `CHANGELOG.md`.
-4. **Merge "chore: version packages"** when you want to release. The next run of `release.yml` finds
-   no pending changesets and runs `pnpm release` (`pnpm build:packages && changeset publish`): every
-   package whose version is not on npm yet is published (with provenance once the repository is
-   public; npm refuses it for a private one), tagged
-   (`@antfabric-ui/core@<version>`, …) and given a GitHub release.
+2. **Merge it.** `release.yml` runs on the push to `main`: `pnpm check`, then picks the version
+   (`scripts/release-version.mjs`), `pnpm build:packages`, `pnpm verify:packages`, publishes the three
+   packages with pnpm, tags the commit `v<version>` and makes a GitHub release with notes generated
+   from the merged pull requests.
+3. **Note the change** in each package's `CHANGELOG.md` in the same pull request when a consumer can
+   see it, under a heading for the next version.
 
-A failed publish is safe to re-run (Actions → Release → Re-run): `changeset publish` skips a version
-npm already has.
+## Which version a push gets
+
+- The version in `packages/core/package.json` (and the other two, kept equal) is the one people
+  chose: **1.0.0** to start.
+- If npm does not have that version yet and it is newer than everything on npm, the push publishes it.
+- Otherwise the push publishes the next patch after the newest version on npm: 1.0.0, then 1.0.1,
+  1.0.2, …
+- To start a minor or a major, raise the version in the three `package.json` files (1.1.0, 2.0.0) in
+  your pull request; the push after the merge publishes it, and later pushes continue from it
+  (1.1.1, …).
+
+Nothing is committed back to `main`: the `v<version>` tags and the GitHub releases record what
+shipped. `node scripts/release-version.mjs --dry` prints the version the next push would get.
+
+A failed run is safe to re-run (Actions → Release → Re-run): the version is picked again from npm.
 
 ## One-time setup
 
-1. **npm organisation.** Create the `antfabric-ui` organisation on npmjs.com (the `@antfabric-ui`
-   scope was free when this was written) and add the people who may publish.
+1. **npm organisation.** Create the `antfabric-ui` organisation on npmjs.com and add the people who
+   may publish.
 2. **`NPM_TOKEN`.** Create a granular access token with read and write on the `@antfabric-ui` scope
    (or an automation token), and add it as the repository secret `NPM_TOKEN`
    (Settings → Secrets and variables → Actions).
-3. **Let Actions open pull requests.** Settings → Actions → General → Workflow permissions: "Read and
-   write permissions" and "Allow GitHub Actions to create and approve pull requests".
-4. **Branch protection on `main`:** if you require the CI check, note that the "chore: version
-   packages" pull request gets no CI run (Actions does not start workflows for pushes made with its
-   own `GITHUB_TOKEN`), so either let admins merge it or give `changesets/action` a GitHub App or
-   personal token instead.
-5. **The first release.** `main` already holds the changesets made since 1.1.0, so the first
-   "chore: version packages" pull request proposes **1.2.0**. Merging it is the first npm publish.
-   Versions 1.0.0 and 1.1.0 were only on the old internal registry.
-6. **Later, optionally:** once the packages exist on npm, add this repository and `release.yml` as a
+3. **Tags and releases.** The workflow pushes tags and creates releases with its own `GITHUB_TOKEN`
+   (`contents: write`). If `v*` tags are protected, allow GitHub Actions to create them.
+4. **Later, optionally:** once the packages exist on npm, add this repository and `release.yml` as a
    [trusted publisher](https://docs.npmjs.com/trusted-publishers) for each package and remove
-   `NPM_TOKEN`.
+   `NPM_TOKEN`. npm adds provenance once the repository is public (it refuses it for a private one).
 
 ## Locally
 
@@ -50,10 +50,8 @@ npm already has.
   would hold. Nothing is sent.
 - `pnpm verify:packages`: packs the three packages, installs them in a scratch project, renders and
   type-checks them.
-- `pnpm version-packages` writes changelog entries with links to GitHub pull requests, so it needs
-  `GITHUB_TOKEN` in the environment; CI has it. You rarely need to run it yourself.
-- Always publish through pnpm (`changeset publish` does): only pnpm applies `publishConfig` (the
-  `dist` exports) and turns `workspace:^` into a version range. A plain `npm publish` would ship the
+- Always publish through pnpm (the workflow does): only pnpm applies `publishConfig` (the `dist`
+  exports) and turns `workspace:^` into a version range. A plain `npm publish` would ship the
   TypeScript sources' export map.
 
 ## Known follow-ups
