@@ -9,7 +9,7 @@ For a team starting a product or a surface on AntFabric UI: the web (any React 1
 
 `@antfabric/ui-core` holds the tokens, the themes (`defineTheme`, `themes`), the stylesheet and the Geist and Figtree font files. Both kits depend on it.
 
-This is 1.0, a generic base: with no theme every component draws `themes.neutral`, and AntFabric's own coral look is `themes.antfabric`. Light or dark is `scheme`; the look is `theme`. **Coming from 0.1?** Follow [`MIGRATION.md`](MIGRATION.md) (the page `/migrate`) instead of this guide: it has the codemod and every rename.
+This is 1.0, a generic base: with no theme every component draws `themes.neutral`, and AntFabric's own coral look is `themes.antfabric`. Light or dark is `scheme`; the look is `theme`. **Coming from 0.1?** Follow [`MIGRATION.md`](MIGRATION.md) (the page `/migrate`) instead of this guide: it has every rename.
 
 Each kit also has three subpaths, in the same package: `./data` (charts, KPIs, panels and tables), `./shell` (the app frame and the native surfaces around it) and `./chat` (messages, threads and the composer). They are not part of the root, so an app that never imports one carries none of it: `./data` is the one that brings recharts (web) or react-native-gifted-charts (phone), which are the kit's own dependencies, not yours. There is nothing more to install; `import { BarChart } from "@antfabric/ui-react/data"` works once the kit is.
 
@@ -278,7 +278,7 @@ Six things to know:
 The three packages share one version, tagged in git per package (`@antfabric/ui-core@<version>`), with a `CHANGELOG.md` each. Pin the
 version you have tested. From 1.0 a rename or a removal is a major; a minor adds, a patch fixes. 1.0 itself
 broke 0.1 once, for every consumer: [`MIGRATION.md`](MIGRATION.md) (the page `/migrate`) is the upgrade
-guide, with a codemod, and each release's changes are in the kits' `CHANGELOG.md`. Every push to
+guide, and each release's changes are in the kits' `CHANGELOG.md`. Every push to
 the library's `main` publishes a new version from GitHub Actions: [`RELEASING.md`](RELEASING.md).
 
 **Check:** `pnpm ls @antfabric/ui-core @antfabric/ui-react` (or `react-native`) prints one version for every package, and it is the one you tested.

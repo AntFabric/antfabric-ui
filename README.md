@@ -50,7 +50,8 @@ packages/docs/          what the catalogue says about each component: props as d
 apps/catalogue/         the Astro site; previews are React islands that draw the kits (the phone
                         kit through React Native Web); screens/ holds whole-screen compositions
 apps/catalogue/scripts/ check.tsx, rerender.tsx, frames.tsx and the other repo scripts
-scripts/                build-packages.mjs and verify-packages.mjs (the npm tarballs), the 0.1 → 1.0 codemod
+scripts/                build-packages.mjs, verify-packages.mjs and publish-packages.mjs (the npm tarballs),
+                        release-version.mjs
 ```
 
 ## How one component serves three platforms

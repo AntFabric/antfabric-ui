@@ -45,22 +45,26 @@ jobs:
         run: node scripts/release-version.mjs
 
       - name: Build and verify the packages
+        if: steps.version.outputs.skip != 'true'
         run: pnpm build:packages && pnpm verify:packages
 
       # npm trusted publishing: npmjs.com trusts this repository's release.yml for each package, so npm
       # signs in with the job's OIDC token; there is no NPM_TOKEN. pnpm packs, npm publishes
       # (scripts/publish-packages.mjs).
       - name: Publish to npm
+        if: steps.version.outputs.skip != 'true'
         run: node scripts/publish-packages.mjs
         env:
           # npm refuses provenance for a private repository, so it is on only once the repo is public.
           NPM_CONFIG_PROVENANCE: ${{ !github.event.repository.private }}
 
       - name: Tag and release on GitHub
+        if: steps.version.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          git tag "v$VERSION" "$GITHUB_SHA"
+          # Idempotent, so a re-run finishes a release whose tag or GitHub release is missing.
+          git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null || git tag "v$VERSION" "$GITHUB_SHA"
           git push origin "v$VERSION"
-          gh release create "v$VERSION" --title "v$VERSION" --generate-notes --verify-tag
+          gh release view "v$VERSION" >/dev/null 2>&1 || gh release create "v$VERSION" --title "v$VERSION" --generate-notes --verify-tag

@@ -11,7 +11,7 @@ Paths are relative to the repository root. A path that starts with `/` is on the
 - `@antfabric/ui-core`: tokens, recipes, themes (`defineTheme`, `themes`), the stylesheet, the Figtree font files. Both kits depend on it.
 - Each kit has three more entries, not part of its root, so an app that never imports one carries none of it: `./data` (KPIs, charts, panels and tables; brings recharts or gifted-charts), `./shell` (the app frame and the pictures of native surfaces: title bars, menus, rails, sidebar, tab bar, OS notification, tray menu, app badge) and `./chat` (the conversation idiom: Message, Composer, ReactionPill, ThreadSummary, TypingIndicator, MessageDivider and, on the web, MessageActions; the agent components stay in the root). Import from `@antfabric/ui-react/data`, `@antfabric/ui-react/shell` or `@antfabric/ui-react/chat`, and the same three names under `@antfabric/ui-react-native`; each component's `platforms.<p>.import` in `/components.json` is its exact line.
 - Install, `.npmrc`, fonts, setup and tenant branding: `/install.md` (`CONSUMING.md` in the repository; `/install` on the catalogue is the same guide for a person). How a component is written: `AUTHORING.md`.
-- Moving an app from 0.1 to 1.0: `/migrate.md` (`MIGRATION.md` in the repository; `/migrate` on the catalogue is the same guide for a person): the codemod, and every break by area.
+- Moving an app from 0.1 to 1.0: `/migrate.md` (`MIGRATION.md` in the repository; `/migrate` on the catalogue is the same guide for a person): every break by area.
 
 ## The data
 

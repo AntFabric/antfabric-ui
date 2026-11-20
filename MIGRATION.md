@@ -1,8 +1,10 @@
 # Migrating to AntFabric UI 1.0
 
-For an app that uses 0.1 (the 0.1 packages) and moves to 1.0. It is one break, made once: every rename and removal below lands in `1.0.0`, and nothing is left behind as a deprecated alias. Follow "The short path"; use "Every break, by area" when the typechecker or the codemod points at something. An agent can follow it as written.
+For an app that uses 0.1 (the 0.1 packages) and moves to 1.0. It is one break, made once: every rename and removal below lands in `1.0.0`, and nothing is left behind as a deprecated alias. Follow "The short path"; use "Every break, by area" when the typechecker points at something. An agent can follow it as written.
 
-Two tags run through the lists. **Codemod** means `pnpm migrate:1` rewrites it: a prop, type, import or literal rename on a known component. **Manual** means it needs a decision or a value only you have, so the codemod reports it and leaves the file alone. If the codemod's own report disagrees with a tag here, the report is right for your code.
+**The codemod is retired.** 0.1 never reached npm: it shipped only on AntFabric's internal registry, as `@antfabric-ui/*`, and the apps that used it have moved. So `pnpm migrate:1`, which made the mechanical renames, is no longer in this repository (it is in its history, up to commit `5b3e2ed`). The renames it made are still listed below, tagged **Codemod**; make them by hand.
+
+Two tags run through the lists. **Codemod** means a mechanical rename the retired codemod used to make: a prop, type, import or literal rename on a known component. **Manual** means it needs a decision or a value only you have.
 
 ## What 1.0 is
 
@@ -15,23 +17,17 @@ Two tags run through the lists. **Codemod** means `pnpm migrate:1` rewrites it: 
 - **Subpaths.** App chrome (title bars, rails, sidebar, tab bar, OS notification, tray menu, app badge) is `./shell`; the conversation (Message, Composer, reactions, threads) is `./chat`; `./data` stays. The root is the generic base.
 - **One API.** The same prop means the same thing on every component (`reports/api/conventions.md`): a changed value is `on<Prop>Change`, an item is named by `key`, open or closed is `expanded`, a photo is `src`. That is what made the renames necessary, and why they were done together.
 
-Why it breaks once: a library that names a thing three ways cannot be made generic by adding a fourth. Making the kit neutral meant moving AntFabric's content out of the defaults, and the same pass fixed the names that disagreed. Doing both in one major means an app migrates once, with one codemod and one list, instead of chasing a rename in every minor.
+Why it breaks once: a library that names a thing three ways cannot be made generic by adding a fourth. Making the kit neutral meant moving AntFabric's content out of the defaults, and the same pass fixed the names that disagreed. Doing both in one major means an app migrates once, with one list, instead of chasing a rename in every minor.
 
 ## The short path
 
 1. **Install 1.0.** Set `@antfabric/ui-core`, `react` and `react-native` (whichever you use) to the same `1.0.x`. From npm that is the version; from tarballs it is the three `file:` versions, and the override for `@antfabric/ui-core` if your workspace has one ([`CONSUMING.md`](CONSUMING.md), section 2).
-2. **Dry run the codemod.** From a checkout of this repository, point it at your repository. `--via` is the wrapper package your code imports instead of `@antfabric/ui-*` (leave it out if you import the kit directly) and `--wrapper` is that package's source folder, relative to your repository.
-
-   ```bash
-   pnpm install
-   pnpm migrate:1 ../your-app --via @your-org/ui-kit --wrapper libs/ui-kit/src
-   ```
-
-3. **Run it for real.** The same command with `--write`, then format what it touched: it keeps every line it did not rewrite as it was, so an attribute list that is now short enough for one line, or a child it de-indented, may not match your formatter and a formatter check in your lint fails on it. (With prettier: `git diff --name-only | xargs pnpm exec prettier --write --ignore-unknown`.) Commit the result on its own, so the manual work reads as a separate diff.
+2. **Rename the imports.** `@antfabric-ui/core`, `@antfabric-ui/react` and `@antfabric-ui/react-native` (0.1) are `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, subpaths included (`@antfabric/ui-react/chat`). If your app has a wrapper package, that is the only place to change.
+3. **Make the Codemod renames.** Work through the items tagged **Codemod** in "Every break, by area", then commit them on their own, so the manual work reads as a separate diff.
 4. **Keep AntFabric's look and wording.** The look is the theme and the wording is the strings, and they are two things.
-   - **The look.** The codemod adds `theme={themes.antfabric}` to your roots (`AntFabricRoot` on the web, `ThemeProvider` on the phone). A product that is not AntFabric passes its own theme instead ([`CONSUMING.md`](CONSUMING.md) section 6). A `defineTheme` call with no `extends` now sits on `themes.neutral`; write `extends: themes.antfabric` to build on AntFabric's look. `extends: null` starts from the raw schema (`tokens.ts`, which holds AntFabric's values) and only the presets need it.
-   - **The wording.** The kit's built-in text is generic now. AntFabric's own copy (0.1's) ships from an opt-in entry, `@antfabric/ui-core/antfabric`, which exports `antfabricStrings` (and re-exports `antfabric`). Pass it beside the theme: `<AntFabricRoot theme={themes.antfabric} strings={antfabricStrings}>`, and the same on the phone's `<ThemeProvider theme={themes.antfabric} strings={antfabricStrings}>`. The codemod does not add `strings`; that is yours.
-5. **Work through the manual list.** The codemod prints it. "Every break, by area" says what each item means, and "What the typechecker cannot see" lists what changes without an error.
+   - **The look.** Add `theme={themes.antfabric}` to your roots (`AntFabricRoot` on the web, `ThemeProvider` on the phone). A product that is not AntFabric passes its own theme instead ([`CONSUMING.md`](CONSUMING.md) section 6). A `defineTheme` call with no `extends` now sits on `themes.neutral`; write `extends: themes.antfabric` to build on AntFabric's look. `extends: null` starts from the raw schema (`tokens.ts`, which holds AntFabric's values) and only the presets need it.
+   - **The wording.** The kit's built-in text is generic now. AntFabric's own copy (0.1's) ships from an opt-in entry, `@antfabric/ui-core/antfabric`, which exports `antfabricStrings` (and re-exports `antfabric`). Pass it beside the theme: `<AntFabricRoot theme={themes.antfabric} strings={antfabricStrings}>`, and the same on the phone's `<ThemeProvider theme={themes.antfabric} strings={antfabricStrings}>`.
+5. **Work through the manual list.** The items tagged **Manual** in "Every break, by area" say what each one means, and "What the typechecker cannot see" lists what changes without an error.
 6. **Run your typecheck and tests.** Props are typed, so a removed or renamed prop is a compile error; fix them until it is clean.
 7. **Look at it.** Open one screen per surface in light and dark, and the phone with its fonts loaded.
 
@@ -99,7 +95,7 @@ The phone's `TabBarTab` is renamed to `NavItem` (the same type NavRail's destina
 - `WebTopBarDesktopApp`: `desktopApp` is an entry in `actions`.
 - `ProjectMoveCardProject`, `ProjectMoveCardProps`: removed with `ProjectMoveCard`.
 
-Type renames are **codemod**; the removals are **manual**: the codemod lists each reference.
+Type renames are **codemod**; the removals are **manual**.
 
 ### Base components
 
@@ -268,8 +264,8 @@ The cross-cutting renames, one row per rule, with what each touched. [`reports/a
 One per step. Each says what you should see.
 
 1. **Install.** `pnpm ls @antfabric/ui-core @antfabric/ui-react @antfabric/ui-react-native` lists `1.0.x` for each and nothing at `0.1.0`. **Check:** `grep -n "antfabric-ui.*0\.1\.0" pnpm-lock.yaml` prints nothing, and `pnpm why @antfabric/ui-core` shows one version.
-2. **Dry run.** **Check:** the codemod prints the files it would change and a manual list, and `git status --short` in your repository prints nothing.
-3. **`--write`.** **Check:** `git diff --stat` touches only files the dry run named, and a second dry run lists no automatic change.
+2. **Imports.** **Check:** `grep -rn "@antfabric-ui/" src` prints nothing.
+3. **Renames.** **Check:** your typecheck reports no renamed prop or type from the Codemod items, and `git status --short` is clean after the commit.
 4. **Keep the look.** **Check:** the root carries `data-af-platform` and, with `themes.antfabric`, no `data-af-theme-id`; the primary `Button` is coral and `getComputedStyle(root).getPropertyValue("--af-font-sans")` starts with `Figtree`. With a branded theme the root carries `data-af-theme-id` and `--af-brand-default` is your primary.
 5. **Manual list.** Search your source folders for the names the kit dropped:
 

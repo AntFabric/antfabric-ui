@@ -22,8 +22,6 @@
     "primitives": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/primitives.mts",
     "primitives:check": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/primitives.mts --check",
     "rerender": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json --import ./apps/catalogue/scripts/native.mjs apps/catalogue/scripts/rerender.tsx",
-    "migrate:1": "tsx scripts/migrate-1.mts",
-    "migrate:1:test": "tsx scripts/migrate-1/test.mts",
     "release:dry": "pnpm build:packages && node scripts/publish-packages.mjs --dry-run",
     "release:version": "node scripts/release-version.mjs",
     "release:publish": "node scripts/publish-packages.mjs"

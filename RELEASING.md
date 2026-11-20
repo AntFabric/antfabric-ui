@@ -30,8 +30,13 @@ three share one version. Nobody publishes from a laptop (except 1.0.0, once; see
 Nothing is committed back to `main`: the `v<version>` tags and the GitHub releases record what
 shipped. `node scripts/release-version.mjs --dry` prints the version the next push would get.
 
-A failed run is safe to re-run (Actions → Release → Re-run): the version is picked again from npm,
-and a package npm already has at that version is skipped.
+A failed run is safe to re-run (Actions → Release → Re-run):
+
+- **Cut short** (npm has the version for some of the three packages, or for all three but there is no
+  `v<version>` tag): the re-run picks the same version, skips the packages npm already has, publishes
+  the rest and tags it. A version is never left with core but no kits.
+- **Already shipped** (the commit carries a `v<version>` tag, as 1.0.0 does after the one-time setup):
+  the re-run publishes nothing, so it never puts out a second version with the same contents.
 
 ## One-time setup
 
