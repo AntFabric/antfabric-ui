@@ -64,7 +64,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section>: the title, an optional headline, \"View as table\" (Button); a ChartFrame holding recharts' PieChart with a Pie (paddingAngle, cornerRadius, 90 degrees round to -270) and a Cell per segment, MetricValue in the hole, and a list of <button> rows (aria-pressed) with a swatch, name, value and share",
-      import: "import { DonutChart } from \"@antfabric-ui/react/data\"",
+      import: "import { DonutChart } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath: recharts is reached only from there. The ring is handed an explicit size, never a responsive container.",
         "Pointing at a segment, tabbing to a row or pointing at one lights that segment: the others fade to 38% over 150ms on the kit's ease-out, and the hole's number eases to the segment's value (MetricValue). The states come from the kit's interaction hook and recharts' own mouse events, never `:hover`.",
@@ -80,7 +80,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same Card, recharts' Pie and list as web, at desktop density",
-      import: "import { DonutChart } from \"@antfabric-ui/react/data\"",
+      import: "import { DonutChart } from \"@antfabric/ui-react/data\"",
       notes: ["The same chart as the web's. The pointer's hover lights a segment, and a click picks it."],
       keyboard: [
         { keys: "Tab", action: "Moves through the list's rows, then to \"View as table\". A row that has focus lights its segment on the ring" },
@@ -90,7 +90,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View: the same header and Button, a ChartFrame holding react-native-gifted-charts' PieChart `donut` (the hole a disc in the card's colour, the segments cut apart by a stroke in the same), MetricValue in the hole, and the list below it as Pressable rows",
-      import: "import { DonutChart } from \"@antfabric-ui/react-native/data\"",
+      import: "import { DonutChart } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there.",
         "The list is below the ring, full width, each row at least 44pt tall. gifted-charts' pie has no hover and its own focus grows a segment out of the ring; the kit does not use it and steps the other segments back instead (their colour at 38%), as the web does.",

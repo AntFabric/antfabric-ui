@@ -42,18 +42,18 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <span role=\"img\"> named by the change (\"Up 4.4%, good\"): the kit's Icon and a text span drawn from its recipe; the tone's ink and fill are picked from the data tokens. No chart library",
-      import: "import { Delta } from \"@antfabric-ui/react/data\"",
+      import: "import { Delta } from \"@antfabric/ui-react/data\"",
       notes: ["Shipped from the data subpath, not the root entry: an app that never imports it carries none of the chart code."],
     },
     desktop: {
       status: "ready",
       base: "The same <span role=\"img\"> as web, at desktop density",
-      import: "import { Delta } from \"@antfabric-ui/react/data\"",
+      import: "import { Delta } from \"@antfabric/ui-react/data\"",
     },
     mobile: {
       status: "ready",
       base: "A View (accessibilityRole image, labelled with the change) over the kit's Icon and a Text, drawn from the same recipe",
-      import: "import { Delta } from \"@antfabric-ui/react-native/data\"",
+      import: "import { Delta } from \"@antfabric/ui-react-native/data\"",
       notes: ["The type is one step up on the phone, as every text token is; the arrow follows the icon tokens."],
     },
   },

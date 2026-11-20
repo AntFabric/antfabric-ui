@@ -91,7 +91,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <nav> holding an <ol>: <a href> crumbs (a plain click calls onNavigate, ⌘-click and middle-click stay the browser's), plain-text steps and an aria-current leaf; inline styles over `t`, hover and focus from useInteraction; the … <button> unfolds a folded trail (`expanded` through useControllable, reported by onExpandedChange)",
-      import: "import { Breadcrumbs } from \"@antfabric-ui/react\"",
+      import: "import { Breadcrumbs } from \"@antfabric/ui-react\"",
       notes: [
         "The same 44px strip, directly under the Web top bar and spanning the content column. No traffic lights and no drag region: the browser owns the frame.",
         "The trail comes from the route (each matched route's crumb, read with useMatches), so Back and Forward redraw it and a shared link lands with the right trail.",
@@ -117,7 +117,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <nav> and <ol> with <button> crumbs, the macOS traffic lights when `lights` is on, and the recording pill <button> at the right end; data-tauri-drag-region on the bar",
-      import: "import { Breadcrumbs } from \"@antfabric-ui/react\"",
+      import: "import { Breadcrumbs } from \"@antfabric/ui-react\"",
       notes: [
         "Text and nothing else (ADR-0180): no search, no avatar, no menu. If a control is proposed for this strip, that is the old top bar being rebuilt one button at a time and needs its own decision.",
         "The one exception is the recording pill (ADR-0437): a live microphone is a statement about the hardware and the person's privacy, not navigation chrome. It renders nothing when idle, carries no Pause or Stop (ADR-1101), and clicking it opens Recordings, where those controls live. It is the only elapsed clock in the window, on every screen.",

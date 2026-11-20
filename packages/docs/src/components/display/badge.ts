@@ -48,7 +48,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<span role=\"img\"> (role status when `live`) named by the count and what it counts, inline styles over `t`; pops in with enter(\"pop\")",
-      import: "import { Badge } from \"@antfabric-ui/react\"",
+      import: "import { Badge } from \"@antfabric/ui-react\"",
       notes: [
         "The same total also drives the tab title, \"(3) AntFabric\", and the favicon dot — see Tab badge.",
         "A badge pops in (fade and a 0.94 → 1 scale, 220ms) when its first unread arrives; a changing count does not re-pop.",
@@ -57,7 +57,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <span role=\"img\"> as web, inline styles over `t`; pops in with enter(\"pop\")",
-      import: "import { Badge } from \"@antfabric-ui/react\"",
+      import: "import { Badge } from \"@antfabric/ui-react\"",
       notes: [
         "The app-wide total also goes to the Dock (macOS) or taskbar overlay (Windows) — see App icon badge.",
         "A badge pops in when its first unread arrives; a changing count does not re-pop.",
@@ -66,7 +66,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "<Enter motion=\"pop\"> (an Animated.View; a polite live region only when `live`), StyleSheet over useTheme()",
-      import: "import { Badge } from \"@antfabric-ui/react-native\"",
+      import: "import { Badge } from \"@antfabric/ui-react-native\"",
       notes: [
         "The same total is the home-screen icon badge, set with expo-notifications setBadgeCountAsync and kept in step by the server's push payload.",
         "A badge pops in (Animated, the same 0.94 → 1 scale and fade) when its first unread arrives; a changing count does not re-pop.",

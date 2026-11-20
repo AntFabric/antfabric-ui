@@ -75,7 +75,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <div role=\"tablist\"> of <button role=\"tab\"> with a roving tabindex, inline styles over `t`; ← → Home End select; the brand bar under each tab scales in with a transform transition; `value` through useControllable(value, onValueChange)",
-      import: "import { Tabs } from \"@antfabric-ui/react\"",
+      import: "import { Tabs } from \"@antfabric/ui-react\"",
       notes: [
         "Web uses the desktop's values (a 32px strip, 12px labels). The web profile's taller controls do not apply here: a tab strip is not a row of buttons.",
         "When the tabs switch a routed view (a project's Meetings, a person's profile), each tab is a link (Tabs.Tab render={<Link>}), so the URL holds the choice, Back returns to the previous tab, ⌘-click opens it in a new browser tab and a shared link lands on the same tab.",
@@ -99,7 +99,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same tablist as web at desktop density",
-      import: "import { Tabs } from \"@antfabric-ui/react\"",
+      import: "import { Tabs } from \"@antfabric/ui-react\"",
       notes: [
         "The bar is ONE absolutely positioned element that travels (ADR-0518). It is 2px tall and sits 1px below the strip so it covers the hairline: it reads as a break in the rule, not a second line. The catalogue draws a bar under every tab, scaled to nothing except under the chosen one, so pressing a tab (it sets `value`) shrinks the old bar while the new one grows: the nearest a static renderer gets to the travel.",
         "The motion moves the travel edges separately, not with a transform: the edge in front arrives in 180 ms and the one behind in 250 ms, ease-out. The cross axis is placed, never eased, so a strip being resized never animates.",
@@ -122,7 +122,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A horizontal ScrollView (accessibilityRole tablist) of Pressable tabs (accessibilityState.selected), StyleSheet over useTheme(); the bar scales in with Animated.timing; `value` through useControllable(value, onValueChange)",
-      import: "import { Tabs } from \"@antfabric-ui/react-native\"",
+      import: "import { Tabs } from \"@antfabric/ui-react-native\"",
       notes: [
         "Top tabs sit directly under a pushed screen's header: edge to edge, with the rule across the full width and the first label on the 12pt gutter.",
         "44pt tall, 14pt semibold labels, 16pt apart. The bar is under the word; each tab gets 8pt of hitSlop either side so neighbouring targets meet with no dead space.",

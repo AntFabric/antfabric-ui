@@ -52,7 +52,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section>: the title, the total as a headline (MetricValue, Delta) and \"View as table\" (Button); a ChartFrame holding a flex row of <span> segments (flex set to each part's value, `chart.splitGap` apart) and a <ul> of <button> rows (aria-pressed) laid out in columns",
-      import: "import { Breakdown } from \"@antfabric-ui/react/data\"",
+      import: "import { Breakdown } from \"@antfabric/ui-react/data\"",
       notes: [
         "No chart library: the bar is views, so it reads the same on every platform and costs nothing. Each segment's width is its share of the whole; a part that is a sliver of it is held to `chart.splitMinW` so it still shows, and a part of 0 is in the list only.",
         "The first and last segments are rounded at the bar's outer ends (`radius.pill`) and the ones between are square, so the gaps read as cuts in one bar. One part is a whole rounded bar; all zero is the empty track in grey.",
@@ -68,7 +68,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same Card, bar and list as web, at desktop density",
-      import: "import { Breakdown } from \"@antfabric-ui/react/data\"",
+      import: "import { Breakdown } from \"@antfabric/ui-react/data\"",
       notes: ["The same panel as the web's. The pointer's hover lights a part, and a click picks it."],
       keyboard: [
         { keys: "Tab", action: "Moves through the parts in the list, then to \"View as table\". A part that has focus is lit, with its segment" },
@@ -78,7 +78,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View: the same header, headline and Button; a ChartFrame holding an Animated row of Pressable segments and, below it, one Pressable row per part (a swatch, the name, the value and the share), each at least 44pt tall",
-      import: "import { Breakdown } from \"@antfabric-ui/react-native/data\"",
+      import: "import { Breakdown } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "No chart library: the bar is views, the same as the web's. The list is one column, full width, each part on one line (the web's two-line cell does not fit a phone's rows).",
         "A phone has no hover, so a tap on a segment or on a row picks the part (the other segments step back to 38%, and `onSelectedChange` is called) and a tap on it again puts it back.",

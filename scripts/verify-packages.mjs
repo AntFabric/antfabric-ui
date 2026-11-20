@@ -1,8 +1,8 @@
 /**
  * Proves the three packages work as consumers get them: builds, `pnpm pack`s the tarballs, installs them into
  * a throwaway project outside the repository, then
- *   (a) server-renders `<AntFabricRoot><Button/></AntFabricRoot>` from `@antfabric-ui/react`,
- *   (b) loads `@antfabric-ui/core`, `@antfabric-ui/core/dtcg`, `@antfabric-ui/core/chart`, `@antfabric-ui/core/tokens.json` and the fonts `fonts.css` names,
+ *   (a) server-renders `<AntFabricRoot><Button/></AntFabricRoot>` from `@antfabric/ui-react`,
+ *   (b) loads `@antfabric/ui-core`, `@antfabric/ui-core/dtcg`, `@antfabric/ui-core/chart`, `@antfabric/ui-core/tokens.json` and the fonts `fonts.css` names,
  *   (c) type-checks a small consumer file against each package's published `.d.ts`,
  *   (d) proves the data subpaths are the only way to reach the chart libraries: a consumer that imports only the kits' root entries,
  *       bundled by esbuild, holds no recharts, react-native-gifted-charts, gifted-charts-core or d3 module (and one that imports a
@@ -91,9 +91,9 @@ const deps = Object.fromEntries(
 );
 writeFileSync(
   join(app, "package.json"),
-  JSON.stringify({ name: "consumer", private: true, type: "module", dependencies: { ...deps, ...Object.fromEntries(NAMES.map((n) => [`@antfabric-ui/${n}`, `file:${packed[n]}`])) } }, null, 2),
+  JSON.stringify({ name: "consumer", private: true, type: "module", dependencies: { ...deps, ...Object.fromEntries(NAMES.map((n) => [`@antfabric/ui-${n}`, `file:${packed[n]}`])) } }, null, 2),
 );
-writeFileSync(join(app, "pnpm-workspace.yaml"), `packages: []\nautoInstallPeers: false\noverrides:\n  "@antfabric-ui/core": "file:${packed.core}"\n`);
+writeFileSync(join(app, "pnpm-workspace.yaml"), `packages: []\nautoInstallPeers: false\noverrides:\n  "@antfabric/ui-core": "file:${packed.core}"\n`);
 let install = spawnSync("pnpm", ["install", "--offline", "--ignore-scripts"], { cwd: app, encoding: "utf8" });
 if (install.status !== 0) {
   console.log("  the local store is missing something; installing from the network:\n" + install.stderr.split("\n").slice(0, 4).join("\n"));
@@ -108,13 +108,13 @@ writeFileSync(
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { readFileSync } from "node:fs";
-import { AntFabricRoot, AntFabricProvider, Button, rootAttrs } from "@antfabric-ui/react";
-import { Delta, Sparkline, rechartsTheme, useChartTokens } from "@antfabric-ui/react/data";
-import * as core from "@antfabric-ui/core";
-import { tokensDtcg, tokensJson } from "@antfabric-ui/core/dtcg";
-import shipped from "@antfabric-ui/core/tokens.json" with { type: "json" };
-import { fmt, niceScale, lttb } from "@antfabric-ui/core/chart";
-import { antfabric, antfabricStrings } from "@antfabric-ui/core/antfabric";
+import { AntFabricRoot, AntFabricProvider, Button, rootAttrs } from "@antfabric/ui-react";
+import { Delta, Sparkline, rechartsTheme, useChartTokens } from "@antfabric/ui-react/data";
+import * as core from "@antfabric/ui-core";
+import { tokensDtcg, tokensJson } from "@antfabric/ui-core/dtcg";
+import shipped from "@antfabric/ui-core/tokens.json" with { type: "json" };
+import { fmt, niceScale, lttb } from "@antfabric/ui-core/chart";
+import { antfabric, antfabricStrings } from "@antfabric/ui-core/antfabric";
 
 const html = renderToStaticMarkup(createElement(AntFabricRoot, { platform: "web", scheme: "light" }, createElement(Button, { label: "Send" })));
 if (!html.includes("<button")) throw new Error("no <button> in: " + html.slice(0, 400));
@@ -137,22 +137,22 @@ if (!core.tokensCss().includes("--af-")) throw new Error("tokensCss() has no var
 const doc = tokensDtcg();
 if (!doc.primitives || !doc.fg) throw new Error("tokensDtcg() has no primitives or fg group");
 if (JSON.stringify(shipped) !== JSON.stringify(JSON.parse(tokensJson()))) throw new Error("tokens.json is not what tokensJson() writes");
-if (!readFileSync(new URL(import.meta.resolve("@antfabric-ui/core/tokens.json")), "utf8").includes("$description")) throw new Error("tokens.json has no descriptions");
+if (!readFileSync(new URL(import.meta.resolve("@antfabric/ui-core/tokens.json")), "utf8").includes("$description")) throw new Error("tokens.json has no descriptions");
 // The font export resolves, and each file fonts.css names is beside it.
-const fontsCss = new URL(import.meta.resolve("@antfabric-ui/core/fonts.css"));
+const fontsCss = new URL(import.meta.resolve("@antfabric/ui-core/fonts.css"));
 for (const [, file] of readFileSync(fontsCss, "utf8").matchAll(/url\\("\\.\\/([^"]+)"\\)/g)) readFileSync(new URL(file, fontsCss));
-readFileSync(new URL(import.meta.resolve("@antfabric-ui/core/fonts/Figtree-SemiBold.ttf")));
-readFileSync(new URL(import.meta.resolve("@antfabric-ui/core/fonts/Geist-SemiBold.ttf")));
+readFileSync(new URL(import.meta.resolve("@antfabric/ui-core/fonts/Figtree-SemiBold.ttf")));
+readFileSync(new URL(import.meta.resolve("@antfabric/ui-core/fonts/Geist-SemiBold.ttf")));
 
 // The antfabric subpath loads: AntFabric's look (the very preset the root exports) and its copy, keyed by component id.
-if (antfabric !== core.themes.antfabric || antfabric.id !== "") throw new Error("@antfabric-ui/core/antfabric's antfabric is not themes.antfabric, or its id is not empty");
-if (antfabricStrings["session-state"]?.titleLocked !== "AntFabric is locked" || antfabricStrings["list-item"]?.withUnreadCount?.one !== "{label}, {count} mention") throw new Error("@antfabric-ui/core/antfabric's antfabricStrings is not AntFabric's copy");
+if (antfabric !== core.themes.antfabric || antfabric.id !== "") throw new Error("@antfabric/ui-core/antfabric's antfabric is not themes.antfabric, or its id is not empty");
+if (antfabricStrings["session-state"]?.titleLocked !== "AntFabric is locked" || antfabricStrings["list-item"]?.withUnreadCount?.one !== "{label}, {count} mention") throw new Error("@antfabric/ui-core/antfabric's antfabricStrings is not AntFabric's copy");
 if (Object.keys(core).includes("antfabricStrings")) throw new Error("core's root exports antfabricStrings; it belongs to ./antfabric only");
 const lockedHtml = renderToStaticMarkup(createElement(AntFabricRoot, { platform: "web", scheme: "light", theme: antfabric, strings: antfabricStrings }, createElement("p", null, "ok")));
 if (!lockedHtml.includes("data-af-platform")) throw new Error("AntFabricRoot with antfabric and antfabricStrings does not draw: " + lockedHtml.slice(0, 200));
 
 // The chart subpath loads on its own and works.
-if (fmt("compact", 12400) !== "12.4K" || niceScale([0, 97]).max !== 100 || lttb([1, 2, 3, 4, 5], 3, (_, i) => i, (v) => v).length !== 3) throw new Error("@antfabric-ui/core/chart does not format, scale or downsample");
+if (fmt("compact", 12400) !== "12.4K" || niceScale([0, 97]).max !== 100 || lttb([1, 2, 3, 4, 5], 3, (_, i) => i, (v) => v).length !== 3) throw new Error("@antfabric/ui-core/chart does not format, scale or downsample");
 
 // The data subpath loads (recharts with it) and draws: a Delta with its label, a Sparkline's labelled frame (the chart itself draws once mounted).
 const dataHtml = renderToStaticMarkup(createElement(AntFabricRoot, { platform: "web", scheme: "dark" }, createElement(Delta, { value: 0.044 }), createElement(Sparkline, { data: [{ v: 1 }, { v: 3 }, { v: 2 }], y: "v", label: "Trend" })));
@@ -161,7 +161,7 @@ if (!dataHtml.includes('aria-label="Trend"') || !dataHtml.includes("recharts-wra
 if (typeof rechartsTheme !== "function" || typeof useChartTokens !== "function") throw new Error("the data subpath does not export its theme helpers");
 
 // The shell subpath loads; once NavRail ships from it, it draws two destinations from data and marks the current one.
-const shell = await import("@antfabric-ui/react/shell");
+const shell = await import("@antfabric/ui-react/shell");
 let shellNote = "shell: empty";
 if (shell.NavRail) {
   const destinations = [{ key: "inbox", label: "Inbox", icon: "inbox" }, { key: "files", label: "Files", icon: "folder" }];
@@ -173,7 +173,7 @@ if (shell.NavRail) {
 }
 
 // The chat subpath loads; once Message ships from it, it draws as one article for a screen reader.
-const chat = await import("@antfabric-ui/react/chat");
+const chat = await import("@antfabric/ui-react/chat");
 let chatNote = "chat: empty";
 if (chat.Message) {
   const messageHtml = renderToStaticMarkup(createElement(AntFabricRoot, { platform: "web", scheme: "light" }, createElement(chat.Message, { author: "Aisha Bello", time: "10:42", body: "Staging is green again." })));
@@ -192,15 +192,15 @@ console.log("  node: " + out.trim());
 writeFileSync(
   join(app, "web.tsx"),
   `
-import { AntFabricProvider, AntFabricRoot, Button, rootAttrs, type ActionItem, type AppMark, type ButtonProps, type MenuItem, type NavItem, type Person, type Reaction, type Attachment, type AgentStep, type ToolArg, type QuestionOption, type Approval, type AvatarIdentity, type AvatarPresence } from "@antfabric-ui/react";
-import { Delta, Sparkline, rechartsTheme, type DeltaProps } from "@antfabric-ui/react/data";
-import * as Shell from "@antfabric-ui/react/shell";
-import * as Chat from "@antfabric-ui/react/chat";
-import { defineTheme, themeCss, themes, tokensCss, tokenVars, type Scheme, type StringsOverrides } from "@antfabric-ui/core";
-import { antfabric, antfabricStrings } from "@antfabric-ui/core/antfabric";
-import { tokensDtcg } from "@antfabric-ui/core/dtcg";
-import { fmt, niceScale, type FormatSpec, type Scale } from "@antfabric-ui/core/chart";
-import tokens from "@antfabric-ui/core/tokens.json";
+import { AntFabricProvider, AntFabricRoot, Button, rootAttrs, type ActionItem, type AppMark, type ButtonProps, type MenuItem, type NavItem, type Person, type Reaction, type Attachment, type AgentStep, type ToolArg, type QuestionOption, type Approval, type AvatarIdentity, type AvatarPresence } from "@antfabric/ui-react";
+import { Delta, Sparkline, rechartsTheme, type DeltaProps } from "@antfabric/ui-react/data";
+import * as Shell from "@antfabric/ui-react/shell";
+import * as Chat from "@antfabric/ui-react/chat";
+import { defineTheme, themeCss, themes, tokensCss, tokenVars, type Scheme, type StringsOverrides } from "@antfabric/ui-core";
+import { antfabric, antfabricStrings } from "@antfabric/ui-core/antfabric";
+import { tokensDtcg } from "@antfabric/ui-core/dtcg";
+import { fmt, niceScale, type FormatSpec, type Scale } from "@antfabric/ui-core/chart";
+import tokens from "@antfabric/ui-core/tokens.json";
 
 const props: ButtonProps = { label: "Send", variant: "primary", onPress: () => {} };
 // @ts-expect-error variant is a closed union
@@ -270,12 +270,12 @@ writeFileSync(
   join(app, "native.tsx"),
   `
 import { View } from "react-native";
-import { ThemeProvider, Button, useTheme, type ButtonProps, type MenuItem, type NavItem, type Person, type Reaction, type Attachment, type AgentStep, type ToolArg, type QuestionOption, type Approval, type AvatarIdentity, type AvatarPresence } from "@antfabric-ui/react-native";
-import { Delta, Sparkline, giftedTheme, type DeltaProps } from "@antfabric-ui/react-native/data";
-import * as Shell from "@antfabric-ui/react-native/shell";
-import * as Chat from "@antfabric-ui/react-native/chat";
-import { resolveTokens } from "@antfabric-ui/core";
-import { antfabric, antfabricStrings } from "@antfabric-ui/core/antfabric";
+import { ThemeProvider, Button, useTheme, type ButtonProps, type MenuItem, type NavItem, type Person, type Reaction, type Attachment, type AgentStep, type ToolArg, type QuestionOption, type Approval, type AvatarIdentity, type AvatarPresence } from "@antfabric/ui-react-native";
+import { Delta, Sparkline, giftedTheme, type DeltaProps } from "@antfabric/ui-react-native/data";
+import * as Shell from "@antfabric/ui-react-native/shell";
+import * as Chat from "@antfabric/ui-react-native/chat";
+import { resolveTokens } from "@antfabric/ui-core";
+import { antfabric, antfabricStrings } from "@antfabric/ui-core/antfabric";
 
 const props: ButtonProps = { label: "Send", variant: "primary", onPress: () => {} };
 // @ts-expect-error variant is a closed union
@@ -329,11 +329,11 @@ console.log("  tsc: web.tsx (react with its item types, react/data, react/shell,
 // The published .d.ts files reference only the package itself, its dependency and its peers.
 const allowed = {
   core: ["react"],
-  react: ["react", "react-dom", "@antfabric-ui/core", "lucide-react", "recharts"],
-  "react-native": ["react", "react-native", "react-native-svg", "expo-glass-effect", "@antfabric-ui/core", "lucide-react-native", "react-native-gifted-charts", "gifted-charts-core"],
+  react: ["react", "react-dom", "@antfabric/ui-core", "lucide-react", "recharts"],
+  "react-native": ["react", "react-native", "react-native-svg", "expo-glass-effect", "@antfabric/ui-core", "lucide-react-native", "react-native-gifted-charts", "gifted-charts-core"],
 };
 for (const name of NAMES) {
-  const dist = join(app, "node_modules/@antfabric-ui", name, "dist");
+  const dist = join(app, "node_modules/@antfabric", `ui-${name}`, "dist");
   const seen = new Set();
   for (const f of readdirSync(dist, { recursive: true }).filter((f) => f.endsWith(".d.ts") || f.endsWith(".js"))) {
     const code = readFileSync(join(dist, f), "utf8");
@@ -344,7 +344,7 @@ for (const name of NAMES) {
   if (extra.length) fail(`${name}: dist imports ${extra.join(", ")}, which is not a declared dependency or peer`);
 }
 // expo-glass-effect is an optional peer, required lazily in a try/catch; Metro needs the literal call (in whichever file holds the glass code).
-const nativeDist = join(app, "node_modules/@antfabric-ui/react-native/dist");
+const nativeDist = join(app, "node_modules/@antfabric/ui-react-native/dist");
 if (!readdirSync(nativeDist, { recursive: true }).some((f) => String(f).endsWith(".js") && readFileSync(join(nativeDist, String(f)), "utf8").includes('require("expo-glass-effect")'))) fail("react-native: the literal require(\"expo-glass-effect\") is gone, Metro will not see it");
 
 // (d) The chart libraries are reachable only through the data subpaths. Bundle what an app that never charts imports (each kit's root
@@ -356,10 +356,10 @@ const bundled = async (name, source) => {
   const { metafile } = await build({ absWorkingDir: app, entryPoints: [`${name}.mjs`], bundle: true, write: false, metafile: true, format: "esm", platform: "neutral", mainFields: ["module", "main"], conditions: ["import"], external: THIRD_PARTY_EXTERNAL, logLevel: "silent" });
   return Object.keys(metafile.inputs);
 };
-const rootOnly = await bundled("root-only", 'import { AntFabricRoot, Button } from "@antfabric-ui/react";\nimport { ThemeProvider, Button as NativeButton } from "@antfabric-ui/react-native";\nimport { resolveTokens } from "@antfabric-ui/core";\nexport { AntFabricRoot, Button, ThemeProvider, NativeButton, resolveTokens };\n');
+const rootOnly = await bundled("root-only", 'import { AntFabricRoot, Button } from "@antfabric/ui-react";\nimport { ThemeProvider, Button as NativeButton } from "@antfabric/ui-react-native";\nimport { resolveTokens } from "@antfabric/ui-core";\nexport { AntFabricRoot, Button, ThemeProvider, NativeButton, resolveTokens };\n');
 const leaked = rootOnly.filter((f) => CHART_LIBS.test(f) || /\/dist\/data\//.test(f));
 if (leaked.length) fail("a consumer that imports only the root entries bundles chart code:\n  " + leaked.slice(0, 8).join("\n  "));
-const withData = await bundled("with-data", 'import { Sparkline } from "@antfabric-ui/react/data";\nimport { Sparkline as NativeSparkline } from "@antfabric-ui/react-native/data";\nexport { Sparkline, NativeSparkline };\n');
+const withData = await bundled("with-data", 'import { Sparkline } from "@antfabric/ui-react/data";\nimport { Sparkline as NativeSparkline } from "@antfabric/ui-react-native/data";\nexport { Sparkline, NativeSparkline };\n');
 for (const lib of ["recharts", "gifted-charts"]) if (!withData.some((f) => f.includes(lib))) fail("a consumer that imports the data entries does not bundle " + lib + ": the root-entry proof above would be an empty one");
 console.log("  bundle: the root entries of react, react-native and core bundle " + rootOnly.length + " files, none from recharts, react-native-gifted-charts, gifted-charts-core or d3; the /data entries bundle " + withData.length + ", with both libraries");
 if (rootOnly.some((f) => /\/dist\/shell\//.test(f))) fail("a consumer that imports only the root entries bundles a dist/shell/ file");
@@ -382,10 +382,10 @@ const ONLY_THEIRS = new Set(["TabBar", "Composer"]);
 const markOf = (name, kit) => (typeof MARKS[name] === "object" ? MARKS[name][kit] : MARKS[name]);
 const seen = [];
 for (const kit of ["react", "react-native"]) {
-  const rootAll = await bundledText(`root-all-${kit}`, `export * from "@antfabric-ui/${kit}";\n`);
+  const rootAll = await bundledText(`root-all-${kit}`, `export * from "@antfabric/ui-${kit}";\n`);
   for (const sub of ["shell", "chat"]) {
-    const withSub = await bundledText(`with-${sub}-${kit}`, `export * from "@antfabric-ui/${kit}/${sub}";\n`);
-    if (!withSub.inputs.some((f) => new RegExp(`@antfabric-ui/${kit}/dist/${sub}/index\\.js$`).test(f))) fail(`${kit}: a consumer of /${sub} does not bundle dist/${sub}/index.js`);
+    const withSub = await bundledText(`with-${sub}-${kit}`, `export * from "@antfabric/ui-${kit}/${sub}";\n`);
+    if (!withSub.inputs.some((f) => new RegExp(`@antfabric/ui-${kit}/dist/${sub}/index\\.js$`).test(f))) fail(`${kit}: a consumer of /${sub} does not bundle dist/${sub}/index.js`);
     const into = rootAll.inputs.filter((f) => new RegExp(`/dist/${sub}/`).test(f));
     if (into.length) fail(`${kit}: everything the root exports, bundled, takes in ${into.join(", ")}`);
     const components = withSub.exports.filter((n) => /^[A-Z]/.test(n) && declared(withSub.text, n));
@@ -401,21 +401,21 @@ for (const kit of ["react", "react-native"]) {
 }
 console.log("  bundle: everything the roots export holds no dist/shell/ or dist/chat/ file and no component /shell or /chat exports (" + seen.join("; ") + ")");
 
-// (g) AntFabric's copy is reachable only through `@antfabric-ui/core/antfabric`. Everything the three roots export, bundled, holds no
+// (g) AntFabric's copy is reachable only through `@antfabric/ui-core/antfabric`. Everything the three roots export, bundled, holds no
 // dist/antfabric file and none of its words; a consumer of the subpath holds both, so the check is not an empty one. The words are two
 // sentences only AntFabric's copy has ("AntFabric is locked" is session-state's `titleLocked`, "Fabric is posting it now" notification-item's `approved`).
 const COPY_WORDS = ["AntFabric is locked", "Fabric is posting it now"];
-const withCopy = await bundledText("with-antfabric", 'export * from "@antfabric-ui/core/antfabric";\n');
-if (!withCopy.inputs.some((f) => /@antfabric-ui\/core\/dist\/antfabric\.js$/.test(f))) fail("a consumer of ./antfabric does not bundle dist/antfabric.js");
+const withCopy = await bundledText("with-antfabric", 'export * from "@antfabric/ui-core/antfabric";\n');
+if (!withCopy.inputs.some((f) => /@antfabric\/ui-core\/dist\/antfabric\.js$/.test(f))) fail("a consumer of ./antfabric does not bundle dist/antfabric.js");
 for (const w of COPY_WORDS) if (!withCopy.text.includes(w)) fail(`a consumer of ./antfabric does not bundle "${w}": the proof below would be an empty one`);
 for (const name of NAMES) {
-  const everything = await bundledText(`root-copy-${name}`, `export * from "@antfabric-ui/${name}";\n`);
+  const everything = await bundledText(`root-copy-${name}`, `export * from "@antfabric/ui-${name}";\n`);
   if (everything.inputs.some((f) => /\/dist\/antfabric\.js$/.test(f))) fail(`${name}: everything the root exports, bundled, takes in dist/antfabric.js`);
   for (const w of COPY_WORDS) if (everything.text.includes(w)) fail(`${name}: everything the root exports, bundled, holds "${w}", which is AntFabric's copy and ships from core/antfabric only`);
   if (everything.exports.includes("antfabricStrings")) fail(`${name}: the root exports antfabricStrings`);
 }
 // react's root pulls core's root in; the check above held it to core's own, and this one says so for what a plain app imports.
-const plainApp = await bundledText("plain-app", 'import { AntFabricRoot, Button } from "@antfabric-ui/react";\nimport { ThemeProvider } from "@antfabric-ui/react-native";\nimport { themes } from "@antfabric-ui/core";\nexport { AntFabricRoot, Button, ThemeProvider, themes };\n');
+const plainApp = await bundledText("plain-app", 'import { AntFabricRoot, Button } from "@antfabric/ui-react";\nimport { ThemeProvider } from "@antfabric/ui-react-native";\nimport { themes } from "@antfabric/ui-core";\nexport { AntFabricRoot, Button, ThemeProvider, themes };\n');
 for (const w of COPY_WORDS) if (plainApp.text.includes(w)) fail(`a consumer of the roots holds "${w}"`);
 console.log("  bundle: AntFabric's copy ships from core/antfabric only: its bundle holds " + COPY_WORDS.map((w) => `"${w}"`).join(" and ") + "; the roots of core, react and react-native, bundled, hold neither");
 

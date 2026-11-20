@@ -1,5 +1,5 @@
-import { ThemeProvider } from '@antfabric-ui/react-native';
-import { resolveTokens, defineTheme, themes } from '@antfabric-ui/core';
+import { ThemeProvider } from '@antfabric/ui-react-native';
+import { resolveTokens, defineTheme, themes } from '@antfabric/ui-core';
 import type { ReactNode } from 'react';
 
 const BRAND = { primary: '#0a7' };

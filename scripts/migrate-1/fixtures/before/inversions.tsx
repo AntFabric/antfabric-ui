@@ -1,6 +1,6 @@
-import { Breadcrumbs, QuestionPanel, UpdateBanner } from '@antfabric-ui/react';
-import { SidebarSection } from '@antfabric-ui/react';
-import { TabBar } from '@antfabric-ui/react-native';
+import { Breadcrumbs, QuestionPanel, UpdateBanner } from '@antfabric/ui-react';
+import { SidebarSection } from '@antfabric/ui-react';
+import { TabBar } from '@antfabric/ui-react-native';
 
 export function Bars({ shut, setShut, items }: { shut: boolean; setShut: (v: boolean) => void; items: never[] }) {
   return (

@@ -81,7 +81,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<button> with the label as aria-label and native title tooltip, inline styles over `t`; hover, press and focus from useInteraction; `active` through useControllable; corner Badge",
-      import: "import { IconButton } from \"@antfabric-ui/react\"",
+      import: "import { IconButton } from \"@antfabric/ui-react\"",
       notes: [
         "Pressing a toggle button (toggle: true) flips `active` (through useControllable, so the catalogue preview is interactive): the brand-soft fill and brand glyph fade in and out, and aria-pressed follows. A one-shot button's own action (open, send, close) stays with the caller.",
       ],
@@ -99,7 +99,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <button> as web: inline styles over `t` at desktop density (28px box); the label is the native title tooltip",
-      import: "import { IconButton } from \"@antfabric-ui/react\"",
+      import: "import { IconButton } from \"@antfabric/ui-react\"",
       notes: [
         "Today the desktop draws 28px; that stays. The 24px hit minimum is met by the 28px box.",
         "Pressing a toggle button (toggle: true) flips `active`: the brand-soft fill fades in over 120ms and aria-pressed follows.",
@@ -108,7 +108,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "Pressable (Animated) with hitSlop to 44pt, StyleSheet over useTheme(); press scale with Animated.timing; `active` through useControllable; corner Badge. Haptics and the long-press callout are left to the app",
-      import: "import { IconButton } from \"@antfabric-ui/react-native\"",
+      import: "import { IconButton } from \"@antfabric/ui-react-native\"",
       notes: [
         "40pt visible box (V2), with hitSlop to make 44pt.",
         "Danger tone turns red only while pressed — a resting red icon reads as an error.",

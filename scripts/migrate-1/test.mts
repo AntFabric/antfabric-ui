@@ -248,7 +248,7 @@ function realExports(): Record<string, Set<string>> {
   const program = ts.createProgram(files.map(([, f]) => f), {
     noEmit: true, jsx: ts.JsxEmit.Preserve, moduleResolution: ts.ModuleResolutionKind.Bundler, module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ESNext,
     skipLibCheck: true, allowImportingTsExtensions: true, baseUrl: root, types: [],
-    paths: { "@antfabric-ui/core": [path.join(root, "packages/core/src/index.ts")], "@antfabric-ui/core/*": [path.join(root, "packages/core/src/*")] },
+    paths: { "@antfabric/ui-core": [path.join(root, "packages/core/src/index.ts")], "@antfabric/ui-core/*": [path.join(root, "packages/core/src/*")] },
   });
   const checker = program.getTypeChecker();
   const out: Record<string, Set<string>> = {};

@@ -1,6 +1,6 @@
-import { useLocale } from "@antfabric-ui/core";
+import { useLocale } from "@antfabric/ui-core";
 import { Area, ComposedChart, Line, ReferenceLine, Tooltip } from "recharts";
-import { FLAT_FILL, markPath, seriesMark, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Scale, type Series } from "@antfabric-ui/core/chart";
+import { FLAT_FILL, markPath, seriesMark, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Scale, type Series } from "@antfabric/ui-core/chart";
 import type { Interaction } from "../lib/interaction";
 import { box, css } from "../lib/style";
 import { cartesianAxes } from "./axes";

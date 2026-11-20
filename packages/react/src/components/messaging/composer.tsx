@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { formatShortcut, recipes, useControllable, useDirection, useStrings, type IconActionItem, type Attachment, type KitStrings } from "@antfabric-ui/core";
+import { formatShortcut, recipes, useControllable, useDirection, useStrings, type IconActionItem, type Attachment, type KitStrings } from "@antfabric/ui-core";
 import { useAutoFocus, usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";

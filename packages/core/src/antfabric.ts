@@ -1,11 +1,11 @@
 /**
- * `@antfabric-ui/core/antfabric`: AntFabric's own look and AntFabric's own words, for AntFabric's apps.
+ * `@antfabric/ui-core/antfabric`: AntFabric's own look and AntFabric's own words, for AntFabric's apps.
  *
  * The kits' English is generic wherever the 0.1 text named AntFabric or its features ("AntFabric is locked", "Search people, channels,
  * projects", "Fabric is posting it now"). Those 0.1 sentences are `antfabricStrings`: an AntFabric app passes them at its root, with the look
  * that goes with them, and keeps 0.1's wording:
  *
- *   import { antfabric, antfabricStrings } from "@antfabric-ui/core/antfabric";
+ *   import { antfabric, antfabricStrings } from "@antfabric/ui-core/antfabric";
  *   <AntFabricRoot theme={antfabric} strings={antfabricStrings}>…</AntFabricRoot>     // the phone: <ThemeProvider theme={antfabric} strings={antfabricStrings}>
  *
  * Opt-in on purpose. It is its own subpath and never part of the root entry, so a product that never imports it carries none of this copy

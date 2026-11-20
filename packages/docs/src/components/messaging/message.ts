@@ -241,7 +241,7 @@ const docs: ComponentDocs = {
     web: {
       status: "partial",
       base: "A <div role=\"article\"> row with inline styles over `t`; the hover wash, gutter time and actions bar follow pointer hover (useInteraction), keyboard focus inside the row, or `hovered`. Children are the kit's Avatar, AttachmentCard, ReactionPill, ThreadSummary and MessageActions. The virtualised timeline is the app's.",
-      import: "import { Message } from \"@antfabric-ui/react/chat\"",
+      import: "import { Message } from \"@antfabric/ui-react/chat\"",
       notes: [
         "The hover wash is a CSS :hover on the row — never an inline background, which would beat it — and the unread wash is painted off a data-unread attribute for the same reason.",
         "Every message has a permalink (…/c/platform-eng/p/<id>); Copy link in ⋯ copies it, and opening it scrolls to and highlights the row.",
@@ -271,7 +271,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "partial",
       base: "The same file as web (one component, desktop density): Avatar + text in the row, the kit's MessageActions floating at top 2 / right 14 on hover. Reply in thread on the bar calls onOpenThread.",
-      import: "import { Message } from \"@antfabric-ui/react/chat\"",
+      import: "import { Message } from \"@antfabric/ui-react/chat\"",
       notes: [
         "Row padding 8 18 2 (1 18 2 when compact), 10 between a 36px face and the text column. The face sits with the name, never in the middle of a long message.",
         "The grouped row's gutter time is opacity-hidden, not display-hidden, and never wraps (\"03:02 PM\" in 32px of width once grew every row from 24 to 39px).",
@@ -301,7 +301,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "Pressable (onLongPress, delayLongPress 300; none while sending) over Views, StyleSheet over useTheme() tokens, Avatar 40. One screen-reader stop whose label carries the words, reactions and replies, with Retry, Delete, Open thread and Message actions as accessibility actions.",
-      import: "import { Message } from \"@antfabric-ui/react-native/chat\"",
+      import: "import { Message } from \"@antfabric/ui-react-native/chat\"",
       notes: [
         "V2: 12pt gutters, 8 above a header row and 0 above a continuation, 8 below every row; 16 Bold name, 12 Medium faint time.",
         "A compact row shows no time at all — there is no hover to reveal it. Long-press shows the full timestamp at the top of the actions sheet.",

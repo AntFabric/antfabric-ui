@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useLocale } from "@antfabric-ui/core";
+import { useLocale } from "@antfabric/ui-core";
 import { Bar, BarChart as RBarChart, Cell, LabelList, ReferenceLine, Tooltip } from "recharts";
-import { DIMMED, bySign, fitLabel, fmt, labelWidth, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Row, type Scale, type Series } from "@antfabric-ui/core/chart";
+import { DIMMED, bySign, fitLabel, fmt, labelWidth, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Row, type Scale, type Series } from "@antfabric/ui-core/chart";
 import type { Interaction } from "../lib/interaction";
 import { box, css } from "../lib/style";
 import { cartesianAxes } from "./axes";

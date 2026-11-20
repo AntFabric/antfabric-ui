@@ -28,19 +28,19 @@ const strip = showcase.map((s) => {
     cells: PLATFORMS.map((p) => ({
       platform: p,
       label: PLATFORM_META[p].label,
-      caption: p === "mobile" ? "@antfabric-ui/react-native" : "@antfabric-ui/react",
+      caption: p === "mobile" ? "@antfabric/ui-react-native" : "@antfabric/ui-react",
       na: doc.platforms[p].status === "not-applicable" ? doc.platforms[p].alternative?.split(".")[0] : undefined,
       defaults: defaultsFor(usedIds(doc), p),
     })),
   };
 });
 
-const reactUse = `import { Button } from "@antfabric-ui/react";
+const reactUse = `import { Button } from "@antfabric/ui-react";
 
 // The web app and the desktop app
 <Button label="Send invite" iconLeading="send"
         shortcut="Mod+Enter" onPress={send} />`;
-const nativeUse = `import { Button } from "@antfabric-ui/react-native";
+const nativeUse = `import { Button } from "@antfabric/ui-react-native";
 
 // The phone app
 <Button label="Send invite" iconLeading="send"
@@ -69,8 +69,8 @@ const nativeUse = `import { Button } from "@antfabric-ui/react-native";
     </div>
     <div class="flow">
       <div class="grid c2">
-        <Code code={reactUse} title="Web and desktop · @antfabric-ui/react" />
-        <Code code={nativeUse} title="Phone · @antfabric-ui/react-native" />
+        <Code code={reactUse} title="Web and desktop · @antfabric/ui-react" />
+        <Code code={nativeUse} title="Phone · @antfabric/ui-react-native" />
       </div>
       <div class="arrow" set:html={iconSvg("arrow-down", 18)} />
       <div class="targets">
@@ -163,8 +163,8 @@ const nativeUse = `import { Button } from "@antfabric-ui/react-native";
       <div class="card">
         <b style="color:var(--af-fg-strong)">In each kit</b>
         <ul class="notes" style="margin-top:10px">
-          <li><code class="mono">@antfabric-ui/react</code>: one file per component for the web app and the desktop app, styled inline over the token variables; the OS, density and Liquid Glass come from <code class="mono">usePlatform()</code></li>
-          <li><code class="mono">@antfabric-ui/react-native</code>: one file per component for the phone, StyleSheet over <code class="mono">useTheme()</code> tokens, fonts by file, motion with Animated</li>
+          <li><code class="mono">@antfabric/ui-react</code>: one file per component for the web app and the desktop app, styled inline over the token variables; the OS, density and Liquid Glass come from <code class="mono">usePlatform()</code></li>
+          <li><code class="mono">@antfabric/ui-react-native</code>: one file per component for the phone, StyleSheet over <code class="mono">useTheme()</code> tokens, fonts by file, motion with Animated</li>
           <li>The same props on both, typed, with events that report what changed</li>
           <li>Interaction states, entrances, accessibility roles and labels</li>
         </ul>

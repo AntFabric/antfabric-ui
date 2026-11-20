@@ -1,8 +1,8 @@
 import { Pressable, Text, View, type ViewStyle } from "react-native";
 import { type RootProps, rootProps } from "../../lib/root-props";
 import { PieChart } from "react-native-gifted-charts";
-import { recipes, useLocale, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { DIMMED, fmt, goalsOf, overallOf, ringAt, ringBands, seriesColors, summarizeGoals, type FormatSpec, type Goal, type Row, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { DIMMED, fmt, goalsOf, overallOf, ringAt, ringBands, seriesColors, summarizeGoals, type FormatSpec, type Goal, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { Enter } from "../../lib/motion";
 import { usePress } from "../../lib/press";

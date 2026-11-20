@@ -56,18 +56,18 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <div role=\"meter\"> track over a fill, drawn from its recipe; the fill slides to a new value on a transform (never its width). The fill is picked from the data tokens by the value against its thresholds. No chart library",
-      import: "import { Meter } from \"@antfabric-ui/react/data\"",
+      import: "import { Meter } from \"@antfabric/ui-react/data\"",
       notes: ["Shipped from the data subpath, not the root entry: an app that never imports it carries none of the chart code."],
     },
     desktop: {
       status: "ready",
       base: "The same <div role=\"meter\"> as web, at desktop density",
-      import: "import { Meter } from \"@antfabric-ui/react/data\"",
+      import: "import { Meter } from \"@antfabric/ui-react/data\"",
     },
     mobile: {
       status: "ready",
       base: "A View (accessibilityRole progressbar, with accessibilityValue min, max, now and the printed text) over a track View and a fill View, drawn from the same recipe",
-      import: "import { Meter } from \"@antfabric-ui/react-native/data\"",
+      import: "import { Meter } from \"@antfabric/ui-react-native/data\"",
       notes: ["React Native has no meter role: progressbar is the closest a screen reader announces as a value out of a range."],
     },
   },

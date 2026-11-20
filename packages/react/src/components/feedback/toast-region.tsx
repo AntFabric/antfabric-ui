@@ -1,5 +1,5 @@
 import { Children, useRef, type CSSProperties, type ReactNode } from "react";
-import { recipes, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { OverlayLayer, useLayerHost } from "../../lib/layer";
 import { useRecipe, type PartStyles } from "../../lib/recipe";

@@ -16,7 +16,7 @@ const cssOff = "css={false}";
 
 const PLAYGROUND = ["button", "text-field", "switch", "card", "tag", "inline-banner"];
 
-const defining = `import { defineTheme, themes } from "@antfabric-ui/core";
+const defining = `import { defineTheme, themes } from "@antfabric/ui-core";
 
 export const antagents = defineTheme({
   name: "antagents",
@@ -92,8 +92,8 @@ const strings = `// Web and desktop: the root sets the language and replaces bui
 { characterCount: "{current}/{max}" }
 { replies: { one: "{count} reply", other: "{count} replies" } }`;
 
-const passing = `import { AntFabricRoot } from "@antfabric-ui/react";
-import { ThemeProvider } from "@antfabric-ui/react-native";
+const passing = `import { AntFabricRoot } from "@antfabric/ui-react";
+import { ThemeProvider } from "@antfabric/ui-react-native";
 import { antagents } from "./theme";
 
 // Web and desktop
@@ -221,7 +221,7 @@ import { antagents } from "./theme";
     <ul class="how" style="margin:16px 0">
       <li>A key is looked up in this order: the instance's <code class="mono">strings</code>, the nearest root's for that component, the root's <code class="mono">common</code>, then the kit's English default. A root inside another merges its own over its parent's, key by key.</li>
       <li>Every component's keys and English defaults are in <code class="mono">packages/core/src/strings/</code>, one file per category. The kit ships English only; your app supplies other languages.</li>
-      <li>The kit's copy is generic. AntFabric's own wording ships from an opt-in entry: <code class="mono">import &#123; antfabricStrings &#125; from "@antfabric-ui/core/antfabric"</code> and pass it as <code class="mono">strings</code> beside <code class="mono">theme=&#123;themes.antfabric&#125;</code>, on <code class="mono">AntFabricRoot</code> or <code class="mono">ThemeProvider</code>.</li>
+      <li>The kit's copy is generic. AntFabric's own wording ships from an opt-in entry: <code class="mono">import &#123; antfabricStrings &#125; from "@antfabric/ui-core/antfabric"</code> and pass it as <code class="mono">strings</code> beside <code class="mono">theme=&#123;themes.antfabric&#125;</code>, on <code class="mono">AntFabricRoot</code> or <code class="mono">ThemeProvider</code>.</li>
     </ul>
     <Code code={strings} />
   </section>

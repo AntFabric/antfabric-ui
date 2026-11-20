@@ -124,7 +124,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "One <button data-af-press> carrying the row's role (link, menuitem, option, checkbox, button) with aria-current / aria-checked / aria-selected, and aria-disabled so a disabled row stays focusable; `selected` through useControllable; the kit's Avatar, Badge and Kbd; inline styles over `t`",
-      import: "import { ListItem } from \"@antfabric-ui/react\"",
+      import: "import { ListItem } from \"@antfabric/ui-react\"",
       notes: [
         "A row that opens a conversation is an <a href>, so middle-click and ⌘-click open it in a new tab; the open one carries aria-current=\"page\".",
         "Hover reveals the row's ⋯ menu and its mark-as-read affordance; the same actions are on the row's context menu and in the keyboard map, so hover is never the only way in.",
@@ -154,7 +154,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <button> as web, at desktop density (30px rows)",
-      import: "import { ListItem } from \"@antfabric-ui/react\"",
+      import: "import { ListItem } from \"@antfabric/ui-react\"",
       notes: [
         "Sidebar rows are 30px with a 7px radius fill; the ⋮ is hover-revealed and the unread count slides beside it (2026-10-06).",
         "FileRow is the two-line, tiled case: a 36px chip, the name in semibold, middot-joined provenance (\"Figma · Nuthan · yesterday · 4.2 MB\"), and the channel trailing. Today's chip is coral-soft; this spec draws it grey because coral is reserved for \"needs you\" — owner to confirm.",
@@ -184,7 +184,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "Pressable (Animated) with the row's accessibilityRole and state; the 0.6 press dim eases back with Animated.timing; `selected` through useControllable; every glyph in a tile; the kit's Avatar and Badge",
-      import: "import { ListItem } from \"@antfabric-ui/react-native\"",
+      import: "import { ListItem } from \"@antfabric/ui-react-native\"",
       notes: [
         "12pt on all four sides and a 12pt gap (owner, 2026-09-09); a row inside a sheet passes its own horizontal inset.",
         "Every glyph sits in a tile: 36 by default, 32 on Settings. The tile is surface.muted so it reads on both a white card and the page (ADR-8910).",

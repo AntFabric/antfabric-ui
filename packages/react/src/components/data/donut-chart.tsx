@@ -1,8 +1,8 @@
 import { useState, type CSSProperties } from "react";
 import { type RootProps, rootProps } from "../../lib/root-props";
 import { Cell, Pie, PieChart } from "recharts";
-import { recipes, useLocale, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { DIMMED, DONUT_HOLE, SLICE_GAP_DEG, fmt, segmentsOf, seriesColors, shareOf, summarizeSegments, totalOf, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { DIMMED, DONUT_HOLE, SLICE_GAP_DEG, fmt, segmentsOf, seriesColors, shareOf, summarizeSegments, totalOf, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

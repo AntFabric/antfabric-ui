@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { Row, Tip } from "@antfabric-ui/core/chart";
+import type { Row, Tip } from "@antfabric/ui-core/chart";
 import { t } from "../tokens";
 import { box, css, row, text } from "../lib/style";
 

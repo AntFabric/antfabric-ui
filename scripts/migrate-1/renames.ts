@@ -7,7 +7,7 @@
  * import bindings, local aliases and a wrapper package's re-exports.
  */
 
-/** The two kits: `react` is web and desktop (`@antfabric-ui/react`), `native` is the phone (`@antfabric-ui/react-native`). */
+/** The two kits: `react` is web and desktop (`@antfabric/ui-react`), `native` is the phone (`@antfabric/ui-react-native`). */
 export type Kit = "react" | "native";
 
 /** `shell.md` and the others: which file of `reports/migration/` a line comes from. */
@@ -512,5 +512,5 @@ export const stringPlaceholders = [
 ];
 
 /** Where each moved name's package comes from: the kit packages. */
-export const PACKAGES: Record<Kit, string> = { react: "@antfabric-ui/react", native: "@antfabric-ui/react-native" };
-export const CORE_PACKAGE = "@antfabric-ui/core";
+export const PACKAGES: Record<Kit, string> = { react: "@antfabric/ui-react", native: "@antfabric/ui-react-native" };
+export const CORE_PACKAGE = "@antfabric/ui-core";

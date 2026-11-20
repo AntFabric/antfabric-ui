@@ -3,7 +3,7 @@
  * written by `pnpm tokens:build`, served by the catalogue as `/tokens.json`, and kept equal to this
  * function's output by `pnpm check`.
  *
- * Import it as `@antfabric-ui/core/dtcg`, not from the package index: it reads `tokens.map.json`, which
+ * Import it as `@antfabric/ui-core/dtcg`, not from the package index: it reads `tokens.map.json`, which
  * the kits (one of them bundled by Metro) have no reason to carry.
  *
  * One token per leaf path, groups nested by path (`fg.muted` is `fg` → `muted`).

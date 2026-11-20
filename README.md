@@ -7,9 +7,9 @@ one works inside the apps, step by step.
 
 | Platform | App | Kit |
 |---|---|---|
-| Web | TanStack Start | `@antfabric-ui/react` |
-| Desktop | Tauri 2 | `@antfabric-ui/react` |
-| Mobile | Expo | `@antfabric-ui/react-native` |
+| Web | TanStack Start | `@antfabric/ui-react` |
+| Desktop | Tauri 2 | `@antfabric/ui-react` |
+| Mobile | Expo | `@antfabric/ui-react-native` |
 
 ```bash
 pnpm install
@@ -25,11 +25,11 @@ How to write a component is in [`AUTHORING.md`](AUTHORING.md). Open decisions an
 
 ## Using the packages
 
-`@antfabric-ui/core`, `@antfabric-ui/react` and `@antfabric-ui/react-native` are published to npm:
+`@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native` are published to npm:
 
 ```bash
-pnpm add @antfabric-ui/core @antfabric-ui/react lucide-react          # web and desktop
-pnpm add @antfabric-ui/core @antfabric-ui/react-native lucide-react-native react-native-svg  # Expo
+pnpm add @antfabric/ui-core @antfabric/ui-react lucide-react          # web and desktop
+pnpm add @antfabric/ui-core @antfabric/ui-react-native lucide-react-native react-native-svg  # Expo
 ```
 
 [`CONSUMING.md`](CONSUMING.md) has what an app or plugin team needs: install, `AntFabricRoot` and the
@@ -41,9 +41,9 @@ npm; [`RELEASING.md`](RELEASING.md) is how a change ships.
 ```
 packages/core/          what both kits share: tokens (as CSS variables and as resolved values),
                         shortcut formatting, the entrance motions
-packages/react/         @antfabric-ui/react — web and desktop, one file per component, styled
+packages/react/         @antfabric/ui-react — web and desktop, one file per component, styled
                         inline over the token variables
-packages/react-native/  @antfabric-ui/react-native — the phone, StyleSheet over useTheme()
+packages/react-native/  @antfabric/ui-react-native — the phone, StyleSheet over useTheme()
                         tokens like the phone app's own components, motion with Animated
 packages/docs/          what the catalogue says about each component: props as documented,
                         examples, edge cases, platform notes, flows; the platform tables
@@ -67,7 +67,7 @@ scripts/                build-packages.mjs and verify-packages.mjs (the npm tarb
 ## Tenant branding
 
 A white-label tenant retints the brand family (`brand.*`, `accent.*`, `fg.onBrandSoft`, `link.default`,
-`border.brand`, `surface.unread`) with one input, `Partial<BrandTokens>` from `@antfabric-ui/core`:
+`border.brand`, `surface.unread`) with one input, `Partial<BrandTokens>` from `@antfabric/ui-core`:
 a `primary`, an `accent`, and optionally a hand-picked `soft`, `softHover`, `onSoft` or `tint` per
 theme. Hover, pressed, the soft tints, the link and the unread tint derive from `primary` the way the
 product's phone derives them (`packages/core/src/brand.ts`). A brand is part of a theme:

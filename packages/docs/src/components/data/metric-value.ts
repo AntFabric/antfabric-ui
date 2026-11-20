@@ -31,18 +31,18 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <span> drawn from its recipe: the digits and, for each symbol or unit, a smaller span in the faint ink; proportional figures. A visually hidden copy carries the plain value for screen readers. No chart library",
-      import: "import { MetricValue } from \"@antfabric-ui/react/data\"",
+      import: "import { MetricValue } from \"@antfabric/ui-react/data\"",
       notes: ["Shipped from the data subpath with the rest of the KPI pieces, though it draws no chart."],
     },
     desktop: {
       status: "ready",
       base: "The same <span> as web, at desktop density",
-      import: "import { MetricValue } from \"@antfabric-ui/react/data\"",
+      import: "import { MetricValue } from \"@antfabric/ui-react/data\"",
     },
     mobile: {
       status: "ready",
       base: "One Text (accessibilityLabel the plain value) with a nested Text for each symbol or unit, which inherits the digits' baseline and overrides the size, ink and weight",
-      import: "import { MetricValue } from \"@antfabric-ui/react-native/data\"",
+      import: "import { MetricValue } from \"@antfabric/ui-react-native/data\"",
       notes: ["md, lg and xl are one type step smaller than on the web and desktop; sm is the same."],
     },
   },

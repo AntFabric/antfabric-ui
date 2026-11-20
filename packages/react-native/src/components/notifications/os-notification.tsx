@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Platform, Pressable, Text, TextInput, View, type TextStyle, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type ActionItem, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { GlassSurface } from "../../lib/glass";
 import { Icon, Spinner } from "../../lib/icon";

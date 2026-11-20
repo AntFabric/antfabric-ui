@@ -41,18 +41,18 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <section> landmark (named \"Notifications\") in the overlay layer of its AntFabricRoot at z.toast, above modal dialogs and sheets; a column at the chosen edge with pointer-events only on the toasts; a press on it is not a press outside an open overlay. In place, in a 560 × 240 stage, on the server and in the catalogue's pictures",
-      import: "import { ToastRegion } from \"@antfabric-ui/react\"",
+      import: "import { ToastRegion } from \"@antfabric/ui-react\"",
       notes: ["Toasts announce themselves through the kit's one announcer; the region does not add a second live region."],
     },
     desktop: {
       status: "ready",
       base: "The same region as web at desktop density",
-      import: "import { ToastRegion } from \"@antfabric-ui/react\"",
+      import: "import { ToastRegion } from \"@antfabric/ui-react\"",
     },
     mobile: {
       status: "partial",
       base: "A View stacking the toasts at its edge, pointerEvents box-none; drawn where it is mounted: the app lays it over its screen inside the safe area",
-      import: "import { ToastRegion } from \"@antfabric-ui/react-native\"",
+      import: "import { ToastRegion } from \"@antfabric/ui-react-native\"",
     },
   },
   a11y: {

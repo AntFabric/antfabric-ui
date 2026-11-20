@@ -1,5 +1,5 @@
 import { useId, useRef, type CSSProperties, type ReactNode } from "react";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useOverlayFocus } from "../../lib/focus";
 import { OverlayLayer, useLayerHost, useLayerStack } from "../../lib/layer";

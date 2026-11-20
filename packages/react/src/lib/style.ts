@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { MOTION, type EnterMotion } from "@antfabric-ui/core";
+import { MOTION, type EnterMotion } from "@antfabric/ui-core";
 import { t } from "../tokens";
 
 /**

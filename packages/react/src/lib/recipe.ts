@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { mergeLayers, recipeFor, recipeLayers, tokenOf, useDirection, type Recipe, type RecipeContext, type RecipePart, type StyleKey, type StyleValue, type TokenStyle, type recipes } from "@antfabric-ui/core";
+import { mergeLayers, recipeFor, recipeLayers, tokenOf, useDirection, type Recipe, type RecipeContext, type RecipePart, type StyleKey, type StyleValue, type TokenStyle, type recipes } from "@antfabric/ui-core";
 import { usePlatform } from "../platform";
 import { t } from "../tokens";
 import { mirror } from "./style";

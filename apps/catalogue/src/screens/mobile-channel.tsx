@@ -1,8 +1,8 @@
 import { ScrollView, View } from "react-native";
-import { useTheme } from "@antfabric-ui/react-native";
-import { Composer, Message, MessageDivider, TypingIndicator } from "@antfabric-ui/react-native/chat";
-import { MobileHeader } from "@antfabric-ui/react-native/shell";
-import { composerTools, messageBar } from "@antfabric-ui/docs/samples";
+import { useTheme } from "@antfabric/ui-react-native";
+import { Composer, Message, MessageDivider, TypingIndicator } from "@antfabric/ui-react-native/chat";
+import { MobileHeader } from "@antfabric/ui-react-native/shell";
+import { composerTools, messageBar } from "@antfabric/ui-docs/samples";
 
 /** A channel pushed from the Messages tab: no tab bar, the composer at the bottom. */
 export default function MobileChannel() {

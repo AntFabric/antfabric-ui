@@ -61,7 +61,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section>: the title and \"View as table\" (Button); a strip of <button role=\"tab\"> (a swatch, a name and a MetricValue each) pulled out to the card's edges, and a tab panel holding a ChartFrame with recharts' BarChart, one Bar under one data key",
-      import: "import { MetricTabs } from \"@antfabric-ui/react/data\"",
+      import: "import { MetricTabs } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath: recharts is reached only from there. The plot is BarChart's own (the kit's `RechartsBars`): the same grid, axes, tooltip, lit category and motion.",
         "The chosen metric is always drawn under one data key, `__metric`, whichever it is. recharts then tweens the same bars to their new heights over 600ms on the kit's ease-out, and each bar's fill eases to the new metric's colour, instead of drawing a new series from zero. The value axis re-fits to the new metric. Reduced motion turns the tween off and the colour change stays a plain swap.",
@@ -81,7 +81,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same Card, tab strip and recharts' BarChart as web, at desktop density",
-      import: "import { MetricTabs } from \"@antfabric-ui/react/data\"",
+      import: "import { MetricTabs } from \"@antfabric/ui-react/data\"",
       notes: ["The same chart as the web's. Hover is the pointer's, so a tab lights under it and the tooltip follows it."],
       keyboard: [
         { keys: "Tab", action: "Moves to the chosen tab (the other tabs are not stops), then into the plot and on to \"View as table\"" },
@@ -94,7 +94,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View: the same header and Button, a row of Pressable tabs (accessibilityRole tab) that share the card's width, and a ChartFrame holding react-native-gifted-charts' BarChart (`data`, one bar per day) under one data key",
-      import: "import { MetricTabs } from \"@antfabric-ui/react-native/data\"",
+      import: "import { MetricTabs } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there. The plot is BarChart's own (the kit's `GiftedBars`), with the same scale as the web's.",
         "A long series cannot label every bar on a phone: core's `sparseLabels` keeps one label in every few (a fortnight of days is one in four), and the tooltip has every day. The tabs share the width, so three fit on a phone, each at least 44pt tall.",

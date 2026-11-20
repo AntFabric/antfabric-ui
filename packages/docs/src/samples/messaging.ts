@@ -1,6 +1,6 @@
 /**
  * Sample data for the messaging components (Message, MessageActions, Composer, SwipeRow): `messageBar`, `composerTools` and the SwipeRow buttons
- * their docs' `sample`s and the screens share. AntFabric's copy for them is in `antfabricStrings` (`@antfabric-ui/core/antfabric`).
+ * their docs' `sample`s and the screens share. AntFabric's copy for them is in `antfabricStrings` (`@antfabric/ui-core/antfabric`).
  */
 
 /**

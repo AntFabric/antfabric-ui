@@ -1,9 +1,9 @@
-import { cap, type AppMark } from "@antfabric-ui/core";
+import { cap, type AppMark } from "@antfabric/ui-core";
 
 /**
  * Sample data for the notification components (AppBadge, InAppBanner, NotificationItem, NotificationSchedule, OsNotification,
  * PermissionPrompt, TrayMenu): what their docs' `sample`s, matrix `cases` and the screens share. AntFabric's copy for them is in
- * `antfabricStrings` (`@antfabric-ui/core/antfabric`). Owned by W8.
+ * `antfabricStrings` (`@antfabric/ui-core/antfabric`). Owned by W8.
  */
 
 /**

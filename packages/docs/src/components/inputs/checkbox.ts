@@ -49,7 +49,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<button role=\"checkbox\"> holding the box and the label, inline styles over `t`; hover, press and focus from useInteraction; `checked` through useControllable (a press also clears `indeterminate`); the tick pops in with enter(\"pop\")",
-      import: "import { Checkbox } from \"@antfabric-ui/react\"",
+      import: "import { Checkbox } from \"@antfabric/ui-react\"",
       notes: [
         "Never the OS checkbox (<input type=\"checkbox\"> with accent-color): it matches nothing in this design and differs per browser.",
         "In forced-colors mode (Windows High Contrast) the box keeps its border in ButtonText and the tick in HighlightText on Highlight, so the state survives with no brand colour.",
@@ -69,7 +69,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <button role=\"checkbox\"> as web, at desktop density: the 15px box with a 2px ring and a 9px tick at stroke 3.4",
-      import: "import { Checkbox } from \"@antfabric-ui/react\"",
+      import: "import { Checkbox } from \"@antfabric/ui-react\"",
       notes: [
         "ONE size: 15px, 2px ring, 4px corner, a 9px tick (0.6 of the box, so it fits inside the rings). There is no size prop and its absence is the feature (owner: \"Checkbox sizes are diff. Need the consistency\"). A bigger target grows the row's padding, never the box.",
         "Two structural uses, one drawing: when the BOX is the control (the task table's done toggle) it is this button with hideLabel; when the ROW is the control (filter menu rows, the ⚙ menu's Notification sound) the row carries role and state and the box is an aria-hidden picture. Never nest one button in another.",
@@ -87,7 +87,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "Pressable (accessibilityRole checkbox, checked \"mixed\" for the dash) over a StyleSheet from useTheme(); the box scales to 0.92 while pressed and the tick pops in through <Enter motion=\"pop\">; `checked` through useControllable. The tick keeps the kit Icon's stroke; haptics are left to the app",
-      import: "import { Checkbox } from \"@antfabric-ui/react-native\"",
+      import: "import { Checkbox } from \"@antfabric/ui-react-native\"",
       notes: [
         "20pt box, 5pt corner, 12pt tick, in a row at least 44pt tall; the whole row is the tap target.",
         "Open decision: V2's Forward and Add participant sheets draw a ticked CIRCLE at the row's end (ADR-9416), while the desktop retired circles for the square (ADR-0527). This spec draws the square everywhere; the owner should confirm which one shape the phone keeps.",

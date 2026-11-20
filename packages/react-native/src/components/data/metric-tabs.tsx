@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { METRIC_KEY, barScale, fmt, metricTotal, prepare, seriesColors, summarize, useSeries, type FormatSpec, type Metric, type Row, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useControllable, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { METRIC_KEY, barScale, fmt, metricTotal, prepare, seriesColors, summarize, useSeries, type FormatSpec, type Metric, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { usePress } from "../../lib/press";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

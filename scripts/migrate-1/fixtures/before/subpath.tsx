@@ -1,6 +1,6 @@
-import { Button, Composer, Message, NavRail, SidebarItem, TitleBar, type NavRailProps } from '@antfabric-ui/react';
-import { Card, MobileHeader, TabBar, Message as PhoneMessage, type MobileHeaderProps } from '@antfabric-ui/react-native';
-import type { SidebarSectionItem } from '@antfabric-ui/react';
+import { Button, Composer, Message, NavRail, SidebarItem, TitleBar, type NavRailProps } from '@antfabric/ui-react';
+import { Card, MobileHeader, TabBar, Message as PhoneMessage, type MobileHeaderProps } from '@antfabric/ui-react-native';
+import type { SidebarSectionItem } from '@antfabric/ui-react';
 
 export function Web() {
   return (

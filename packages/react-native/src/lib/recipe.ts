@@ -1,5 +1,5 @@
 import { StyleSheet, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
-import { FACE_NAMES, WEIGHT_NAMES, mergeLayers, recipeFor, recipeLayers, tokenOf, type NativeTokens, type Recipe, type RecipeContext, type RecipePart, type StyleKey, type StyleValue, type TokenStyle, type recipes } from "@antfabric-ui/core";
+import { FACE_NAMES, WEIGHT_NAMES, mergeLayers, recipeFor, recipeLayers, tokenOf, type NativeTokens, type Recipe, type RecipeContext, type RecipePart, type StyleKey, type StyleValue, type TokenStyle, type recipes } from "@antfabric/ui-core";
 import { useTheme } from "../theme";
 import { font } from "./type";
 

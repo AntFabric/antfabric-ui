@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, type CSSProperties, type ReactNode } from "react";
-import { hasGlass, kitCss, StringsProvider, themeCss, themes, tokensCss, type Direction, type OS, type Scheme, type StringsOverrides, type Theme } from "@antfabric-ui/core";
+import { hasGlass, kitCss, StringsProvider, themeCss, themes, tokensCss, type Direction, type OS, type Scheme, type StringsOverrides, type Theme } from "@antfabric/ui-core";
 import { t } from "./tokens";
 
 /**

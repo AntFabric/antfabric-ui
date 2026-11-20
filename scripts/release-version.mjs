@@ -29,10 +29,10 @@ const compare = (a, b) => {
   return 0;
 };
 
-/** Every version of @antfabric-ui/core on npm (none before the first release). */
+/** Every version of @antfabric/ui-core on npm (none before the first release). */
 function published() {
   try {
-    const out = execFileSync("npm", ["view", "@antfabric-ui/core", "versions", "--json"], {
+    const out = execFileSync("npm", ["view", "@antfabric/ui-core", "versions", "--json"], {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
     });

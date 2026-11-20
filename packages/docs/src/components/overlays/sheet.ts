@@ -91,7 +91,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A role=\"dialog\" aria-modal panel in the overlay layer of its AntFabricRoot, the window's height, sliding in from its side (enter(\"slide-left\") from the end, \"slide-right\" from the start) over a scrim; header (title, subtitle, IconButton ✕), a body that scrolls, a footer. Tab wraps inside, Esc and a press on the scrim close it (the top overlay only), the page's scroll is locked and the rest of the root is inert while it is open; `open` through useControllable(open, onOpenChange)",
-      import: "import { Sheet } from \"@antfabric-ui/react\"",
+      import: "import { Sheet } from \"@antfabric/ui-react\"",
       notes: [
         "On the server, and in the catalogue's pictures, it is drawn in place in a 640 × 420 stage; in the browser it moves into the layer before the first paint.",
         "Focus moves to the first control in the sheet when it opens and back to what opened it when it closes.",
@@ -104,12 +104,12 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same panel as web at desktop density",
-      import: "import { Sheet } from \"@antfabric-ui/react\"",
+      import: "import { Sheet } from \"@antfabric/ui-react\"",
     },
     mobile: {
       status: "partial",
       base: "The BottomSheet, with the title, the ✕, the subtitle at the top of the body and the footer under it; `side` and `width` are the web's. Drawn where it is mounted, as the BottomSheet is: the app presents it (a Modal or its navigator's sheet)",
-      import: "import { Sheet } from \"@antfabric-ui/react-native\"",
+      import: "import { Sheet } from \"@antfabric/ui-react-native\"",
       alternative: "BottomSheet",
     },
   },

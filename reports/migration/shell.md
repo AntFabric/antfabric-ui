@@ -1,4 +1,4 @@
-# Shell (now `@antfabric-ui/react/shell`, `@antfabric-ui/react-native/shell`)
+# Shell (now `@antfabric/ui-react/shell`, `@antfabric/ui-react-native/shell`)
 
 - SidebarItem: `kind` removed → `glyph`, `icon`, `avatar`, `description`. `kind="channel"` → `glyph="#"`; `kind="private"` → `icon="lock" description="private channel"`; `kind="dm"` → `avatar`; `kind="group"` → `icon="users" description="group conversation"` (a group row on the phone is 44pt, as other icon rows).
 - SidebarSection: `kind` → `icon` (`kind="starred"` → `icon="star"`); `onToggle` → `onCollapsedChange`; `items[i].onPress` → `onSelectedChange(name)`.

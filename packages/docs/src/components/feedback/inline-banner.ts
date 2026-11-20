@@ -62,7 +62,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A role=\"status\" <div> that fades in with enter(\"fade\"), with the kit's Button (sm) and IconButton (Dismiss); the × keeps `dismissed` inside and fades it out; inline styles over `t`",
-      import: "import { InlineBanner } from \"@antfabric-ui/react\"",
+      import: "import { InlineBanner } from \"@antfabric/ui-react\"",
       notes: [
         "Below 420px of container width (a container query, not the viewport) the action wraps under the text.",
         "Browser-permission banners deep-link nowhere — a browser cannot open its own site settings — so they say where to click: \"Click the lock in the address bar, then Notifications.\"",
@@ -71,7 +71,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <div> as web, at desktop density",
-      import: "import { InlineBanner } from \"@antfabric-ui/react\"",
+      import: "import { InlineBanner } from \"@antfabric/ui-react\"",
       notes: [
         "Neutral is the WHITE card surface, not recessed (owner, 2026-09-03): on the warm page a cool recessed grey reads as a dirty patch, not a layer.",
         "Its rim is border.subtle, the same as Card's — a heavier rim on the one box that is a notice reads as emphasis nobody asked for.",
@@ -83,7 +83,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View (role status, polite live region) with <Enter motion=\"fade\">, the action under the message as the kit's Button (sm) and the kit's IconButton for Dismiss; dismissing fades it with Animated.timing",
-      import: "import { InlineBanner } from \"@antfabric-ui/react-native\"",
+      import: "import { InlineBanner } from \"@antfabric/ui-react-native\"",
       notes: [
         "Today's InfoBanner: a sunken strip (surface.muted), 12 × 8 padding, radius 8, a 16pt faint icon nudged 2pt down against the first line, one sentence and no heading. It has no bottom margin — the next SectionHeader owns the gap.",
         "A title line is allowed for state banners (ConnectivityBanner has one); footnote banners leave it out.",

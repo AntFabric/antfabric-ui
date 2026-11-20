@@ -1,6 +1,6 @@
 import { Pressable, Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { DIMMED, fmt, labelWidth, segmentsOf, seriesColors, shareOf, summarizeSegments, totalOf, type FormatSpec, type Row, type Segment, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useControllable, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { DIMMED, fmt, labelWidth, segmentsOf, seriesColors, shareOf, summarizeSegments, totalOf, type FormatSpec, type Row, type Segment, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { Enter } from "../../lib/motion";
 import { usePress } from "../../lib/press";

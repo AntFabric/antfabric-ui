@@ -1,5 +1,5 @@
 {
-  "name": "@antfabric-ui/catalogue",
+  "name": "@antfabric/ui-catalogue",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,10 +10,10 @@
     "check": "astro check"
   },
   "dependencies": {
-    "@antfabric-ui/core": "workspace:*",
-    "@antfabric-ui/docs": "workspace:*",
-    "@antfabric-ui/react": "workspace:*",
-    "@antfabric-ui/react-native": "workspace:*",
+    "@antfabric/ui-core": "workspace:*",
+    "@antfabric/ui-docs": "workspace:*",
+    "@antfabric/ui-react": "workspace:*",
+    "@antfabric/ui-react-native": "workspace:*",
     "@astrojs/react": "7.1.2",
     "astro": "7.3.8",
     "lucide": "1.50.0",

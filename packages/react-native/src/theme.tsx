@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { Platform, StyleSheet } from "react-native";
-import { hasGlass, resolveTokens, StringsProvider, themes, type Direction, type NativeTokens, type Scheme, type StringsOverrides, type Theme } from "@antfabric-ui/core";
+import { hasGlass, resolveTokens, StringsProvider, themes, type Direction, type NativeTokens, type Scheme, type StringsOverrides, type Theme } from "@antfabric/ui-core";
 
 const WEB = Platform.OS === "web";
 

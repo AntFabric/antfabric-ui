@@ -29,12 +29,12 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A role=status row drawn from its recipe: the lattice on the kit's af-lattice (648 ms, each ring 135 ms later), the word clipped to an af-shimmer gradient, a clock painted every 100 ms without re-rendering; the fold is a grid-rows transition",
-      import: 'import { ThinkingIndicator } from "@antfabric-ui/react"',
+      import: 'import { ThinkingIndicator } from "@antfabric/ui-react"',
     },
     desktop: {
       status: "ready",
       base: "The same row, where Fabric's next message will start",
-      import: 'import { ThinkingIndicator } from "@antfabric-ui/react"',
+      import: 'import { ThinkingIndicator } from "@antfabric/ui-react"',
       notes: [
         "Today's desktop gives each lit cell a soft coral glow; this kit leaves it out, as no shadow token says it yet.",
         "It shows while a turn is in flight and nothing is written yet, comes back when Fabric goes to a tool after writing, and goes when Fabric asks a question (assistant-core's showsThinking).",
@@ -43,7 +43,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "partial",
       base: "Views on Animated's native driver: each cell's ripple, the word breathing between 45% and full, the clock re-rendered every 100 ms; the steps unfold without an animation",
-      import: 'import { ThinkingIndicator } from "@antfabric-ui/react-native"',
+      import: 'import { ThinkingIndicator } from "@antfabric/ui-react-native"',
       notes: [
         "Today's phone sweeps a gradient band across the word through an SVG mask (react-native-svg and Reanimated). This kit breathes the word instead, as it uses neither; the owner may want the sweep.",
         "Today's phone restarts the clock when the screen remounts; since keeps it running.",

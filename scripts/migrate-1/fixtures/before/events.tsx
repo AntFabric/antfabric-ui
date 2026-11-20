@@ -1,6 +1,6 @@
-import { Chip, IconButton, ListItem, Message } from '@antfabric-ui/react';
-import { ReactionPill, ThreadSummary } from '@antfabric-ui/react';
-import { CommandPalette, MessageActions, TitleBar, TrayMenu } from '@antfabric-ui/react';
+import { Chip, IconButton, ListItem, Message } from '@antfabric/ui-react';
+import { ReactionPill, ThreadSummary } from '@antfabric/ui-react';
+import { CommandPalette, MessageActions, TitleBar, TrayMenu } from '@antfabric/ui-react';
 
 function toggle(on: boolean) {
   return on;

@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { t } from "../tokens";
-import { LOADING_BARS } from "@antfabric-ui/core/chart";
+import { LOADING_BARS } from "@antfabric/ui-core/chart";
 import { box, css, row } from "../lib/style";
 import { Skeleton } from "../components/feedback/skeleton";
 import { useChartTokens } from "./theme";

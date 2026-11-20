@@ -151,27 +151,27 @@ Edits per rule
            1  QuestionPanelOption → QuestionOption
            1  ThinkingIndicatorStep → AgentStep
     43  imports moved to /shell or /chat
-           4  NavRail → @antfabric-ui/react/shell
-           4  SidebarSection → @antfabric-ui/react/shell
-           3  Message → @antfabric-ui/react/chat
-           3  MobileHeader → @antfabric-ui/react-native/shell
-           3  SidebarItem → @antfabric-ui/react/shell
-           3  TabBar → @antfabric-ui/react-native/shell
-           3  TitleBar → @antfabric-ui/react/shell
-           2  Composer → @antfabric-ui/react/chat
-           2  MessageActions → @antfabric-ui/react/chat
-           2  MobileHeaderProps → @antfabric-ui/react-native/shell
-           2  ReactionPill → @antfabric-ui/react/chat
-           2  ThreadSummary → @antfabric-ui/react/chat
-           2  TrayMenu → @antfabric-ui/react/shell
-           1  AppBadge → @antfabric-ui/react/shell
-           1  Message → @antfabric-ui/react-native/chat
-           1  NavRailProps → @antfabric-ui/react/shell
-           1  OsNotification → @antfabric-ui/react/shell
-           1  SidebarSectionItem → @antfabric-ui/react/shell
-           1  WebTopBar → @antfabric-ui/react/shell
-           1  WorkspaceSwitcher → @antfabric-ui/react-native/shell
-           1  WorkspaceSwitcher → @antfabric-ui/react/shell
+           4  NavRail → @antfabric/ui-react/shell
+           4  SidebarSection → @antfabric/ui-react/shell
+           3  Message → @antfabric/ui-react/chat
+           3  MobileHeader → @antfabric/ui-react-native/shell
+           3  SidebarItem → @antfabric/ui-react/shell
+           3  TabBar → @antfabric/ui-react-native/shell
+           3  TitleBar → @antfabric/ui-react/shell
+           2  Composer → @antfabric/ui-react/chat
+           2  MessageActions → @antfabric/ui-react/chat
+           2  MobileHeaderProps → @antfabric/ui-react-native/shell
+           2  ReactionPill → @antfabric/ui-react/chat
+           2  ThreadSummary → @antfabric/ui-react/chat
+           2  TrayMenu → @antfabric/ui-react/shell
+           1  AppBadge → @antfabric/ui-react/shell
+           1  Message → @antfabric/ui-react-native/chat
+           1  NavRailProps → @antfabric/ui-react/shell
+           1  OsNotification → @antfabric/ui-react/shell
+           1  SidebarSectionItem → @antfabric/ui-react/shell
+           1  WebTopBar → @antfabric/ui-react/shell
+           1  WorkspaceSwitcher → @antfabric/ui-react-native/shell
+           1  WorkspaceSwitcher → @antfabric/ui-react/shell
 
 Files changed
     16  content.tsx

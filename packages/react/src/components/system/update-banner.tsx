@@ -1,6 +1,6 @@
 import { useEffect, useId, type CSSProperties, type ReactNode } from "react";
 import { usePlatform } from "../../platform";
-import { ART_UPDATE, recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { ART_UPDATE, recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
 import { Icon } from "../../lib/icon";

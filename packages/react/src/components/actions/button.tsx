@@ -1,5 +1,5 @@
 import { useEffect, type CSSProperties } from "react";
-import { formatShortcut, recipes, useDirection, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { formatShortcut, recipes, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";

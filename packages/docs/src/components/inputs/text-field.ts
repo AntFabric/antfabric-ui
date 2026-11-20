@@ -141,7 +141,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<label for> + <input type=\"text\" data-af-input> in a drawn box, inline styles over `t`; hover and focus-within from useInteraction on the box (the 2px edge is a 1px border plus a 1px inset ring, so nothing shifts); the error and helper are tied to the input by aria-describedby; `value` through useControllable",
-      import: "import { TextField } from \"@antfabric-ui/react\"",
+      import: "import { TextField } from \"@antfabric/ui-react\"",
       notes: [
         "The error is announced through aria-describedby on the control plus aria-invalid; Field.Error renders only while invalid, so a screen reader is not told about an error that is not there.",
         "Set type, autoComplete and inputMode for what the field holds (email, url, one-time-code) so browsers autofill it and phones browsing the web app get the right keyboard. Inside a FormField the field supplies the id, aria-describedby, aria-invalid and aria-required.",
@@ -165,7 +165,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <label> + <input> as web: lg 44px on --radius-input, sm 32px on --radius-control",
-      import: "import { TextField } from \"@antfabric-ui/react\"",
+      import: "import { TextField } from \"@antfabric/ui-react\"",
       notes: [
         "Hover moves the FILL only (surface.hover) and never on an invalid or focused field; focus is a 2px border.active edge with no halo (ADR-0421). The edge is drawn so it takes no room — the text never shifts 1px when the field takes focus.",
         "The 2px grey edge measures 1.57:1, under WCAG 2.2's 3:1 for a focus indicator. ADR-0421 records that as the cost of the owner's explicit call (width, not a darker grey); it is a known gap, not an oversight.",
@@ -187,7 +187,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "TextInput (fontFamily set by font(), placeholderTextColor, maxFontSizeMultiplier fontScale.content, keyboard and secure entry from `type`) in a View box over a StyleSheet from useTheme(); focus draws a 1pt inset boxShadow ring over the 1pt edge; the error fades in through <Enter motion=\"fade\">; `copied`, an error and the characters left are announced with announceForAccessibility; `value` through useControllable",
-      import: "import { TextField } from \"@antfabric-ui/react-native\"",
+      import: "import { TextField } from \"@antfabric/ui-react-native\"",
       notes: [
         "48pt minimum, --radius-input 11, a 1pt edge drawn as a Rim over the edge so it takes no room; focus thickens it to 2pt border.active, never the brand colour.",
         "The phone had no error state; this spec adds one: a danger edge (2pt while focused) and the message under the field with an icon, replacing the helper. LabeledInput's error line was colour-only; the icon is added so the error does not rely on colour.",

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, type ViewStyle } from "react-native";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { fmt, withoutSign, type FormatSpec, type Row, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { fmt, withoutSign, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles, useTheme } from "../../theme";
 import { Icon } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

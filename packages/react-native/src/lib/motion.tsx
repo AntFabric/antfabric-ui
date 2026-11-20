@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Animated, Dimensions, Easing, Platform, type StyleProp, type ViewProps, type ViewStyle } from "react-native";
-import { MOTION, type EnterMotion } from "@antfabric-ui/core";
+import { MOTION, type EnterMotion } from "@antfabric/ui-core";
 
 /**
  * The entrances, with React Native's own Animated (on the native driver on a device): the same
- * offsets and timing as the React kit's CSS keyframes (MOTION in @antfabric-ui/core), so a menu
+ * offsets and timing as the React kit's CSS keyframes (MOTION in @antfabric/ui-core), so a menu
  * pops the same on every platform. Reduced motion turns them into a plain appearance.
  *
  *   <Enter motion="pop" style={s.menu}>…</Enter>

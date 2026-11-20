@@ -45,8 +45,8 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import ts from "typescript";
-import { registry } from "@antfabric-ui/docs";
-import { descriptions as tokenDescriptions, isReference, primitiveMeta, recipeEntries, recipes, referencedPrimitives, tokenOf, tokens, tokenSource, type Recipe, type TokenNote } from "@antfabric-ui/core";
+import { registry } from "@antfabric/ui-docs";
+import { descriptions as tokenDescriptions, isReference, primitiveMeta, recipeEntries, recipes, referencedPrimitives, tokenOf, tokens, tokenSource, type Recipe, type TokenNote } from "@antfabric/ui-core";
 
 // --- What is counted -------------------------------------------------------------------------
 

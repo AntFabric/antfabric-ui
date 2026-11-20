@@ -1,9 +1,9 @@
-import { Chip, IconButton, ListItem } from '@antfabric-ui/react';
-import { Message } from '@antfabric-ui/react/chat';
-import { ReactionPill, ThreadSummary } from '@antfabric-ui/react/chat';
-import { CommandPalette } from '@antfabric-ui/react';
-import { MessageActions } from '@antfabric-ui/react/chat';
-import { TitleBar, TrayMenu } from '@antfabric-ui/react/shell';
+import { Chip, IconButton, ListItem } from '@antfabric/ui-react';
+import { Message } from '@antfabric/ui-react/chat';
+import { ReactionPill, ThreadSummary } from '@antfabric/ui-react/chat';
+import { CommandPalette } from '@antfabric/ui-react';
+import { MessageActions } from '@antfabric/ui-react/chat';
+import { TitleBar, TrayMenu } from '@antfabric/ui-react/shell';
 
 function toggle(on: boolean) {
   return on;

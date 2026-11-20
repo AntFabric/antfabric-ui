@@ -19,8 +19,8 @@ Why it breaks once: a library that names a thing three ways cannot be made gener
 
 ## The short path
 
-1. **Install 1.0.** Set `@antfabric-ui/core`, `react` and `react-native` (whichever you use) to the same `1.0.x`. From npm that is the version; from tarballs it is the three `file:` versions, and the override for `@antfabric-ui/core` if your workspace has one ([`CONSUMING.md`](CONSUMING.md), section 2).
-2. **Dry run the codemod.** From a checkout of this repository, point it at your repository. `--via` is the wrapper package your code imports instead of `@antfabric-ui/*` (leave it out if you import the kit directly) and `--wrapper` is that package's source folder, relative to your repository.
+1. **Install 1.0.** Set `@antfabric/ui-core`, `react` and `react-native` (whichever you use) to the same `1.0.x`. From npm that is the version; from tarballs it is the three `file:` versions, and the override for `@antfabric/ui-core` if your workspace has one ([`CONSUMING.md`](CONSUMING.md), section 2).
+2. **Dry run the codemod.** From a checkout of this repository, point it at your repository. `--via` is the wrapper package your code imports instead of `@antfabric/ui-*` (leave it out if you import the kit directly) and `--wrapper` is that package's source folder, relative to your repository.
 
    ```bash
    pnpm install
@@ -30,7 +30,7 @@ Why it breaks once: a library that names a thing three ways cannot be made gener
 3. **Run it for real.** The same command with `--write`, then format what it touched: it keeps every line it did not rewrite as it was, so an attribute list that is now short enough for one line, or a child it de-indented, may not match your formatter and a formatter check in your lint fails on it. (With prettier: `git diff --name-only | xargs pnpm exec prettier --write --ignore-unknown`.) Commit the result on its own, so the manual work reads as a separate diff.
 4. **Keep AntFabric's look and wording.** The look is the theme and the wording is the strings, and they are two things.
    - **The look.** The codemod adds `theme={themes.antfabric}` to your roots (`AntFabricRoot` on the web, `ThemeProvider` on the phone). A product that is not AntFabric passes its own theme instead ([`CONSUMING.md`](CONSUMING.md) section 6). A `defineTheme` call with no `extends` now sits on `themes.neutral`; write `extends: themes.antfabric` to build on AntFabric's look. `extends: null` starts from the raw schema (`tokens.ts`, which holds AntFabric's values) and only the presets need it.
-   - **The wording.** The kit's built-in text is generic now. AntFabric's own copy (0.1's) ships from an opt-in entry, `@antfabric-ui/core/antfabric`, which exports `antfabricStrings` (and re-exports `antfabric`). Pass it beside the theme: `<AntFabricRoot theme={themes.antfabric} strings={antfabricStrings}>`, and the same on the phone's `<ThemeProvider theme={themes.antfabric} strings={antfabricStrings}>`. The codemod does not add `strings`; that is yours.
+   - **The wording.** The kit's built-in text is generic now. AntFabric's own copy (0.1's) ships from an opt-in entry, `@antfabric/ui-core/antfabric`, which exports `antfabricStrings` (and re-exports `antfabric`). Pass it beside the theme: `<AntFabricRoot theme={themes.antfabric} strings={antfabricStrings}>`, and the same on the phone's `<ThemeProvider theme={themes.antfabric} strings={antfabricStrings}>`. The codemod does not add `strings`; that is yours.
 5. **Work through the manual list.** The codemod prints it. "Every break, by area" says what each item means, and "What the typechecker cannot see" lists what changes without an error.
 6. **Run your typecheck and tests.** Props are typed, so a removed or renamed prop is a compile error; fix them until it is clean.
 7. **Look at it.** Open one screen per surface in light and dark, and the phone with its fonts loaded.
@@ -42,7 +42,7 @@ These change what is drawn or announced, not what compiles.
 - **The default look is neutral.** Without `theme`, coral becomes ink, Figtree becomes Geist, and radii shrink. Step 4 fixes it.
 - **Default text is generic.** The English is the same unless an item below says otherwise; the sample content is gone. `ProgressBar` with no `label` is named "Progress" (it was "Uploading Q4 roadmap.pdf"); `Skeleton` with no `label` is "Loading" (it was "Loading messages"); `Badge` with a count and no `label` reads "3 unread" (it was "3 unread mentions").
 - **`defineTheme`'s `extends` defaults to `themes.neutral`.** A theme built in 0.1-style code with no `extends` used to start from AntFabric's values; it now starts from neutral, and compiles the same. Write `extends: themes.antfabric` to keep AntFabric's look. `extends: null` is the raw schema, and only the presets need it.
-- **AntFabric's wording is opt-in.** Text that was AntFabric's phrasing by default is generic now. An AntFabric app passes `strings={antfabricStrings}` (from `@antfabric-ui/core/antfabric`) beside `theme={themes.antfabric}` to keep 0.1's wording. Nothing fails without it; a test that looks for the old text does.
+- **AntFabric's wording is opt-in.** Text that was AntFabric's phrasing by default is generic now. An AntFabric app passes `strings={antfabricStrings}` (from `@antfabric/ui-core/antfabric`) beside `theme={themes.antfabric}` to keep 0.1's wording. Nothing fails without it; a test that looks for the old text does.
 - **A `ListItem`'s accessible name changed.** A count that read "…, 3 mentions" reads "…, 3 unread". A test or a screen-reader script that matches the old name fails, silently in the app.
 - **A danger `InlineBanner` is an alert** (`role="alert"` on the web, the alert role with an assertive live region on the phone). It interrupts a screen reader; before it waited. A test that does `getByRole("alert")` now also finds it.
 - **`EmptyState` draws its `icon`.** 0.1 ignored `icon` unless `art="none"`, and `art` defaulted to `messages`, so an `icon` on its own drew the speech-bubble art. `art` now defaults to `none`, so the icon shows.
@@ -59,14 +59,14 @@ Names are the ones 1.0 ships. Where the ledger's first pass and its later conven
 |---|---|---|
 | `Theme` (the type `"light" \| "dark"`) | `Scheme`. `Theme` is now a theme object (from `defineTheme`). | Codemod |
 | `<AntFabricRoot theme="dark">`, `<AntFabricProvider theme="dark">` | `scheme="dark"`. `theme` takes a theme object; a string throws. The phone's `ThemeProvider` already took `scheme`. | Codemod |
-| no `theme` meant AntFabric's look | no `theme` means `neutral`. For AntFabric's look pass `theme={themes.antfabric}` (`themes` and `defineTheme` are from `@antfabric-ui/core`). | Codemod adds it |
+| no `theme` meant AntFabric's look | no `theme` means `neutral`. For AntFabric's look pass `theme={themes.antfabric}` (`themes` and `defineTheme` are from `@antfabric/ui-core`). | Codemod adds it |
 | `<AntFabricRoot brand={{ primary }}>`, `<ThemeProvider brand={…}>` | `theme={defineTheme({ name: "acme", extends: themes.antfabric, brand: { primary } })}`. The `brand` props are gone. | Codemod for a literal `brand`; manual for a spread or a conditional |
 | `brandVars(brand, scheme)`, `brandKey` | removed. A host that writes the variables itself uses `themeCss(theme)` and `rootAttrs({ platform, os, scheme, theme })`. | Manual |
 | `resolveTokens(profile, scheme, { brand })` | `resolveTokens(profile, scheme, { theme })` | Manual |
 | `AntFabricRoot css` | `true` (default: base sheet and the theme's), `"theme"` (only the theme's; the host loads the base sheet once), `false` (neither: the host adds `tokensCss() + kitCss` and `themeCss(theme)`) | Manual |
 | a theme stored as JSON | a theme is only what `defineTheme` built; load the JSON and pass it back through `defineTheme` | Manual |
 | `ANTFABRIC_MARK` in core | removed (it is AntFabric's mark). Pass your product's `mark` to `AppBadge`. | Manual |
-| app chrome and the conversation in the root | `@antfabric-ui/react/shell`, `/chat` and the same under `@antfabric-ui/react-native` (the table below) | Codemod |
+| app chrome and the conversation in the root | `@antfabric/ui-react/shell`, `/chat` and the same under `@antfabric/ui-react-native` (the table below) | Codemod |
 | (none) | new: `strings` and `locale` on both roots; `styles` and `strings` on every component | New |
 
 `data-af-theme` on the root element (or on `<html>`) still means the scheme, `"light"` or `"dark"`, so code that writes `html.dataset.afTheme = scheme` stays valid. A theme other than `themes.antfabric` adds `data-af-theme-id` beside it.
@@ -77,9 +77,9 @@ A host without `AntFabricRoot` passes `theme` to `AntFabricProvider` and writes 
 
 | Subpath | Components |
 |---|---|
-| `@antfabric-ui/react/shell` (web, desktop) | SidebarItem, SidebarSection, NavRail, TitleBar (desktop), WebTopBar (web), AppMenuBar (desktop), WorkspaceSwitcher, OsNotification, TrayMenu (desktop), AppBadge |
-| `@antfabric-ui/react-native/shell` | MobileHeader, TabBar, SidebarItem, SidebarSection, WorkspaceSwitcher, OsNotification, AppBadge |
-| `@antfabric-ui/react/chat`, `@antfabric-ui/react-native/chat` | Message, MessageActions (web, desktop), Composer, ReactionPill, ThreadSummary, TypingIndicator, MessageDivider |
+| `@antfabric/ui-react/shell` (web, desktop) | SidebarItem, SidebarSection, NavRail, TitleBar (desktop), WebTopBar (web), AppMenuBar (desktop), WorkspaceSwitcher, OsNotification, TrayMenu (desktop), AppBadge |
+| `@antfabric/ui-react-native/shell` | MobileHeader, TabBar, SidebarItem, SidebarSection, WorkspaceSwitcher, OsNotification, AppBadge |
+| `@antfabric/ui-react/chat`, `@antfabric/ui-react-native/chat` | Message, MessageActions (web, desktop), Composer, ReactionPill, ThreadSummary, TypingIndicator, MessageDivider |
 | stay in the root | AttachmentCard, SwipeRow (phone), NotificationItem, InAppBanner, PermissionPrompt, NotificationSchedule, ConnectionBanner, SessionState, UpdateBanner, HoverCard, Breadcrumbs, CommandPalette, ContextMenu, Fab, the agent components |
 
 **Types and helpers that were removed or replaced**, each with its successor: `NavRailKey`, `NavRailDestination`, `NavRailSection` become core's `NavItem`; `MobileHeaderAction` becomes `IconActionItem`; `AvatarStackPerson`, `ThreadSummaryParticipant` become `Person`; `ComposerAttachment`, `MessageAttachment` become `Attachment`; `MessageReaction` becomes `Reaction`; `AgentStepsStep`, `AgentStepsStepState`, `ThinkingIndicatorStep` become `AgentStep`; `QuestionPanelOption` becomes `QuestionOption`; `QuestionPanelArg` becomes `ToolArg`; `CommandPaletteGroupItem` becomes `CommandPaletteItem`; `ContextMenuReaction` is gone; `ProjectMoveCard` is gone.
@@ -267,7 +267,7 @@ The cross-cutting renames, one row per rule, with what each touched. [`reports/a
 
 One per step. Each says what you should see.
 
-1. **Install.** `pnpm ls @antfabric-ui/core @antfabric-ui/react @antfabric-ui/react-native` lists `1.0.x` for each and nothing at `0.1.0`. **Check:** `grep -n "antfabric-ui.*0\.1\.0" pnpm-lock.yaml` prints nothing, and `pnpm why @antfabric-ui/core` shows one version.
+1. **Install.** `pnpm ls @antfabric/ui-core @antfabric/ui-react @antfabric/ui-react-native` lists `1.0.x` for each and nothing at `0.1.0`. **Check:** `grep -n "antfabric-ui.*0\.1\.0" pnpm-lock.yaml` prints nothing, and `pnpm why @antfabric/ui-core` shows one version.
 2. **Dry run.** **Check:** the codemod prints the files it would change and a manual list, and `git status --short` in your repository prints nothing.
 3. **`--write`.** **Check:** `git diff --stat` touches only files the dry run named, and a second dry run lists no automatic change.
 4. **Keep the look.** **Check:** the root carries `data-af-platform` and, with `themes.antfabric`, no `data-af-theme-id`; the primary `Button` is coral and `getComputedStyle(root).getPropertyValue("--af-font-sans")` starts with `Figtree`. With a branded theme the root carries `data-af-theme-id` and `--af-brand-default` is your primary.

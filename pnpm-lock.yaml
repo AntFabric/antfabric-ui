@@ -26,16 +26,16 @@ importers:
 
   apps/catalogue:
     dependencies:
-      '@antfabric-ui/core':
+      '@antfabric/ui-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@antfabric-ui/docs':
+      '@antfabric/ui-docs':
         specifier: workspace:*
         version: link:../../packages/docs
-      '@antfabric-ui/react':
+      '@antfabric/ui-react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@antfabric-ui/react-native':
+      '@antfabric/ui-react-native':
         specifier: workspace:*
         version: link:../../packages/react-native
       '@astrojs/react':
@@ -93,7 +93,7 @@ importers:
 
   packages/docs:
     dependencies:
-      '@antfabric-ui/core':
+      '@antfabric/ui-core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -103,7 +103,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@antfabric-ui/core':
+      '@antfabric/ui-core':
         specifier: workspace:^
         version: link:../core
       recharts:
@@ -131,7 +131,7 @@ importers:
 
   packages/react-native:
     dependencies:
-      '@antfabric-ui/core':
+      '@antfabric/ui-core':
         specifier: workspace:^
         version: link:../core
       gifted-charts-core:

@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { ART, ART_CANVAS, ART_PART, recipes, type ArtPart, type ArtShape } from "@antfabric-ui/core";
+import { ART, ART_CANVAS, ART_PART, recipes, type ArtPart, type ArtShape } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

@@ -1,5 +1,5 @@
 import { View, type ViewStyle } from "react-native";
-import { LOADING_BARS } from "@antfabric-ui/core/chart";
+import { LOADING_BARS } from "@antfabric/ui-core/chart";
 import { createStyles } from "../theme";
 import { Skeleton } from "../components/feedback/skeleton";
 import { useChartTokens } from "./theme";

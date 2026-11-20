@@ -127,7 +127,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "partial",
       base: "A <div role=\"banner\"> whose empty strips carry data-tauri-drag-region, for Tauri 2's window chrome (macOS: titleBarStyle \"Overlay\", trafficLightPosition {x:16, y:24}; Windows/Linux: decorations false + shadow true). IconButton for ☰, the sidebar button, Back / Forward / History and Help; the search field is a <button> with a Kbd hint; the macOS lights are drawn in place (aria-hidden), Windows' caption buttons and GNOME's round ones are <button tabIndex=-1>. Inline styles over `t`, hover / press / focus from useInteraction, `menuOpen` and `sidebarExpanded` through useControllable; on macOS 26 the bar goes transparent and the sidebar button, history and search become glass() capsules.",
-      import: "import { TitleBar } from \"@antfabric-ui/react/shell\"",
+      import: "import { TitleBar } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Today: macOS overlays the traffic lights on the breadcrumb row with a 96px left inset (TRAFFIC_LIGHT_INSET, ADR-5322) and Windows/Linux keep the native title bar and native menu bar. The ☰ button, the custom Windows/Linux bar and the visible Back / Forward / History buttons are new in this spec — today history is only ⌘[ / ⌘] (ADR-6130) with nothing on screen.",
         "The 96px inset follows trafficLightPosition.x (16) plus three 12px buttons 20px apart. Change tauri.conf.json, tauri.staging.conf.json and this inset together.",

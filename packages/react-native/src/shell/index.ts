@@ -1,6 +1,6 @@
 /**
- * `@antfabric-ui/react-native/shell`: the phone's app frame, and the pictures of the native surfaces around it. Not part of the root
- * entry, which stays the generic set a product composes its own screens from. The same name, `@antfabric-ui/react/shell`, is the web's
+ * `@antfabric/ui-react-native/shell`: the phone's app frame, and the pictures of the native surfaces around it. Not part of the root
+ * entry, which stays the generic set a product composes its own screens from. The same name, `@antfabric/ui-react/shell`, is the web's
  * and the desktop's.
  *
  * It holds MobileHeader, TabBar, SidebarItem, SidebarSection and WorkspaceSwitcher (`../components/shell`), and AppBadge and

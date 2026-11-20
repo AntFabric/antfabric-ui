@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
 import { Icon, type IconName } from "../../lib/icon";

@@ -1,6 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ComponentType } from "react";
 import * as lucide from "lucide-react";
-import { pascal } from "@antfabric-ui/core";
+import { pascal } from "@antfabric/ui-core";
 
 /** A lucide glyph by kit name, looked up among the package's exports the way the React kit does, so renamed icons keep their old names. */
 function Glyph({ name }: { name: string }) {

@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { recipes, useControllable, useDirection, useStrings, type KitStrings, type QuestionOption, type ToolArg } from "@antfabric-ui/core";
+import { recipes, useControllable, useDirection, useStrings, type KitStrings, type QuestionOption, type ToolArg } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useAutoFocus } from "../../platform";
 import { useInteraction } from "../../lib/interaction";

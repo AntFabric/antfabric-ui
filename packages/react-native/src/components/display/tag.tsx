@@ -1,5 +1,5 @@
 import { Text, View, type ViewStyle } from "react-native";
-import { recipes } from "@antfabric-ui/core";
+import { recipes } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
 import { Icon, type IconName } from "../../lib/icon";
 import { useRecipe, type PartStyles } from "../../lib/recipe";

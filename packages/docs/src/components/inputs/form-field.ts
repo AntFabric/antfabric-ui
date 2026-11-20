@@ -51,7 +51,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <div> with a <label for> over the control, a description and an error; a context carries the control's id, the ids of the description and the error (for aria-describedby), `invalid` and `required` to whichever control is inside; the error is announced through the page's polite live region",
-      import: "import { FormField } from \"@antfabric-ui/react\"",
+      import: "import { FormField } from \"@antfabric/ui-react\"",
       notes: [
         "A control inside reads the field with `useFormField()`; a product's own control can too, to take the same wiring.",
         "A control that is not a native field (a Select's trigger, a RadioGroup) is named with aria-labelledby pointing at the label; a TextField and a SearchField are named by the label's `for`.",
@@ -67,13 +67,13 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same field as web",
-      import: "import { FormField } from \"@antfabric-ui/react\"",
+      import: "import { FormField } from \"@antfabric/ui-react\"",
       notes: ["The label is a real label, so a click on it focuses a text field and presses a checkbox, as in the browser."],
     },
     mobile: {
       status: "ready",
       base: "A View with a Text label, a description and an error; a context carries the field's label and one hint (the description, the error and \"Required\") to the control inside, which reads it as its accessibility label (when it has none) and hint; the error is announced with announceForAccessibility because iOS has no live regions",
-      import: "import { FormField } from \"@antfabric-ui/react-native\"",
+      import: "import { FormField } from \"@antfabric/ui-react-native\"",
       notes: [
         "The phone has no aria-invalid or aria-required: the hint is how a screen reader hears them, after the name.",
         "The label and the messages scale with the person's text size, up to 2×.",

@@ -22,9 +22,9 @@ Edits per rule
            4  Theme → Scheme
            1  NavRailDestination → NavItem
      3  wrapper: export * from a subpath
-           1  @acme/ui-kit: export * from @antfabric-ui/react/chat
-           1  @acme/ui-kit: export * from @antfabric-ui/react/shell
-           1  @acme/ui-kit/native: export * from @antfabric-ui/react-native/shell
+           1  @acme/ui-kit: export * from @antfabric/ui-react/chat
+           1  @acme/ui-kit: export * from @antfabric/ui-react/shell
+           1  @acme/ui-kit/native: export * from @antfabric/ui-react-native/shell
      2  wrapper: core exports added
            1  @acme/ui-kit: themes
            1  @acme/ui-kit/native: themes

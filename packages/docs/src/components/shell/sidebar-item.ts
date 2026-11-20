@@ -120,7 +120,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <button data-af-press> row (aria-current=\"page\" when open, one aria-label for the whole row) with Avatar and Badge, and the ⋮ IconButton laid over its right end as a sibling; inline styles over t, hover, press and focus from useInteraction. There is no href prop yet, so the kit's row is a button, not a link; the ⋮ reports `onMenu`, from which the app opens its Base UI <Menu>",
-      import: "import { SidebarItem } from \"@antfabric-ui/react/shell\"",
+      import: "import { SidebarItem } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Right-click opens the same menu as the ⋮; the browser's own context menu is still one Shift+right-click away.",
       ],
@@ -141,8 +141,8 @@ const docs: ComponentDocs = {
     },
     desktop: {
       status: "ready",
-      base: "The same @antfabric-ui/react component as the web: a <button> row (6/10 padding, radius.row) + Avatar, Badge and the ⋮ IconButton as a sibling; inline styles over t, states from useInteraction. active is kept by the row (useControllable) and toggled by a press; a surrounding section decides through selectedName",
-      import: "import { SidebarItem } from \"@antfabric-ui/react/shell\"",
+      base: "The same @antfabric/ui-react component as the web: a <button> row (6/10 padding, radius.row) + Avatar, Badge and the ⋮ IconButton as a sibling; inline styles over t, states from useInteraction. active is kept by the row (useControllable) and toggled by a press; a surrounding section decides through selectedName",
+      import: "import { SidebarItem } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Unread is asked first: a channel you have open can still gather unread (window in the background) and then it is bold AND selected.",
         "The ⋮ is a sibling button laid over the row's right end, never a button inside a button; the row reserves its room only while it is shown, so it never covers the count. The catalogue draws it with actionsVisible.",
@@ -168,7 +168,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "partial",
       base: "A full-bleed Pressable (accessibilityRole button, accessibilityState.selected, onLongPress) with inset content: Avatar, Badge, Icon and Text in StyleSheet over useTheme() tokens, fonts by file. Swipe actions are not in the kit; the list wraps rows in swipe-row",
-      import: "import { SidebarItem } from \"@antfabric-ui/react-native/shell\"",
+      import: "import { SidebarItem } from \"@antfabric/ui-react-native/shell\"",
       notes: [
         "V2 today (owner, 2026-10-06) draws the name only — 44pt for a channel, 56pt for a DM — with no last message and no time, and so does the kit (2026-11-11): the last message and its time would need a backend change, so the row leaves them out. It grows to 64pt with a second line only while someone types.",
         "A draft is the desktop's pencil at the end of the name line, since there is no preview line to begin with 'Draft:'.",

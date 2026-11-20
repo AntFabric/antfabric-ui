@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { fmt, useTween, valueParts, type FormatSpec, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { fmt, useTween, valueParts, type FormatSpec, type FormatWords } from "@antfabric/ui-core/chart";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { css, visuallyHidden } from "../../lib/style";

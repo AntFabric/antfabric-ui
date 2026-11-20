@@ -72,7 +72,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "role=\"tablist\" of <button role=\"tab\"> segments, inline styles over `t`; ONE card, measured after mount (and on resize), slides by transform to the chosen segment — on the server and the first paint the chosen segment draws its own card in the same place; roving tabindex with ArrowLeft / ArrowRight / Home / End (automatic activation); hover and focus from useInteraction; `value` through useControllable",
-      import: "import { SegmentedControl } from \"@antfabric-ui/react\"",
+      import: "import { SegmentedControl } from \"@antfabric/ui-react\"",
       notes: [
         "Web values are the desktop's (32px tabs inside a 42px strip). The web profile's taller controls do not apply: a tab strip is not a press target on its own row.",
         "When the strip switches a routed view, each tab is a link (Tabs.Tab render={<Link>}) so the URL holds the choice and back/forward and a shared link land on the same tab.",
@@ -96,7 +96,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same tablist as web, at desktop density: the one card slides 250ms ease-out between segments",
-      import: "import { SegmentedControl } from \"@antfabric-ui/react\"",
+      import: "import { SegmentedControl } from \"@antfabric/ui-react\"",
       notes: [
         "The chosen card is ONE absolutely-positioned element that travels (ADR-0518); the segments paint no fill of their own.",
         "Labels are semibold in both states so nothing changes width while the card is in flight; only the ink changes (text.strong chosen, text.faint not).",
@@ -119,7 +119,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View (tablist) of Pressable segments, in a horizontal ScrollView when scrollable; StyleSheet over useTheme(); the chosen segment fills itself at once; on iOS 26 a PanResponder drives the selection lens (a clear GlassSurface at 1.15 scale that follows a horizontal drag and settles on the nearest segment); `value` through useControllable",
-      import: "import { SegmentedControl } from \"@antfabric-ui/react-native\"",
+      import: "import { SegmentedControl } from \"@antfabric/ui-react-native\"",
       notes: [
         "The fill does not travel on the phone: the chosen segment fills itself on the render after the tap, matching V2's FilterChips decision (\"No smooth motion\").",
         "One size: 36pt tall (8 + 20 line + 8) with a 1pt edge on every segment, transparent when unchosen, so nothing moves when the choice does.",

@@ -187,19 +187,19 @@
   },
   "chart.fileBold": {
     "source": "proposal",
-    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric-ui/core/fonts"
+    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
   },
   "chart.fileMedium": {
     "source": "proposal",
-    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric-ui/core/fonts"
+    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
   },
   "chart.fileRegular": {
     "source": "proposal",
-    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric-ui/core/fonts"
+    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
   },
   "chart.fileSemibold": {
     "source": "proposal",
-    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric-ui/core/fonts"
+    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
   },
   "chart.font": {
     "source": "proposal",

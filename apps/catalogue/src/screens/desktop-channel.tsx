@@ -1,8 +1,8 @@
 import { useState, type CSSProperties } from "react";
-import { Icon, IconButton, t } from "@antfabric-ui/react";
-import { Composer, Message, MessageDivider, TypingIndicator } from "@antfabric-ui/react/chat";
-import { NavRail, SidebarSection, TitleBar } from "@antfabric-ui/react/shell";
-import { composerTools, messageBar, NAV_RAIL_SAMPLE, TITLE_BAR_SAMPLE } from "@antfabric-ui/docs/samples";
+import { Icon, IconButton, t } from "@antfabric/ui-react";
+import { Composer, Message, MessageDivider, TypingIndicator } from "@antfabric/ui-react/chat";
+import { NavRail, SidebarSection, TitleBar } from "@antfabric/ui-react/shell";
+import { composerTools, messageBar, NAV_RAIL_SAMPLE, TITLE_BAR_SAMPLE } from "@antfabric/ui-docs/samples";
 
 const view: CSSProperties = { display: "flex", flexDirection: "column", boxSizing: "border-box", minWidth: 0, position: "relative" };
 const row: CSSProperties = { ...view, flexDirection: "row", alignItems: "center" };

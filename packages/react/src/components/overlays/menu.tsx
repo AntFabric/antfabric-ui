@@ -1,5 +1,5 @@
 import { useState, type CSSProperties, type ElementType, type KeyboardEvent, type MouseEvent } from "react";
-import { menuItemKey, recipes, useDirection, useStrings, type KitStrings, type MenuItem } from "@antfabric-ui/core";
+import { menuItemKey, recipes, useDirection, useStrings, type KitStrings, type MenuItem } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";

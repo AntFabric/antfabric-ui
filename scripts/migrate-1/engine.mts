@@ -65,10 +65,10 @@ const SKIP_DIRS = new Set([
   "target", ".gradle", ".idea", ".vscode", "tmp", "vendor",
 ]);
 
-const KIT_PREFIX = "@antfabric-ui/";
-const NATIVE_PKG = "@antfabric-ui/react-native";
-const REACT_PKG = "@antfabric-ui/react";
-const CORE_PKG = "@antfabric-ui/core";
+const KIT_PREFIX = "@antfabric/ui-";
+const NATIVE_PKG = "@antfabric/ui-react-native";
+const REACT_PKG = "@antfabric/ui-react";
+const CORE_PKG = "@antfabric/ui-core";
 
 interface KitSpec {
   pkg: Kit | "core";
@@ -436,7 +436,7 @@ export function migrate(opts: Options): Result {
     if (!subs?.size && !core?.size) continue;
     const star = entry.stars.find((s) => parseKitSpec(s.spec)?.sub === "" && parseKitSpec(s.spec)?.pkg !== "core") ?? entry.stars[0];
     if (!star) {
-      pushManual(result.manual, { file: rel(entry.file), line: 1, ledger: "foundations.md", note: `${spec} has no \`export * from "@antfabric-ui/…"\` line to put ${[...(subs ?? [])].map((s) => "/" + s).join(", ")} ${core ? `and ${[...core].join(", ")} ` : ""}beside; add the exports by hand` });
+      pushManual(result.manual, { file: rel(entry.file), line: 1, ledger: "foundations.md", note: `${spec} has no \`export * from "@antfabric/ui-…"\` line to put ${[...(subs ?? [])].map((s) => "/" + s).join(", ")} ${core ? `and ${[...core].join(", ")} ` : ""}beside; add the exports by hand` });
       continue;
     }
     const rec = processed.get(star.file) ?? (() => {

@@ -177,7 +177,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "Inline styles over `t`: the open target is a <button> (an <a href target=_blank> for a link), hover and focus from useInteraction; Download / Cancel / Retry are the kit's IconButton and Button. The lightbox is the app's, from onOpen.",
-      import: "import { AttachmentCard } from \"@antfabric-ui/react\"",
+      import: "import { AttachmentCard } from \"@antfabric/ui-react\"",
       notes: [
         "Download is a real link to a short-lived signed URL with Content-Disposition: attachment, so the browser's own download UI and ⌘-click both work.",
         "Images lazy-load with explicit width and height so the timeline never reflows when a thumbnail arrives.",
@@ -201,7 +201,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same file as web (one component, desktop density tokens): the 40px letter badge, the middle-truncated name and the kit's IconButton / Button; the preview is the app's, from onOpen.",
-      import: "import { AttachmentCard } from \"@antfabric-ui/react\"",
+      import: "import { AttachmentCard } from \"@antfabric/ui-react\"",
       notes: [
         "The FileRow shape: 40px letter badge in the family colour, name in 13 SemiBold, \"PDF document · 2.4 MB\", a 26px Download. 320 wide, 100% on narrow panes.",
         "Downloads go to the OS Downloads folder through Tauri's dialog/fs plugins and announce themselves with a native notification when the window is not focused.",
@@ -226,7 +226,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "Pressable + View, StyleSheet over useTheme() tokens; React Native <Image> for thumbnails, Linking for a link, the name truncated in the middle with ellipsizeMode; MediaViewer is the app's, from onOpen.",
-      import: "import { AttachmentCard } from \"@antfabric-ui/react-native\"",
+      import: "import { AttachmentCard } from \"@antfabric/ui-react-native\"",
       notes: [
         "Files: a 40pt recessed squircle with the family glyph tinted (PDF red, sheet green), \"2.4 MB · PDF\" faint.",
         "Images: a 220 × 165 tile. Tap opens MediaViewer with swipe between this message's images and videos, pinch to zoom, swipe down to close.",

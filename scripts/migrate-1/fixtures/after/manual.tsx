@@ -4,7 +4,7 @@ import {
   EmptyState,
   Fab,
   InAppBanner,
-} from '@antfabric-ui/react';
+} from '@antfabric/ui-react';
 import {
   AppBadge,
   NavRail,
@@ -12,11 +12,11 @@ import {
   SidebarSection,
   WebTopBar,
   WorkspaceSwitcher,
-} from '@antfabric-ui/react/shell';
-import { Fab as PhoneFab, SwipeRow } from '@antfabric-ui/react-native';
-import { MobileHeader } from '@antfabric-ui/react-native/shell';
-import { Breakdown, DonutChart, Sparkline, StatTile } from '@antfabric-ui/react/data';
-import { ProgressBar } from '@antfabric-ui/react';
+} from '@antfabric/ui-react/shell';
+import { Fab as PhoneFab, SwipeRow } from '@antfabric/ui-react-native';
+import { MobileHeader } from '@antfabric/ui-react-native/shell';
+import { Breakdown, DonutChart, Sparkline, StatTile } from '@antfabric/ui-react/data';
+import { ProgressBar } from '@antfabric/ui-react';
 
 export function Manual({ variant, source }: { variant: 'compose' | 'ink'; source: string }) {
   return (

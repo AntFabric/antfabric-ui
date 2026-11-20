@@ -194,9 +194,9 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A native <table> in a scroll region (tabindex 0), drawn from its recipe: sticky <th>, a sort <button> in each sortable header, the kit's Checkbox, Tag, Avatar, Delta, Sparkline and Meter in the cells, Skeleton rows and EmptyState; hover from useInteraction",
-      import: "import { Table } from \"@antfabric-ui/react/data\"",
+      import: "import { Table } from \"@antfabric/ui-react/data\"",
       notes: [
-        "Shipped from the data subpath. Core's `@antfabric-ui/core/chart` holds what both kits agree on: how a column is read, how rows are ordered and paged, what the phone's card keeps.",
+        "Shipped from the data subpath. Core's `@antfabric/ui-core/chart` holds what both kits agree on: how a column is read, how rows are ordered and paged, what the phone's card keeps.",
         "The header sticks to the top of the scroll region. A table that is as tall as its rows never scrolls the region, so it has nothing to stick to: pass `maxHeight` (or give the table a parent with a height) and the rows scroll under the header.",
         "A column is as wide as its widest cell. Wider than the region, the table scrolls sideways; the region is a keyboard stop, so the arrow keys scroll it.",
         "`narrow=\"cards\"`: below `table.cardsBelow` (600px) of its own width the table draws the phone's card per row instead of the grid, a description list of label and value lines per card, under a sort bar (the kit's Select and an IconButton). It measures its box before paint, so a page drawn in the browser never shows the other layout first; drawn on the server it starts as cards and turns into the grid once it measures a wide box. The web's card shows every column (the card's own lines, then the rest): it has no details button.",
@@ -211,7 +211,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <table> as web, at desktop density",
-      import: "import { Table } from \"@antfabric-ui/react/data\"",
+      import: "import { Table } from \"@antfabric/ui-react/data\"",
       keyboard: [
         { keys: "Tab", action: "Moves to the scroll region, then through the sort buttons and the boxes" },
         { keys: "Enter", action: "On a sort button: sorts by that column, then reverses it, then clears it" },
@@ -221,7 +221,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View per row, as a card (decision D3): the title column beside its box and a badge, then label and value lines. A sort bar above holds the kit's Select and an IconButton; Pagination below is compact",
-      import: "import { Table } from \"@antfabric-ui/react-native/data\"",
+      import: "import { Table } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "One card per row. The column with the lowest `priority` is the card's title, a `badge` column among the next three sits beside it, and the rest are label and value lines. A column with no priority is left off the card; when none has one, the columns' order is the priority.",
         "Sorting is the sort bar above the cards: the Select picks a column (the same first direction as the header's first press) and the arrow button beside it reverses the direction. \"As listed\" clears the sort.",

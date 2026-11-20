@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { StyleSheet, Text, View, type ViewStyle } from "react-native";
-import { chartTable, type ChartTableInput, type FormatSpec, type Row } from "@antfabric-ui/core/chart";
+import { chartTable, type ChartTableInput, type FormatSpec, type Row } from "@antfabric/ui-core/chart";
 import { createStyles } from "../theme";
 import { partId } from "../lib/root-props";
 import type { PartStyle } from "../lib/recipe";

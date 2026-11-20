@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Image, StyleSheet, Text, View, type ImageStyle, type ViewStyle } from "react-native";
-import { initials, recipes, useStrings, type AvatarIdentity, type AvatarPresence, type KitStrings } from "@antfabric-ui/core";
+import { initials, recipes, useStrings, type AvatarIdentity, type AvatarPresence, type KitStrings } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
 import { Icon } from "../../lib/icon";
 import { Enter } from "../../lib/motion";

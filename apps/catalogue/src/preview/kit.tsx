@@ -1,22 +1,22 @@
 /**
- * Draws a component from either kit: `@antfabric-ui/react` for web and desktop, and
- * `@antfabric-ui/react-native` (through React Native Web) for mobile. Also draws the docs' scenes —
+ * Draws a component from either kit: `@antfabric/ui-react` for web and desktop, and
+ * `@antfabric/ui-react-native` (through React Native Web) for mobile. Also draws the docs' scenes —
  * an example's slot content, a flow frame's composition — with the same kit.
  */
 
 import { Component, createContext, useContext, type CSSProperties, type ReactNode } from "react";
 import { Text, TextInput, View, type TextStyle, type ViewStyle } from "react-native";
-import * as R from "@antfabric-ui/react";
-import * as N from "@antfabric-ui/react-native";
-import * as RD from "@antfabric-ui/react/data";
-import * as ND from "@antfabric-ui/react-native/data";
-import * as RS from "@antfabric-ui/react/shell";
-import * as NS from "@antfabric-ui/react-native/shell";
-import * as RC from "@antfabric-ui/react/chat";
-import * as NC from "@antfabric-ui/react-native/chat";
-import { cssVarName, pascal, useControllable, type InteractionState, type NativeTokens, type OS, type Platform, type Scheme, type Theme } from "@antfabric-ui/core";
-import type { Scene, SceneStyle } from "@antfabric-ui/docs";
-import { ANTFABRIC_STRINGS, TITLE_BAR_SAMPLE, WEB_TOP_BAR_SAMPLE } from "@antfabric-ui/docs/samples";
+import * as R from "@antfabric/ui-react";
+import * as N from "@antfabric/ui-react-native";
+import * as RD from "@antfabric/ui-react/data";
+import * as ND from "@antfabric/ui-react-native/data";
+import * as RS from "@antfabric/ui-react/shell";
+import * as NS from "@antfabric/ui-react-native/shell";
+import * as RC from "@antfabric/ui-react/chat";
+import * as NC from "@antfabric/ui-react-native/chat";
+import { cssVarName, pascal, useControllable, type InteractionState, type NativeTokens, type OS, type Platform, type Scheme, type Theme } from "@antfabric/ui-core";
+import type { Scene, SceneStyle } from "@antfabric/ui-docs";
+import { ANTFABRIC_STRINGS, TITLE_BAR_SAMPLE, WEB_TOP_BAR_SAMPLE } from "@antfabric/ui-docs/samples";
 
 type AnyComponent = (props: Record<string, unknown>) => ReactNode;
 
@@ -151,7 +151,7 @@ class Boundary extends Component<{ id: string; platform: Platform; children: Rea
 }
 
 function Missing({ id, platform }: { id: string; platform: Platform }) {
-  const label = `${pascal(id)} is not in ${platform === "mobile" ? "@antfabric-ui/react-native" : "@antfabric-ui/react"} yet`;
+  const label = `${pascal(id)} is not in ${platform === "mobile" ? "@antfabric/ui-react-native" : "@antfabric/ui-react"} yet`;
   if (platform === "mobile")
     return (
       <View style={{ borderWidth: 1, borderStyle: "dashed", borderColor: "#be123c", padding: 6 }}>

@@ -42,7 +42,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A role=\"status\" strip, inline styles over `t`, that slides down with enter(\"slide-down\"); Try now is a <button> with hover and focus from useInteraction. The app feeds `state` from navigator.onLine, the online/offline events and the realtime socket",
-      import: "import { ConnectionBanner } from \"@antfabric-ui/react\"",
+      import: "import { ConnectionBanner } from \"@antfabric/ui-react\"",
       notes: [
         "Two signals, two states: the browser's offline event means the device has no network and shows \"You're offline\" at once; a socket that drops while navigator.onLine is true waits out the 5 s grace and then says \"Reconnecting…\", because the network is fine and AntFabric is not.",
         "No device cache on the web: offline shows what was already loaded in this tab, and says so.",
@@ -57,7 +57,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same role=\"status\" strip as web, in warning.soft over a warning.border edge, for inside the content column (never across the rail); the degraded note is a recessed card for the sidebar above the conversation list",
-      import: "import { ConnectionBanner } from \"@antfabric-ui/react\"",
+      import: "import { ConnectionBanner } from \"@antfabric/ui-react\"",
       notes: [
         "Amber and centred on purpose (owner, 2026-09-22): amber is degraded-but-working; not danger, because nothing failed; not coral, because the strip asks for no action.",
         "Dark themes wash the amber anchor at 10% with a 25% edge instead of the light ramp — the desktop's --banner-warning-* tokens carry both. Here warning.soft and warning.border carry both themes.",
@@ -70,7 +70,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "<Enter motion=\"slide-down\"> card (role status, polite live region) with an Icon and two Texts, StyleSheet over useTheme(), for under the screen header; the pill is a read-only labelled View for HeaderActions",
-      import: "import { ConnectionBanner } from \"@antfabric-ui/react-native\"",
+      import: "import { ConnectionBanner } from \"@antfabric/ui-react-native\"",
       notes: [
         "Offline is a normal mode for a capture app, so it reads as reassurance on a neutral surface — no alarm colour, no Retry: the capture queue drains itself on the reconnect edge.",
         "\"Back online\" stays 5 s (RECONNECT_NOTICE_MS) and only claims a sync when something was waiting.",

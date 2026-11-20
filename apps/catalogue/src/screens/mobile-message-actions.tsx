@@ -1,8 +1,8 @@
 import { StyleSheet, View } from "react-native";
-import { ContextMenu, useTheme } from "@antfabric-ui/react-native";
-import { Message, MessageDivider } from "@antfabric-ui/react-native/chat";
-import { MobileHeader } from "@antfabric-ui/react-native/shell";
-import { CONTEXT_MENU_SAMPLE, messageBar } from "@antfabric-ui/docs/samples";
+import { ContextMenu, useTheme } from "@antfabric/ui-react-native";
+import { Message, MessageDivider } from "@antfabric/ui-react-native/chat";
+import { MobileHeader } from "@antfabric/ui-react-native/shell";
+import { CONTEXT_MENU_SAMPLE, messageBar } from "@antfabric/ui-docs/samples";
 
 /** Long-press on Marcus's message: the channel dims and the actions sheet rises over it. */
 export default function MobileMessageActions() {

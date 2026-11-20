@@ -162,7 +162,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <nav aria-label=\"Main\"> with a nested <nav aria-label=\"Mode\">: every row a <button data-af-press> (aria-current=\"page\" on the current one, a title as its tooltip) with Badge, Kbd and Avatar; inline styles over t, hover and focus from useInteraction. active, level and section are useControllable with onActiveChange, onLevelChange and onSectionChange; expanded is the app's, set by the web top bar's sidebar button (onSidebarExpandedChange). The pill is painted on the current row (no shared sliding indicator yet), and rows are buttons, not router links, since there is no href prop",
-      import: "import { NavRail } from \"@antfabric-ui/react/shell\"",
+      import: "import { NavRail } from \"@antfabric/ui-react/shell\"",
       notes: [
         "The same rail as desktop, under the web top bar rather than beside traffic lights. Every row is a real link — /assistant, /projects, /channels — so ⌘-click and middle-click open a destination in a new tab.",
         "The active row comes from the route, not from state: Back in the browser moves the pill.",
@@ -192,8 +192,8 @@ const docs: ComponentDocs = {
     },
     desktop: {
       status: "ready",
-      base: "The same @antfabric-ui/react component as the web: <button> rows over t with Badge, Kbd and Avatar, states from useInteraction; the width animates by a CSS transition and the labels fade in with enter(\"fade\"). Drill-in: the sections slide in with enter(\"slide-left\") and the destinations back with enter(\"slide-right\"), the tile pops in with enter(\"pop\"). The coral pill is drawn on the current row; the sliding indicator (useSlidingIndicator) and the destination icon's flight to the top are not in the kit yet",
-      import: "import { NavRail } from \"@antfabric-ui/react/shell\"",
+      base: "The same @antfabric/ui-react component as the web: <button> rows over t with Badge, Kbd and Avatar, states from useInteraction; the width animates by a CSS transition and the labels fade in with enter(\"fade\"). Drill-in: the sections slide in with enter(\"slide-left\") and the destinations back with enter(\"slide-right\"), the tile pops in with enter(\"pop\"). The coral pill is drawn on the current row; the sliding indicator (useSlidingIndicator) and the destination icon's flight to the top are not in the kit yet",
+      import: "import { NavRail } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Every row is 40px — a circle collapsed, a pill expanded (ADR-0300: the rail stays round; only the search field is squared).",
         "The active pill is ONE element that slides between rows with a leading edge faster than its trailing edge, so it stretches toward the destination and settles (ADR-0517/0518). Rows paint nothing; the catalogue draws the pill on the active row because it cannot animate.",

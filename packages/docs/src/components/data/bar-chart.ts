@@ -43,7 +43,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section>: the title, an optional headline, \"View as table\" (Button); a ChartFrame holding recharts' BarChart (`layout=\"vertical\"` for horizontal) with a Bar per series, Cells for the hover dim and the sign colours, and a LabelList for a horizontal bar's value; the Legend (toggle buttons) in the header beside the Button, as the reference dashboard has it",
-      import: "import { BarChart } from \"@antfabric-ui/react/data\"",
+      import: "import { BarChart } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath: recharts is reached only from there. The chart is handed an explicit width and height.",
         "Everything the chart reads from the tokens goes through `rechartsTheme(useChartTokens(), useReducedMotion())`, exported beside the chart: `<CartesianGrid {...theme.grid} /> <XAxis dataKey=\"team\" {...theme.axis} /> <Bar fill={theme.series[0]} radius={theme.bar.radius} maxBarSize={theme.bar.maxBarSize} {...theme.motion.draw} />`. A chart the kit does not ship, written with recharts and the same call, matches.",
@@ -60,7 +60,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same Card, recharts' BarChart and Legend as web, at desktop density",
-      import: "import { BarChart } from \"@antfabric-ui/react/data\"",
+      import: "import { BarChart } from \"@antfabric/ui-react/data\"",
       keyboard: [
         { keys: "Tab", action: "Moves into the plot, then on to the legend's entries and \"View as table\"" },
         { keys: "ArrowRight", action: "In the plot: moves the tooltip to the next category" },
@@ -71,7 +71,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View: the same header and Button, a ChartFrame holding react-native-gifted-charts' BarChart (`data` for grouped bars, `stackData` for stacked, `renderTooltip` for the card); a horizontal single series is a ranked list of Views instead;; the Legend's toggles above the plot",
-      import: "import { BarChart } from \"@antfabric-ui/react-native/data\"",
+      import: "import { BarChart } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "`giftedTheme(useChartTokens())` is the chart tokens as gifted-charts' own props, exported beside the chart: `<BarChart {...theme.axis} barWidth={theme.bar.width} frontColor={theme.series[0]} />`.",
         "Horizontal bars are a ranked list of rows (label and value over a track and its fill), not a rotated gifted-charts chart, whose labels turn sideways on a 390pt screen. More than one horizontal series draws the vertical chart.",

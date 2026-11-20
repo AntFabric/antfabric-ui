@@ -1,5 +1,5 @@
 import { Text, type ViewStyle } from "react-native";
-import { cap, recipes, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { cap, recipes, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
 import { Enter } from "../../lib/motion";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

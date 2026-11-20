@@ -10,10 +10,10 @@ import {
   SidebarSection,
   WebTopBar,
   WorkspaceSwitcher,
-} from '@antfabric-ui/react';
-import { Fab as PhoneFab, MobileHeader, SwipeRow } from '@antfabric-ui/react-native';
-import { Breakdown, DonutChart, Sparkline, StatTile } from '@antfabric-ui/react/data';
-import { ProgressBar } from '@antfabric-ui/react';
+} from '@antfabric/ui-react';
+import { Fab as PhoneFab, MobileHeader, SwipeRow } from '@antfabric/ui-react-native';
+import { Breakdown, DonutChart, Sparkline, StatTile } from '@antfabric/ui-react/data';
+import { ProgressBar } from '@antfabric/ui-react';
 
 export function Manual({ variant, source }: { variant: 'compose' | 'ink'; source: string }) {
   return (

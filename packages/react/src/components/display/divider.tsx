@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { recipes } from "@antfabric-ui/core";
+import { recipes } from "@antfabric/ui-core";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, text } from "../../lib/style";
 import { rootProps, type RootProps } from "../../lib/root-props";

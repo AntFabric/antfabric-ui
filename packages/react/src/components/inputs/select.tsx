@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties, type KeyboardEvent } from "react";
-import { cssVarName, recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { cssVarName, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { useAutoFocus, usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";

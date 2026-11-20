@@ -1,5 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode, type RefObject } from "react";
-import { recipes, useControllable } from "@antfabric-ui/core";
+import { recipes, useControllable } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useOverlayFocus } from "../../lib/focus";
 import { OverlayLayer, useLayerHost, useLayerStack } from "../../lib/layer";

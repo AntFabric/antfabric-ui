@@ -1,6 +1,6 @@
 /**
  * The item shapes both kits draw from data: a menu's rows, a place to go, a button the kit draws for the product, an app's mark. They live
- * here, once, and each kit re-exports them as types from its root (`import type { MenuItem } from "@antfabric-ui/react"`). An icon is a
+ * here, once, and each kit re-exports them as types from its root (`import type { MenuItem } from "@antfabric/ui-react"`). An icon is a
  * lucide name in kebab case (`IconName` is `string` in both kits). Items carry no functions: data stays serialisable, so a product can build
  * it from config or plugins and the docs can describe it. A component that needs more extends one of these in its own file; nothing adds
  * fields to the base types here.

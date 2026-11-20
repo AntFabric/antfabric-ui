@@ -3,8 +3,8 @@
  * props API is the same on every platform; only the import differs.
  */
 
-import { pascal, type Platform } from "@antfabric-ui/core";
-import type { ComponentDocs } from "@antfabric-ui/docs";
+import { pascal, type Platform } from "@antfabric/ui-core";
+import type { ComponentDocs } from "@antfabric/ui-docs";
 
 /** `item: MenuItem, opts: { a: string }` → `["item", "opts"]`: the names, split at top-level commas. */
 function paramNames(args: string): string[] {
@@ -49,6 +49,6 @@ export function usage(doc: ComponentDocs, props: Record<string, unknown>, platfo
   const all = [...attrs, ...events];
   const tag = all.length > 2 ? `<${name}\n  ${all.join("\n  ")}\n/>` : `<${name}${all.length ? ` ${all.join(" ")}` : ""} />`;
   // The data components ship from the kit's `/data` subpath, not its root.
-  const from = `${platform === "mobile" ? "@antfabric-ui/react-native" : "@antfabric-ui/react"}${doc.category === "data" ? "/data" : ""}`;
+  const from = `${platform === "mobile" ? "@antfabric/ui-react-native" : "@antfabric/ui-react"}${doc.category === "data" ? "/data" : ""}`;
   return `import { ${name} } from "${from}";\n\n${tag}`;
 }

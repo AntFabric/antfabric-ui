@@ -1,6 +1,6 @@
 import { useId, useRef, useState, type ReactNode } from "react";
-import type { InteractionState, OS, Platform } from "@antfabric-ui/core";
-import type { Scene } from "@antfabric-ui/docs";
+import type { InteractionState, OS, Platform } from "@antfabric/ui-core";
+import type { Scene } from "@antfabric/ui-docs";
 import { highlight } from "../lib/highlight";
 import { osOf, usePrefs } from "../lib/prefs";
 import { SceneNode, Stage, Thing } from "./kit";

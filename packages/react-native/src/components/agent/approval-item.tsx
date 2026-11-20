@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { AccessibilityInfo, findNodeHandle, Platform, Pressable, Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type Approval, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type Approval, type KitStrings } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
 import { announce } from "../../lib/a11y";
 import { useRecipe, type PartStyles } from "../../lib/recipe";

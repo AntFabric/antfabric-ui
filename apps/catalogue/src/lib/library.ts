@@ -4,8 +4,8 @@
  */
 
 import { icons as allIcons } from "lucide";
-import { kitCss, tokensCss, OS_VERSIONS, PLATFORM_OS, PLATFORMS, type InteractionState, type OS, type Platform } from "@antfabric-ui/core";
-import { categories, components, dataGroups, levels, registry, screens, withDefaults, type ComponentDocs, type DataGroup, type Level, type MatrixCase, type MatrixDoc, type ScreenDocs } from "@antfabric-ui/docs";
+import { kitCss, tokensCss, OS_VERSIONS, PLATFORM_OS, PLATFORMS, type InteractionState, type OS, type Platform } from "@antfabric/ui-core";
+import { categories, components, dataGroups, levels, registry, screens, withDefaults, type ComponentDocs, type DataGroup, type Level, type MatrixCase, type MatrixDoc, type ScreenDocs } from "@antfabric/ui-docs";
 
 export { categories, components, dataGroups, levels, registry, screens, withDefaults, PLATFORMS, PLATFORM_OS, OS_VERSIONS };
 export type { DataGroup, Level, MatrixCase, MatrixDoc };
@@ -17,9 +17,9 @@ const icons = allIcons as unknown as Record<string, IconNode>;
 export const DEFAULT_OS: Record<Platform, OS> = { web: "browser", desktop: "mac", mobile: "ios" };
 
 export const PLATFORM_META: Record<Platform, { label: string; stack: string; kit: string; icon: string }> = {
-  web: { label: "Web", stack: "React · TanStack Start · inline styles over token variables", kit: "@antfabric-ui/react", icon: "globe" },
-  desktop: { label: "Desktop", stack: "React · Tauri 2 · inline styles over token variables", kit: "@antfabric-ui/react", icon: "monitor" },
-  mobile: { label: "Mobile", stack: "React Native · Expo · StyleSheet over useTheme()", kit: "@antfabric-ui/react-native", icon: "smartphone" },
+  web: { label: "Web", stack: "React · TanStack Start · inline styles over token variables", kit: "@antfabric/ui-react", icon: "globe" },
+  desktop: { label: "Desktop", stack: "React · Tauri 2 · inline styles over token variables", kit: "@antfabric/ui-react", icon: "monitor" },
+  mobile: { label: "Mobile", stack: "React Native · Expo · StyleSheet over useTheme()", kit: "@antfabric/ui-react-native", icon: "smartphone" },
 };
 
 /** The catalogue's own pages, as the sidebar lists them. `file` is the page's source under `src/pages`, which search reads for its section headings. */

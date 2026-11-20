@@ -1,8 +1,8 @@
 import { useState, type CSSProperties } from "react";
-import { Icon, IconButton, NotificationItem, NotificationSchedule, Tabs, t } from "@antfabric-ui/react";
-import { Composer, Message, MessageDivider, TypingIndicator } from "@antfabric-ui/react/chat";
-import { NavRail, SidebarSection, TitleBar } from "@antfabric-ui/react/shell";
-import { composerTools, messageBar, NAV_RAIL_SAMPLE, NOTIFICATION_SCHEDULE_NOTE, NOTIFICATION_SCHEDULE_OPTIONS, TITLE_BAR_SAMPLE } from "@antfabric-ui/docs/samples";
+import { Icon, IconButton, NotificationItem, NotificationSchedule, Tabs, t } from "@antfabric/ui-react";
+import { Composer, Message, MessageDivider, TypingIndicator } from "@antfabric/ui-react/chat";
+import { NavRail, SidebarSection, TitleBar } from "@antfabric/ui-react/shell";
+import { composerTools, messageBar, NAV_RAIL_SAMPLE, NOTIFICATION_SCHEDULE_NOTE, NOTIFICATION_SCHEDULE_OPTIONS, TITLE_BAR_SAMPLE } from "@antfabric/ui-docs/samples";
 
 const root: CSSProperties = {
   display: "flex",

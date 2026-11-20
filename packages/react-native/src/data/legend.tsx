@@ -1,6 +1,6 @@
 import { Pressable, Text, View, type ViewStyle } from "react-native";
 import Svg, { Line, Path } from "react-native-svg";
-import { markPath, seriesMark, type Series } from "@antfabric-ui/core/chart";
+import { markPath, seriesMark, type Series } from "@antfabric/ui-core/chart";
 import { createStyles } from "../theme";
 import { usePress } from "../lib/press";
 import { chartFont, useChartTokens } from "./theme";

@@ -1,5 +1,5 @@
 import type { CSSProperties, MutableRefObject } from "react";
-import { recipes, useControllable, useStrings, type IconActionItem, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type IconActionItem, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

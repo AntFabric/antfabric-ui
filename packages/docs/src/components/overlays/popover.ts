@@ -109,7 +109,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <div> round the trigger (`children`); while open, the panel (role=\"dialog\", or the content's own role when `bare`) is drawn in the overlay layer: a fixed, full-window box rendered into the nearest AntFabricRoot, so the theme's variables apply and no overflow clips it. Placed from the trigger's box, flipped and kept inside the window, re-placed on scroll and resize; focus moves in and back through useOverlayFocus; `open` through useControllable(open, onOpenChange)",
-      import: "import { Popover } from \"@antfabric-ui/react\"",
+      import: "import { Popover } from \"@antfabric/ui-react\"",
       notes: [
         "Only the top overlay takes Esc and a press outside: a popover opened from a dialog closes before the dialog does.",
         "On the server, and in the catalogue's pictures, the panel is drawn in place under its trigger; in the browser it moves into the layer before the first paint.",
@@ -124,12 +124,12 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same panel as web at desktop density",
-      import: "import { Popover } from \"@antfabric-ui/react\"",
+      import: "import { Popover } from \"@antfabric/ui-react\"",
     },
     mobile: {
       status: "ready",
       base: "A Pressable round the trigger; while open, the panel is drawn in a transparent Modal over the screen, placed from the trigger's measureInWindow and flipped where there is no room. A press on the backdrop and Android's back close it",
-      import: "import { Popover } from \"@antfabric-ui/react-native\"",
+      import: "import { Popover } from \"@antfabric/ui-react-native\"",
       notes: ["`modal` marks the panel accessibilityViewIsModal, so a screen reader stays inside it."],
     },
   },

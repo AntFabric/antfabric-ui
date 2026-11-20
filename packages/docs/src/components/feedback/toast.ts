@@ -58,7 +58,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The ink pill: a role=status / alert <div> with aria-live, rising in with enter(\"rise\"); Undo, Dismiss and the × are <button>s with hover and focus from useInteraction. Pressing one keeps `dismissed` inside and fades it back down; placement and the timer are the app's",
-      import: "import { Toast } from \"@antfabric-ui/react\"",
+      import: "import { Toast } from \"@antfabric/ui-react\"",
       notes: [
         "Bottom-centre, 24px up, one at a time. The fixed viewport is pointer-events: none and only the pill takes clicks, so the strip never eats the composer's clicks.",
         "`duration` is the kit's timer: it pauses while the pointer is on the toast or focus is inside it and resumes with the time that was left. Starting it when the tab is visible, and queuing, are the app's.",
@@ -75,7 +75,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same pill as web, at desktop density",
-      import: "import { Toast } from \"@antfabric-ui/react\"",
+      import: "import { Toast } from \"@antfabric/ui-react\"",
       notes: [
         "Today: one ink pill, bottom-centred, 5.2 s, Dismiss on the right. A second toast REPLACES the first (one timer).",
         "The mark follows toastTone (ADR-4734): a failure no longer wears a tick. aria-live follows it too — polite for success, assertive for a refusal.",
@@ -94,7 +94,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A Pressable pill (the whole toast dismisses) that drops in with <Enter motion=\"drop\"> and fades back up with Animated.timing; Undo is its own Pressable and an accessibility action; placement, the queue and the timer are the app's",
-      import: "import { Toast } from \"@antfabric-ui/react-native\"",
+      import: "import { Toast } from \"@antfabric/ui-react-native\"",
       notes: [
         "At the TOP, at the safe-area inset + 8pt, 12pt from each side: at the bottom it sat over the channel composer and swallowed the tap meant for Send.",
         "A FIFO queue, one at a time, 4 s each; tapping the toast dismisses it. Mounted under the auth overlay, so a toast never covers sign-in.",

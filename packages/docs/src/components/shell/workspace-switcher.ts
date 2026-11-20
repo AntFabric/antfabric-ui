@@ -45,7 +45,7 @@ const docs: ComponentDocs = {
     web: {
       status: "planned",
       base: "A <div role=\"menu\"> that pops in (enter(\"pop\")): each workspace an <a href> (role=\"menuitemradio\") to its own origin with a square Avatar, then a 'Sign in to another workspace' <button role=\"menuitem\">; inline styles over `t`, hover and focus from useInteraction. In the app it opens from the rail's workspace pill inside the menu primitive, which owns opening, Esc and arrow keys.",
-      import: "import { WorkspaceSwitcher } from \"@antfabric-ui/react/shell\"",
+      import: "import { WorkspaceSwitcher } from \"@antfabric/ui-react/shell\"",
       notes: [
         "DECISION: one workspace per tab, switched from a menu — not a tile column. Every workspace is its own instance at its own origin (<org>.antfabric.ai, ADR-5552), with its own session cookie, so a tab can only ever be signed into the workspace in its address bar.",
         "Choosing a workspace navigates this tab there; ⌘-click or middle-click opens it in a new tab, which is how a person keeps two workspaces open in a browser.",
@@ -74,7 +74,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "partial",
       base: "A role=\"list\" column, the rail's 64px width: each tile a <button> (title tooltip, aria-current, aria-keyshortcuts) around a square Avatar with a Badge for mentions, the left bar for current / activity, and a Kbd under it while ⌘ is held; a dashed + <button> to add one. Inline styles over `t`, hover / press / focus from useInteraction, `current` kept by the component unless the app controls it. The app confirms a switch with its ConfirmDialog.",
-      import: "import { WorkspaceSwitcher } from \"@antfabric-ui/react/shell\"",
+      import: "import { WorkspaceSwitcher } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Today (desktop-onboarding, ADR-5553): the rail's workspace pill opens a menu — 'Workspaces', every one this device has used with the current one ticked, then 'Sign in to another workspace'. The profile menu carries 'Switch workspace' for the collapsed rail.",
         "This spec moves it to Slack's tile column, shown once two or more workspaces are signed in. With one, the rail keeps the pill.",
@@ -100,7 +100,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "planned",
       base: "The sheet's panel as a View that slides up (<Enter motion=\"slide-up\">, accessibilityViewIsModal): a grabber, the title, and a Pressable row per workspace with a square Avatar, Badge (count or neutral dot) and a tick that pops in; StyleSheet over useTheme(), fonts by file, press from usePress. In the app it sits in the sheet host opened by long-pressing the header photo, which owns the scrim and the drag to dismiss.",
-      import: "import { WorkspaceSwitcher } from \"@antfabric-ui/react-native/shell\"",
+      import: "import { WorkspaceSwitcher } from \"@antfabric/ui-react-native/shell\"",
       notes: [
         "The photo in the main header opens Settings on a tap (ADR-9419); a long-press, or 'Switch workspace' at the top of Settings, opens this sheet. With one workspace the sheet is never offered from the long-press.",
         "Rows are 64pt with a 40pt tile; current is ticked, others carry their mention count once multi-sign-in exists.",

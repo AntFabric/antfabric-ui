@@ -1,5 +1,5 @@
 import { PixelRatio } from "react-native";
-import { fmt, labelWidth, type FormatSpec, type FormatWords, type Scale } from "@antfabric-ui/core/chart";
+import { fmt, labelWidth, type FormatSpec, type FormatWords, type Scale } from "@antfabric/ui-core/chart";
 import { fontScale } from "../lib/type";
 import { giftedTheme, type ChartTokens } from "./theme";
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Text, View, type ViewStyle } from "react-native";
-import { recipes, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
 import { announce } from "../../lib/a11y";
 import { Icon } from "../../lib/icon";

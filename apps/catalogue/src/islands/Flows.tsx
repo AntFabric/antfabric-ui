@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { MOTION, type Platform } from "@antfabric-ui/core";
-import type { Flow, FlowFrame, FlowStep, FlowStepKind } from "@antfabric-ui/docs";
+import { MOTION, type Platform } from "@antfabric/ui-core";
+import type { Flow, FlowFrame, FlowStep, FlowStepKind } from "@antfabric/ui-docs";
 import { osOf, usePrefs } from "../lib/prefs";
 import { DefaultsProvider, SceneNode, Stage, Thing } from "../preview/kit";
 import { pressTarget } from "../preview/press";

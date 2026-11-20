@@ -1,7 +1,7 @@
 /**
  * The words both kits and the catalogue share: which platform, which OS, which theme.
  *
- * `web` and `desktop` are drawn by `@antfabric-ui/react`; `mobile` by `@antfabric-ui/react-native`.
+ * `web` and `desktop` are drawn by `@antfabric/ui-react`; `mobile` by `@antfabric/ui-react-native`.
  */
 
 export type Platform = "web" | "desktop" | "mobile";

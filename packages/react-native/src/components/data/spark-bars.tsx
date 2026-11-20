@@ -1,8 +1,8 @@
 import { View, type ViewStyle } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { type RootProps, partId, rootProps } from "../../lib/root-props";
-import { EARLIER_BARS, barLayout, fmt, valueDomain, withAlpha, type FormatSpec, type Row } from "@antfabric-ui/core/chart";
+import { EARLIER_BARS, barLayout, fmt, valueDomain, withAlpha, type FormatSpec, type Row } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { giftedAnimated, useChartTokens, useReducedMotion } from "../../data/theme";

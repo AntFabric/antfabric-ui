@@ -1,5 +1,5 @@
 import { useId, type CSSProperties } from "react";
-import { recipes, useDirection, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";

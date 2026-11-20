@@ -9,7 +9,7 @@
  *     export const iconButton = defineRecipe({ parts: [...], styles: { ... } });   // camelCase of the id; a reserved word takes `Recipe` (`switchRecipe`)
  *   its line in `recipes/<category>/index.ts`:  import { iconButton } from "./icon-button";  ...  { button, "icon-button": iconButton } as const
  *   (the key is the docs id) and the kit reads it, never imports the file:
- *     import { recipes } from "@antfabric-ui/core";   useRecipe(recipes["icon-button"], ...)     // `recipes.button` for a one-word id
+ *     import { recipes } from "@antfabric/ui-core";   useRecipe(recipes["icon-button"], ...)     // `recipes.button` for a one-word id
  * A STATIC component (a divider, a spacer, a heading) has no hover, press or focus: drop `usePress`, `{...press.handlers}` and the `Pressable`, every `state` in the
  * recipe and in `useRecipe` (pass only `variants`), `useControllable` and the `onX` props. It still marks every part, takes `style`, and has docs
  * and a recipe. `accessibilityRole` has no "separator" value: hide a decorative line from screen readers with `accessibilityElementsHidden` and `importantForAccessibility="no-hide-descendants"`.
@@ -20,7 +20,7 @@
  * `pnpm describe button` shows a finished component.
  */
 import { Pressable, Text, View, type TextStyle, type ViewStyle } from "react-native";
-import { defineRecipe, useControllable, type RecipePart } from "@antfabric-ui/core";
+import { defineRecipe, useControllable, type RecipePart } from "@antfabric/ui-core";
 import { createStyles } from "./src/theme";
 import { Icon, type IconName } from "./src/lib/icon";
 import { Enter } from "./src/lib/motion";

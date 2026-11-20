@@ -8,16 +8,16 @@
  *   pnpm describe tokens <group>   one group: each path, variable, value per mode, description, reference
  *   --json                         the same data as JSON, on any of the above
  *
- * It reads the sources the catalogue reads (`@antfabric-ui/docs` for components, `recipes` and the token
- * tree and `descriptions` from `@antfabric-ui/core`) and holds no data of its own.
+ * It reads the sources the catalogue reads (`@antfabric/ui-docs` for components, `recipes` and the token
+ * tree and `descriptions` from `@antfabric/ui-core`) and holds no data of its own.
  */
 
 import { existsSync } from "node:fs";
 import { relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { cssVarName, descriptions, isReference, recipeEntries, recipes, tokenSource, tokens, type Recipe, type RecipeEntry, type TokenNote } from "@antfabric-ui/core";
-import { categories, components, registry } from "@antfabric-ui/docs";
-import type { ComponentDocs, PropDoc } from "@antfabric-ui/docs";
+import { cssVarName, descriptions, isReference, recipeEntries, recipes, tokenSource, tokens, type Recipe, type RecipeEntry, type TokenNote } from "@antfabric/ui-core";
+import { categories, components, registry } from "@antfabric/ui-docs";
+import type { ComponentDocs, PropDoc } from "@antfabric/ui-docs";
 import { sourceFile } from "./sources";
 import { tokenLeaves } from "./token-leaves";
 

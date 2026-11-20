@@ -7,7 +7,7 @@
  *   - fitting wide previews and screens to their place
  */
 
-import type { OS, Platform, Scheme } from "@antfabric-ui/core";
+import type { OS, Platform, Scheme } from "@antfabric/ui-core";
 import { getPrefs, setPrefs, subscribe } from "./prefs";
 
 const OS_NAME: Record<OS, string> = { mac: "macOS", windows: "Windows", linux: "Linux", ios: "iOS", android: "Android", browser: "Browser" };

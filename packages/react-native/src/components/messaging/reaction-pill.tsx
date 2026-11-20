@@ -1,5 +1,5 @@
 import { Pressable, Text, View, type ViewStyle } from "react-native";
-import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon } from "../../lib/icon";
 import { hitSlopTo } from "../../lib/a11y";

@@ -32,7 +32,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section>: the title, an optional headline, \"View as table\" (Button); a ChartFrame holding recharts' ComposedChart with a Bar, a dashed Line behind it (its dots over the bars) and a ReferenceLine; the Legend (toggle buttons) in the header beside the Button, as the reference dashboard has it",
-      import: "import { ComboChart } from \"@antfabric-ui/react/data\"",
+      import: "import { ComboChart } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath: recharts is reached only from there. The chart is handed an explicit width and height.",
         "The same `rechartsTheme(useChartTokens(), useReducedMotion())` as LineChart and BarChart, exported beside the chart: the grid, axes, bar and line geometry and the dash patterns are the tokens', so a ComposedChart written with recharts matches this one.",
@@ -50,7 +50,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same Card, recharts' ComposedChart and Legend as web, at desktop density",
-      import: "import { ComboChart } from \"@antfabric-ui/react/data\"",
+      import: "import { ComboChart } from \"@antfabric/ui-react/data\"",
       keyboard: [
         { keys: "Tab", action: "Moves into the plot, then on to the legend's entries and \"View as table\"" },
         { keys: "ArrowRight", action: "In the plot: moves the tooltip to the next category" },
@@ -61,7 +61,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View: the same header and Button, a ChartFrame holding react-native-gifted-charts' BarChart with `showLine`, `lineData` and `lineConfig` for the dashed line, `lineData2` and `lineConfig2` for its dots, `referenceLine1` for the target and `renderTooltip` for the card; the Legend's toggles above the plot",
-      import: "import { ComboChart } from \"@antfabric-ui/react-native/data\"",
+      import: "import { ComboChart } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "`giftedTheme(useChartTokens())` is the chart tokens as gifted-charts' own props, exported beside the chart; a chart the kit does not ship, written with gifted-charts and the same call, matches this one.",
         "The line is drawn by the bar chart over the bars, as PeriodCompare's last period is (`chart.previousW`, dashed). gifted-charts draws a point as one circle with no stroke, so each dot is two: a disc of the card on the first line, and the dot in the line's colour on a second line that draws no stroke.",

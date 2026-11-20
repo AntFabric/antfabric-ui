@@ -1,4 +1,4 @@
-/* Figtree, the kit's body face, for the web and the desktop: `import "@antfabric-ui/core/fonts.css"` once, beside AntFabricRoot.
+/* Figtree, the kit's body face, for the web and the desktop: `import "@antfabric/ui-core/fonts.css"` once, beside AntFabricRoot.
    The family is named `Figtree`, which the `font.sans` stack asks for. Satoshi (headlines) is not here: its licence does not let
    the files be passed on, so `font.display` falls back to Figtree unless an AntFabric app loads Satoshi itself (CONSUMING.md, Fonts). */
 

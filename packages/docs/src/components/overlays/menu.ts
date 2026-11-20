@@ -118,7 +118,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <div role=\"menu\"> of <button role=\"menuitem\"> / \"menuitemcheckbox\" rows (aria-disabled rows stay reachable), inline styles over `t`; hover, press and focus from useInteraction; ↑ ↓ Home End and type-ahead through the shared roving keys, Esc and Tab handled in the panel; the panel scrolls past 80vh; Kbd for the shortcut column; pops in with enter(\"pop\"). Placing and portalling the panel are the app's",
-      import: "import { Menu } from \"@antfabric-ui/react\"",
+      import: "import { Menu } from \"@antfabric/ui-react\"",
       notes: [
         "Portalling and placing the panel are the app's (it takes a `placement` of below or above and does not flip at the viewport's edge); the panel scrolls inside 80vh when it has many rows.",
         "A row with `href` is a link item (<a href role=\"menuitem\">), so ⌘-click and middle-click open a new tab; a plain click calls onSelect.",
@@ -164,7 +164,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <div role=\"menu\"> as web at desktop density (30px rows), drawing the desktop shortcut rather than webShortcut. The scrim and the z layers stay the app's",
-      import: "import { Menu } from \"@antfabric-ui/react\"",
+      import: "import { Menu } from \"@antfabric/ui-react\"",
       notes: [
         "The transparent scrim belongs to the menu, not the caller: every menu that forgot one stayed open after a click elsewhere. A click on the scrim dismisses and stops there — nothing behind it hears the click.",
         "A row of sibling triggers sharing one open state (the task filter bar) raises them to z 62, so clicking the next filter opens it in one click instead of first closing this one.",
@@ -190,7 +190,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "<Enter motion=\"pop\"> (accessibilityRole menu) of Pressable rows (menuitem, or checkbox for a toggle row), StyleSheet over useTheme(). Anchoring with measureInWindow and the Modal stay the app's",
-      import: "import { Menu } from \"@antfabric-ui/react-native\"",
+      import: "import { Menu } from \"@antfabric/ui-react-native\"",
       notes: [
         "A dropdown, not a sheet, and no scrim: right edge on the 12pt gutter, 4pt under the ⋮ that opened it, 256pt wide, 6pt padding, 44pt rows and 60pt for a row with a sublabel.",
         "It flips above the ⋮ when it would run off the bottom of the screen.",

@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { cap, recipes, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { cap, recipes, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { css, enter, text } from "../../lib/style";

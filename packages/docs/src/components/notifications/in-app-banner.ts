@@ -135,7 +135,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<div role=\"status\" aria-live=\"polite\"> holding a card that slides in from the right with enter(): one <button> that opens it, an IconButton ×, Button actions and an inline reply <input> with Send; Escape dismisses, Enter sends. Inline styles over `t`; `dismissed`, `replying` and `replyText` kept in local state that follows the props. The app hosts it in its own top-right viewport, apart from the action toasts",
-      import: "import { InAppBanner } from \"@antfabric-ui/react\"",
+      import: "import { InAppBanner } from \"@antfabric/ui-react\"",
       notes: [
         "Shown only while this tab is visible AND focused (document.visibilityState === 'visible' && document.hasFocus()). A background tab raises the browser notification instead, and the tab title count changes either way.",
         "With several AntFabric tabs open, only the most recently focused tab shows it — tabs agree through a BroadcastChannel so nobody gets the same banner three times.",
@@ -160,7 +160,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "planned",
       base: "The same card as web at desktop density; the app places it top-right under the title bar, above the content and never over the composer. Mod+Enter sends too (any Enter does)",
-      import: "import { InAppBanner } from \"@antfabric-ui/react\"",
+      import: "import { InAppBanner } from \"@antfabric/ui-react\"",
       notes: [
         "New on desktop: today a focused window gets the rail entry and the sound, and no banner at all. The banner uses the same isOnScreen() test the sound and the OS banner already use: window focused, channel pane drawn, and the same channel — or, for a thread reply, the same thread panel open.",
         "When the window is not focused the OS notification is raised instead (shouldToast), never both.",
@@ -185,7 +185,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "planned",
       base: "View (role status, polite live region) with a card that drops in with <Enter motion=\"drop\">, drawn on GlassSurface (Liquid Glass on iOS 26+); a PanResponder swipe up follows the finger and dismisses, the grabber stands in for it, and a Dismiss accessibilityAction and the iOS escape gesture do the same; StyleSheet over useTheme(). The app hosts it over the root stack, with expo-notifications' handleNotification returning shouldShowBanner: false while the app is in front",
-      import: "import { InAppBanner } from \"@antfabric-ui/react-native\"",
+      import: "import { InAppBanner } from \"@antfabric/ui-react-native\"",
       notes: [
         "Fixes a gap: today every foreground notification raises the OS banner (shouldShowBanner: true), including one for the channel you are reading. The handler now asks the router for the open channel / thread and stays silent for it; everything else draws this banner instead of the OS one.",
         "Sits below the status bar (safe-area top inset + 8pt), above the tab bar and the keyboard, and never moves the composer.",

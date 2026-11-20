@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Checkbox, RadioGroup, SearchField, SegmentedControl, Select, Switch, Tabs, TextField } from '@antfabric-ui/react';
+import { Checkbox, RadioGroup, SearchField, SegmentedControl, Select, Switch, Tabs, TextField } from '@antfabric/ui-react';
 
 const SEGMENTS = [{ id: 'day', label: 'Day' }];
 

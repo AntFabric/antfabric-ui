@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
-import { Chip, Fab, useTheme } from "@antfabric-ui/react-native";
-import { MobileHeader, SidebarItem, TabBar } from "@antfabric-ui/react-native/shell";
-import { TAB_BAR_ACTION, TAB_BAR_TABS } from "@antfabric-ui/docs/samples";
+import { Chip, Fab, useTheme } from "@antfabric/ui-react-native";
+import { MobileHeader, SidebarItem, TabBar } from "@antfabric/ui-react-native/shell";
+import { TAB_BAR_ACTION, TAB_BAR_TABS } from "@antfabric/ui-docs/samples";
 
 const FILTERS = [
   { label: "All", count: 0 },

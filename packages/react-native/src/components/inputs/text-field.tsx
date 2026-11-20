@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Text, TextInput, View, type TextInputProps, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { announce } from "../../lib/a11y";
 import { Icon, type IconName } from "../../lib/icon";

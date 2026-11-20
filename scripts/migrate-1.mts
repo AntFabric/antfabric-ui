@@ -5,7 +5,7 @@
  *   pnpm exec tsx scripts/migrate-1.mts <repo> [--via <wrapper-package> --wrapper <path>] [--write] [--no-diff]
  *
  * <repo>       the repository to migrate
- * --via        the wrapper package the repository imports instead of @antfabric-ui/* (`@antfabric/ui-kit`)
+ * --via        the wrapper package the repository imports instead of @antfabric/ui-* (`@antfabric/ui-kit`)
  * --wrapper    the wrapper's source folder, relative to <repo>: its re-exports and aliases are read, and its entry files are fixed
  * --write      write the changes. Without it, nothing is written and the diff is printed.
  * --no-diff    print only the summary and the manual list

@@ -1,6 +1,6 @@
-import { AntFabricProvider, AntFabricRoot } from '@antfabric-ui/react';
+import { AntFabricProvider, AntFabricRoot } from '@antfabric/ui-react';
 import type { ReactNode } from 'react';
-import { defineTheme, themes } from '@antfabric-ui/core';
+import { defineTheme, themes } from '@antfabric/ui-core';
 
 export function Plain({ children }: { children: ReactNode }) {
   return <AntFabricRoot platform="web" theme={themes.antfabric}>{children}</AntFabricRoot>;

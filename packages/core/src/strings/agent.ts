@@ -4,7 +4,7 @@ import type { OnlyOn, StringGroups } from "./index";
  * Built-in text of the `agent` components, keyed by component id. See `strings/index.ts`. The kit never names an assistant: a sentence that
  * would name the agent has a nameless key and a `…Named` key, and the component reads `…Named` when it is given an `agentName`.
  * Where a text names the product or its features, the English default is a plain sentence and the catalogue's
- * copy is in `ANTFABRIC_STRINGS` (`@antfabric-ui/docs/samples`).
+ * copy is in `ANTFABRIC_STRINGS` (`@antfabric/ui-docs/samples`).
  */
 export const agent = {
   "agent-steps": {

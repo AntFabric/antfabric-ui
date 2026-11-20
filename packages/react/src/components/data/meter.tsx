@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { meterReading, meterTone, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { meterReading, meterTone, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { type RootProps, rootProps } from "../../lib/root-props";

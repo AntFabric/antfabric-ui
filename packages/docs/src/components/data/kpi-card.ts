@@ -50,7 +50,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section> drawn from the recipe: the label, Delta (badge), MetricValue (lg), a sentence with the trending Icon, a note; then a flush Sparkline in a measured <div>, outside the section's padding; Skeleton while loading",
-      import: "import { KpiCard } from \"@antfabric-ui/react/data\"",
+      import: "import { KpiCard } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath. The trend is measured (a ResizeObserver) and drawn at the card's width: recharts takes a number, not a percentage.",
         "A row of cards is the page's layout: a grid of auto-filled columns at least 240px wide.",
@@ -59,12 +59,12 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same Card and <section> as web, at desktop density",
-      import: "import { KpiCard } from \"@antfabric-ui/react/data\"",
+      import: "import { KpiCard } from \"@antfabric/ui-react/data\"",
     },
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View, then a measured View holding a flush Sparkline (gifted-charts) at the card's width",
-      import: "import { KpiCard } from \"@antfabric-ui/react-native/data\"",
+      import: "import { KpiCard } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "On the phone a row of KpiCards is a sideways snap row, each card about 82% of the screen so the next one peeks in. That is the screen's layout, not the card's: put the cards in a horizontal ScrollView with snapToInterval and the kit's own gap.",
         "The Card is flat on the phone: the hairline border separates it, and `elevate` does not apply.",

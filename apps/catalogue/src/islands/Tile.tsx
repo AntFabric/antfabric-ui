@@ -1,5 +1,5 @@
-import type { Platform } from "@antfabric-ui/core";
-import type { Example } from "@antfabric-ui/docs";
+import type { Platform } from "@antfabric/ui-core";
+import type { Example } from "@antfabric/ui-docs";
 import { DefaultsProvider } from "../preview/kit";
 import { Shot } from "../preview/ui";
 

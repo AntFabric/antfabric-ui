@@ -109,7 +109,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <header role=\"banner\">: IconButton for the sidebar button, Back / Forward / History, Help and ⋯; the search field is a <button> with a Kbd hint (an IconButton when compact); Button (ghost, sm) or IconButton for the desktop app. Inline styles over `t`, hover / press / focus from useInteraction, `menuOpen` and `sidebarExpanded` through useControllable. The app wires onBack / onForward to TanStack Router (router.history.back / forward, useCanGoBack).",
-      import: "import { WebTopBar } from \"@antfabric-ui/react/shell\"",
+      import: "import { WebTopBar } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Back and Forward ARE the browser's history — every in-app navigation is a router push, so the buttons, the browser's own arrows, a mouse's side buttons and a trackpad swipe all walk one stack and can never disagree.",
         "The app writes its own index into history.state on each push. Back is disabled at index 0 — the first in-app entry of the tab — so the in-app button never leaves the app, even when the browser's Back could return to the SSO page.",

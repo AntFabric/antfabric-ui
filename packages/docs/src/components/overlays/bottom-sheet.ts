@@ -141,7 +141,7 @@ const docs: ComponentDocs = {
     web: {
       status: "partial",
       base: "A <div role=\"dialog\"> aria-modal on a scrim, inline styles over `t`; slides up with enter(\"slide-up\"), then a drag or a close moves it with a transform transition. The handle is a Dismiss <button>; ×, the handle and Esc set `closed` (useControllable) and call onClose; onDismiss fires when the slide down ends",
-      import: "import { BottomSheet } from \"@antfabric-ui/react\"",
+      import: "import { BottomSheet } from \"@antfabric/ui-react\"",
       notes: [
         "Decision: a bottom sheet exists on the web only in a phone-width browser. At 640px and wider the same caller content opens as what it is on desktop: a Dialog for pickers and forms, a Menu for action lists, a HoverCard or side panel for details.",
         "The kit does not lift the sheet over the on-screen keyboard or read the safe-area inset: the host that mounts it owns both (visualViewport, env(safe-area-inset-bottom)).",
@@ -171,7 +171,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "<Enter motion=\"slide-up\"> (role dialog, accessibilityViewIsModal) around an Animated.View that the handle and title row drag through PanResponder (past 120pt or a fling dismisses), on GlassSurface (Liquid Glass on iOS 26+); ScrollView body; `closed` through useControllable, onDismiss when the slide down ends",
-      import: "import { BottomSheet } from \"@antfabric-ui/react-native\"",
+      import: "import { BottomSheet } from \"@antfabric/ui-react-native\"",
       notes: [
         "The surface panel with 20pt top corners, the 36 × 5 handle 12pt from the top, then one 16pt rhythm: handle → title row → first child. The title row is the title on the left and the × in a 40pt box whose box (not glyph) sits on the 12pt gutter.",
         "Title is 20pt semibold on a 24pt line; largeTitle is 28pt on the 40pt box line, one line.",

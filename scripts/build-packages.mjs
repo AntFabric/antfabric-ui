@@ -69,5 +69,5 @@ for (const [name, opts] of Object.entries(PACKAGES)) {
 
   execFileSync(tsc, ["-p", join(dir, "tsconfig.build.json")], { stdio: "inherit" });
   const files = readdirSync(join(dir, "dist"), { recursive: true }).filter((f) => /\.(js|d\.ts)$/.test(f));
-  console.log(`@antfabric-ui/${name}: dist/ ${files.length} files`);
+  console.log(`@antfabric/ui-${name}: dist/ ${files.length} files`);
 }

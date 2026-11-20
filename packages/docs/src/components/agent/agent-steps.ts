@@ -27,17 +27,17 @@ const docs: ComponentDocs = {
     max: { type: "number", default: 0, description: "How many of the newest steps to draw; the rest become \"+N earlier\". 0 is the platform's own: 5 on web and desktop, 3 on the phone." },
   },
   platforms: {
-    web: { status: "ready", base: "A role=list of rows drawn from its recipe; the running dot on the kit's af-step-pulse, rows rise in", import: 'import { AgentSteps } from "@antfabric-ui/react"' },
+    web: { status: "ready", base: "A role=list of rows drawn from its recipe; the running dot on the kit's af-step-pulse, rows rise in", import: 'import { AgentSteps } from "@antfabric/ui-react"' },
     desktop: {
       status: "ready",
       base: "The same list, inside the thinking indicator's fold",
-      import: 'import { AgentSteps } from "@antfabric-ui/react"',
+      import: 'import { AgentSteps } from "@antfabric/ui-react"',
       notes: ["Today it is drawn only inside the thinking indicator, not on its own."],
     },
     mobile: {
       status: "ready",
       base: "Views and Texts drawn from the same recipe; the dot pulses with Animated on the native driver and holds still under Reduce Motion; rows fade in",
-      import: 'import { AgentSteps } from "@antfabric-ui/react-native"',
+      import: 'import { AgentSteps } from "@antfabric/ui-react-native"',
       notes: ["The phone keeps three rows, the desktop five: a phone has less height to give a turn in flight.", "Rows sit 4pt apart against the desktop's 6."],
     },
   },

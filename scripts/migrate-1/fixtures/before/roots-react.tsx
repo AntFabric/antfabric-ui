@@ -1,4 +1,4 @@
-import { AntFabricProvider, AntFabricRoot } from '@antfabric-ui/react';
+import { AntFabricProvider, AntFabricRoot } from '@antfabric/ui-react';
 import type { ReactNode } from 'react';
 
 export function Plain({ children }: { children: ReactNode }) {

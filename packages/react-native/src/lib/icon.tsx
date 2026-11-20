@@ -1,7 +1,7 @@
 import * as lucide from "lucide-react-native";
 import type { ComponentType } from "react";
 import { ActivityIndicator, Platform, View, type ViewStyle } from "react-native";
-import { pascal } from "@antfabric-ui/core";
+import { pascal } from "@antfabric/ui-core";
 import { useTheme } from "../theme";
 
 /** A lucide icon name in kebab case: `"trash-2"`, `"chevron-right"`. The same names as the React kit. */

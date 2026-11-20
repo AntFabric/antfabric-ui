@@ -81,7 +81,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A role=\"status\" inverse pill, inline styles over `t`, fading in with enter(\"fade\"), with the kit's Button for Reload; the app pins it bottom-left and compares the build id against /version.json on each route change and every 30 min",
-      import: "import { UpdateBanner } from \"@antfabric-ui/react\"",
+      import: "import { UpdateBanner } from \"@antfabric/ui-react\"",
       notes: [
         "Reload is the person's choice. The page is never reloaded for them while a composer has focus or holds text — drafts are already saved per conversation, so Reload brings them back.",
         "Only when the server says the running build is too old to talk to it (an API version below the minimum) does the line change to \"This version of AntFabric is out of date. Reload to keep going.\" — still a button, still waiting for an idle moment.",
@@ -96,7 +96,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "A <button> card (role=\"status\", or \"alert\" when failed) for the foot of the nav rail, inline styles over `t`, rising in with enter(\"rise\"); a non-pressable busy card while downloading or installing; a 40px rail <button> with a dot when collapsed. Hover and focus from useInteraction, `stage` through useControllable; the app drives it from the Tauri updater plugin",
-      import: "import { UpdateBanner } from \"@antfabric-ui/react\"",
+      import: "import { UpdateBanner } from \"@antfabric/ui-react\"",
       notes: [
         "Renders nothing unless a release is genuinely waiting: a failed launch check, or a shell with no updater configured, stays idle and silent.",
         "No dismiss, by the owner's design (ADR-0294): a waiting update stays until it is installed or the app restarts.",
@@ -115,7 +115,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View card with the kit's Button, StyleSheet over useTheme(); the Restart to apply? sheet slides up with <Enter motion=\"slide-up\"> and follows a downward drag (PanResponder + Animated) to put itself away. `stage` and `confirm` through useControllable; the app drives it from expo-updates",
-      import: "import { UpdateBanner } from \"@antfabric-ui/react-native\"",
+      import: "import { UpdateBanner } from \"@antfabric/ui-react-native\"",
       notes: [
         "OTA updates replace the JavaScript only. A change to native code bumps runtimeVersion, and the phone is then told to update from the store — an OTA cannot deliver it.",
         "Restarting is optional: an update that has downloaded applies on its own the next time the app opens.",

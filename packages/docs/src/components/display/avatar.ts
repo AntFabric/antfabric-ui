@@ -54,7 +54,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "<span role=\"img\"> named by the person (and presence, in words), inline styles over `t`; initials always drawn, a lazy <img> fading in over them and dropped on error",
-      import: "import { Avatar } from \"@antfabric-ui/react\"",
+      import: "import { Avatar } from \"@antfabric/ui-react\"",
       notes: [
         "Images are lazy-loaded with an explicit width and height so the row never reflows when the photo arrives.",
       ],
@@ -62,7 +62,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <span role=\"img\"> as web, at desktop density; initials under a lazy <img> that fades in and is dropped on error",
-      import: "import { Avatar } from \"@antfabric-ui/react\"",
+      import: "import { Avatar } from \"@antfabric/ui-react\"",
       notes: [
         "Photos are cached in the Tauri app data folder so the sidebar draws offline.",
         "Hovering an avatar opens the person's hover card after 380 ms (existing desktop timing).",
@@ -71,7 +71,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "View (accessibilityRole image), StyleSheet over useTheme(); initials always drawn, React Native <Image> fading in over them with <Enter motion=\"fade\"> and dropped on error",
-      import: "import { Avatar } from \"@antfabric-ui/react-native\"",
+      import: "import { Avatar } from \"@antfabric/ui-react-native\"",
       notes: [
         "The kit draws React Native's <Image>; the app's expo-image memory+disk cache stays in the app. The Notionist face from the current app is a src, not a separate component.",
         "Presence dot grows to 10pt minimum so it survives Dynamic Type and small sizes.",

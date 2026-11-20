@@ -1,5 +1,5 @@
 {
-  "name": "@antfabric-ui/react-native",
+  "name": "@antfabric/ui-react-native",
   "version": "1.0.0",
   "type": "module",
   "description": "A generic, themeable component kit for React Native and Expo. StyleSheet over useTheme() tokens.",
@@ -63,7 +63,7 @@
     }
   },
   "dependencies": {
-    "@antfabric-ui/core": "workspace:^",
+    "@antfabric/ui-core": "workspace:^",
     "react-native-gifted-charts": "1.4.81",
     "gifted-charts-core": "0.1.83"
   },

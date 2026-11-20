@@ -13,9 +13,9 @@ const docs: ComponentDocs = {
     inset: { type: "enum", options: ["none", "sm", "md"], default: "none", description: "Space left around the rule so it stops short of its neighbours. none runs edge to edge." },
   },
   platforms: {
-    web: { status: "ready", base: "A <div role=separator> with its rule and label drawn from the recipe", import: 'import { Divider } from "@antfabric-ui/react"' },
-    desktop: { status: "ready", base: "The same <div> at desktop density", import: 'import { Divider } from "@antfabric-ui/react"' },
-    mobile: { status: "ready", base: "A View with a rule View and a Text drawn from the same recipe", import: 'import { Divider } from "@antfabric-ui/react-native"' },
+    web: { status: "ready", base: "A <div role=separator> with its rule and label drawn from the recipe", import: 'import { Divider } from "@antfabric/ui-react"' },
+    desktop: { status: "ready", base: "The same <div> at desktop density", import: 'import { Divider } from "@antfabric/ui-react"' },
+    mobile: { status: "ready", base: "A View with a rule View and a Text drawn from the same recipe", import: 'import { Divider } from "@antfabric/ui-react-native"' },
   },
   a11y: { role: "separator", label: "{label}", notes: ["A vertical divider sets aria-orientation. A labelled one is named by its label."] },
   examples: [

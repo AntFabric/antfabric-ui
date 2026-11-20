@@ -1,16 +1,16 @@
-# @antfabric-ui/react
+# @antfabric/ui-react
 
-A generic, themeable component kit for React: the web and the desktop (Tauri). Inline styles over the token variables from [`@antfabric-ui/core`](https://www.npmjs.com/package/@antfabric-ui/core); the look is a theme passed to the root. The props match [`@antfabric-ui/react-native`](https://www.npmjs.com/package/@antfabric-ui/react-native)'s.
+A generic, themeable component kit for React: the web and the desktop (Tauri). Inline styles over the token variables from [`@antfabric/ui-core`](https://www.npmjs.com/package/@antfabric/ui-core); the look is a theme passed to the root. The props match [`@antfabric/ui-react-native`](https://www.npmjs.com/package/@antfabric/ui-react-native)'s.
 
 ```bash
-pnpm add @antfabric-ui/react @antfabric-ui/core lucide-react
+pnpm add @antfabric/ui-react @antfabric/ui-core lucide-react
 ```
 
 Peers: `react` and `react-dom` 19.1 or later, `lucide-react`.
 
 ```tsx
-import "@antfabric-ui/core/fonts.css";
-import { AntFabricRoot, Button } from "@antfabric-ui/react";
+import "@antfabric/ui-core/fonts.css";
+import { AntFabricRoot, Button } from "@antfabric/ui-react";
 
 export function App() {
   return (
@@ -25,10 +25,10 @@ export function App() {
 
 | Import | What it is |
 |---|---|
-| `@antfabric-ui/react` | the root, providers and the generic components |
-| `@antfabric-ui/react/data` | charts, KPIs, panels and tables (brings recharts) |
-| `@antfabric-ui/react/shell` | the app frame and pictures of native surfaces |
-| `@antfabric-ui/react/chat` | messages, threads and the composer |
+| `@antfabric/ui-react` | the root, providers and the generic components |
+| `@antfabric/ui-react/data` | charts, KPIs, panels and tables (brings recharts) |
+| `@antfabric/ui-react/shell` | the app frame and pictures of native surfaces |
+| `@antfabric/ui-react/chat` | messages, threads and the composer |
 
 The packages are ES modules only.
 

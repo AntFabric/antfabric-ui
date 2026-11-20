@@ -69,18 +69,18 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section> drawn from the recipe: the Icon in a soft chip, MetricValue, Delta (badge, sm), and one of Sparkline, SparkBars or ProgressRing; Skeleton while loading",
-      import: "import { StatTile } from \"@antfabric-ui/react/data\"",
+      import: "import { StatTile } from \"@antfabric/ui-react/data\"",
       notes: ["Shipped from the data subpath. The visual at the end is a fixed size (92px for a line, 84px for bars); the tile around it takes whatever width its parent gives."],
     },
     desktop: {
       status: "ready",
       base: "The same Card and <section> as web, at desktop density",
-      import: "import { StatTile } from \"@antfabric-ui/react/data\"",
+      import: "import { StatTile } from \"@antfabric/ui-react/data\"",
     },
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View: the Icon in a soft chip, MetricValue, Delta, and the visual stacked under the value at the tile's measured width, or a ProgressRing beside it",
-      import: "import { StatTile } from \"@antfabric-ui/react-native/data\"",
+      import: "import { StatTile } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "The phone stacks a sparkline or bars under the value and stretches them to the tile; a ring stays beside it.",
         "The Card is flat on the phone: the hairline border separates it, and `elevate` does not apply.",

@@ -82,7 +82,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "role=\"radiogroup\" over <button role=\"radio\"> options (or pills), inline styles over `t`; roving tabindex and arrow keys that move and select, skipping disabled options; hover, press and focus from useInteraction; `value` through useControllable",
-      import: "import { RadioGroup } from \"@antfabric-ui/react\"",
+      import: "import { RadioGroup } from \"@antfabric/ui-react\"",
       notes: [
         "Pressing an option sets `value` (an `on.press` action, so the catalogue preview is interactive): the new dot grows from the ring's centre as the old one shrinks away, and a pill's ink fill cross-fades. Disabled options set nothing.",
         "appearance=\"cards\": each card is the <button role=\"radio\">, in a CSS grid of as many columns of at least `radioGroup.cardMinW` as fit. Hover takes the edge to border.default; the chosen card's edge is the strong ink at 2px (a hairline plus an inset ring, so nothing moves), never the brand. The preview is aria-hidden; the card is named by its label and its tags (aria-labelledby), and its description is its aria-describedby.",
@@ -105,7 +105,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same radiogroup as web; appearance=\"pills\" draws the ChoicePills look (36px ink pills)",
-      import: "import { RadioGroup } from \"@antfabric-ui/react\"",
+      import: "import { RadioGroup } from \"@antfabric/ui-react\"",
       notes: [
         "pills: 36px, 14px padding, caption semibold. The chosen pill goes INK (surface.inverse), the design's one deliberate exception to coral selection — a wizard screen already has a coral primary button, and two corals cannot both mean \"commit\".",
         "Only unchosen pills take the hover fill; hovering the pill you already chose would be feedback for an action that does nothing.",
@@ -127,7 +127,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "A View (accessibilityRole radiogroup) of Pressable rows (radio), StyleSheet over useTheme(); the dot scales in and out with Animated.timing; `value` through useControllable. Always the list — pills are web and desktop only",
-      import: "import { RadioGroup } from \"@antfabric-ui/react-native\"",
+      import: "import { RadioGroup } from \"@antfabric/ui-react-native\"",
       notes: [
         "Each option is a 44pt row: a 20pt ring with a 1.5pt stroke, a 10pt dot when chosen, 12pt gap, a 16pt medium label. The chosen ring is primary; the rest are borderStrong (#DEDEDE).",
         "Radio buttons, not tabs (owner, 2026-10-15: \"Tab isn't a right way to take the input\").",

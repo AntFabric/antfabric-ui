@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric-ui/core";
-import { fmt, withoutSign, type FormatSpec, type Row, type FormatWords } from "@antfabric-ui/core/chart";
+import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { fmt, withoutSign, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

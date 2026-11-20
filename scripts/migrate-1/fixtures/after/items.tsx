@@ -1,6 +1,6 @@
-import { AgentSteps, QuestionPanel, Select, Tabs } from '@antfabric-ui/react';
-import { NavRail, SidebarSection } from '@antfabric-ui/react/shell';
-import { Table } from '@antfabric-ui/react/data';
+import { AgentSteps, QuestionPanel, Select, Tabs } from '@antfabric/ui-react';
+import { NavRail, SidebarSection } from '@antfabric/ui-react/shell';
+import { Table } from '@antfabric/ui-react/data';
 
 const BUILT_ELSEWHERE = [{ id: 'a', label: 'A' }];
 

@@ -1,6 +1,6 @@
 /**
- * `@antfabric-ui/react/data`: the data components (KPIs, charts, panels, tables), and what they are built from. Not part of the root
- * entry, so an app that never imports it carries none of recharts. The same name, `@antfabric-ui/react-native/data`, is the phone's.
+ * `@antfabric/ui-react/data`: the data components (KPIs, charts, panels, tables), and what they are built from. Not part of the root
+ * entry, so an app that never imports it carries none of recharts. The same name, `@antfabric/ui-react-native/data`, is the phone's.
  *
  * `rechartsTheme(useChartTokens(), useReducedMotion())` is the chart tokens as recharts' own props, for a chart this kit does not ship. One
  * composed example, a weekly line that reads the same grid, axes, crosshair, tooltip and series colour as LineChart:

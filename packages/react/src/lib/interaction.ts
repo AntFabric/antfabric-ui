@@ -1,5 +1,5 @@
 import { useMemo, useState, useSyncExternalStore, type FocusEvent, type PointerEvent } from "react";
-import { useForcedState } from "@antfabric-ui/core";
+import { useForcedState } from "@antfabric/ui-core";
 
 export interface Interaction {
   hovered: boolean;

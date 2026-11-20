@@ -88,7 +88,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A role=group <div>: a header row holding the toggle <button> (aria-expanded) and the + / ⋯ IconButtons as siblings, then a role=list of SidebarItem rows; inline styles over t. Hover, focus and the actions' reveal (header hover or focus-within, by opacity) come from useInteraction and pointer/focus events, never :hover. expanded is useControllable with onExpandedChange; selected is kept by the section (onSelectedChange) and set by a row press",
-      import: "import { SidebarSection } from \"@antfabric-ui/react/shell\"",
+      import: "import { SidebarSection } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Collapse state belongs to the account, not the browser: collapsing Channels on the web collapses it on the desktop app too. It is saved with the sidebar layout, the same record that holds section order and which channel lives where.",
         "+ and ⋯ fade in on header hover or focus-within; they are in the layout at rest (opacity 0), so revealing them never moves the label.",
@@ -110,8 +110,8 @@ const docs: ComponentDocs = {
     },
     desktop: {
       status: "ready",
-      base: "The same @antfabric-ui/react component as the web: a header row holding the toggle <button> and sibling + / ⋯ IconButtons (never a button inside a button), then SidebarItem rows; inline styles over t, states from useInteraction",
-      import: "import { SidebarSection } from \"@antfabric-ui/react/shell\"",
+      base: "The same @antfabric/ui-react component as the web: a header row holding the toggle <button> and sibling + / ⋯ IconButtons (never a button inside a button), then SidebarItem rows; inline styles over t, states from useInteraction",
+      import: "import { SidebarSection } from \"@antfabric/ui-react/shell\"",
       notes: [
         "One component for all six kinds today — Starred, Channels, Projects, Direct messages, each project inside Projects, and custom sections.",
         "The label is --text-body (14) semibold in fg.subtle, level with the rows under it (ADR-0670). The chevron matches the label's size and turns rather than swapping glyphs.",
@@ -133,7 +133,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "partial",
       base: "A View (role group): a Pressable header (accessibilityState.expanded, long press → onMenu) with an Animated chevron and the + IconButton, then SidebarItem rows in a list View; StyleSheet over useTheme() tokens. A long list virtualises in the app's own FlashList around it",
-      import: "import { SidebarSection } from \"@antfabric-ui/react-native/shell\"",
+      import: "import { SidebarSection } from \"@antfabric/ui-react-native/shell\"",
       notes: [
         "Today the Messages tab groups Channels and Direct messages with plain headings and no collapse; collapsing, Starred and custom sections are new on the phone.",
         "No hover: + is always visible; ⋯ is replaced by long-pressing the header.",

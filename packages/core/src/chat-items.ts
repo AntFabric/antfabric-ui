@@ -1,7 +1,7 @@
 /**
  * The shapes the conversation and agent components draw from data: a person, a reaction, an attachment, an agent's step, a gated tool
  * call's argument, an answer row, a decision routed to a person. Like `items.ts` they live here once and each kit re-exports them as types
- * from its root (`import type { Reaction } from "@antfabric-ui/react"`). Items carry no functions: data stays serialisable, so a server or
+ * from its root (`import type { Reaction } from "@antfabric/ui-react"`). Items carry no functions: data stays serialisable, so a server or
  * a plugin can produce it. A kit keeps a component-named type only where a component has one, derived from these; it never copies a shape.
  */
 

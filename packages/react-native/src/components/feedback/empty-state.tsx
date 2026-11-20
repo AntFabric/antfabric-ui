@@ -1,5 +1,5 @@
 import { Text, View, type ViewStyle } from "react-native";
-import { ART, ART_CANVAS, ART_PART, recipes, type ArtPart, type ArtShape } from "@antfabric-ui/core";
+import { ART, ART_CANVAS, ART_PART, recipes, type ArtPart, type ArtShape } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon, type IconName } from "../../lib/icon";
 import { Enter } from "../../lib/motion";

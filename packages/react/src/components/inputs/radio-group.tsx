@@ -1,5 +1,5 @@
 import { useId, type CSSProperties, type ReactNode } from "react";
-import { recipes, useControllable } from "@antfabric-ui/core";
+import { recipes, useControllable } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";

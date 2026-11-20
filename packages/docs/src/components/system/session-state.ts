@@ -66,7 +66,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A role=\"region\" card named by its title, inline styles over `t`, popping in with enter(\"pop\"), with the kit's Button; Sign in again turns it to waiting (`state` through useControllable) while the route's same-tab OIDC redirect runs (TanStack Start beforeLoad → /sign-in?next=…)",
-      import: "import { SessionState } from \"@antfabric-ui/react\"",
+      import: "import { SessionState } from \"@antfabric/ui-react\"",
       notes: [
         "Sign in again keeps the URL: the current path rides in next= and the router sends the person back to it. Only a same-origin path is accepted, never an absolute URL, so the parameter cannot become an open redirect.",
         "Drafts are kept in IndexedDB per user and restored only when the same person signs back in.",
@@ -81,7 +81,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same card as web at desktop density, with the kit's Button (lg, full); Login with AntFabric turns it to waiting while the system browser handles SSO and returns through antfabric://auth/callback (tauri-plugin-deep-link); Escape inside the card calls onCancel",
-      import: "import { SessionState } from \"@antfabric-ui/react\"",
+      import: "import { SessionState } from \"@antfabric/ui-react\"",
       notes: [
         "Staging builds register antfabric-staging:// (the committed default) and production passes VITE_DEEP_LINK_SCHEME=antfabric, so a staging and a production install on one Mac never steal each other's callbacks.",
         "Only the hand-off id rides the custom-scheme URL — never a token. A callback whose state does not match the sign-in this window started is refused.",
@@ -103,7 +103,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "<Enter motion=\"pop\"> card, StyleSheet over useTheme(), with the kit's Button; `state` and `unlocked` through useControllable. The app runs expo-auth-session (ASWebAuthenticationSession / Custom Tabs) and expo-local-authentication around it",
-      import: "import { SessionState } from \"@antfabric-ui/react-native\"",
+      import: "import { SessionState } from \"@antfabric/ui-react-native\"",
       notes: [
         "The lock screen auto-prompts for Face ID / fingerprint when it opens, and falls back to the passcode when the hardware is missing or nothing is enrolled.",
         "Signing in or out never draws a login screen at someone who is mid-sign-in: while the keychain read or the profile flush is outstanding, a loader shows instead.",

@@ -23,8 +23,8 @@ globalThis.matchMedia = reduce as unknown as typeof globalThis.matchMedia;
 
 const { act, createElement } = await import("react");
 const { createRoot } = await import("react-dom/client");
-const { PLATFORMS, antfabric, defineTheme, themes } = await import("@antfabric-ui/core");
-const { components } = await import("@antfabric-ui/docs");
+const { PLATFORMS, antfabric, defineTheme, themes } = await import("@antfabric/ui-core");
+const { components } = await import("@antfabric/ui-docs");
 const { DefaultsProvider, SceneNode, Stage, Thing, kitComponent } = await import("../src/preview/kit");
 const { casesFor, defaultsFor, usedIds } = await import("../src/lib/library");
 const { foldIds, foldUseIds } = await import("./ids");
@@ -32,8 +32,8 @@ const { normalise, roundCoords } = await import("./snapshot-hash");
 const { createHash } = await import("node:crypto");
 const { writeFileSync } = await import("node:fs");
 
-type OSPick = { os: import("@antfabric-ui/core").OS; osVersion?: number };
-const OSES: Record<import("@antfabric-ui/core").Platform, OSPick[]> = {
+type OSPick = { os: import("@antfabric/ui-core").OS; osVersion?: number };
+const OSES: Record<import("@antfabric/ui-core").Platform, OSPick[]> = {
   web: [{ os: "browser" }],
   desktop: [{ os: "mac", osVersion: 26 }, { os: "windows" }],
   mobile: [{ os: "ios", osVersion: 26 }, { os: "android" }],
@@ -164,7 +164,7 @@ for (const doc of components) {
       document.body.appendChild(host);
       const root = createRoot(host);
       const seen = new Set<string>();
-      const step = async (at: string, body: ReturnType<typeof createElement>, state?: import("@antfabric-ui/core").InteractionState) => {
+      const step = async (at: string, body: ReturnType<typeof createElement>, state?: import("@antfabric/ui-core").InteractionState) => {
         logged.length = 0;
         steps++;
         try {
@@ -181,7 +181,7 @@ for (const doc of components) {
         }
         if (doc.category === "data") mount(platform, host.innerHTML);
       };
-      const mount = (p: import("@antfabric-ui/core").Platform, html: string) => {
+      const mount = (p: import("@antfabric/ui-core").Platform, html: string) => {
         const key = `${doc.id}/${p}@mounted${suffix}`;
         const entry = mountedHashes.get(key) ?? { hash: createHash("sha256"), renders: 0 };
         mountedHashes.set(key, entry);
@@ -214,7 +214,7 @@ for (const doc of components) {
         const probeHost = document.createElement("div");
         document.body.appendChild(probeHost);
         const probe = createRoot(probeHost);
-        const draw = (state?: import("@antfabric-ui/core").InteractionState, autoFocus?: boolean) => createElement(DefaultsProvider, { value: defaults }, createElement(Stage, { platform, ...os, scheme: "light", theme, state, autoFocus, children: thing() }));
+        const draw = (state?: import("@antfabric/ui-core").InteractionState, autoFocus?: boolean) => createElement(DefaultsProvider, { value: defaults }, createElement(Stage, { platform, ...os, scheme: "light", theme, state, autoFocus, children: thing() }));
         const quiet = logged.length;
         try {
           // Opened from the keyboard: a menu or a dialog that moves focus only for a keyboard user (or after any input) sees a key first.
@@ -297,7 +297,7 @@ for (const doc of components) {
 // `styles` on the web: a longhand the recipe also writes as a shorthand (`styles.root.backgroundColor` beside the recipe's `background`) must stay
 // through every state, and updating the recipe's value must not warn of the two fighting. Button is mounted with it and driven like a pointer would.
 {
-  const ReactKit = await import("@antfabric-ui/react");
+  const ReactKit = await import("@antfabric/ui-react");
   const cases: [string, Record<string, unknown>, (el: HTMLElement) => string | undefined][] = [
     ["backgroundColor", { root: { backgroundColor: "red" } }, (el) => (el.style.backgroundColor === "red" ? undefined : `background-color is "${el.style.backgroundColor}", not red`)],
     ["paddingLeft", { root: { paddingLeft: 3 } }, (el) => (el.style.paddingLeft === "3px" ? undefined : `padding-left is "${el.style.paddingLeft}", not 3px`)],
@@ -346,7 +346,7 @@ for (const doc of components) {
 
 // A theme built inline on every render has the same id each time: the provider keys its context by the id, so what is inside does not re-render.
 {
-  const ReactKit = await import("@antfabric-ui/react");
+  const ReactKit = await import("@antfabric/ui-react");
   const host = document.createElement("div");
   document.body.appendChild(host);
   const root = createRoot(host);

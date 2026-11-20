@@ -213,7 +213,7 @@ const docs: ComponentDocs = {
     web: {
       status: "partial",
       base: "A plain <textarea data-af-input> (field-sizing: content, and a measured height as a fallback) in a card drawn with inline styles over `t`; the toolbar and footer are the kit's IconButton, staged files the kit's AttachmentCard (compact). Enter / Shift+Enter / Mod+Enter / Escape on the textarea, IME-safe. Rich text, the emoji panel and the @ / # / : / slash pickers are the app's.",
-      import: "import { Composer } from \"@antfabric-ui/react/chat\"",
+      import: "import { Composer } from \"@antfabric/ui-react/chat\"",
       notes: [
         "Centred at clamp(680px, 34vw, 880px) — the desktop's --content-w-composer — so a 2560px window does not stretch a line of text across the screen.",
         "Drafts are saved to IndexedDB per workspace and conversation on every pause in typing, so a reload or a crashed tab keeps them. Two tabs on one channel share the draft (BroadcastChannel); the last edit wins.",
@@ -264,7 +264,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "partial",
       base: "The same file as web (one component): the textarea grows 22–220px, then scrolls; IconButton footer; ⌘ glyphs in the hints from usePlatform().os. The RichInput, EmojiPanel and MentionPicker are the app's.",
-      import: "import { Composer } from \"@antfabric-ui/react/chat\"",
+      import: "import { Composer } from \"@antfabric/ui-react/chat\"",
       notes: [
         "Footer today: + Attach files, Insert emoji, Mention someone, Slash command, the silent-until-needed LengthCounter, and a Send that turns into a coral circle once there is something to send (ADR-8930).",
         "The channel composer spans the pane today (padding 0 18 16); the clamp width is what Home and Fabric use. Confirm whether channels should adopt it.",
@@ -307,7 +307,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "partial",
       base: "A multiline TextInput (34–112pt, then it scrolls) in a View (radius 20) + the bar of the kit's IconButtons at 36pt with no gaps; staged files are the kit's AttachmentCard (compact). Keyboard avoidance and haptics are the screen's.",
-      import: "import { Composer } from \"@antfabric-ui/react-native/chat\"",
+      import: "import { Composer } from \"@antfabric/ui-react-native/chat\"",
       notes: [
         "Keyboard-aware: the composer rides the keyboard (useKeyboardInset), sits on the home-indicator inset when it is down, and tapping the timeline dismisses the keyboard without losing the draft.",
         "Grows from one line to 112pt, then scrolls inside. Today's channel composer grows to 20% of the screen (4–8 lines, models/composerHeight.ts) and the Fabric composer stops at 112 — this spec uses 112 everywhere; confirm with design.",

@@ -48,7 +48,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "The kit's Card (pad none) around a <section>: the title, an optional headline, \"View as table\" (Button); a ChartFrame holding recharts' PieChart with one Pie from 180 degrees to 0 (round ends, a hair of gap between fill and track) and an SVG <line> for the target, MetricValue in the hole and three captions under it",
-      import: "import { GaugeChart } from \"@antfabric-ui/react/data\"",
+      import: "import { GaugeChart } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath: recharts is reached only from there. The ring is handed an explicit width and height, never a responsive container.",
         "The fill is `tokens.data.warning` or `data.negative` once the share crosses a threshold, and a series colour otherwise, so a gauge reads the same as the Meter that shows the same number; no colour of the brand is read.",
@@ -59,12 +59,12 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same Card, recharts' Pie and tick as web, at desktop density",
-      import: "import { GaugeChart } from \"@antfabric-ui/react/data\"",
+      import: "import { GaugeChart } from \"@antfabric/ui-react/data\"",
     },
     mobile: {
       status: "ready",
       base: "The kit's Card (pad none) around a View: the same header and Button, a ChartFrame holding react-native-gifted-charts' PieChart `donut` with `semiCircle` (the hole a disc in the card's colour), a react-native-svg <Line> for the target, MetricValue in the hole and three captions under it",
-      import: "import { GaugeChart } from \"@antfabric-ui/react-native/data\"",
+      import: "import { GaugeChart } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there.",
         "gifted-charts draws a half ring as a whole pie, in a view half as tall that crops it; the kit lays that view `chart.tickOver` down in a taller one so the tick has room above the ring.",

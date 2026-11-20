@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric-ui/core";
+import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, row, text, truncate } from "../../lib/style";

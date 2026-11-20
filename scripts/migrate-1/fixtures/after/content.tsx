@@ -1,5 +1,5 @@
-import { BottomSheet, Card, Dialog } from '@antfabric-ui/react';
-import { Card as NativeCard } from '@antfabric-ui/react-native';
+import { BottomSheet, Card, Dialog } from '@antfabric/ui-react';
+import { Card as NativeCard } from '@antfabric/ui-react-native';
 
 const Panel = Card;
 

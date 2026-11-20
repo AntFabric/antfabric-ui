@@ -132,7 +132,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A drawing of Chrome's own notification frame: a `<button>` for the banner and one per action, inline styles over `t`, the face from Avatar, hover and focus from useInteraction, rising in with enter(\"rise\"). What the app uses is the Web Notifications API — ServiceWorkerRegistration.showNotification() for pushes (Push API + VAPID), new Notification() only while a tab is open — and the browser draws it.",
-      import: "import { OsNotification } from \"@antfabric-ui/react/shell\"",
+      import: "import { OsNotification } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Chrome, Edge and Safari on macOS and Windows hand the notification to the OS, so there it looks like the macOS banner or Windows toast with the browser's icon and \"app.antfabric.com\" underneath. This frame is what Chrome draws itself (Linux, ChromeOS, and macOS with native notifications off).",
         "No inline reply: `actions` with type 'text' is not supported in any shipping browser. Action buttons (max 2) work only on Chromium-based browsers with a service worker; Safari and Firefox show the body and nothing else, so a click that opens the right conversation is the whole contract.",
@@ -150,7 +150,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "partial",
       base: "A drawing of the macOS banner, the Windows toast or the GNOME card, picked by usePlatform().os: `<button>`s for the banner, close and actions, an `<input data-af-input>` for the inline reply, inline styles over `t`, the face from Avatar, hover and focus from useInteraction, Liquid Glass through glass() on macOS 26, sliding in with enter(\"slide-left\"). What the app calls is the Tauri `notify_show` command → UNUserNotificationCenter on macOS (src-tauri/src/notify_click.rs), and tauri-plugin-notification (WinRT toast on Windows, notify-rust / libnotify on Linux) elsewhere.",
-      import: "import { OsNotification } from \"@antfabric-ui/react/shell\"",
+      import: "import { OsNotification } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Raised only when the window is NOT focused (shouldToast) — so it is also what reaches you when AntFabric is closed to the tray. The rail entry is written either way.",
         "Today the title is one line, \"Priya Raman · #platform-eng\"; this spec splits it — sender is the title, the channel is the macOS subtitle / Windows attribution — so the name is never the part that truncates.",
@@ -171,7 +171,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "partial",
       base: "A drawing of the iOS banner (with its long-press menu) or the Android heads-up, picked by useTheme().os: Pressables for the banner and actions, a TextInput for the inline reply, StyleSheet over useTheme() tokens in the system face, the face from Avatar, GlassSurface on iOS 26, dropping in with <Enter motion=\"drop\">. What the app uses is expo-notifications — APNs / FCM push from notification-service, category `chat_message` (Reply with text input, Mark as read), Android channel `default` = \"Messages and alerts\", importance MAX, lock-screen PUBLIC.",
-      import: "import { OsNotification } from \"@antfabric-ui/react-native/shell\"",
+      import: "import { OsNotification } from \"@antfabric/ui-react-native/shell\"",
       notes: [
         "Both actions are `opensAppToForeground: false`: iOS wakes the app in the background, Android runs the headless task `antfabric-notification-action` even with the app killed (services/notificationActions.ts).",
         "The payload is ids and a destination only; the title and body are the server's words, drawn and discarded. Nothing quotable is written to `content.data`, which the OS keeps.",

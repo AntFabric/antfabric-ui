@@ -6,7 +6,7 @@ import TokenTable from "../components/TokenTable.astro";
 import { defaultsFor, OS_VERSIONS, PLATFORM_META, PLATFORMS, registry, usedIds, type OS, type Platform } from "../lib/library";
 import { slug } from "../lib/search";
 import { groups, refCount, rowCount, valueOf } from "../lib/token-ref";
-import { BRAND_PATHS, kebab, MOTION, tokens } from "@antfabric-ui/core";
+import { BRAND_PATHS, kebab, MOTION, tokens } from "@antfabric/ui-core";
 import { BRAND_SAMPLE, SAMPLE_TENANT } from "../lib/brand";
 
 // Materials: the same component at the Liquid Glass release and the one before it, side by side.
@@ -27,7 +27,7 @@ const caption = (section: string, g: string) => `${section}: ${g}`;
 const TOPICS = ["Colour", "Tenant branding", "Type", "Space", "Radius", "Size", "Components", "Data", "Elevation", "Motion", "Layers and opacity", "Materials: Liquid Glass and blur"];
 const textRoles = groups("type")[0]!.rows.filter((r) => !r.path.endsWith("Line")).map((r) => r.path.slice("text.".length));
 const brandIds = BRAND_SAMPLE.map((s) => s.id);
-const brandUse = `import { defineTheme, themes } from "@antfabric-ui/core";
+const brandUse = `import { defineTheme, themes } from "@antfabric/ui-core";
 
 // A product's brand is a theme: the preset it starts from, and the brand on top
 export const antagents = defineTheme({
@@ -226,7 +226,7 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
     <p class="sub">
       What charts, KPIs and tables draw with. Series colours are a palette of their own, after the reference dashboard, fixed for every tenant (a brand does not move them); only neutrals come from the kit.
       They are tested in both themes: lightness in a band, chroma above a floor, neighbours kept apart under protan and deutan vision. In light, several sit under 3:1 against the card, so every chart also has a tooltip, a read-aloud summary and a view as a table.
-      Chart text is set in Geist, which ships with <code class="mono">@antfabric-ui/core</code>.
+      Chart text is set in Geist, which ships with <code class="mono">@antfabric/ui-core</code>.
     </p>
     <h3 id="data-palette">Palette in both themes</h3>
     <div class="grid c2">
@@ -308,7 +308,7 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
       ))
     }
     <h3 id="motion-entrances">Entrances</h3>
-    <p class="sub">What a component plays when it mounts, by the name <code class="mono">MOTION</code> in <code class="mono">@antfabric-ui/core</code> gives it. These are not tokens: each one is built from a duration and a curve.</p>
+    <p class="sub">What a component plays when it mounts, by the name <code class="mono">MOTION</code> in <code class="mono">@antfabric/ui-core</code> gives it. These are not tokens: each one is built from a duration and a curve.</p>
     <div class="tok-scroll" tabindex="0" role="region" aria-label="Entrances">
       <table class="tok">
         <caption class="sr-only">Entrances: where each starts, and how long it takes</caption>

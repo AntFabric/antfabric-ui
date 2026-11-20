@@ -64,7 +64,7 @@ const docs: ComponentDocs = {
     web: {
       status: "ready",
       base: "A <button> with inline styles over `t`; hover, press and focus from useInteraction; faces from the kit's Avatar (xs).",
-      import: "import { ThreadSummary } from \"@antfabric-ui/react/chat\"",
+      import: "import { ThreadSummary } from \"@antfabric/ui-react/chat\"",
       notes: [
         "Opens the thread in the right-hand panel and updates the URL (…/c/platform-eng/t/<id>), so a thread is a link that can be pasted, bookmarked and opened in a new tab with ⌘-click.",
         "Hover lifts it to a card edge (Slack's) so it reads as a button and not as the message's text.",
@@ -84,7 +84,7 @@ const docs: ComponentDocs = {
     desktop: {
       status: "ready",
       base: "The same <button> as web (one file), at the desktop density; faces from the kit's Avatar (xs).",
-      import: "import { ThreadSummary } from \"@antfabric-ui/react/chat\"",
+      import: "import { ThreadSummary } from \"@antfabric/ui-react/chat\"",
       notes: [
         "Today's desktop draws the thread glyph, \"N unread\" in info blue and \"N replies\" in coral (ADR-4007: two numbers in one colour read as one fact). This spec adds the repliers' faces, \"Last reply …\" and Following.",
         "The count uses the link ink (coral) and the unread uses info blue, so the two numbers stay apart at a glance.",
@@ -103,7 +103,7 @@ const docs: ComponentDocs = {
     mobile: {
       status: "ready",
       base: "Pressable over a wrapping row, StyleSheet over useTheme() tokens (44pt target), usePress for the pressed fade; faces from the kit's Avatar (xs).",
-      import: "import { ThreadSummary } from \"@antfabric-ui/react-native/chat\"",
+      import: "import { ThreadSummary } from \"@antfabric/ui-react-native/chat\"",
       notes: [
         "14pt SemiBold, coral count, info-blue unread — the V2 Figma. The whole line is one 44pt-tall target even though the text is 20pt.",
         "On a 375pt screen \"Last reply …\" is what gives way first: it truncates, then the faces stay, then Following stays — the count and unread never truncate.",
