@@ -24,14 +24,10 @@
     "rerender": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json --import ./apps/catalogue/scripts/native.mjs apps/catalogue/scripts/rerender.tsx",
     "migrate:1": "tsx scripts/migrate-1.mts",
     "migrate:1:test": "tsx scripts/migrate-1/test.mts",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "pnpm build:packages && changeset publish",
-    "release:dry": "pnpm build:packages && pnpm publish -r --access public --no-git-checks --dry-run --filter @antfabric-ui/core --filter @antfabric-ui/react --filter @antfabric-ui/react-native"
+    "release:dry": "pnpm build:packages && pnpm publish -r --access public --no-git-checks --dry-run --filter @antfabric-ui/core --filter @antfabric-ui/react --filter @antfabric-ui/react-native",
+    "release:version": "node scripts/release-version.mjs"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "0.5.1",
-    "@changesets/cli": "2.29.7",
     "@types/node": "26.6.6",
     "esbuild": "0.27.7",
     "linkedom": "0.18.12",

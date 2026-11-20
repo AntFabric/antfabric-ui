@@ -33,8 +33,8 @@ pnpm add @antfabric-ui/core @antfabric-ui/react-native lucide-react-native react
 ```
 
 [`CONSUMING.md`](CONSUMING.md) has what an app or plugin team needs: install, `AntFabricRoot` and the
-stylesheet, fonts, tenant branding, the tokens and the imports. Versions and changelogs are kept with
-[Changesets](.changeset/README.md); [`RELEASING.md`](RELEASING.md) is how a change ships.
+stylesheet, fonts, tenant branding, the tokens and the imports. Every push to `main` publishes a new version to
+npm; [`RELEASING.md`](RELEASING.md) is how a change ships.
 
 ## Layout
 
@@ -86,8 +86,8 @@ The catalogue draws a sample tenant beside the default at `/foundations#tenant-b
 
 GitHub Actions: `.github/workflows/ci.yml` runs `pnpm build` (which runs `pnpm check`),
 `pnpm verify:packages` and a publish dry run on every pull request.
-`.github/workflows/release.yml` runs on `main`: with pending changesets it opens a "Version packages"
-pull request, and when that is merged it publishes the three packages to npm. See
+`.github/workflows/release.yml` runs on every push to `main` and publishes the three packages to npm
+at the next version (1.0.0 first, then 1.0.1, …), tagging the commit. See
 [`RELEASING.md`](RELEASING.md).
 
 ## License
