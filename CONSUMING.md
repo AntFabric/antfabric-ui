@@ -15,7 +15,7 @@ Each kit also has three subpaths, in the same package: `./data` (charts, KPIs, p
 
 ## 1. Before you start
 
-- **Node and pnpm.** The kits are built and tested on Node 24 with pnpm; npm and yarn work too, and the commands below are pnpm's.
+- **Node and pnpm.** The kits are built and tested on Node 26 with pnpm; npm and yarn work too, and the commands below are pnpm's.
 - **React 19.1 or later** (and React Native 0.81 or later on the phone).
 
 ## 2. Install
