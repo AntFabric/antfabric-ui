@@ -4,7 +4,7 @@
  * about drawing. A column is plain data (no function is needed), so the docs can write one down and `chartTable` can make one.
  */
 
-import { fmt, type FormatSpec, type FormatWords } from "./format";
+import { fmt, whenOf, type FormatSpec, type FormatWords } from "./format";
 import type { MeterKind } from "./meter";
 import type { Row } from "./types";
 
@@ -88,16 +88,6 @@ export function nextSort(c: TableColumn, sort: TableSort | null | undefined): Ta
 /** `aria-sort`'s word for a column. */
 export const ariaSort = (c: TableColumn, sort: TableSort | null | undefined): "ascending" | "descending" | "none" => (sort?.column === c.key ? (sort.direction === "asc" ? "ascending" : "descending") : "none");
 
-/** A date written as a Date, a timestamp or a string, as the number `Intl` takes. */
-export function whenOf(value: unknown): unknown {
-  if (value instanceof Date) return value;
-  if (typeof value === "string") {
-    const ms = Date.parse(value);
-    return Number.isNaN(ms) ? undefined : ms;
-  }
-  return value;
-}
-
 /** What a row is ordered by in a column: its rank, its timestamp, its number or its text. */
 function sortKey(c: TableColumn, row: Row): number | string | null {
   const v = row[c.key];
@@ -164,6 +154,15 @@ export function pageSlots(page: number, count: number): PageSlot[] {
 
 /* ---------- selection ---------- */
 
+/**
+ * The id of each row of `shown`, as text: its `rowKey` field, or, for a row without one, its index in `rows` (the order the rows came in, so a row
+ * keeps its id when the table is sorted or paged). Without the index every such row would be `"undefined"`, and ticking one would tick them all.
+ */
+export function rowIds(shown: readonly Row[], rows: readonly Row[], rowKey: string): string[] {
+  const index = new Map(rows.map((row, i) => [row, i]));
+  return shown.map((row, i) => String(row[rowKey] ?? index.get(row) ?? i));
+}
+
 /** The ids of a page with all of them ticked, some of them, or none. */
 export function pickState(ids: readonly string[], selected: readonly string[]): { all: boolean; some: boolean } {
   const on = ids.filter((id) => selected.includes(id)).length;
@@ -228,7 +227,8 @@ export function cellText(c: TableColumn, value: unknown, words: FormatWords, loc
   if (isBlank(value)) return words.unavailable;
   const type = cellOf(c);
   const spec = withCurrency(c.format ?? DEFAULT_FORMAT[type], currency);
-  return fmt(spec, type === "date" ? whenOf(value) : value, words, locale);
+  // The date formats read the value themselves (a date-only string stays a calendar day); a function is handed the timestamp.
+  return fmt(spec, type === "date" && typeof spec === "function" ? whenOf(value) : value, words, locale);
 }
 
 /** A sparkline cell's points as the rows a Sparkline takes, in a field named `v`. A value that is not a list is no points. */

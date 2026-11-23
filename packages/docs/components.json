@@ -11351,7 +11351,7 @@
         },
         "format": {
           "type": "object",
-          "description": "A format name, its options or a function: what core's `fmt` takes. The value, the target, the two ends, the summary and \"View as table\" all print through it, so they agree.",
+          "description": "A format name, its options or a function: what core's `fmt` takes. The value, the target, the two ends, the summary and \"View as table\" all print through it, so they agree. A percent format prints each as its share of `max`, as Meter does: 58 of 100 is 58%.",
           "default": "percent",
           "sample": "percent"
         },
@@ -29269,7 +29269,7 @@
         },
         "rowKey": {
           "type": "string",
-          "description": "The field of each row that names it, for selection and for React's keys. The keys `selected` holds are its values as text.",
+          "description": "The field of each row that names it, for selection and for React's keys. The keys `selected` holds are its values as text. A row without the field is named by its index in `rows`.",
           "default": "key"
         },
         "sort": {

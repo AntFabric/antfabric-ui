@@ -66,7 +66,7 @@ const docs: ComponentDocs = {
     rowKey: {
       type: "string",
       default: "key",
-      description: "The field of each row that names it, for selection and for React's keys. The keys `selected` holds are its values as text.",
+      description: "The field of each row that names it, for selection and for React's keys. The keys `selected` holds are its values as text. A row without the field is named by its index in `rows`.",
     },
     sort: {
       type: "object",

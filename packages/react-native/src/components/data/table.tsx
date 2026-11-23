@@ -14,6 +14,7 @@ import {
   isSortable,
   pageCountOf,
   pickState,
+  rowIds,
   sortRows,
   sparkRows,
   togglePage,
@@ -51,7 +52,7 @@ export interface TableProps extends RootProps<View> {
   columns: TableColumn[];
   /** One object per row. The same rows can feed a chart, a stat and a table. */
   rows: Row[];
-  /** The field of each row that names it, for selection and for React's keys. Default `key`; the keys `selected` holds are its values as text. */
+  /** The field of each row that names it, for selection and for React's keys. Default `key`; the keys `selected` holds are its values as text. A row without the field is named by its index in `rows`. */
   rowKey?: string;
   /** The column the rows are ordered by and which way, or `null` for the order they came in. */
   sort?: TableSort | null;
@@ -179,7 +180,7 @@ export function Table({ columns, rows, rowKey = "key", sort, onSortChange, selec
   const count = pageCountOf(rowTotal, pageSize);
   const current = clampPage(at ?? 1, count);
   const shown = pageSize > 0 && !manual ? sorted.slice((current - 1) * pageSize, current * pageSize) : sorted;
-  const ids = shown.map((x) => String(x[rowKey]));
+  const ids = rowIds(shown, rows, rowKey);
   const { all, some } = pickState(ids, picked);
   const layout = cardLayout(columns);
   const sortable = columns.filter(isSortable);

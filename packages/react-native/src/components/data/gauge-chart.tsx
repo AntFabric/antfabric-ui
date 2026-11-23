@@ -3,7 +3,7 @@ import { type RootProps, rootProps } from "../../lib/root-props";
 import { Line, Svg } from "react-native-svg";
 import { PieChart } from "react-native-gifted-charts";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
-import { GAUGE_HOLE, fmt, gaugeState, onHalfRing, summarizeGauge, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
+import { GAUGE_HOLE, fmt, gaugeState, meterShown, onHalfRing, summarizeGauge, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { Enter } from "../../lib/motion";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -33,7 +33,7 @@ export interface GaugeChartProps extends RootProps {
   kind?: MeterKind;
   /** The shares of `max` where the fill turns to the caution colour and then the loss colour. Default Meter's for the kind. */
   thresholds?: MeterThresholds;
-  /** A format name, its options, or a function: what core's `fmt` takes. The value, the target, the ends, the summary and the table print through it. */
+  /** A format name, its options, or a function: what core's `fmt` takes. The value, the target, the ends, the summary and the table print through it; a percent format prints each as its share of `max`. */
   format?: FormatSpec;
   /** The half ring's width, in points; its height is half. */
   size?: number;
@@ -91,6 +91,8 @@ export function GaugeChart({ value, max = 1, target, title, subtitle = "", headl
   const foot = partStyle(r, "foot", { view: { width: w }, text: [chartFont(tk), { fontVariant: ["tabular-nums"] }] });
   const tick = g.targetShare === null ? null : { a: onHalfRing(g.targetShare, w / 2, cy, inner - over), b: onHalfRing(g.targetShare, w / 2, cy, outer + over) };
   const hasTarget = g.targetShare !== null;
+  // Meter's reading: a percent format prints the share of `max` (58 of 100 is 58%), any other the value itself.
+  const shown = (v: number) => meterShown(v, max, format);
   return (
     <ChartCard
       id="gauge-chart"
@@ -100,7 +102,7 @@ export function GaugeChart({ value, max = 1, target, title, subtitle = "", headl
       title={title}
       subtitle={subtitle}
       headline={headline && { format, ...headline }}
-      table={!loading && g.known ? { data: [{ measure: title, value, ...(hasTarget ? { target } : {}) }], x: "measure", y: hasTarget ? ["value", "target"] : ["value"], format, labels: { value: str("value"), target: str("target") }, xLabel: str("measure") } : null}
+      table={!loading && g.known ? { data: [{ measure: title, value: shown(value), ...(hasTarget ? { target: shown(target!) } : {}) }], x: "measure", y: hasTarget ? ["value", "target"] : ["value"], format, labels: { value: str("value"), target: str("target") }, xLabel: str("measure") } : null}
       style={style}
     >
       <ChartFrame height={cy + over} grow interactive label={loading ? str("loading", { title }) : summary} loading={loading} empty={!g.known} emptyTitle={empty ?? str("empty")} emptyLine={emptyLine ?? str("emptyLine")} loadingLabel={str("loadingChart")}>
@@ -128,14 +130,14 @@ export function GaugeChart({ value, max = 1, target, title, subtitle = "", headl
                 </Svg>
               ) : null}
               <View testID="gauge-chart.center" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" pointerEvents="none" style={[s.center, center.view]}>
-                <MetricValue value={value} format={format} size="lg" />
+                <MetricValue value={shown(value)} format={format} size="lg" />
                 {label ? <Text testID="gauge-chart.centerLabel" numberOfLines={1} style={[caption.view, caption.text]}>{label}</Text> : null}
               </View>
             </Enter>
             <View testID="gauge-chart.foot" style={[s.foot, foot.view]}>
-              <Text style={foot.text}>{fmt(format, 0, formatWords, locale)}</Text>
-              {hasTarget ? <Text style={foot.text}>{str.parts("targetValue", { value: fmt(format, target, formatWords, locale) })}</Text> : null}
-              <Text style={foot.text}>{fmt(format, max, formatWords, locale)}</Text>
+              <Text style={foot.text}>{fmt(format, shown(0), formatWords, locale)}</Text>
+              {hasTarget ? <Text style={foot.text}>{str.parts("targetValue", { value: fmt(format, shown(target!), formatWords, locale) })}</Text> : null}
+              <Text style={foot.text}>{fmt(format, shown(max), formatWords, locale)}</Text>
             </View>
           </View>
         )}

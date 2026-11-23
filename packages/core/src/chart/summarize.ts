@@ -54,13 +54,16 @@ export interface SummaryWords {
   summary(v: { label: string; range: string; parts: string }): string;
 }
 
+const numberOf = (v: unknown): number => (typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" ? Number(v) : Number.NaN);
+
 /** Ordered data (time) reads as a trend; categories read as highest and lowest. */
 export function summarize({ label, data, keys, fields, labels, format, formatWords, ordered, locale }: SummaryInput, words: SummaryWords): string {
   if (!data.length) return words.noData({ title: label });
   const f = (v: unknown) => fmt(format, v, formatWords, locale);
   const parts = fields.map((field) => {
     const name = labels[field] ?? field;
-    const pts = data.map((r, i) => [i, r[field] as number] as const).filter(([, v]) => v != null);
+    // A number, or text that is one ("120"); anything else (a gap, NaN, "n/a") is left out.
+    const pts = data.map((r, i) => [i, numberOf(r[field])] as const).filter(([, v]) => Number.isFinite(v));
     if (!pts.length) return words.noValues({ name });
     const max = pts.reduce((a, b) => (b[1] > a[1] ? b : a));
     const min = pts.reduce((a, b) => (b[1] < a[1] ? b : a));
@@ -68,7 +71,8 @@ export function summarize({ label, data, keys, fields, labels, format, formatWor
     const first = pts[0]![1];
     const last = pts[pts.length - 1]![1];
     if (pts.length < 2) return words.single({ name, value: f(last) });
-    const change = first === 0 ? (last === 0 ? 0 : 1) : (last - first) / Math.abs(first);
+    // From 0 there is no share of a change, only its direction: 0 to -5 fell.
+    const change = first === 0 ? Math.sign(last) : (last - first) / Math.abs(first);
     const trend = Math.abs(change) < 0.01 ? words.held({ name, value: f(last) }) : (change > 0 ? words.rose : words.fell)({ name, from: f(first), to: f(last) });
     return `${trend}${pts.length > 2 ? words.peak({ key: keys[max[0]]! }) : ""}`;
   });
