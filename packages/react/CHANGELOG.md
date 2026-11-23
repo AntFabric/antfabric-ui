@@ -99,6 +99,20 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 12: per-component fixes
 
+Messaging, agent and feedback:
+
+- ToastRegion: each toast is held by its own React `key`, not its place, so dismissing one no longer remounts the toasts after it (their timers kept running from the start again, each was announced again, and focus on a later Undo was lost). Give each Toast a `key` (the notification's id) (H6).
+- Message: the actions bar stays mounted while its ⋯ menu is open, so a menu the app anchors to ⋯ keeps its anchor when the pointer or focus moves into it. Message now keeps `menuOpen` itself when the app passes only `onMenuOpenChange` (M25). On touch, a long press opens the bar on that row only; a press outside the row puts it away (L21).
+- MessageActions: ⋯ is a menu button (`aria-haspopup="menu"`, `aria-expanded`) instead of a toggle (`aria-pressed`); it still draws pressed while the menu is open (L31).
+- AttachmentCard and Composer: a ready staged chip's thumbnail or badge and name are one button that calls `onOpen`, so Composer's `onAttachmentOpen` fires (M26). A link card calls `onOpen` as the browser follows it (L36). Composer's `onAttachmentDownload` can never fire (a staged file has no download): it is documented and marked deprecated, kept for 1.x.
+- Composer: while only an upload holds a typed message, Send stays pressable (`aria-disabled`, not `disabled`), so a press or Enter says "Waiting for the upload to finish" (L28). With `sendKey="mod-enter"` the edit banner says Mod+Enter saves, not Enter (L27).
+- ReactionPill: hover and focus open no who-reacted card when `reactors` is empty (L22).
+- ThinkingIndicator: with no steps, the row holds the sentence it announces ("Fabric is thinking") as hidden text, so a screen reader moving through the page finds it (L23).
+- Toast: a new `message` on a mounted toast starts its `duration` again (L29).
+- Skeleton: while `visible` is false it is hidden from screen readers too (`aria-hidden`), not only from sight (L30).
+- ProgressBar: `value` left out is indeterminate, as a NaN was; it no longer draws and announces 40% for an upload with no value yet. The docs default (40) is now only the catalogue's sample (L32).
+- EmptyState: new `headingLevel` (1 to 6, default 2) for the title, so it can keep the page's heading order (L35).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:

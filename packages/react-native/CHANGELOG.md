@@ -95,6 +95,16 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 12: per-component fixes
 
+Messaging, agent and feedback:
+
+- AttachmentCard and Composer: a ready staged chip's thumbnail or badge and name are one button that calls `onOpen`, so Composer's `onAttachmentOpen` fires (M26). A link card calls `onOpen` when pressed and opens the link itself only for `http`, `https` and `mailto`; any other scheme a message carried is the app's to open from `onOpen`, or not at all. `removable` now draws Remove preview on a link card, as on the web (L26, L36).
+- Composer: while only an upload holds a typed message, Send stays pressable, so a tap says "Waiting for the upload to finish" (L28).
+- Toast: the Undo and Dismiss chips read the pill's ink in any form (#rgb, #rgba, #rrggbb, #rrggbbaa, rgb(), rgba(), hsl(), hsla()); `#fff` drew them blue and `rgb(…)` drew nothing. A colour name leaves them unfilled (M30).
+- TypingIndicator: the dots' animation runs only while someone is typing (L24).
+- Skeleton: while `visible` is false it is hidden from screen readers too (L30). A one-line row (`lines={1}`) draws the small 20pt lead, as the web does (L33).
+- ProgressBar: `value` left out is indeterminate, as a NaN was; it no longer draws and announces 40% (L32).
+- SwipeRow: a drag that starts on an open row starts from where the row rests, at once, instead of from a value the native driver reports a frame later (L34).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:

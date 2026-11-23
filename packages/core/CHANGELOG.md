@@ -58,6 +58,11 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 12: per-component fixes
 
+Messaging, agent and feedback:
+
+- The AttachmentCard recipe has a `chipOpen` part: the ready staged chip's open target (gap, radius and its focus ring), which `styles.chipOpen` reaches in both kits.
+- Strings: AttachmentCard's `removePreview` is read by the phone too (it drew no Remove preview before).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:
