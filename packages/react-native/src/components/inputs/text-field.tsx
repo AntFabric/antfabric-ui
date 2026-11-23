@@ -77,7 +77,8 @@ function entry(type: TextFieldType, autoComplete?: string): Partial<TextInputPro
     keyboardType: type === "email" ? "email-address" : type === "tel" ? "phone-pad" : type === "url" ? "url" : type === "number" ? "decimal-pad" : "default",
     autoCapitalize: address ? "none" : undefined,
     autoCorrect: address ? false : undefined,
-    textContentType: type === "email" ? "emailAddress" : type === "password" ? "password" : type === "tel" ? "telephoneNumber" : type === "url" ? "URL" : undefined,
+    // A sign-up field (`new-password`) is offered a strong new password, not the saved one.
+    textContentType: type === "email" ? "emailAddress" : type === "password" ? (autoComplete === "new-password" ? "newPassword" : "password") : type === "tel" ? "telephoneNumber" : type === "url" ? "URL" : undefined,
     autoComplete: autoComplete ? known[autoComplete] : undefined,
     returnKeyType: type === "search" ? "search" : undefined,
   };
@@ -219,8 +220,9 @@ export function TextField({
             onBlur?.();
           }}
           {...rootProps(rest)}
-          // What is said after the name: the error or the helper, the field's own description and error, that it is required, then the product's hint.
-          accessibilityHint={[showError ? error : helper, form?.hint, required && !form?.required ? tag || str("required") : "", rest.accessibilityHint].filter(Boolean).join(". ") || undefined}
+          // What is said after the name: the error or the helper, the field's own description and error, that it is required (never the tag
+          // in its place: the tag is read where it is drawn), then the product's hint.
+          accessibilityHint={[showError ? error : helper, form?.hint, required && !form?.required ? str("required") : "", rest.accessibilityHint].filter(Boolean).join(". ") || undefined}
           style={[s.input, input.view, inputText]}
         />
         {trailing || revealing ? (
