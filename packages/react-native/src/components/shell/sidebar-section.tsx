@@ -33,7 +33,7 @@ export interface SidebarSectionProps extends RootProps {
   unread?: number;
   /** The + action's name: 'Add channels', 'New message', 'Add to this section'. Default: the `add` string. */
   addLabel?: string;
-  /** Draws +. On a phone it is always there; the section's other actions are a long press on the header. */
+  /** Draws + (with `onAdd`). On a phone it is always there; the section's other actions are a long press on the header (with `onMenu`). */
   actionsVisible?: boolean;
   /** A hairline above the header, parting it from the section before. Off for the first section. */
   divided?: boolean;
@@ -127,7 +127,8 @@ export function SidebarSection({
           accessibilityHint={shut ? str("expandPhone", { label }) : str("collapsePhone", { label })}
           accessibilityState={{ expanded: !shut }}
           onPress={() => setExpanded(shut)}
-          onLongPress={() => onMenu?.()}
+          // Only with a handler: attached, a hold is taken by the long press and never becomes the press.
+          onLongPress={onMenu ? () => onMenu() : undefined}
           accessibilityActions={onMenu ? [{ name: "longpress", label: str("options", { label }) }] : undefined}
           onAccessibilityAction={(e) => e.nativeEvent.actionName === "longpress" && onMenu?.()}
           {...press.handlers}
@@ -142,15 +143,16 @@ export function SidebarSection({
           </Text>
           {shut && unread > 0 ? <Badge count={unread} label={str("unreadIn", { label })} style={s.badge} /> : null}
         </Pressable>
-        {actionsVisible ? (
+        {/* Drawn only when it fires something. */}
+        {actionsVisible && onAdd ? (
           <View style={s.actions}>
-            <IconButton icon="plus" label={addLabel || str("add")} size="sm" onPress={() => onAdd?.()} />
+            <IconButton icon="plus" label={addLabel || str("add")} size="sm" onPress={() => onAdd()} />
           </View>
         ) : null}
       </View>
       <View accessibilityRole="list">
         {shown.map(({ key, ...item }) => (
-          <SidebarItem key={key} {...item} selectedName={open ? (open === key ? item.name : NOT_OPEN) : ""} onPress={() => setOpen(key)} onLongPress={() => onItemLongPress?.(key)} />
+          <SidebarItem key={key} {...item} selectedName={open ? (open === key ? item.name : NOT_OPEN) : ""} onPress={() => setOpen(key)} onLongPress={onItemLongPress ? () => onItemLongPress(key) : undefined} />
         ))}
         {!shut && items.length === 0 && emptyText ? <Text testID={partId(testID, "sidebar-section", "emptyText")} maxFontSizeMultiplier={fontScale.content} style={[s.empty, r.emptyText.view, r.emptyText.text]}>{emptyText}</Text> : null}
       </View>

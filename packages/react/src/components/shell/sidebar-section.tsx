@@ -10,9 +10,9 @@ import { Badge } from "../display/badge";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { SidebarItem, type SidebarItemProps } from "./sidebar-item";
 
-/** One row: SidebarItem's props and a `key`, but the section decides which row is open (`selected`) and a row's press is the section's `onSelectedChange`. */
+/** One row: SidebarItem's props and a `key`, but the section decides which row is open (`selected`), a row's press is the section's `onSelectedChange` and its ⋮ the section's `onItemMenu`. */
 export type SidebarSectionItem = Omit<SidebarItemProps, "selectedName" | "actionsVisible" | "onPress" | "onMenu"> & {
-  /** What `selected` and `onSelectedChange` name the row by. */
+  /** What `selected`, `onSelectedChange` and `onItemMenu` name the row by. */
   key: string;
 };
 
@@ -31,7 +31,7 @@ export interface SidebarSectionProps extends RootProps<HTMLDivElement> {
   unread?: number;
   /** The + action's name: 'Add channels', 'New message', 'Add to this section'. Default: the `add` string. */
   addLabel?: string;
-  /** Draws + and ⋯, revealed on header hover or focus-within (opacity, so revealing never reflows). */
+  /** Draws + (with `onAdd`) and ⋯ (with `onMenu`), revealed on header hover or focus-within (opacity, so revealing never reflows). */
   actionsVisible?: boolean;
   /** A hairline above the header, parting it from the section before. Off for the first section. */
   divided?: boolean;
@@ -41,6 +41,8 @@ export interface SidebarSectionProps extends RootProps<HTMLDivElement> {
   onExpandedChange?: (expanded: boolean) => void;
   /** A row was pressed: its `key`. */
   onSelectedChange?: (selected: string) => void;
+  /** A row's options were asked for: its ⋮, the context menu on it, or Shift+F10 or the Menu key. Its `key`; the app opens the row's menu from it. */
+  onItemMenu?: (key: string) => void;
   onAdd?: () => void;
   onMenu?: () => void;
   /** Per-part styles over the theme: `{ header: {…}, toggle: {…}, list: {…} }`. */
@@ -54,9 +56,9 @@ const header: CSSProperties = { ...row, gap: t.space["2xs"], paddingBottom: t.sp
 
 const toggle: CSSProperties = { ...pressable, flexDirection: "row", alignItems: "center", flex: 1, textAlign: "left", transition: `color ${t.duration.fast}` };
 
-/** A row of the list: memoised, with a press that names its key through one shared handler. */
-const Row = memo(function Row({ itemKey, item, selectedName, onSelect }: { itemKey: string; item: Omit<SidebarSectionItem, "key">; selectedName: string; onSelect: (key: string) => void }) {
-  return <SidebarItem {...item} selectedName={selectedName} onPress={() => onSelect(itemKey)} />;
+/** A row of the list: memoised, with a press and a menu that name its key through one shared handler each. */
+const Row = memo(function Row({ itemKey, item, selectedName, onSelect, onMenu }: { itemKey: string; item: Omit<SidebarSectionItem, "key">; selectedName: string; onSelect: (key: string) => void; onMenu?: (key: string) => void }) {
+  return <SidebarItem {...item} selectedName={selectedName} onPress={() => onSelect(itemKey)} onMenu={onMenu ? () => onMenu(itemKey) : undefined} />;
 });
 
 export function SidebarSection({
@@ -72,6 +74,7 @@ export function SidebarSection({
   items = [],
   onExpandedChange,
   onSelectedChange,
+  onItemMenu,
   onAdd,
   onMenu,
   styles,
@@ -93,6 +96,9 @@ export function SidebarSection({
   const latest = useRef(setOpen);
   latest.current = setOpen;
   const select = useCallback((key: string) => latest.current(key), []);
+  const menuOf = useRef(onItemMenu);
+  menuOf.current = onItemMenu;
+  const itemMenu = useCallback((key: string) => menuOf.current?.(key), []);
   const shown = items.filter((item) => !shut || (open ? item.key === open : item.active));
   return (
     <div
@@ -124,17 +130,18 @@ export function SidebarSection({
           <span style={css(text, truncate(1), { flexShrink: 1 })}>{label}</span>
           {shut && unread > 0 && <Badge count={unread} label={s("unreadIn", { label })} style={{ alignSelf: "center" }} />}
         </button>
-        {actionsVisible && (
+        {/* Each is drawn only when it fires something. */}
+        {actionsVisible && (onAdd || onMenu) && (
           <div style={css(row, { gap: t.space["3xs"], opacity: revealed ? 1 : 0, transition: `opacity ${t.duration.fast}` })}>
-            <IconButton icon="plus" label={addLabel || s("add")} size="sm" onPress={() => onAdd?.()} />
-            <IconButton icon="ellipsis" label={s("options", { label })} size="sm" onPress={() => onMenu?.()} />
+            {onAdd ? <IconButton icon="plus" label={addLabel || s("add")} size="sm" onPress={() => onAdd()} /> : null}
+            {onMenu ? <IconButton icon="ellipsis" label={s("options", { label })} size="sm" onPress={() => onMenu()} /> : null}
           </div>
         )}
       </div>
       <div role="list" data-af-part="list" style={css(box, { paddingInline: t.space.sm }, r.list)}>
         {shown.map(({ key, ...item }) => (
           <div role="listitem" key={key} style={box}>
-            <Row itemKey={key} item={item} selectedName={open ? (open === key ? item.name : NOT_OPEN) : ""} onSelect={select} />
+            <Row itemKey={key} item={item} selectedName={open ? (open === key ? item.name : NOT_OPEN) : ""} onSelect={select} onMenu={onItemMenu ? itemMenu : undefined} />
           </div>
         ))}
         {!shut && items.length === 0 && emptyText && (
