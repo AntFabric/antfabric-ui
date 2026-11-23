@@ -36,7 +36,7 @@ const docs: ComponentDocs = {
       type: "boolean",
       default: false,
       platforms: ["mobile"],
-      description: "The lock was just passed: the tile turns to an open lock in success green, the buttons go, and the app comes forward. What the Unlock button does in the catalogue; in the app onUnlock fires and the lock screen leaves.",
+      description: "The lock was just passed: the tile turns to an open lock in success green, the buttons go, and the app comes forward. The app's answer to onUnlock: the button spins until the app passes it (or a new `error`), then the lock screen leaves.",
     },
     error: {
       type: "string",
@@ -50,6 +50,7 @@ const docs: ComponentDocs = {
     },
     onSignIn: {
       type: "event",
+      description: "Reports the request; Sign in spins until the app answers with `state` (waiting), `error` or `offline`, or settles the promise the handler returns. The card never turns to waiting on its own.",
     },
     onCancel: {
       type: "event",
@@ -57,6 +58,7 @@ const docs: ComponentDocs = {
     onUnlock: {
       type: "event",
       platforms: ["mobile"],
+      description: "Reports the request; Unlock spins until the app answers with `unlocked` or `error`, or settles the promise the handler returns. The lock never opens on its own.",
     },
     onSignOut: {
       type: "event",
@@ -65,7 +67,7 @@ const docs: ComponentDocs = {
   platforms: {
     web: {
       status: "ready",
-      base: "A role=\"region\" card named by its title, inline styles over `t`, popping in with enter(\"pop\"), with the kit's Button; Sign in again turns it to waiting (`state` through useControllable) while the route's same-tab OIDC redirect runs (TanStack Start beforeLoad → /sign-in?next=…)",
+      base: "A role=\"region\" card named by its title, inline styles over `t`, popping in with enter(\"pop\"), with the kit's Button; Sign in again reports the request and spins (usePending) until the app sets `state` to waiting while the route's same-tab OIDC redirect runs (TanStack Start beforeLoad → /sign-in?next=…)",
       import: "import { SessionState } from \"@antfabric/ui-react\"",
       notes: [
         "Sign in again keeps the URL: the current path rides in next= and the router sends the person back to it. Only a same-origin path is accepted, never an absolute URL, so the parameter cannot become an open redirect.",
@@ -87,7 +89,7 @@ const docs: ComponentDocs = {
         "Only the hand-off id rides the custom-scheme URL — never a token. A callback whose state does not match the sign-in this window started is refused.",
         "The reason line uses the gateway's refusal CODE, never its message: an ordinary expiry, account_suspended, or account_deleted.",
         "\"Open the browser again\" and Cancel on the waiting card are new; today the Login screen says \"Signing you in…\" and waits.",
-        "In the catalogue the card pops in, and Login with AntFabric (Sign in again on the web) sets `state` to waiting, which is what the person sees while the browser has them.",
+        "In the catalogue the card pops in, and Login with AntFabric (Sign in again on the web) spins until the app answers; the flows pass `state: \"waiting\"`, which is what the person sees while the browser has them.",
       ],
       keyboard: [
         {
@@ -102,13 +104,13 @@ const docs: ComponentDocs = {
     },
     mobile: {
       status: "ready",
-      base: "<Enter motion=\"pop\"> card, StyleSheet over useTheme(), with the kit's Button; `state` and `unlocked` through useControllable. The app runs expo-auth-session (ASWebAuthenticationSession / Custom Tabs) and expo-local-authentication around it",
+      base: "<Enter motion=\"pop\"> card, StyleSheet over useTheme(), with the kit's Button; `state` and `unlocked` are the app's: Sign in and Unlock spin (usePending) until it answers. The app runs expo-auth-session (ASWebAuthenticationSession / Custom Tabs) and expo-local-authentication around it",
       import: "import { SessionState } from \"@antfabric/ui-react-native\"",
       notes: [
         "The lock screen auto-prompts for Face ID / fingerprint when it opens, and falls back to the passcode when the hardware is missing or nothing is enrolled.",
         "Signing in or out never draws a login screen at someone who is mid-sign-in: while the keychain read or the profile flush is outstanding, a loader shows instead.",
         "Sign out unregisters this phone's push token first, or the next person would receive the previous person's notifications.",
-        "In the catalogue the card pops in; Login with AntFabric sets `state` to waiting, and Unlock (or Use passcode) sets `unlocked`, so the tile turns to an open lock and the buttons go.",
+        "In the catalogue the card pops in; Login with AntFabric and Unlock (or Use passcode) spin until the app answers; the flows pass `state: \"waiting\"` and `unlocked: true`, so the tile turns to an open lock and the buttons go.",
       ],
       gestures: [
         {

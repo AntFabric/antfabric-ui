@@ -1,5 +1,5 @@
 import { useEffect, useRef, type CSSProperties } from "react";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { recipes, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
@@ -21,7 +21,8 @@ export interface SessionStateProps extends RootProps<HTMLDivElement> {
   error?: string;
   /** No backend answering: Sign in would do nothing, so the card says so. */
   offline?: boolean;
-  onSignIn?: () => void;
+  /** Reports the request; Sign in spins until the app answers with `state` (waiting), `error` or `offline`, or the returned promise settles. */
+  onSignIn?: () => void | Promise<unknown>;
   onCancel?: () => void;
   onSignOut?: () => void;
   /** Per-part styles over the theme: `{ root: {…}, tile: {…}, title: {…}, actions: {…} }`. */
@@ -39,12 +40,13 @@ const ICON: Record<SessionStateState, string> = {
   "signed-out": "log-in",
 };
 
-export function SessionState({ state: stateProp = "expired", returnTo = "", error = "", offline = false, onSignIn, onCancel, onSignOut, styles, strings, style, ...rest }: SessionStateProps) {
+export function SessionState({ state = "expired", returnTo = "", error = "", offline = false, onSignIn, onCancel, onSignOut, styles, strings, style, ...rest }: SessionStateProps) {
   const s = useStrings("session-state", strings);
   const { platform } = usePlatform();
   const web = platform === "web";
-  // Signing in hands over to the browser: the card turns to waiting while it has them.
-  const [state, setState] = useControllable(stateProp);
+  // Sign in reports the request and spins until the app answers with a new `state`, `error` or `offline` (or its promise settles): the
+  // card never shows waiting before the app says the browser has them.
+  const { pending, run } = usePending([state, error, offline]);
   const title = {
     expired: s("titleExpired"),
     waiting: web ? s("titleWaitingWeb") : s("titleWaitingDesktop"),
@@ -60,10 +62,7 @@ export function SessionState({ state: stateProp = "expired", returnTo = "", erro
     "signed-out": s("bodySignedOut"),
   }[state];
   const r = useRecipe(recipes["session-state"], { variants: { state }, styles });
-  const signIn = () => {
-    setState("waiting");
-    onSignIn?.();
-  };
+  const signIn = () => run(onSignIn);
   // Sign in turns into the waiting status: focus, which was on the button that went, moves to the status.
   const waitRef = useFocusHandoff<HTMLDivElement>(state === "waiting");
   // A change of state is said once when focus did not move to it, and the reason or error as it arrives: a status that is mounted
@@ -121,8 +120,8 @@ export function SessionState({ state: stateProp = "expired", returnTo = "", erro
         </span>
       ) : null}
       <div data-af-part="actions" style={css(box, { alignSelf: "stretch", marginTop: t.space.md }, r.actions)}>
-        {state === "expired" && <Button label={web ? s("signInAgain") : s("signIn")} size="lg" full disabled={offline} onPress={signIn} />}
-        {state === "signed-out" && <Button label={s("signIn")} size="lg" full disabled={offline} onPress={signIn} />}
+        {state === "expired" && <Button label={web ? s("signInAgain") : s("signIn")} size="lg" full disabled={offline} loading={pending} onPress={signIn} />}
+        {state === "signed-out" && <Button label={s("signIn")} size="lg" full disabled={offline} loading={pending} onPress={signIn} />}
         {state === "waiting" && !web && <Button label={s("openBrowserAgain")} variant="secondary" size="lg" full iconTrailing="external-link" onPress={() => onSignIn?.()} />}
         {state === "waiting" && !web && <Button label={s("cancel")} variant="ghost" size="lg" full onPress={() => onCancel?.()} />}
         {state === "suspended" && <Button label={s("useDifferentAccount")} variant="secondary" size="lg" full onPress={() => onSignOut?.()} />}
