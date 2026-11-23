@@ -16,6 +16,8 @@ Every prop a component can change is reported by `on<Prop>Change(next)`. It is d
 
 `open` / `onOpenChange` is a boolean, and only on overlays.
 
+The value and its event are independent. Both passed, the component is controlled. The value alone, it starts there and keeps its own state, following each new value (an array or plain object is compared by its items). **The event alone, it keeps its own state and reports each change**: a `<Switch onCheckedChange={save} />` turns on. So a kit never defaults the prop in its destructuring, which would hold it at the default; it defaults the hook's result, `const [on = false, setOn] = useControllable(checked, onCheckedChange)`. `pnpm check conventions` holds it (`controllable-default`), and the re-render pass mounts each changeable prop with its event alone, presses it, and expects it to move (`controlTodo`).
+
 ## 2. An item is named by `key`
 Every item in a list carries `key: string`. A prop that names an item (`value`, `selected`, `active`, `current`, `openMenu`, `filter`, `confirmOption`) holds a key.
 
