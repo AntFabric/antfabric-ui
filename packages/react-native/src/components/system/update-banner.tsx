@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { Animated, PanResponder, Platform, Text, View, type ViewStyle } from "react-native";
+import { AccessibilityInfo, Animated, PanResponder, Platform, Text, View, findNodeHandle, type ViewStyle } from "react-native";
 import { recipes, useControllable, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { announce, useBackHandler } from "../../lib/a11y";
@@ -112,6 +112,12 @@ export function UpdateBanner({
   }, [said]);
   // Android's back button puts the restart sheet away, as Later does.
   useBackHandler(() => setConfirm(false), confirm);
+  // A screen reader starts at the restart sheet's title when it opens, as it does in a Dialog.
+  const sheetTitle = useRef<Text>(null);
+  useEffect(() => {
+    const node = confirm && Platform.OS !== "web" && sheetTitle.current ? findNodeHandle(sheetTitle.current) : null;
+    if (node) AccessibilityInfo.setAccessibilityFocus(node);
+  }, [confirm]);
   return (
     <View {...rootProps(rest)} testID={partId(testID, "update-banner", "root")} style={[s.root, r.root.view, style]}>
       <View testID={partId(testID, "update-banner", "card")} style={r.card.view}>
@@ -160,10 +166,10 @@ export function UpdateBanner({
         ) : null}
       </View>
       {confirm ? (
-        <Enter motion="slide-up" role="dialog" aria-modal accessibilityLabel={str("confirmTitle")} accessibilityViewIsModal>
+        <Enter motion="slide-up" role="dialog" aria-modal accessibilityLabel={str("confirmTitle")} accessibilityViewIsModal onAccessibilityEscape={() => setConfirm(false)}>
           <Animated.View testID={partId(testID, "update-banner", "sheet")} {...swipe.handlers} style={[s.sheet, r.sheet.view, { transform: [{ translateY: swipe.y }] }]}>
             <View testID={partId(testID, "update-banner", "grabber")} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden style={[s.grabber, r.grabber.view]} />
-            <Text testID={partId(testID, "update-banner", "sheetTitle")} accessibilityRole="header" maxFontSizeMultiplier={fontScale.content} style={[r.sheetTitle.view, r.sheetTitle.text]}>
+            <Text ref={sheetTitle} testID={partId(testID, "update-banner", "sheetTitle")} accessibilityRole="header" maxFontSizeMultiplier={fontScale.content} style={[r.sheetTitle.view, r.sheetTitle.text]}>
               {str("confirmTitle")}
             </Text>
             <Text testID={partId(testID, "update-banner", "sheetBody")} maxFontSizeMultiplier={fontScale.content} style={[s.sheetBody, r.sheetBody.view, r.sheetBody.text]}>

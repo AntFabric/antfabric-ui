@@ -160,7 +160,9 @@ export function BottomSheet({
         accessibilityViewIsModal
         accessibilityLabel={title || undefined}
         {...rootProps(rest)}
+        // Put away, it is hidden from VoiceOver (accessibilityElementsHidden) and from TalkBack (importantForAccessibility).
         accessibilityElementsHidden={gone}
+        importantForAccessibility={gone ? "no-hide-descendants" : undefined}
         onAccessibilityEscape={() => close()}
         style={tall ? { flex: 1 } : null}
       >
