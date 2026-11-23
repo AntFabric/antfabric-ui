@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useId, type CSSProperties } from "react";
 import { recipes, useControllable, useDirection, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { METRIC_KEY, barScale, fmt, metricTotal, prepare, seriesColors, summarize, useSeries, type FormatSpec, type Metric, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
@@ -115,8 +115,8 @@ export function MetricTabs({ data, x, metrics, title, subtitle = "", format = "i
   const r = useRecipe(recipes["metric-tabs"], { state: { focus: ui.focused }, styles });
   const [picked, setPicked] = useControllable(value, onValueChange);
   const tabs = metrics.slice(0, MOST);
-  // Named from the title, not a generated id, so the markup is the same on every mount; two tab sets on one page need different titles.
-  const uid = `metric-tabs-${title.replace(/\W+/g, "-")}`;
+  // React's id, so two tab sets never share one (a title of non-Latin words would have been all dashes); the server and the client give the same.
+  const uid = `metric-tabs-${useId()}`;
   const panelId = `${uid}-panel`;
   const tabId = (i: number) => `${uid}-tab-${i}`;
   // The arrows move by the reading direction and the tab chosen is the one focused (automatic activation); Home and End go to the ends.
