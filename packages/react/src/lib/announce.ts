@@ -50,7 +50,10 @@ export function announce(message: string, politeness: Politeness = "polite"): vo
   // A beat between emptying and filling, so the change is seen as new text.
   timers[politeness] = setTimeout(() => {
     timers[politeness] = undefined;
-    el.textContent = queue.splice(0).reduce((said, m) => (said ? `${said.trimEnd()}${/[.!?…]$/.test(said.trimEnd()) ? "" : "."} ${m}` : m), "");
+    // The region again: the page may have dropped the one emptied above (a router replacing the body) during the beat.
+    const live = region(politeness);
+    if (!live) return void queue.splice(0);
+    live.textContent = queue.splice(0).reduce((said, m) => (said ? `${said.trimEnd()}${/[.!?…]$/.test(said.trimEnd()) ? "" : "."} ${m}` : m), "");
   }, 50);
 }
 
