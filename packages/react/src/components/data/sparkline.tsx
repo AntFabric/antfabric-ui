@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { Area, AreaChart, YAxis } from "recharts";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
-import { FLAT_FILL, fmt, valueDomain, type FormatSpec, type Row } from "@antfabric/ui-core/chart";
+import { FLAT_FILL, fmt, valueDomain, type FormatSpec, type FormatWords, type Row } from "@antfabric/ui-core/chart";
 import { type RootProps, rootProps } from "../../lib/root-props";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { css } from "../../lib/style";
@@ -49,6 +49,8 @@ export function Sparkline({ data, y, width = 120, height = 32, area = false, mar
   const t = useChartTokens();
   const r = useRecipe(recipes.sparkline, { styles });
   const s = useStrings("sparkline", strings);
+  // The words a format writes (points, a duration, the dash) are the kit's, so the default label is said in the product's language.
+  const formatWords: FormatWords = { unavailable: s("unavailable"), points: ({ value }) => s("formatPoints", { value }), duration: ({ minutes, seconds }) => s("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
   const reduced = useReducedMotion();
   const values = data.map((row) => row[y]).filter((v): v is number => typeof v === "number" && Number.isFinite(v));
@@ -60,7 +62,7 @@ export function Sparkline({ data, y, width = 120, height = 32, area = false, mar
   const span = hi - lo || 1;
   const floor = lo - span * (flush ? AIR_UNDER_FLUSH : AIR);
   const edge = flush ? 0 : t.chart.pointR;
-  const said = label || s("trend", { from: fmt(format, values[0], undefined, locale), to: fmt(format, values[values.length - 1], undefined, locale) });
+  const said = label || s("trend", { from: fmt(format, values[0], formatWords, locale), to: fmt(format, values[values.length - 1], formatWords, locale) });
   // One point has no line to draw: it is a dot.
   const dot = marker || rows.length === 1 ? (p: { index?: number; cx?: number; cy?: number }) => (p.index === rows.length - 1 ? <circle key="last" cx={p.cx} cy={p.cy} r={t.chart.pointR - 1} fill={color} stroke={t.surface.card} strokeWidth={t.border.wThick} /> : <g key={p.index} />) : false;
   return (

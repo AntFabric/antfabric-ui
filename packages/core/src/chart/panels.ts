@@ -5,6 +5,7 @@
  */
 
 import { fmt, type FormatSpec, type FormatWords } from "./format";
+import { keysOf } from "./rings";
 import type { Row } from "./types";
 
 /** The sum of a field over the rows. A value that is not a number counts as 0. */
@@ -92,6 +93,8 @@ export const METRIC_KEY = "__metric";
 export const MOST_GOALS = 3;
 
 export interface Goal {
+  /** What names the goal in `selected` (and a React key): its label, or `label#2` for the second of the same name (`keysOf`). */
+  key: string;
   label: string;
   done: number;
   target: number;
@@ -109,12 +112,14 @@ export interface Goal {
 
 /** The rows of GoalRings as goals, in order: up to three. A value or target that is not a number counts as 0; a target of 0 is no goal. */
 export function goalsOf(data: Row[], label: string, value: string, goal: string, most: number = MOST_GOALS): Goal[] {
-  return data.slice(0, most).map((r) => {
+  const rows = data.slice(0, most);
+  const keys = keysOf(rows.map((r) => String(r[label] ?? "–")));
+  return rows.map((r, i) => {
     const done = Number.isFinite(+(r[value] as number)) ? +(r[value] as number) : 0;
     const target = Number.isFinite(+(r[goal] as number)) ? +(r[goal] as number) : 0;
     const known = target > 0;
     const share = known ? done / target : 0;
-    return { label: String(r[label] ?? "–"), done, target, known, share, ratio: Math.min(1, Math.max(0, share)), left: Math.max(0, target - done), met: known && done >= target };
+    return { key: keys[i]!, label: String(r[label] ?? "–"), done, target, known, share, ratio: Math.min(1, Math.max(0, share)), left: Math.max(0, target - done), met: known && done >= target };
   });
 }
 

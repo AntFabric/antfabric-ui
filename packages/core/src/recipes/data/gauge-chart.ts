@@ -16,5 +16,5 @@ export const gaugeChart = defineRecipe({
     centerLabel: { base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.muted" } },
     foot: { base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" } },
   },
-  reads: [...chartReads, "$chart.font", "$chart.series3", "$data.warning", "$chart.gaugeW", "$chart.gaugeCap", "$chart.tickW", "$chart.tickOver", "$fg.strong"],
+  reads: [...chartReads, "$chart.font", "$chart.series3", "$data.warning", "$chart.gaugeW", "$chart.gaugeCap", "$chart.tickW", "$chart.tickOver", "$fg.strong", "$icon.sizeMd", "$space.2xs"],
 });

@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { Bar, BarChart, Cell, YAxis } from "recharts";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
-import { EARLIER_BARS, barLayout, fmt, valueDomain, type FormatSpec, type Row } from "@antfabric/ui-core/chart";
+import { EARLIER_BARS, barLayout, fmt, valueDomain, type FormatSpec, type FormatWords, type Row } from "@antfabric/ui-core/chart";
 import { type RootProps, rootProps } from "../../lib/root-props";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { css } from "../../lib/style";
@@ -40,6 +40,8 @@ export function SparkBars({ data, y, width = 96, height = 36, animate = false, t
   const t = useChartTokens();
   const r = useRecipe(recipes["spark-bars"], { styles });
   const s = useStrings("spark-bars", strings);
+  // The words a format writes (points, a duration, the dash) are the kit's, so the default label is said in the product's language.
+  const formatWords: FormatWords = { unavailable: s("unavailable"), points: ({ value }) => s("formatPoints", { value }), duration: ({ minutes, seconds }) => s("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
   const reduced = useReducedMotion();
   const values = data.map((row) => row[y]).filter((v): v is number => typeof v === "number" && Number.isFinite(v));
@@ -50,7 +52,7 @@ export function SparkBars({ data, y, width = 96, height = 36, animate = false, t
   const [lo, hi] = valueDomain(rows, ["v"]);
   const last = rows.length - 1;
   const { gap } = barLayout(width, rows.length, t.chart.barGap);
-  const said = label || s("summary", { count: values.length, latest: fmt(format, values[last], undefined, locale) });
+  const said = label || s("summary", { count: values.length, latest: fmt(format, values[last], formatWords, locale) });
   return (
     <span data-af-part="root" role="img" aria-label={said} {...rootProps(rest)} style={frame}>
       <BarChart accessibilityLayer={false} width={width} height={height} data={rows} margin={{ top: 0, right: 0, bottom: 0, left: 0 }} barCategoryGap={gap / 2} style={{ display: "block" }}>

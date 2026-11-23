@@ -3,8 +3,9 @@ import { type RootProps, rootProps } from "../../lib/root-props";
 import { Line, Svg } from "react-native-svg";
 import { PieChart } from "react-native-gifted-charts";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
-import { GAUGE_HOLE, fmt, gaugeState, meterShown, onHalfRing, summarizeGauge, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
+import { GAUGE_HOLE, fmt, gaugeState, meterIcon, meterShown, onHalfRing, summarizeGauge, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
+import { Icon } from "../../lib/icon";
 import { Enter } from "../../lib/motion";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { ChartCard, type ChartHeadline } from "../../data/chart-card";
@@ -35,6 +36,8 @@ export interface GaugeChartProps extends RootProps {
   thresholds?: MeterThresholds;
   /** A format name, its options, or a function: what core's `fmt` takes. The value, the target, the ends, the summary and the table print through it; a percent format prints each as its share of `max`. */
   format?: FormatSpec;
+  /** An icon beside the value in the caution and critical states, so the state is not the ring's colour alone. On by default. The summary always says it. */
+  showState?: boolean;
   /** The half ring's width, in points; its height is half. */
   size?: number;
   /** The title of the empty state when the value is not a number. */
@@ -60,9 +63,10 @@ const useStyles = createStyles((t) => ({
   tick: { position: "absolute", top: 0, left: 0 },
   center: { position: "absolute", left: 0, right: 0, top: 0, alignItems: "center", justifyContent: "flex-end", paddingBottom: t.space["3xs"] },
   foot: { flexDirection: "row", justifyContent: "space-between", marginTop: t.space.xs },
+  valueRow: { flexDirection: "row", alignItems: "center", gap: t.space["2xs"] },
 }));
 
-export function GaugeChart({ value, max = 1, target, title, subtitle = "", headline, label = "", kind = "score", thresholds, format = "percent", size, empty, emptyLine, loading = false, styles, strings, headingLevel: _headingLevel, testID, style, ...rest }: GaugeChartProps) {
+export function GaugeChart({ value, max = 1, target, title, subtitle = "", headline, label = "", kind = "score", thresholds, format = "percent", showState = true, size, empty, emptyLine, loading = false, styles, strings, headingLevel: _headingLevel, testID, style, ...rest }: GaugeChartProps) {
   const str = useStrings("gauge-chart", strings);
   const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
@@ -78,12 +82,15 @@ export function GaugeChart({ value, max = 1, target, title, subtitle = "", headl
   const over = tk.chart.tickOver;
   // The ring's flat edge is `over` above the bottom, so the tick has room to reach past the ring's top and ends.
   const cy = outer + over;
+  // Meter's state mark: an icon beside the number in caution and critical, and the state said after the value, so it is not the ring's colour alone.
+  const tone = g.known ? g.tone : "ok";
+  const icon = showState ? meterIcon(tone) : null;
   const summary = summarizeGauge({ label: title, value, max, target, caption: label, format, formatWords, locale }, {
     noValue: (v) => str("summaryNoValue", v),
     caption: (v) => str("summaryCaption", v),
     over: (v) => str("summaryOver", v),
     target: (v) => str("summaryTarget", v),
-    summary: (v) => str("summary", v),
+    summary: (v) => str("summary", { ...v, value: tone === "warning" ? str("stateWarning", { value: v.value }) : tone === "danger" ? str("stateDanger", { value: v.value }) : v.value }),
   });
   const ring = partStyle(r, "ring", { view: { width: w, height: cy + over } });
   const center = partStyle(r, "center", { view: { height: cy } });
@@ -130,7 +137,14 @@ export function GaugeChart({ value, max = 1, target, title, subtitle = "", headl
                 </Svg>
               ) : null}
               <View testID="gauge-chart.center" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" pointerEvents="none" style={[s.center, center.view]}>
-                <MetricValue value={shown(value)} format={format} size="lg" />
+                {icon ? (
+                  <View style={s.valueRow}>
+                    <Icon name={icon} size={tk.icon.sizeMd} color={color} />
+                    <MetricValue value={shown(value)} format={format} size="lg" />
+                  </View>
+                ) : (
+                  <MetricValue value={shown(value)} format={format} size="lg" />
+                )}
                 {label ? <Text testID="gauge-chart.centerLabel" numberOfLines={1} style={[caption.view, caption.text]}>{label}</Text> : null}
               </View>
             </Enter>

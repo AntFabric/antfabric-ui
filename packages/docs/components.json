@@ -3225,6 +3225,10 @@
           "type": "boolean",
           "description": "Bars run left to right with the categories down the side. A single series gets its value at each bar's end and no value axis. Long category labels are cut with an ellipsis and the tooltip has the full one. On the phone a single horizontal series is a ranked list of rows, not a rotated chart.",
           "default": false
+        },
+        "marks": {
+          "type": "boolean",
+          "description": "Each series past the first is filled with a texture over its colour (lines rising at 45°, lines falling at 135°, both, dots: `seriesMark`), in the plot and in the legend's swatch, so two series are never told apart by hue alone (WCAG 1.4.1). Left out, it is on for two or more series and off for one; `false` keeps flat fills where the product labels the series another way. A single series coloured by sign is never textured."
         }
       },
       "parts": [
@@ -3417,6 +3421,7 @@
           "The figure is named by the sentence core's `summarize` writes from the rows: categories read as highest and lowest, dates as a trend. It is heard, not printed: in the light theme most series colours sit under 3:1 against the card, so the tooltip and \"View as table\" give the numbers without colour.",
           "\"View as table\" shows the same rows in Table, with real headers, and a Button names it by what it will do (\"View as table\", then \"View as chart\").",
           "The legend says what it toggles: each entry is a button that is pressed while its series is on, and one that is off is struck through, not only dimmer. The last series showing cannot be turned off.",
+          "With `marks` (on by default for two or more series), a series is told apart by its texture as well as its colour: the first is plain, the next lines rising at 45°, then lines falling at 135°, then both, then dots, inked tone on tone in the card's colour, so the hue still leads. The legend's swatch draws the same.",
           "A bar coloured by sign is never only coloured: the tooltip and the table print the value with its minus, and a bar below zero hangs under a zero rule.",
           "On the web the plot is a stop for the arrow keys (recharts' accessibility layer): the tooltip moves category to category, and the plot draws a focus edge while the keyboard is in it."
         ]
@@ -3656,6 +3661,7 @@
             "Shipped from the data subpath: recharts is reached only from there. The chart is handed an explicit width and height.",
             "Everything the chart reads from the tokens goes through `rechartsTheme(useChartTokens(), useReducedMotion())`, exported beside the chart: `<CartesianGrid {...theme.grid} /> <XAxis dataKey=\"team\" {...theme.axis} /> <Bar fill={theme.series[0]} radius={theme.bar.radius} maxBarSize={theme.bar.maxBarSize} {...theme.motion.draw} />`. A chart the kit does not ship, written with recharts and the same call, matches.",
             "The hovered category keeps its colour and the rest step back to 38% over 150ms; a bar's fill eases to a new colour over 250ms. The bars draw in once over 600ms on the kit's ease-out and tween to new values; reduced motion turns the movement off and keeps the fades.",
+            "With `marks`, a series' bars are filled with an SVG `<pattern>`: its colour, and its texture over it in the card's colour (`TexturePattern`, core's `texturePath` and `TEXTURE`). The legend's swatch is filled with the same pattern.",
             "A horizontal chart gives its categories up to 40% of the width, cuts a longer label with an ellipsis (the tooltip shows the whole one) and draws each bar's value after it, with no value axis and no rules."
           ],
           "keyboard": [
@@ -3692,6 +3698,7 @@
             "gifted-charts' `height` is the part above zero: sections below zero are added to it, so the kit shrinks the plot by their share to keep the card's height, and moves a negative bar's label under the bar (`autoShiftLabels`).",
             "gifted-charts opens its own tooltip on a grouped bar, but not on a stack (it compares the stack's selection with `===` against an array), so the kit draws the card itself over the pressed stack, centred on it and kept inside the plot. A press also lights the category's bars and steps the rest back, as the web's hover does.",
             "A long series (fourteen days) has more labels than room: the kit draws one in every few, centred on its bar, and the tooltip names the day.",
+            "With `marks`, gifted-charts draws a bar as a view of one colour and has no pattern fill per series, so the kit lays its texture over each bar: an svg with a `Pattern` (`Texture`), handed in as a stack's `innerBarComponent` and, for grouped bars, through the chart's `barInnerComponent` (gifted-charts reads it from the chart, not from the bar). The legend's swatch carries the same. A horizontal single series (the ranked list) has one series, so no texture.",
             "The bars draw in unless the person reduces motion. Under react-native-web (the catalogue, `pnpm check`) gifted-charts' animation is off."
           ],
           "gestures": [
@@ -4503,7 +4510,7 @@
         },
         "selected": {
           "type": "string",
-          "description": "The part that is picked, by its name: its segment of the bar and its row stay lit and the others step back until it is picked again. Pointing at a part or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
+          "description": "The part that is picked, by its name (`#billing#2` for the second of two rows with one name): its segment of the bar and its row stay lit and the others step back until it is picked again. Pointing at a part or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
         },
         "onSelectedChange": {
           "type": "event",
@@ -9954,7 +9961,7 @@
         },
         "hidden": {
           "type": "array",
-          "description": "The segments the list has turned off, by name: [\"Email\"]. Left out, the chart keeps its own, starting with every segment on. Controlled when the app passes it with `onHiddenChange`."
+          "description": "The segments the list has turned off, by name: [\"Email\"]. A name that two rows share is two segments: the second is `Email#2`. Left out, the chart keeps its own, starting with every segment on. Controlled when the app passes it with `onHiddenChange`."
         },
         "onHiddenChange": {
           "type": "event",
@@ -9964,7 +9971,7 @@
         },
         "selected": {
           "type": "string",
-          "description": "The segment that is picked, by name: the hole shows it and the others step back until it is picked again. Pointing at a segment or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
+          "description": "The segment that is picked, by name (`Email#2` for the second of two rows named Email): the hole shows it and the others step back until it is picked again. Pointing at a segment or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
         },
         "onSelectedChange": {
           "type": "event",
@@ -10211,7 +10218,7 @@
         "label": "The summary: \"Tickets by channel: #support 312 (40.6%), #billing 158 (20.5%), #platform-eng 121 (15.7%), #onboarding 96 (12.5%), Email 82 (10.7%); total 769.\"",
         "notes": [
           "The figure (the ring on the phone) is named by the sentence core's `segmentsOf` and `summarizeSegments` write from the rows: every segment, its value and its share, and the total. It is heard, not printed: the legend under the ring prints every segment's name, value and share, so colour is never the only way in.",
-          "The list is the legend, the pick and the toggles: each row is a button that is pressed while its segment is the picked one (\"#billing, 158, 20.5%\"), so `selected` is reachable by keyboard and screen reader as well as by touching the ring. Each swatch is its own toggle button named \"Show #billing\", pressed while the segment shows; a segment that is off is struck through and faint, not only dimmer, with an en dash for its share. The last one showing cannot be turned off. The rows and swatches draw a focus ring.",
+          "The list is the legend, the pick and the toggles: each row is a button that is pressed while its segment is the picked one (\"#billing, 158, 20.5%\"), so `selected` is reachable by keyboard and screen reader as well as by touching the ring. Each swatch is its own toggle button named \"Show #billing\", pressed while the segment shows (a switch on the phone), drawn beside the row's button and not inside it, so a screen reader reaches both; a segment that is off is struck through and faint, not only dimmer, with an en dash for its share. The last one showing cannot be turned off. The rows and swatches draw a focus ring.",
           "\"View as table\" is the other way in: every row, with real headers, and nothing folded into \"Other\".",
           "The ring's hole is drawn for the eye and hidden from a screen reader (it repeats the summary)."
         ]
@@ -11477,6 +11484,11 @@
           "default": "percent",
           "sample": "percent"
         },
+        "showState": {
+          "type": "boolean",
+          "description": "An icon beside the value in the caution (triangle) and critical (circle) states, so the state is not the ring's colour alone (WCAG 1.4.1), as Meter's `showState`. On by default; `false` leaves the colour and the summary to say it (\"84%, caution\"), for a product that prints the state beside the gauge itself.",
+          "default": true
+        },
         "size": {
           "type": "number",
           "description": "The half ring's width, in px (points on the phone); its height is half. Default 280 on the web and desktop, 220 on the phone: `chart.gaugeW`."
@@ -11614,7 +11626,9 @@
           "$chart.gaugeCap",
           "$chart.tickW",
           "$chart.tickOver",
-          "$fg.strong"
+          "$fg.strong",
+          "$icon.sizeMd",
+          "$space.2xs"
         ],
         "tokens": [
           "border.wHairline",
@@ -11664,7 +11678,9 @@
           "font.weightRegular",
           "font.weightSemibold",
           "hover.surface",
+          "icon.sizeMd",
           "radius.row",
+          "space.2xs",
           "space.3xs",
           "space.lg",
           "space.md",
@@ -11683,6 +11699,7 @@
         "label": "The summary: \"Resolved by Fabric: 58.3% of resolved tickets, target 60%.\"",
         "notes": [
           "The figure (the ring on the phone) is named by the sentence core's `summarizeGauge` writes: the value in the chart's format, what it is of, and the target. It is heard, not printed: the value and the target are already in the hole and under the ring.",
+          "In the caution and critical states the summary says so after the value (\"Seats in use: 42 seats, caution …\", Meter's words), and `showState` draws Meter's icon beside the number in the hole.",
           "The colour is never the only signal: the number is in the hole, the target is a tick and a caption (\"Target 60%\"), and a value past `max` says so in the summary (\"over the 100% it is measured against\").",
           "\"View as table\" is the other way in: the measure, its value and its target, with real headers.",
           "The numbers in the hole and under the ring are for the eye: the summary says them once for a screen reader."
@@ -11919,7 +11936,7 @@
         },
         "selected": {
           "type": "string",
-          "description": "The goal that is picked, by its name: the middle shows its share and the other rings and goals step back until it is picked again. Pointing at a goal or tabbing to it lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
+          "description": "The goal that is picked, by its name (`name#2` for the second of two rows with one name): the middle shows its share and the other rings and goals step back until it is picked again. Pointing at a goal or tabbing to it lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
         },
         "onSelectedChange": {
           "type": "event",
@@ -12274,7 +12291,7 @@
           "notes": [
             "Shipped from the data subpath: recharts is reached only from there. The rings are handed an explicit size, never a responsive container.",
             "Each band is `chart.ringW` thick with `chart.ringGap` between it and the next ring in; the outermost is the first goal. A ring is its value Pie over a whole track Pie, so the round end of a value sits on the track.",
-            "The overall share is the mean of the rings' fill: a goal that is passed counts as whole and cannot make up for one that is not. Pointing at a ring or at its goal (or tabbing to it) lights it: the other rings and goals fade to 38% over 150ms on the kit's ease-out, and the middle's number eases to that goal's own share (MetricValue) under \"This goal\".",
+            "The overall share is the mean of the rings' fill: a goal that is passed counts as whole and cannot make up for one that is not. Pointing at a ring or at its goal (or tabbing to it) lights it: the other rings and goals fade to 38% over 150ms on the kit's ease-out, and the middle's number eases to that goal's own share (MetricValue) under \"This goal\", past 100% when it is passed (a full ring, 116%).",
             "The rings draw in once over 600ms on the kit's ease-out. Reduced motion turns it off.",
             "The list sits beside the rings and drops under them when the card is narrower than the rings, the gap and `chart.listMinW`."
           ],
@@ -23474,6 +23491,10 @@
           "default": {},
           "sample": { "q4": "Q4 2026", "q3": "Q3 2026" }
         },
+        "marks": {
+          "type": "boolean",
+          "description": "Each series gets its own dash pattern and marker shape besides its colour, the line chart's (`seriesMark`): in its outline, at each axis and in the legend's key, so two series are never told apart by hue alone (WCAG 1.4.1). Left out, it is on for two or more series and off for one; `false` keeps plain outlines where the product labels the series another way."
+        },
         "height": {
           "type": "number",
           "description": "The plot's height, in px (points on the phone). The card is as wide as the space it is given.",
@@ -23652,6 +23673,7 @@
           "The figure is named by the sentence core's `summarize` writes from the rows, categories read as highest and lowest; it is heard, not printed: in the light theme most series colours sit under 3:1 against the card, so the tooltip and \"View as table\" give the scores without colour.",
           "\"View as table\" is the other way in, and the better one for exact numbers: one row per axis, one column per series, with real headers.",
           "The legend says what it toggles: each entry is a button that is pressed while the series is on, struck through when it is off. The last series showing cannot be turned off.",
+          "With `marks` (on by default for two or more series), a series is told apart by its outline's dash and the marker at each axis as well as its colour (the first solid with round markers, the next dashed with squares), and the legend's key draws the same.",
           "A radar is not read polygon by polygon: the summary and the table carry the scores, and the tooltip is never the only place a value is."
         ]
       },
@@ -23833,6 +23855,7 @@
             "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there.",
             "gifted-charts' radar applies one opacity to a polygon's fill and line alike, so each series is two polygons in `dataSet`: its fill at `FLAT_FILL`, then its line over it. Its grid and polygon gradients default on and share ids across charts, which draws the wrong colours, so `showGradient` is off on every one and the fills are the tokens'.",
             "gifted-charts' radar has no pointer of its own: the kit finds the axis under a finger from where it lands (core's `nearestAxis`) and draws the tooltip card, so a finger can read each axis as the web's pointer does.",
+            "With `marks`, each outline is dashed through the polygon config's `strokeDashArray`. gifted-charts' radar draws no markers, so the kit draws them in an svg over the plot, at the points the library draws (core's `radarPoint`: the same centre, outer ring and angles). They do not draw in with the polygons: they are there from the start.",
             "The polygons draw in unless the person reduces motion. Under react-native-web (the catalogue, `pnpm check`) gifted-charts' animation is off, because the values it animates with reach the DOM as text."
           ],
           "gestures": [
@@ -30984,7 +31007,7 @@
           "import": "import { Table } from \"@antfabric/ui-react-native/data\"",
           "notes": [
             "One card per row. The column with the lowest `priority` is the card's title, a `badge` column among the next three sits beside it, and the rest are label and value lines. A column with no priority is left off the card; when none has one, the columns' order is the priority.",
-            "Sorting is the sort bar above the cards: the Select picks a column (the same first direction as the header's first press) and the arrow button beside it reverses the direction. \"As listed\" clears the sort.",
+            "Sorting is the sort bar above the cards: the Select picks a column (the same first direction as the header's first press) and the arrow button beside it reverses the direction. \"As listed\" clears the sort. With no sortable column the bar has no Select, and with neither a sort nor `selectable` there is no bar.",
             "A card's height is its content, and `table.rowH` (52pt) is the least a one-line card is.",
             "`dense` and `maxHeight` have no meaning here and are not props on the phone.",
             "The card shows the title and three more columns, lowest `priority` first; the other columns are not dropped: the card's details button opens them in place as more label and value lines (`expanded`)."

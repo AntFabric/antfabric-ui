@@ -140,11 +140,11 @@ export function GoalRings({ data, name, value, goal, title, subtitle = "", forma
   // The goal that is lit: the one under the pointer or the keyboard, else the one that was picked. The others step back, and the middle shows its own share.
   const [picked, setPicked] = useControllable(selected, onSelectedChange);
   const [hot, setHot] = useState<number | null>(null);
-  const pickedAt = picked == null ? -1 : goals.findIndex((g) => g.label === picked);
+  const pickedAt = picked == null ? -1 : goals.findIndex((g) => g.key === picked);
   const at = hot ?? (pickedAt >= 0 ? pickedAt : null);
   const lit = at !== null ? (goals[at] ?? null) : null;
   const pick = (k: number) => {
-    const next = goals[k]?.label;
+    const next = goals[k]?.key;
     if (next !== undefined) setPicked(picked === next ? null : next);
   };
   const summary = summarizeGoals({ label: title, goals, format, formatWords, locale }, {
@@ -176,13 +176,13 @@ export function GoalRings({ data, name, value, goal, title, subtitle = "", forma
                   <PieChart accessibilityLayer={false} width={size} height={size} style={{ display: "block" }}>
                     {/* A whole ring under each value's, so the round ends of the value sit on it. */}
                     {goals.map((g, k) => (
-                      <Pie key={`track-${g.label}`} data={[{ v: 1 }]} dataKey="v" cx="50%" cy="50%" innerRadius={bands[k]!.inner} outerRadius={bands[k]!.outer} stroke="none" isAnimationActive={false} tooltipType="none" rootTabIndex={-1}>
+                      <Pie key={`track-${g.key}`} data={[{ v: 1 }]} dataKey="v" cx="50%" cy="50%" innerRadius={bands[k]!.inner} outerRadius={bands[k]!.outer} stroke="none" isAnimationActive={false} tooltipType="none" rootTabIndex={-1}>
                         <Cell fill={tk.chart.track} />
                       </Pie>
                     ))}
                     {goals.map((g, k) => (
                       <Pie
-                        key={g.label}
+                        key={g.key}
                         data={[{ v: g.ratio }, { v: 1 - g.ratio }]}
                         dataKey="v"
                         cx="50%"
@@ -207,12 +207,12 @@ export function GoalRings({ data, name, value, goal, title, subtitle = "", forma
                   </PieChart>
                   <div aria-hidden data-af-part="center" style={css(box, { position: "absolute", inset: 0, alignItems: "center", justifyContent: "center", pointerEvents: "none", textAlign: "center" }, r.center)}>
                     <span data-af-part="centerLabel" style={css(text, { fontFamily: tk.chart.font }, r.centerLabel)}>{lit ? str("thisGoal") : (centerLabel ?? str("centerLabel"))}</span>
-                    <MetricValue value={lit ? lit.ratio : overallOf(goals)} format={WHOLE} size="md" />
+                    <MetricValue value={lit ? lit.share : overallOf(goals)} format={WHOLE} size="md" />
                   </div>
                 </div>
                 <ul data-af-part="list" aria-label={str("goals")} style={css(box, { listStyle: "none", margin: 0, padding: 0, flex: 1, alignSelf: "stretch", justifyContent: "center" }, r.list)}>
                   {goals.map((g, k) => (
-                    <GoalItem key={g.label} goal={g} color={palette[k % palette.length]!} format={format} dim={dimmed(k)} picked={pickedAt === k} onPick={() => pick(k)} onHot={(isHot) => setHot((h) => (isHot ? k : h === k ? null : h))} styles={styles} strings={strings} />
+                    <GoalItem key={g.key} goal={g} color={palette[k % palette.length]!} format={format} dim={dimmed(k)} picked={pickedAt === k} onPick={() => pick(k)} onHot={(isHot) => setHot((h) => (isHot ? k : h === k ? null : h))} styles={styles} strings={strings} />
                   ))}
                 </ul>
               </div>

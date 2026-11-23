@@ -35,7 +35,7 @@ const docs: ComponentDocs = {
     period: { type: "string", default: "", description: "What the change is against, after the badge: \"tickets, vs September\"." },
     selected: {
       type: "string",
-      description: "The part that is picked, by its name: its segment of the bar and its row stay lit and the others step back until it is picked again. Pointing at a part or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`.",
+      description: "The part that is picked, by its name (`#billing#2` for the second of two rows with one name): its segment of the bar and its row stay lit and the others step back until it is picked again. Pointing at a part or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`.",
     },
     onSelectedChange: {
       type: "event",

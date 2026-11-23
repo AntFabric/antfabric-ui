@@ -3,7 +3,7 @@ import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-c
 import { Icon } from "../../lib/icon";
 import { type RootProps, partId, rootProps } from "../../lib/root-props";
 import { fontScale } from "../../lib/type";
-import { meterReading, meterTone, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
+import { meterReading, meterIcon, meterTone, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles, useTheme } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 
@@ -63,7 +63,8 @@ export function Meter({ value, max = 1, label, kind = "usage", format = "percent
   const track = partStyle(r, "track", { view: compact && { width: t.kpi.meterCompactW, flexShrink: 0 } });
   const bar = partStyle(r, "fill", { view: [{ width: `${Math.min(1, Math.max(0, share)) * 100}%` }, fill !== null && { backgroundColor: fill }] });
   const said = tone === "warning" ? str("stateWarning", { value: shown }) : tone === "danger" ? str("stateDanger", { value: shown }) : shown;
-  const mark = showState && tone !== "ok" ? <Icon name={tone === "danger" ? "circle-alert" : "triangle-alert"} size={t.icon.sizeMd} color={fill ?? t.fg.body} style={s.mark} /> : null;
+  const icon = meterIcon(tone);
+  const mark = showState && icon ? <Icon name={icon} size={t.icon.sizeMd} color={fill ?? t.fg.body} style={s.mark} /> : null;
   const readout = <Text testID={partId(testID, "meter", "value")} maxFontSizeMultiplier={fontScale.chrome} style={[value$.view, value$.text]}>{shown}</Text>;
   const valueText = mark ? <View style={s.valueRow}>{mark}{readout}</View> : readout;
   return (

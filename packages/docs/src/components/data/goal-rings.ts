@@ -35,7 +35,7 @@ const docs: ComponentDocs = {
     centerLabel: { type: "string", default: "Completed", description: "What the middle says above the overall share. It says \"This goal\" while a goal is lit." },
     selected: {
       type: "string",
-      description: "The goal that is picked, by its name: the middle shows its share and the other rings and goals step back until it is picked again. Pointing at a goal or tabbing to it lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`.",
+      description: "The goal that is picked, by its name (`name#2` for the second of two rows with one name): the middle shows its share and the other rings and goals step back until it is picked again. Pointing at a goal or tabbing to it lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`.",
     },
     onSelectedChange: {
       type: "event",
@@ -55,7 +55,7 @@ const docs: ComponentDocs = {
       notes: [
         "Shipped from the data subpath: recharts is reached only from there. The rings are handed an explicit size, never a responsive container.",
         "Each band is `chart.ringW` thick with `chart.ringGap` between it and the next ring in; the outermost is the first goal. A ring is its value Pie over a whole track Pie, so the round end of a value sits on the track.",
-        "The overall share is the mean of the rings' fill: a goal that is passed counts as whole and cannot make up for one that is not. Pointing at a ring or at its goal (or tabbing to it) lights it: the other rings and goals fade to 38% over 150ms on the kit's ease-out, and the middle's number eases to that goal's own share (MetricValue) under \"This goal\".",
+        "The overall share is the mean of the rings' fill: a goal that is passed counts as whole and cannot make up for one that is not. Pointing at a ring or at its goal (or tabbing to it) lights it: the other rings and goals fade to 38% over 150ms on the kit's ease-out, and the middle's number eases to that goal's own share (MetricValue) under \"This goal\", past 100% when it is passed (a full ring, 116%).",
         "The rings draw in once over 600ms on the kit's ease-out. Reduced motion turns it off.",
         "The list sits beside the rings and drops under them when the card is narrower than the rings, the gap and `chart.listMinW`.",
       ],

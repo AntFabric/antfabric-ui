@@ -38,6 +38,11 @@ const docs: ComponentDocs = {
       description:
         "Bars run left to right with the categories down the side. A single series gets its value at each bar's end and no value axis. Long category labels are cut with an ellipsis and the tooltip has the full one. On the phone a single horizontal series is a ranked list of rows, not a rotated chart.",
     },
+    marks: {
+      type: "boolean",
+      description:
+        "Each series past the first is filled with a texture over its colour (lines rising at 45°, lines falling at 135°, both, dots: `seriesMark`), in the plot and in the legend's swatch, so two series are never told apart by hue alone (WCAG 1.4.1). Left out, it is on for two or more series and off for one; `false` keeps flat fills where the product labels the series another way. A single series coloured by sign is never textured.",
+    },
   },
   platforms: {
     web: {
@@ -48,6 +53,7 @@ const docs: ComponentDocs = {
         "Shipped from the data subpath: recharts is reached only from there. The chart is handed an explicit width and height.",
         "Everything the chart reads from the tokens goes through `rechartsTheme(useChartTokens(), useReducedMotion())`, exported beside the chart: `<CartesianGrid {...theme.grid} /> <XAxis dataKey=\"team\" {...theme.axis} /> <Bar fill={theme.series[0]} radius={theme.bar.radius} maxBarSize={theme.bar.maxBarSize} {...theme.motion.draw} />`. A chart the kit does not ship, written with recharts and the same call, matches.",
         "The hovered category keeps its colour and the rest step back to 38% over 150ms; a bar's fill eases to a new colour over 250ms. The bars draw in once over 600ms on the kit's ease-out and tween to new values; reduced motion turns the movement off and keeps the fades.",
+        "With `marks`, a series' bars are filled with an SVG `<pattern>`: its colour, and its texture over it in the card's colour (`TexturePattern`, core's `texturePath` and `TEXTURE`). The legend's swatch is filled with the same pattern.",
         "A horizontal chart gives its categories up to 40% of the width, cuts a longer label with an ellipsis (the tooltip shows the whole one) and draws each bar's value after it, with no value axis and no rules.",
       ],
       keyboard: [
@@ -78,6 +84,7 @@ const docs: ComponentDocs = {
         "gifted-charts' `height` is the part above zero: sections below zero are added to it, so the kit shrinks the plot by their share to keep the card's height, and moves a negative bar's label under the bar (`autoShiftLabels`).",
         "gifted-charts opens its own tooltip on a grouped bar, but not on a stack (it compares the stack's selection with `===` against an array), so the kit draws the card itself over the pressed stack, centred on it and kept inside the plot. A press also lights the category's bars and steps the rest back, as the web's hover does.",
         "A long series (fourteen days) has more labels than room: the kit draws one in every few, centred on its bar, and the tooltip names the day.",
+        "With `marks`, gifted-charts draws a bar as a view of one colour and has no pattern fill per series, so the kit lays its texture over each bar: an svg with a `Pattern` (`Texture`), handed in as a stack's `innerBarComponent` and, for grouped bars, through the chart's `barInnerComponent` (gifted-charts reads it from the chart, not from the bar). The legend's swatch carries the same. A horizontal single series (the ranked list) has one series, so no texture.",
         "The bars draw in unless the person reduces motion. Under react-native-web (the catalogue, `pnpm check`) gifted-charts' animation is off.",
       ],
       gestures: [
@@ -93,6 +100,7 @@ const docs: ComponentDocs = {
       "The figure is named by the sentence core's `summarize` writes from the rows: categories read as highest and lowest, dates as a trend. It is heard, not printed: in the light theme most series colours sit under 3:1 against the card, so the tooltip and \"View as table\" give the numbers without colour.",
       "\"View as table\" shows the same rows in Table, with real headers, and a Button names it by what it will do (\"View as table\", then \"View as chart\").",
       "The legend says what it toggles: each entry is a button that is pressed while its series is on, and one that is off is struck through, not only dimmer. The last series showing cannot be turned off.",
+      "With `marks` (on by default for two or more series), a series is told apart by its texture as well as its colour: the first is plain, the next lines rising at 45°, then lines falling at 135°, then both, then dots, inked tone on tone in the card's colour, so the hue still leads. The legend's swatch draws the same.",
       "A bar coloured by sign is never only coloured: the tooltip and the table print the value with its minus, and a bar below zero hangs under a zero rule.",
       "On the web the plot is a stop for the arrow keys (recharts' accessibility layer): the tooltip moves category to category, and the plot draws a focus edge while the keyboard is in it.",
     ],

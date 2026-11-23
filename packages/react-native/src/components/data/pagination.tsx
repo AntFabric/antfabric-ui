@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Text, View, type ViewStyle } from "react-native";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { clampPage, pageCountOf, pageRange, pageSlots } from "@antfabric/ui-core/chart";
@@ -67,6 +68,8 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
   // The summary is said when it changes (iOS has no live regions), not on first draw.
   useAnnounce(summary);
   const sizes = pageSizes && pageSizes.length > 0 ? (pageSizes.includes(size) ? pageSizes : [size, ...pageSizes].sort((a, b) => a - b)) : null;
+  // One item a page, built again only when the count changes.
+  const pages = useMemo(() => (jump ? Array.from({ length: count }, (_, i) => ({ key: String(i + 1), label: String(i + 1) })) : []), [jump, count]);
   // With the choices above it, the pager sits in a wrapper, which is then the root the pass-through names.
   const alone = !sizes && !(jump && count > 1);
   const pager = (
@@ -113,7 +116,7 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
               label={str("goToPage")}
               value={String(at)}
               searchable={count > SEARCHABLE_AFTER}
-              items={Array.from({ length: count }, (_, i) => ({ key: String(i + 1), label: String(i + 1) }))}
+              items={pages}
               onValueChange={(key) => go(Number(key))}
             />
           </View>

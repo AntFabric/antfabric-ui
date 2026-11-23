@@ -67,6 +67,11 @@ Messaging, agent and feedback:
 - Strings: AttachmentCard's `removePreview` is read by the phone too (it drew no Remove preview before).
 - Strings: `avatar.labelAgent`; `sidebar-item` `agent` and the presence words; `nav-rail` `profileWithPresence` and the presence words; `workspace-switcher.newMessages` is read by both kits now. `in-app-banner` `open` and `openIn` give way to `titleIn`, `withBody`, `leadBody` and `toOpen` (with the common `withDetail`): a product that overrode `open` or `openIn` moves its text to these.
 - Recipes: `tab-bar` `action` and `os-notification` `action` gain a `disabled` state (`opacity.disabled`).
+- `fmt`: where `Intl.NumberFormat` lacks `signDisplay` or `notation: "compact"` (Hermes may), the signed percent and the compact formats fall back to `exceptZero` and `shortNumber` (both exported), probed once. `points` no longer needs either option. (L59)
+- `moved` takes a `locale`, so a spoken change matches the printed one (`11,3 %`). (L62)
+- `segmentsOf` and `goalsOf` give each item a `key` (`keysOf`: the label, then `label#2` for a repeat). `summarizeSegments` and `totalOf` take segments without one. (L66)
+- `SERIES_MARKS` entries carry a `texture` (`MarkTexture`), drawn with `texturePath` and `TEXTURE`; `radarPoint` places a value on the phone's radar; `meterIcon` is Meter's state icon, shared with GaugeChart. (M45, M46)
+- `kitCss`: `[data-af-scroll]:focus{outline:none}`, so a keyboard-reached scroll region keeps the forced-colours outline.
 
 ## 1.0.0
 

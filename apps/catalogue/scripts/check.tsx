@@ -169,6 +169,7 @@ import { citedPaths, componentsJson, llmsTxt } from "./agent-surface";
 import { tokensJson, EXTENSION, REFERENCE } from "@antfabric/ui-core/dtcg";
 import { tokenLeaves, tokenPaths } from "./token-leaves";
 import { barLayout, barScale, bySign, chartTable, clampScore, easeFn, cellText as coreCellText, fitLabel, fmt as coreFmt, gaugeState, labelWidth, lineScale, goalsOf, lttb, meterReading as coreMeterReading, meterShown, meterTone, moved as coreMoved, nearestAxis, niceScale, onHalfRing, pickState, prepare as corePrepare, rowIds, segmentAt, segmentsOf, shareOf, sortRows, sparseLabels, summarize as coreSummarize, summarizeCompare as coreSummarizeCompare, summarizeGauge as coreSummarizeGauge, summarizeGoals as coreSummarizeGoals, summarizeSegments as coreSummarizeSegments, tipRows as coreTipRows, toggleRow, totalOf, valueDomain, valueParts as coreValueParts, whenOf, withAlpha, withoutSign, type CompareWords, type FormatSpec, type FormatWords, type GaugeWords, type GoalWords, type SegmentWords, type SummaryWords } from "@antfabric/ui-core/chart";
+import { exceptZero, radarPoint, seriesMark, shortNumber, texturePath } from "@antfabric/ui-core/chart";
 import { contrast, lightnessChroma, separation } from "../src/lib/palette";
 import { rowCount } from "../src/lib/token-ref";
 
@@ -844,6 +845,21 @@ function checkChart() {
   same("moved, in points", moved(0.038, "points"), { direction: "up", known: true, value: "3.8 pts" });
   same("moved, flat", moved(0), { direction: "flat", known: true, value: "" });
   same("moved, not a number", moved(NaN), { direction: "flat", known: false, value: "" });
+  // The spoken change is in the locale the figure beside it is printed in (L62).
+  same("moved, in the locale", coreMoved(0.113, EN_WORDS, undefined, "de-DE").value, "11,3 %");
+  // An engine without `signDisplay` or `notation: "compact"` (Hermes may lack them, L59) gets the same text from the fallbacks, checked here against Node's Intl.
+  const pct = (l: string) => new Intl.NumberFormat(l, { style: "percent", maximumFractionDigits: 1 });
+  for (const [l, v] of [["en-US", 0.124], ["en-US", -0.05], ["en-US", 0], ["en-US", 0.00001], ["en-US", -0.00001], ["de-DE", 0.113], ["de-DE", -0.113]] as const)
+    same(`exceptZero ${l} ${v}`, exceptZero(pct(l), v), new Intl.NumberFormat(l, { style: "percent", maximumFractionDigits: 1, signDisplay: "exceptZero" }).format(v));
+  const one = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+  for (const v of [0, 987, -987, 1234, 12400, -12400, 999_949, 999_950, 3_200_000, 4.5e9, 7e12])
+    same(`shortNumber ${v}`, shortNumber(one, v), new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(v));
+  // A radar's points where gifted-charts puts them (its outer ring at 0.8 of the half-size, the first axis straight up, clockwise): the phone's markers sit on its polygons.
+  same("radarPoint, the first axis at full", radarPoint(0, 3, 100, 100, 280), { x: 140, y: 28 });
+  same("radarPoint, the second axis at half", [radarPoint(1, 4, 50, 100, 280)].map((p) => [Math.round(p.x * 1000) / 1000, Math.round(p.y * 1000) / 1000])[0], [196, 140]);
+  same("texturePath, none is nothing", texturePath("none"), "");
+  same("seriesMark, the first series is plain and the textures follow the dashes", [0, 1, 2, 3, 4].map((i) => seriesMark(i).texture), ["none", "rising", "falling", "cross", "dots"]);
+  same("shortNumber, a currency", shortNumber(new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 1 }), 184200), "$184.2K");
   // The words for it are the dictionary's: a KPI card, a stat tile and a period comparison say them the same way.
   const say = stringsFor("kpi-card", undefined, undefined);
   same("the sentence about a change", [say("up", { value: "4.4%" }), say("down", { value: "10.1%" }), say("noChange"), say("changeUnavailable"), say("againstPeriod", { change: say("up", { value: "4.4%" }), period: "on September" })], ["Up 4.4%", "Down 10.1%", "No change", "Change unavailable", "Up 4.4% on September"]);
@@ -909,7 +925,8 @@ function checkChart() {
   const channels = [["#support", 212], ["#billing", 148], ["#platform-eng", 101], ["#onboarding", 86], ["Email", 62], ["#design-crit", 48], ["#sales-ops", 38], ["#security", 27], ["Slack Connect", 22], ["Chat widget", 16], ["Phone", 9]].map(([channel, tickets]) => ({ channel, tickets }));
   const segs = segmentsOf(channels, "channel", "tickets", "Other");
   same("segmentsOf, eleven rows are eight and Other", segs.length, 9);
-  same("segmentsOf, Other is the ninth row on", segs[8], { label: "Other", value: 47, folded: 3 });
+  same("segmentsOf, Other is the ninth row on", segs[8], { key: "Other", label: "Other", value: 47, folded: 3 });
+  same("segmentsOf, a name that repeats is two segments (L66)", segmentsOf([{ a: "Email", v: 1 }, { a: "Chat", v: 2 }, { a: "Email", v: 3 }], "a", "v", "Other").map((s) => s.key), ["Email", "Chat", "Email#2"]);
   same("segmentsOf, the first eight are as given", segs.slice(0, 8).map((s) => s.label), channels.slice(0, 8).map((r) => r.channel));
   same("segmentsOf, the total is the rows' total", totalOf(segs), 769);
   same("segmentsOf, eight rows are not folded", segmentsOf(channels.slice(0, 8), "channel", "tickets", "Other").some((s) => s.folded), false);

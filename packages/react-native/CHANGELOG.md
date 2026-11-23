@@ -126,6 +126,14 @@ Messaging, agent and feedback:
   - NotificationSchedule: the Custom picker's Pause is disabled until both fields hold something (L41).
   - WorkspaceSwitcher: a row's activity dot is read in its name, "new messages" (L44).
   - InAppBanner: the open button's name says the title and conversation, the time, the lead and body and the queue, then "Open"; with no body it is no longer "Title: . Open" (L47).
+- `BarChart`: new `marks`, left out on for two or more series: each series past the first is textured over its colour (an svg pattern laid in each bar and the legend's swatch). Pass `marks={false}` for flat fills. (M46)
+- `RadarChart`: new `marks`, left out on for two or more series: a dash per outline and a marker shape at each axis (drawn by the kit over gifted-charts' polygons), and the same in the legend's key. (M46)
+- `GaugeChart`: new `showState`, default `true`: Meter's icon beside the value in caution and critical, and the state said in the summary. New strings `stateWarning`, `stateDanger`. (M45)
+- `LineChart` with `marks` draws the five marker shapes the legend shows (was a circle and a square), and a `null` or non-numeric value is a gap in the line, not a point at zero. (L58, L63)
+- `SparkBars` draws values below zero: a mixed range hangs its losses under a zero line, an all-negative one hangs every bar from the top (was a broken scale). (L63)
+- `DonutChart`: the segment switch sits beside the row's button instead of inside it, so a screen reader reaches it. (M50)
+- `Table` draws its sort bar only when a column sorts or rows can be ticked. (L66)
+- `PeriodCompare` says its change in the locale. `GoalRings`, `DonutChart`, `Breakdown`, `Sparkline`, `SparkBars` and `Pagination`: as the React kit. (L62, L66, L67)
 
 ## 1.0.0
 

@@ -160,13 +160,13 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
   const all = segmentsOf(data, name, value, str("other"));
   const palette = seriesColors(tk);
   const colors = all.map((x, i) => (x.folded ? tk.chart.other : palette[i % palette.length]!));
-  const s = useSeries(all.map((x) => x.label), colors, { hidden, onHiddenChange });
-  const shown = all.filter((x) => s.visible.includes(x.label));
+  const s = useSeries(all.map((x) => x.key), colors, { hidden, onHiddenChange });
+  const shown = all.filter((x) => s.visible.includes(x.key));
   const total = totalOf(shown);
   const [picked, setPicked] = useControllable(selected, onSelectedChange);
   // What the ring is showing: the segment under the pointer or the keyboard, else the one that was picked.
   const [hot, setHot] = useState<string | null>(null);
-  const focus = shown.find((x) => x.label === (hot ?? picked)) ?? null;
+  const focus = shown.find((x) => x.key === (hot ?? picked)) ?? null;
   const summary = summarizeSegments({ label: title, segments: shown, format, formatWords, locale }, {
     noData: (v) => str("noData", v),
     allZero: (v) => str("summaryAllZero", v),
@@ -212,18 +212,18 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
                       tooltipType="none"
                       rootTabIndex={-1}
                       {...rechartsDraw(tk, reduced)}
-                      onMouseEnter={(_: unknown, i: number) => setHot(shown[i]?.label ?? null)}
+                      onMouseEnter={(_: unknown, i: number) => setHot(shown[i]?.key ?? null)}
                       onMouseLeave={() => setHot(null)}
                       onClick={(_: unknown, i: number) => {
-                        const next = shown[i]?.label;
+                        const next = shown[i]?.key;
                         if (next !== undefined) setPicked(picked === next ? null : next);
                       }}
                     >
                       {shown.map((x) => (
                         <Cell
-                          key={x.label}
-                          fill={s.colorOf(x.label)}
-                          fillOpacity={focus === null || focus.label === x.label ? 1 : DIMMED}
+                          key={x.key}
+                          fill={s.colorOf(x.key)}
+                          fillOpacity={focus === null || focus.key === x.key ? 1 : DIMMED}
                           style={{ cursor: "pointer", outline: "none", transition: `fill-opacity ${t.duration.base} ${t.ease.out}` }}
                         />
                       ))}
@@ -244,21 +244,21 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
               </div>
               <ul data-af-part="list" aria-label={str("segments")} style={css({ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${t.chart.partMinW}, 1fr))`, columnGap: t.space.lg, listStyle: "none", margin: 0, padding: 0 }, r.list)}>
                 {all.map((x) => {
-                  const on = s.visible.includes(x.label);
+                  const on = s.visible.includes(x.key);
                   return (
                     <Item
-                      key={x.label}
+                      key={x.key}
                       label={x.label}
                       value={fmt(format, x.value, formatWords, locale)}
                       share={on ? fmt("percent", shareOf(x.value, total), formatWords, locale) : str("unavailable")}
-                      color={s.colorOf(x.label)}
+                      color={s.colorOf(x.key)}
                       on={on}
-                      active={focus?.label === x.label}
-                      picked={picked === x.label}
-                      onPick={() => setPicked(picked === x.label ? null : x.label)}
-                      onToggle={() => s.toggle(x.label)}
+                      active={focus?.key === x.key}
+                      picked={picked === x.key}
+                      onPick={() => setPicked(picked === x.key ? null : x.key)}
+                      onToggle={() => s.toggle(x.key)}
                       strings={strings}
-                      onHot={(isHot) => setHot((h) => (isHot ? (on ? x.label : h) : h === x.label ? null : h))}
+                      onHot={(isHot) => setHot((h) => (isHot ? (on ? x.key : h) : h === x.key ? null : h))}
                       styles={styles}
                     />
                   );

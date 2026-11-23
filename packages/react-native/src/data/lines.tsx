@@ -1,8 +1,8 @@
 import { useId } from "react";
 import { useLocale } from "@antfabric/ui-core";
-import { LinearGradient, Stop } from "react-native-svg";
+import Svg, { LinearGradient, Path, Stop } from "react-native-svg";
 import { LineChart as GiftedLineChart } from "react-native-gifted-charts";
-import { FLAT_FILL, seriesMark, sparseLabels, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Scale, type Series } from "@antfabric/ui-core/chart";
+import { FLAT_FILL, markPath, seriesMark, sparseLabels, tipRows, type FormatSpec, type FormatWords, type MarkShape, type PreparedRow, type Scale, type Series } from "@antfabric/ui-core/chart";
 import { giftedAxis, labelScale, plotHeight, plotWidth } from "./axis";
 import { giftedTheme, type ChartTokens } from "./theme";
 import { ChartTooltip } from "./tooltip";
@@ -30,6 +30,12 @@ export interface GiftedLinesProps {
   height: number;
 }
 
+/** A value gifted-charts can draw: a finite number. Anything else (null, text that is not a number) is a gap, which `interpolateMissingValues={false}` leaves open, as the web's line does. */
+const valueOf = (v: unknown): number | undefined => {
+  const n = v == null || v === "" ? NaN : +(v as number);
+  return Number.isFinite(n) ? n : undefined;
+};
+
 /**
  * gifted-charts' LineChart for the phone, from the same rows, scale and tooltip rows as the web's: a series is `data`…`data5` with its colour and
  * thickness, the fill is `areaChart1`, the tooltip is `pointerConfig` (press and drag), a target is `referenceLine1`. A series in `dashed` is thinner and
@@ -46,19 +52,29 @@ export function GiftedLines({ tk, theme, rows, s, labels, format, formatWords, s
   const spacing = n > 1 ? (w - edge * 2) / (n - 1) : 0;
   // A long series has more labels than room: one in every few is drawn, the rest blank, as the web's axis thins its ticks.
   const thin = sparseLabels(rows.map((row) => row.__x), spacing || w, tk.chart.labelSize * labelScale());
+  // gifted-charts draws a point as a circle or a rectangle only, so a series' marker (`seriesMark`: five shapes) is drawn by the kit, from the
+  // same path the legend's key and the web's plot draw, in a box the stroke fits in.
+  const markSize = theme.line.dataPointsRadius * 2;
+  const markBox = markSize + tk.border.wThick;
+  const markOf = (shape: MarkShape, color: string) => () => (
+    <Svg width={markBox} height={markBox}>
+      <Path d={markPath(shape, markBox / 2, markBox / 2, markSize)} fill={shape === "cross" ? "none" : color} stroke={color} strokeWidth={tk.border.wThick} />
+    </Svg>
+  );
   const series: Record<string, unknown> = {};
   s.visible.forEach((f, k) => {
     const sfx = k === 0 ? "" : String(k + 1);
-    series[`data${sfx}`] = rows.map((row, i) => ({ value: row[f] as number, label: k === 0 ? thin[i] : undefined }));
-    series[`color${k + 1}`] = s.colorOf(f);
-    series[`startFillColor${k + 1}`] = s.colorOf(f);
-    series[`endFillColor${k + 1}`] = s.colorOf(f);
+    const mark = marks && !dashed.includes(f) ? seriesMark(s.fields.indexOf(f)) : null;
+    const point = mark ? { customDataPoint: markOf(mark.shape, s.colorOf(f)), dataPointWidth: markBox, dataPointHeight: markBox } : null;
+    const values = rows.map((row) => valueOf(row[f]));
+    series[`data${sfx}`] = values.map((value, i) => ({ value, label: k === 0 ? thin[i] : undefined, ...point }));
+    // A series with no number at all draws nothing, rather than a line along zero.
+    const none = values.every((v) => v === undefined);
+    series[`color${k + 1}`] = none ? "transparent" : s.colorOf(f);
+    series[`startFillColor${k + 1}`] = none ? "transparent" : s.colorOf(f);
+    series[`endFillColor${k + 1}`] = none ? "transparent" : s.colorOf(f);
     series[`dataPointsColor${k + 1}`] = s.colorOf(f);
-    if (marks && !dashed.includes(f)) {
-      const mark = seriesMark(s.fields.indexOf(f));
-      if (mark.dash.length) series[`strokeDashArray${k + 1}`] = mark.dash.map((d) => d * theme.line.thickness);
-      series[`dataPointsShape${k + 1}`] = mark.shape === "square" || mark.shape === "diamond" ? "rectangular" : mark.shape === "triangle" || mark.shape === "cross" ? "triangular" : "circular";
-    }
+    if (mark?.dash.length) series[`strokeDashArray${k + 1}`] = mark.dash.map((d) => d * theme.line.thickness);
     if (dashed.includes(f)) {
       series[`strokeDashArray${k + 1}`] = theme.line.seriesDash;
       series[`thickness${k + 1}`] = tk.chart.previousW;
@@ -78,6 +94,7 @@ export function GiftedLines({ tk, theme, rows, s, labels, format, formatWords, s
       endSpacing={edge}
       curved={theme.line.curved}
       thickness={theme.line.thickness}
+      interpolateMissingValues={false}
       // One point has no line to draw: it is a dot.
       hideDataPoints={n > 1 && !(marks && n <= 40)}
       dataPointsRadius={theme.line.dataPointsRadius}

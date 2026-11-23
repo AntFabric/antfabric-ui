@@ -88,7 +88,7 @@ export function PeriodCompare({ data, x, current, previous, title, subtitle = ""
     summary: (v) => str("summary", v),
   });
   // What a screen reader hears for this period's total: core says which way it moved and by how much, the words are the chart's (the common `up` and `down`).
-  const m = moved(total.change, formatWords);
+  const m = moved(total.change, formatWords, undefined, locale);
   const change = !m.known ? str("changeUnavailable") : m.direction === "flat" ? str("noChange") : m.direction === "up" ? str("up", { value: m.value }) : str("down", { value: m.value });
   const caption = partStyle(r, "caption", { text: chartFont(tk) });
   const periodStyle = partStyle(r, "period", { text: chartFont(tk) });
