@@ -113,15 +113,15 @@ const useStyles = createStyles((t) => ({
   sliver: { borderTopWidth: 0, ...blur },
 }));
 
-function MenuRow({ label, icon, last, styles, onPress }: { label: string; icon?: IconName; last: boolean; styles?: PartStyles<"os-notification">; onPress: () => void }) {
+function MenuRow({ label, icon, last, styles, testID, onPress }: { label: string; icon?: IconName; last: boolean; styles?: PartStyles<"os-notification">; testID?: string; onPress: () => void }) {
   const s = useStyles();
   const press = usePress();
   const r = useRecipe(recipes["os-notification"], { state: { pressed: press.pressed, focus: press.focused }, styles });
   // The row's rule is its bottom edge alone: the recipe's width and colour, on that side; the last row has none.
   const row = partStyle(r, "menuRow", { view: last ? { borderBottomWidth: 0 } : undefined });
   return (
-    <Pressable testID="os-notification.menuRow" accessibilityRole="menuitem" accessibilityLabel={label} onPress={() => onPress()} {...press.handlers} style={[s.menuRow, row.view]}>
-      <Text testID="os-notification.menuText" numberOfLines={1} style={[face("ios"), { flexShrink: 1 }, r.menuText.view, r.menuText.text]}>
+    <Pressable testID={partId(testID, "os-notification", "menuRow")} accessibilityRole="menuitem" accessibilityLabel={label} onPress={() => onPress()} {...press.handlers} style={[s.menuRow, row.view]}>
+      <Text testID={partId(testID, "os-notification", "menuText")} numberOfLines={1} style={[face("ios"), { flexShrink: 1 }, r.menuText.view, r.menuText.text]}>
         {label}
       </Text>
       {icon ? <Icon name={icon} size={18} color={r.menuText.text.color} /> : null}
@@ -129,13 +129,13 @@ function MenuRow({ label, icon, last, styles, onPress }: { label: string; icon?:
   );
 }
 
-function ActionButton({ label, styles, onPress }: { label: string; styles?: PartStyles<"os-notification">; onPress: () => void }) {
+function ActionButton({ label, styles, testID, onPress }: { label: string; styles?: PartStyles<"os-notification">; testID?: string; onPress: () => void }) {
   const s = useStyles();
   const press = usePress();
   const r = useRecipe(recipes["os-notification"], { state: { focus: press.focused }, styles });
   return (
-    <Pressable testID="os-notification.action" accessibilityRole="button" accessibilityLabel={label} onPress={() => onPress()} {...press.handlers} style={[s.action, r.action.view]}>
-      <Text testID="os-notification.actionText" numberOfLines={1} style={[face("android", "600"), r.actionText.view, r.actionText.text]}>
+    <Pressable testID={partId(testID, "os-notification", "action")} accessibilityRole="button" accessibilityLabel={label} onPress={() => onPress()} {...press.handlers} style={[s.action, r.action.view]}>
+      <Text testID={partId(testID, "os-notification", "actionText")} numberOfLines={1} style={[face("android", "600"), r.actionText.view, r.actionText.text]}>
         {label}
       </Text>
     </Pressable>
@@ -149,11 +149,12 @@ interface ReplyProps {
   sending: boolean;
   strings?: Partial<KitStrings["os-notification"]>;
   styles?: PartStyles<"os-notification">;
+  testID?: string;
   onChange: (text: string) => void;
   onSend: () => void;
 }
 
-function ReplyRow({ os, sender, value, sending, strings, styles, onChange, onSend }: ReplyProps) {
+function ReplyRow({ os, sender, value, sending, strings, styles, testID, onChange, onSend }: ReplyProps) {
   const s = useStyles();
   const str = useStrings("os-notification", strings);
   const [focused, setFocused] = useState(false);
@@ -170,7 +171,7 @@ function ReplyRow({ os, sender, value, sending, strings, styles, onChange, onSen
   return (
     <View style={s.replyRow}>
       <TextInput
-        testID="os-notification.replyField"
+        testID={partId(testID, "os-notification", "replyField")}
         value={value}
         placeholder={str("replyPlaceholder")}
         placeholderTextColor={placeholderTextColor}
@@ -183,7 +184,7 @@ function ReplyRow({ os, sender, value, sending, strings, styles, onChange, onSen
         style={[s.field, field.view, fieldText]}
       />
       <Pressable
-        testID="os-notification.sendButton"
+        testID={partId(testID, "os-notification", "sendButton")}
         accessibilityRole="button"
         accessibilityLabel={str("send")}
         accessibilityState={{ disabled: press.disabled, busy: sending }}
@@ -198,14 +199,14 @@ function ReplyRow({ os, sender, value, sending, strings, styles, onChange, onSen
   );
 }
 
-function Status({ os, failed, appName, strings, styles }: { os: Phone; failed: boolean; appName: string; strings?: Partial<KitStrings["os-notification"]>; styles?: PartStyles<"os-notification"> }) {
+function Status({ os, failed, appName, strings, styles, testID }: { os: Phone; failed: boolean; appName: string; strings?: Partial<KitStrings["os-notification"]>; styles?: PartStyles<"os-notification">; testID?: string }) {
   const s = useStyles();
   const str = useStrings("os-notification", strings);
   const r = useRecipe(recipes["os-notification"], { state: { invalid: failed }, styles });
   return (
     <View role="status" aria-live="polite" style={s.status}>
-      {failed ? <Icon testID="os-notification.statusIcon" name="circle-alert" size={14} color={r.statusIcon.text.color} style={Object.keys(r.statusIcon.view).length ? r.statusIcon.view : undefined} /> : null}
-      <Text testID="os-notification.statusText" style={[face(os), { flexShrink: 1 }, r.statusText.view, r.statusText.text]}>
+      {failed ? <Icon testID={partId(testID, "os-notification", "statusIcon")} name="circle-alert" size={14} color={r.statusIcon.text.color} style={Object.keys(r.statusIcon.view).length ? r.statusIcon.view : undefined} /> : null}
+      <Text testID={partId(testID, "os-notification", "statusText")} style={[face(os), { flexShrink: 1 }, r.statusText.view, r.statusText.text]}>
         {failed ? str("replyFailed", { app: appName }) : str("sendingText")}
       </Text>
     </View>
@@ -267,33 +268,33 @@ export function OsNotification({
   const mark = (size: number) => {
     const m = partStyle(r, "mark", { text: { fontSize: size, lineHeight: size } });
     return (
-      <Text testID="os-notification.mark" style={[m.view, m.text]}>
+      <Text testID={partId(testID, "os-notification", "mark")} style={[m.view, m.text]}>
         {initial(appName)}
       </Text>
     );
   };
   const titleText = (
-    <Text testID="os-notification.title" numberOfLines={1} style={[s.title, face(os, ios ? "600" : "500"), r.title.view, r.title.text]}>
+    <Text testID={partId(testID, "os-notification", "title")} numberOfLines={1} style={[s.title, face(os, ios ? "600" : "500"), r.title.view, r.title.text]}>
       {heading}
     </Text>
   );
   const bodyText =
     preview && body ? (
-      <Text testID="os-notification.body" numberOfLines={open ? 8 : 3} style={[face(os), { fontSize: ios ? 15 : 14 }, r.body.view, r.body.text]}>
+      <Text testID={partId(testID, "os-notification", "body")} numberOfLines={open ? 8 : 3} style={[face(os), { fontSize: ios ? 15 : 14 }, r.body.view, r.body.text]}>
         {lead ? (
-          <Text testID="os-notification.lead" style={[face(os, "500"), r.lead.view, r.lead.text]}>{str("leadSuffix", { lead })}</Text>
+          <Text testID={partId(testID, "os-notification", "lead")} style={[face(os, "500"), r.lead.view, r.lead.text]}>{str("leadSuffix", { lead })}</Text>
         ) : null}
         {body}
       </Text>
     ) : null;
   const more =
     grouped > 0 ? (
-      <Text testID="os-notification.small" style={[face(os), { marginTop: t.space["3xs"], fontSize: ios ? 13 : 12 }, r.small.view, r.small.text]}>
+      <Text testID={partId(testID, "os-notification", "small")} style={[face(os), { marginTop: t.space["3xs"], fontSize: ios ? 13 : 12 }, r.small.view, r.small.text]}>
         {preview && context ? str("moreFrom", { count: grouped, context }) : str("more", { count: grouped })}
       </Text>
     ) : null;
-  const replyRow = typing ? <ReplyRow os={os} sender={sender} value={draft} sending={replying === "sending"} strings={strings} styles={styles} onChange={setDraft} onSend={send} /> : null;
-  const statusRow = status ? <Status os={os} failed={replying === "failed"} appName={appName} strings={strings} styles={styles} /> : null;
+  const replyRow = typing ? <ReplyRow os={os} sender={sender} value={draft} sending={replying === "sending"} strings={strings} styles={styles} testID={testID} onChange={setDraft} onSend={send} /> : null;
+  const statusRow = status ? <Status os={os} failed={replying === "failed"} appName={appName} strings={strings} styles={styles} testID={testID} /> : null;
   const banner = (children: ReactNode) => (
     <Pressable
       accessibilityRole="button"
@@ -303,7 +304,7 @@ export function OsNotification({
         onOpen?.();
       }}
       {...hit.handlers}
-      testID="os-notification.hit"
+      testID={partId(testID, "os-notification", "hit")}
       style={[ios ? s.hit : s.hitAndroid, rHit.hit.view]}
     >
       {children}
@@ -314,14 +315,14 @@ export function OsNotification({
     return (
       <View {...rootProps(rest)} testID={partId(testID, "os-notification", "root")} style={[r.root.view, style]}>
         <Enter motion="drop" style={s.front}>
-          <View testID="os-notification.card" style={[s.android, r.card.view]}>
+          <View testID={partId(testID, "os-notification", "card")} style={[s.android, r.card.view]}>
             {banner(
               <>
                 <View style={s.header}>
-                  <View testID="os-notification.smallIcon" aria-hidden style={[s.smallIcon, r.smallIcon.view]}>
+                  <View testID={partId(testID, "os-notification", "smallIcon")} aria-hidden style={[s.smallIcon, r.smallIcon.view]}>
                     {mark(10)}
                   </View>
-                  <Text testID="os-notification.source" numberOfLines={1} style={[face(os), { flex: 1 }, r.source.view, r.source.text]}>
+                  <Text testID={partId(testID, "os-notification", "source")} numberOfLines={1} style={[face(os), { flex: 1 }, r.source.view, r.source.text]}>
                     {preview && context ? str("sourcePhoneIn", { app: appName, context, time }) : str("sourcePhone", { app: appName, time })}
                   </Text>
                   <Icon name={open ? "chevron-up" : "chevron-down"} size={18} color={t.fg.muted} />
@@ -341,7 +342,7 @@ export function OsNotification({
             {(replying === "none" || replying === "failed") && actions.length > 0 ? (
               <View style={s.actions}>
                 {actions.map((a) => (
-                  <ActionButton key={a.key} label={a.label} styles={styles} onPress={() => press(a)} />
+                  <ActionButton key={a.key} label={a.label} styles={styles} testID={testID} onPress={() => press(a)} />
                 ))}
               </View>
             ) : null}
@@ -357,32 +358,32 @@ export function OsNotification({
   return (
     <View {...rootProps(rest)} testID={partId(testID, "os-notification", "root")} style={[r.root.view, style]}>
       <Enter motion="drop" style={s.front}>
-        <GlassSurface testID="os-notification.card" style={[s.ios, r.card.view]} glassStyle={styles?.card}>
+        <GlassSurface testID={partId(testID, "os-notification", "card")} style={[s.ios, r.card.view]} glassStyle={styles?.card}>
           {banner(
             <>
               {showFace ? (
                 <View style={s.avatarSlot}>
                   {avatar}
                   {!agent ? (
-                    <View testID="os-notification.badge" aria-hidden style={[s.appBadge, r.badge.view]}>
+                    <View testID={partId(testID, "os-notification", "badge")} aria-hidden style={[s.appBadge, r.badge.view]}>
                       {mark(9)}
                     </View>
                   ) : null}
                 </View>
               ) : (
-                <View testID="os-notification.appIcon" aria-hidden style={[s.appIcon, r.appIcon.view]}>
+                <View testID={partId(testID, "os-notification", "appIcon")} aria-hidden style={[s.appIcon, r.appIcon.view]}>
                   {mark(18)}
                 </View>
               )}
               <View style={s.content}>
                 <View style={s.headRow}>
                   {titleText}
-                  <Text testID="os-notification.time" style={[face(os), { flexShrink: 0, fontVariant: ["tabular-nums"] }, r.time.view, r.time.text]}>
+                  <Text testID={partId(testID, "os-notification", "time")} style={[face(os), { flexShrink: 0, fontVariant: ["tabular-nums"] }, r.time.view, r.time.text]}>
                     {time}
                   </Text>
                 </View>
                 {preview && context ? (
-                  <Text testID="os-notification.subtitle" numberOfLines={1} style={[face(os, "600"), r.subtitle.view, r.subtitle.text]}>
+                  <Text testID={partId(testID, "os-notification", "subtitle")} numberOfLines={1} style={[face(os, "600"), r.subtitle.view, r.subtitle.text]}>
                     {context}
                   </Text>
                 ) : null}
@@ -397,18 +398,18 @@ export function OsNotification({
       </Enter>
       {/* Long-press: iOS pops a menu of the banner's actions under it. */}
       {open && replying === "none" && actions.length > 0 ? (
-        <Enter motion="pop" testID="os-notification.menu" accessibilityRole="menu" style={[s.menu, r.menu.view]}>
-          <GlassSurface testID="os-notification.menuSheet" style={[s.menuSheet, r.menuSheet.view]} glassStyle={styles?.menuSheet}>
+        <Enter motion="pop" testID={partId(testID, "os-notification", "menu")} accessibilityRole="menu" style={[s.menu, r.menu.view]}>
+          <GlassSurface testID={partId(testID, "os-notification", "menuSheet")} style={[s.menuSheet, r.menuSheet.view]} glassStyle={styles?.menuSheet}>
             {actions.map((a, i) => (
-              <MenuRow key={a.key} label={a.label} icon={a.icon} last={i === actions.length - 1} styles={styles} onPress={() => press(a)} />
+              <MenuRow key={a.key} label={a.label} icon={a.icon} last={i === actions.length - 1} styles={styles} testID={testID} onPress={() => press(a)} />
             ))}
           </GlassSurface>
         </Enter>
       ) : null}
       {grouped > 0 ? (
         <View aria-hidden style={s.stack}>
-          <GlassSurface testID="os-notification.sliver" style={[s.sliver, sliver.view]} glassStyle={styles?.sliver} />
-          {grouped > 1 ? <GlassSurface testID="os-notification.sliverFar" style={[s.sliver, sliverFar.view]} glassStyle={styles?.sliverFar} /> : null}
+          <GlassSurface testID={partId(testID, "os-notification", "sliver")} style={[s.sliver, sliver.view]} glassStyle={styles?.sliver} />
+          {grouped > 1 ? <GlassSurface testID={partId(testID, "os-notification", "sliverFar")} style={[s.sliver, sliverFar.view]} glassStyle={styles?.sliverFar} /> : null}
         </View>
       ) : null}
     </View>

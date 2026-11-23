@@ -5,13 +5,14 @@ import { announce } from "../../lib/announce";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { splitRootProps, type RootProps } from "../../lib/root-props";
 import { box, css, enter, input, row, rtl, text, visuallyHidden } from "../../lib/style";
 import { joinIds, useFormField } from "./form-field";
 
 export type TextAreaResize = "vertical" | "none";
 
-export interface TextAreaProps extends RootProps<HTMLDivElement> {
+/** `id`, `aria-*` and `ref` name the textarea; `className` and `data-*` go on the root (`splitRootProps`). */
+export interface TextAreaProps extends RootProps<HTMLTextAreaElement> {
   /** Visible label and the field's accessible name. With `hideLabel` it is only the accessible name. */
   label: string;
   /** The text. Left out, the field keeps its own text, starting from `defaultValue`, and still reports each change. */
@@ -89,7 +90,9 @@ export function TextArea({
   const s = useStrings("text-area", strings);
   const own = useId();
   const form = useFormField();
-  const id = form?.id ?? own;
+  const pass = splitRootProps(rest);
+  // A FormField's label points at its own id; outside one, a passed `id` replaces the kit's, so the label and the helper still line up.
+  const id = form?.id ?? (pass.control.id as string | undefined) ?? own;
   const dir = useDirection();
   const ui = useInteraction({ disabled });
   // Left out, `value` is the field's own state, which starts as `defaultValue`.
@@ -123,7 +126,7 @@ export function TextArea({
   });
   const mustHave = required || !!form?.required;
   return (
-    <div data-af-part="root" {...rootProps(rest)} style={css(box, { alignSelf: "stretch", width: "100%" }, r.root, style)}>
+    <div data-af-part="root" {...pass.root} style={css(box, { alignSelf: "stretch", width: "100%" }, r.root, style)}>
       <div style={css(row, { justifyContent: "space-between", gap: t.space.sm }, hideLabel && visuallyHidden)}>
         <label htmlFor={id} data-af-part="label" style={css(text, r.label)}>
           {label}
@@ -136,7 +139,6 @@ export function TextArea({
       </div>
       <div data-af-part="field" {...ui.handlers} style={css(field, partStyle(r, "field", disabled && { cursor: "not-allowed" }))}>
         <textarea
-          id={id}
           data-af-part="input"
           data-af-input
           name={name}
@@ -148,12 +150,15 @@ export function TextArea({
           placeholder={placeholder}
           aria-invalid={invalid || form?.invalid || undefined}
           aria-required={mustHave || undefined}
-          aria-describedby={joinIds(form?.describedBy, said, maxLength > 0 && `${id}-counter`)}
           disabled={disabled}
           readOnly={readOnly}
           maxLength={maxLength > 0 ? maxLength : undefined}
           onChange={(e) => setText(e.target.value)}
           onBlur={() => onBlur?.()}
+          {...pass.control}
+          id={id}
+          // A product's description is read after the kit's own.
+          aria-describedby={joinIds(form?.describedBy, said, maxLength > 0 && `${id}-counter`, pass.control["aria-describedby"] as string | undefined)}
           style={css(input, { display: "block", width: "100%", boxSizing: "border-box", resize, minHeight: 0 }, partStyle(r, "input", disabled && { cursor: "not-allowed" }))}
         />
       </div>

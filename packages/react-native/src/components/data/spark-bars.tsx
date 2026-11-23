@@ -59,7 +59,7 @@ export function SparkBars({ data, y, width = 96, height = 36, animate = false, t
   const barWidth = Math.min(layout.barWidth, t.kpi.sparkBarMaxW);
   const said = label || str("summary", { count: values.length, latest: fmt(format, values[last], undefined, locale) });
   return (
-    <View testID={partId(testID, "spark-bars", "root")} {...rootProps(rest)} accessible accessibilityRole="image" accessibilityLabel={said} style={frame}>
+    <View testID={partId(testID, "spark-bars", "root")} accessible accessibilityRole="image" accessibilityLabel={said} {...rootProps(rest)} style={frame}>
       <BarChart
         data={values.map((value, i) => ({ value, frontColor: i === last ? color : withAlpha(color, EARLIER_BARS) }))}
         width={width}

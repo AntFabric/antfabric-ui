@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties, type KeyboardEvent } from "react";
+import { memo, useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties, type KeyboardEvent, type Ref } from "react";
 import { cssVarName, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { useAutoFocus, usePlatform } from "../../platform";
 import { t } from "../../tokens";
@@ -6,7 +6,7 @@ import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { box, css, enter, pressable, row, text, truncate } from "../../lib/style";
 import { Avatar, type AvatarIdentity } from "../display/avatar";
 import { joinIds, useFormField } from "./form-field";
@@ -31,7 +31,8 @@ export interface SelectItem {
   disabled?: boolean;
 }
 
-export interface SelectProps extends RootProps<HTMLDivElement> {
+/** `id`, `aria-*` and `ref` name the trigger (the native `<select>` in a phone browser); `className` and `data-*` go on the root (`splitRootProps`). */
+export interface SelectProps extends RootProps<HTMLButtonElement | HTMLSelectElement> {
   items: SelectItem[];
   /** The chosen item's key. */
   value?: string;
@@ -187,7 +188,11 @@ export function Select({
   const s = useStrings("select", strings);
   const own = useId();
   const form = useFormField();
-  const id = form?.id ?? own;
+  const pass = splitRootProps(rest);
+  const { ref, ...control } = pass.control as { ref?: Ref<HTMLButtonElement | HTMLSelectElement> } & Record<string, unknown>;
+  // A FormField's label points at its own id; outside one, a passed `id` replaces the kit's, so the label and the list still line up.
+  const id = form?.id ?? (control.id as string | undefined) ?? own;
+  const describedBy = joinIds(form?.describedBy, control["aria-describedby"] as string | undefined);
   const { platform } = usePlatform();
   const allowFocus = useAutoFocus();
   const phone = usePhoneBrowser() && platform === "web";
@@ -329,23 +334,25 @@ export function Select({
 
   if (phone) {
     return (
-      <div data-af-part="root" {...rootProps(rest)} style={css(box, { width: "100%" }, r.root, style)}>
+      <div data-af-part="root" {...pass.root} style={css(box, { width: "100%" }, r.root, style)}>
         {label && variant === "field" && (
           <label htmlFor={id} data-af-part="label" style={css(text, r.label)}>
             {label}
           </label>
         )}
         <select
-          id={id}
           {...labelled}
           aria-invalid={invalid || form?.invalid || undefined}
           aria-required={form?.required || undefined}
-          aria-describedby={joinIds(form?.describedBy)}
           title={title || undefined}
           disabled={disabled}
           name={fieldName}
           value={current}
           onChange={(e) => setCurrent(e.target.value)}
+          {...control}
+          ref={(el) => setRef(ref, el)}
+          id={id}
+          aria-describedby={describedBy}
           data-af-part="trigger"
           style={css(trigger, partStyle(r, "trigger", variant === "link" && linkWidth))}
         >
@@ -370,7 +377,7 @@ export function Select({
         const to = e.relatedTarget as Node | null;
         if (isOpen && to && !rootRef.current?.contains(to)) show(false);
       }}
-      {...rootProps(rest)}
+      {...pass.root}
       style={css(box, { width: "100%" }, r.root, style)}
     >
       {label && variant === "field" && (
@@ -380,8 +387,6 @@ export function Select({
       )}
       <div style={css(box, { gap: t.space.xs }, above && { flexDirection: "column-reverse" })}>
         <button
-          ref={triggerRef}
-          id={id}
           type="button"
           data-af-press
           role="combobox"
@@ -390,7 +395,6 @@ export function Select({
           aria-controls={isOpen ? `${id}-list` : undefined}
           aria-activedescendant={isOpen && !searchable && activeIndex >= 0 ? optionId(activeIndex) : undefined}
           {...labelled}
-          aria-describedby={joinIds(form?.describedBy)}
           aria-invalid={invalid || form?.invalid || undefined}
           aria-required={form?.required || undefined}
           title={title || undefined}
@@ -398,6 +402,13 @@ export function Select({
           onClick={() => show(!isOpen)}
           onKeyDown={(e) => keys(e)}
           {...ui.handlers}
+          {...control}
+          ref={(el) => {
+            triggerRef.current = el;
+            setRef(ref, el);
+          }}
+          id={id}
+          aria-describedby={describedBy}
           data-af-part="trigger"
           style={css(trigger, partStyle(r, "trigger", variant === "link" && linkWidth, ui.disabled && { cursor: "not-allowed" }))}
         >

@@ -257,8 +257,18 @@ export const switchRecipe = defineRecipe({
     cuts the text at its variables the same way; `s("mentions", { n })` is for an attribute, a string and the phone.
 - **Pass-through:** every component's props extend the kit's `RootProps` (`lib/root-props.ts`): `id`, `className`, `data-*`, `aria-*` and
   `ref` on the web, `testID`, `nativeID`, the accessibility label and hint and `ref` on the phone. Destructure `...rest` and spread
-  `{...rootProps(rest)}` on the root after the kit's own attributes and before `style`; on the phone the root's `testID` is
-  `partId(testID, "<id>", "root")` and each part's `partId(testID, "<id>", "<part>")`. They are universal props: the docs do not list them.
+  `{...rootProps(rest)}` on the root after the kit's own attributes (an `aria-label` the kit writes after the spread drops the product's)
+  and before `style`; on the phone the root's `testID` is `partId(testID, "<id>", "root")` and each part's `partId(testID, "<id>", "<part>")`,
+  in every helper the file draws parts with. They are universal props: the docs do not list them.
+  - **The element with the role.** When the root wraps the one element that carries the component's role (a field's input, a select's
+    trigger, a chip's button, a segmented control's tab list, a sheet's `role="dialog"` panel), `id`, `aria-*` and `ref` go to that element
+    and `className`, `data-*` and `style` stay on the root: `splitRootProps(rest)` on the web gives `{ root, control }`; on the phone spread
+    `rootProps(rest)` on the control and nothing on the root. Type the props `RootProps<TheControl>`. A kit `useId` the label points at
+    takes a passed `id` instead (`form?.id ?? passed ?? own`), and a product's `aria-describedby` (`accessibilityHint`) is joined after the
+    kit's, never in place of it. An element with a ref of its own merges the product's with `setRef(ref, el)` (both kits), after the spread.
+  - `pnpm check generic` holds it: every drawing, in both kits, with an `id` and an `aria-label` passed (the phone's `nativeID` and
+    `accessibilityLabel`) must carry both on one element (the one `PASS_THROUGH_TARGET` in `scripts/check.tsx` names, else a drawn
+    `role="dialog"`, else the root), the product's name over the kit's. `passThroughTodo` in `reports/generic.json` is the ratchet.
 - **Locale and direction:** numbers, dates, currency and sorting use `useLocale()` (never a hard-coded `"en-US"`); a style that names a
   side (`paddingLeft`, `left`, a corner) goes through `rtl(style, useDirection())` on the web (recipes are mirrored for you) and a
   transform or swipe direction reads `I18nManager.isRTL` on the phone. Keep physical properties: a left-to-right render must not move.

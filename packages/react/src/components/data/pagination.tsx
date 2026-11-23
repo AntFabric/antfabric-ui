@@ -3,7 +3,7 @@ import { recipes, useControllable, useStrings, type KitStrings } from "@antfabri
 import { clampPage, pageCountOf, pageRange, pageSlots } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { rootProps, setRef, type RootProps } from "../../lib/root-props";
 import { css, row, text } from "../../lib/style";
 import { Button } from "../actions/button";
 import { IconButton } from "../actions/icon-button";
@@ -69,7 +69,16 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
   const summary = total === undefined ? s("pageOf", { page: at, count }) : compact ? s("rangeOf", range) : s("showing", range);
   const sizes = pageSizes && pageSizes.length > 0 ? (pageSizes.includes(size) ? pageSizes : [size, ...pageSizes].sort((a, b) => a - b)) : null;
   return (
-    <nav ref={nav} data-af-part="root" aria-label={s("pages")} {...rootProps(rest)} style={css(row, { justifyContent: "space-between" }, (sizes || jump) && { flexWrap: "wrap", gap: t.space.sm }, r.root, style)}>
+    <nav
+      data-af-part="root"
+      aria-label={s("pages")}
+      {...rootProps(rest)}
+      ref={(el) => {
+        nav.current = el;
+        setRef(rest.ref, el);
+      }}
+      style={css(row, { justifyContent: "space-between" }, (sizes || jump) && { flexWrap: "wrap", gap: t.space.sm }, r.root, style)}
+    >
       <span data-af-part="summary" aria-live="polite" style={css(text, { fontVariantNumeric: "tabular-nums" }, r.summary)}>{summary}</span>
       {sizes ? (
         <Select

@@ -13,6 +13,7 @@ import { IconButton } from "../actions/icon-button";
 export type DialogKind = "confirm" | "form";
 export type DialogTone = "danger" | "primary";
 
+/** `nativeID`, the accessibility label and hint, and `ref` name the dialog; `testID` and `style` stay on the root. */
 export interface DialogProps extends RootProps {
   /** confirm: a decision about something already chosen. form: fields to fill. Both are a bottom sheet on the phone. */
   kind?: DialogKind;
@@ -120,7 +121,7 @@ export function Dialog({
   // A form's fields are lifted above the keyboard; a confirm has none.
   const Lift = kind === "form" ? KeyboardAvoidingView : View;
   const drawn = (
-    <Enter testID={partId(testID, "dialog", "root")} motion="fade" {...rootProps(rest)} style={[s.scrim, modal && s.screen, r.root.view, style]}>
+    <Enter testID={partId(testID, "dialog", "root")} motion="fade" style={[s.scrim, modal && s.screen, r.root.view, style]}>
       {modal ? <Pressable testID={partId(testID, "dialog", "backdrop")} accessible={false} style={s.backdrop} onPress={() => dismissible && cancel()} /> : null}
       <Lift {...(kind === "form" ? { behavior: Platform.OS === "ios" ? ("padding" as const) : undefined } : null)}>
       <Enter
@@ -130,6 +131,7 @@ export function Dialog({
         aria-modal
         accessibilityViewIsModal
         accessibilityLabel={title}
+        {...rootProps(rest)}
         onAccessibilityEscape={() => dismissible && cancel()}
         style={[s.sheet, r.sheet.view]}
       >

@@ -134,7 +134,7 @@ export function InAppBanner({
   }, [gone, said]);
 
   return (
-    <View {...rootProps(rest)} testID={partId(testID, "in-app-banner", "root")} role="status" accessibilityLabel={str("newNotification")} style={[r.root.view, style]}>
+    <View testID={partId(testID, "in-app-banner", "root")} role="status" accessibilityLabel={str("newNotification")} {...rootProps(rest)} style={[r.root.view, style]}>
       {!gone ? (
         <Enter motion="drop" onAccessibilityEscape={() => dismiss("swipe")}>
           <Animated.View {...pan.panHandlers} style={{ transform: [{ translateY: y }] }}>

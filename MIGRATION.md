@@ -308,6 +308,32 @@ the props below, or when the promise your handler returns settles. So either ret
 - **Check:** press each of these with your handler stubbed to return a rejected promise: the control spins, then comes back as it was, and
   no outcome (Approved, Unlocked, Notifications are on, Downloading) is drawn or announced.
 
+## 1.0 → 1.1: pass-through props
+
+`id`, `aria-*` and `ref` (the phone: `nativeID`, `accessibilityLabel`, `accessibilityHint` and `ref`) now go to the element that carries the
+component's role. `className`, `data-*`, `testID` and `style` stay on the root.
+
+| Component | `ref` and `id` were | Now |
+|---|---|---|
+| TextField, TextArea | the wrapper `<div>` (`View`) | the `<input>` / `<textarea>` (`TextInput`) |
+| SearchField | the wrapper | the `<input>` (`TextInput`); the launcher `<button>` with `launcher` |
+| Select | the wrapper | the trigger: `<button role="combobox">`, the native `<select>` in a phone browser, the `Pressable` on the phone |
+| Chip | the wrapper | the chip's button |
+| SegmentedControl | the wrapper (the `ScrollView` when `scrollable` on the phone) | the tab list |
+| Dialog, Sheet, BottomSheet, CommandPalette, ContextMenu (phone) | the scrim or backdrop | the `role="dialog"` panel |
+| Tabs (phone) | discarded | the `ScrollView` |
+| PeriodCompare, MetricTabs, Breakdown (phone) | dropped | the chart's root inside its card |
+
+- **Type change.** `TextFieldProps` takes `RootProps<HTMLInputElement>`, `TextAreaProps` `RootProps<HTMLTextAreaElement>`, `SearchFieldProps`
+  `RootProps<HTMLInputElement | HTMLButtonElement>`, `SelectProps` `RootProps<HTMLButtonElement | HTMLSelectElement>`, `ChipProps`
+  `RootProps<HTMLButtonElement>`; on the phone TextField, TextArea and SearchField take `RootProps<TextInput>`. A `useRef<HTMLDivElement>()` you
+  passed to one of them is now a type error: change its type to the control's.
+- **A ref that measured or scrolled the wrapper** now gets the control. Wrap the component in an element of your own and measure that.
+- **Your own `aria-label` now wins** over the kit's name on every component (ListItem, Message, Skeleton, SessionState, the sparklines and
+  others named in the changelog). An `aria-label` you passed and the kit ignored is now what a screen reader says: check its wording.
+- **Check:** `<label htmlFor="email">Email</label><TextField id="email" />` focuses the field when the label is clicked, and
+  `ref.current.focus()` on a TextField puts the caret in it.
+
 ## Checks you can run
 
 One per step. Each says what you should see.

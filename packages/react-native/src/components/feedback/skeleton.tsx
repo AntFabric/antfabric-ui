@@ -138,7 +138,6 @@ export function Skeleton({
   return (
     <Enter
       // Laid out but invisible until `visible`; then it fades in.
-      {...rootProps(rest)}
       testID={partId(testID, "skeleton", "root")}
       key={visible ? "on" : "off"}
       motion={visible ? "fade" : false}
@@ -146,6 +145,7 @@ export function Skeleton({
       role="status"
       accessibilityLabel={name}
       accessibilityState={{ busy: true }}
+      {...rootProps(rest)}
       style={[{ alignSelf: shape === "row" ? "stretch" : "flex-start", maxWidth: "100%" }, partStyle(r, "root", { view: !visible && { opacity: 0 } }).view, style]}
     >
       {shape !== "row" ? (

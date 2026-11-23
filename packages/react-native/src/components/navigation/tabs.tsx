@@ -4,7 +4,7 @@ import { cap, recipes, useControllable, useStrings, type KitStrings } from "@ant
 import { createStyles, useTheme } from "../../theme";
 import { usePress } from "../../lib/press";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { partId, rootProps, type RootProps } from "../../lib/root-props";
+import { partId, rootProps, setRef, type RootProps } from "../../lib/root-props";
 
 export interface TabsItem {
   key: string;
@@ -109,7 +109,10 @@ export function Tabs({ items, value, full = false, rule = true, label, onValueCh
   }, [current]);
   return (
     <ScrollView
-      ref={scroll}
+      ref={(el) => {
+        scroll.current = el;
+        setRef(rest.ref, el);
+      }}
       onLayout={(e) => {
         view.current = e.nativeEvent.layout.width;
       }}

@@ -140,7 +140,7 @@ export function Breakdown({ data, name, value, title, subtitle = "", format = "i
       headline={!loading && data.length ? { value: total, format, delta, deltaFormat, inverse, period } : undefined}
       table={!loading && data.length ? { data, x: name, y: value, format, labels: { [value]: valueLabel ?? str("valueLabel") } } : null}
       style={style}
-      {...({ testID, ...rootProps(rest) } as object)}
+      testID={testID} root={rootProps(rest)}
     >
       <ChartFrame height={height} grow interactive label={loading ? str("loading", { title }) : summary} loading={loading} empty={parts.length === 0} emptyTitle={empty ?? str("empty")} emptyLine={emptyLine ?? str("emptyLine")} loadingLabel={str("loadingChart")}>
         {() => (

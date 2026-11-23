@@ -118,7 +118,7 @@ export function SidebarSection({
   const rotate = turn.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "-90deg"] });
 
   return (
-    <View testID={partId(testID, "sidebar-section", "root")} {...rootProps(rest)} role="group" accessibilityLabel={label} style={[s.root, r.root.view, style]}>
+    <View testID={partId(testID, "sidebar-section", "root")} role="group" accessibilityLabel={label} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
       <View testID={partId(testID, "sidebar-section", "header")} style={[s.header, r.header.view]}>
         <Pressable
           testID={partId(testID, "sidebar-section", "toggle")}

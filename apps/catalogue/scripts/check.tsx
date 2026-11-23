@@ -88,7 +88,10 @@
  *            every size, spacing, radius, colour, opacity and cursor it already had set to another value, and every part that appears must
  *            carry them (`styles` wins over the kit's own inline styles). A component that fails is in `stylesProofTodo` with its parts
  *            The probe also fails a component whose recipe has a `root` part when a drawing shows its parts and no root of its own
- *            (the web: its outermost part is not `root`; the phone: a part of it with no `<id>.root`); today's are in `stylesProofTodo` as `<kit>:root`
+ *            (the web: its outermost part is not `root`; the phone: a part of it with no `<id>.root`); today's are in `stylesProofTodo` as `<kit>:root`.
+ *            And the pass-through props: every drawing of every component, in both kits, drawn with an `id` and an `aria-label` (the phone's
+ *            `nativeID` and `accessibilityLabel`), must carry both, once, on the element they name (a single-control composite's control, a
+ *            sheet's dialog, else the root; `PASS_THROUGH_TARGET`), the product's name over the kit's; what fails is `passThroughTodo`
  *   conventions  reports/api/conventions.md as far as a machine reads it (`pnpm check conventions`, and part of `code`): no component declares
  *            `onChange` or `collapsed` (docs or either kit), a `required` prop has no documented `default`, every `changes: "<prop>"` event is named
  *            `on<Prop>Change`, and a prop passed to `useControllable` with its event has no destructuring default (handler only keeps its own state). What breaks a rule today is in `conventionsTodo` in reports/generic.json (`{ id: ["<rule>: <detail>"] }`): a violation not
@@ -1263,6 +1266,8 @@ interface Generic {
   conventionsTodo?: Record<string, string[]>;
   /** `{ "<theme>/<scheme>: <fg> on <bg>": "<reason>" }`: the pairs `checkContrast` measures that fall short today. */
   contrastTodo?: Record<string, string>;
+  /** `"<id>/<kit>: <what>"`: a passed `id` or `aria-label` that does not reach the element it names (checkPassThrough). */
+  passThroughTodo?: string[];
 }
 const readGeneric = () => JSON.parse(readFileSync(GENERIC_FILE, "utf8")) as Generic;
 function checkStyles() {
@@ -1631,6 +1636,104 @@ function checkStylesProbe() {
     if (gone.length) err(GENERIC_AT, `stylesProofTodo["${id}"] lists ${gone.join(", ")}, which now carry \`styles\`: take ${gone.length === listed.length ? `"${id}"` : "them"} off the list`);
     if (!fresh.length && !gone.length && now.length) warn(`${at} ${id}`, `(stylesProofTodo) \`styles\` does not win on ${reasons(now)}`);
   }
+}
+
+// The pass-through props reach the element they name, and the product's name beats the kit's (AUTHORING.md "Pass-through"). Every component is drawn through each of
+// its drawings (the rest, the examples, the edge cases, each matrix value) on web, desktop and the phone's two OSes with `id="probe-id"` and `aria-label="Probe name"`
+// (the phone: `nativeID` and `accessibilityLabel`, which React Native Web writes as `id` and `aria-label`). Both must land on one element, once:
+//   the target   a component in PASS_THROUGH_TARGET: the element its selector finds (inside the root first, then the root itself);
+//   the dialog   a drawing with a `role="dialog"` or `"alertdialog"`: the surface itself, so a sheet with no title is named by the caller;
+//   the root     everything else: the component's outermost element (a `hidden` anchor beside it is not drawn).
+// What fails today is `passThroughTodo` in reports/generic.json (`"<id>/<kit>: <what>"`), and the list only shrinks.
+const PASS_THROUGH_TARGET: Record<string, { select?: string; kit?: "react" | "react-native"; why: string }> = Object.fromEntries([
+  // Single-control composites: the wrapper draws the label, the helper and the error around one control, which a `<label htmlFor>`, a form's jump
+  // to its first invalid field and an `aria-describedby` must reach (AUTHORING.md "Pass-through").
+  ...(
+    [
+      ["text-field", "input"],
+      ["text-area", "textarea"],
+      ["search-field", 'input, [data-af-part="launcher"]'],
+      ["select", '[role="combobox"], [role="button"]'],
+      ["chip", 'button, [role="button"], [role="togglebutton"]'],
+      ["checkbox", '[role="checkbox"]'],
+      ["switch", '[role="switch"]'],
+      ["radio-group", '[role="radiogroup"]'],
+      ["segmented-control", '[role="tablist"]'],
+    ] as const
+  ).map(([id, select]) => [id, { select, why: "a single-control composite: the control, not its wrapper" }]),
+  ["menu", { select: '[role="menu"]', why: "the root lays the trigger out beside the panel; the menu is the panel" }],
+  ...["bar-chart", "breakdown", "combo-chart", "donut-chart", "gauge-chart", "goal-rings", "kpi-card", "line-chart", "metric-tabs", "period-compare", "radar-chart", "stat-tile"].map((id) => [
+    id,
+    { select: `[data-af-part="root"], [data-testid="${id}.root"]`, why: "a ready-made chart sits in the kit's Card: the chart's own root inside it (ChartCard's `root`)" },
+  ]),
+  ["nav-rail", { select: "nav", why: "the catalogue draws the rail in a window (RailWindow); the rail is its <nav>" }],
+  ["inline-banner", { select: '[data-testid="inline-banner.root"]', kit: "react-native", why: "the phone's root is an entrance wrapper around the banner, which is its own root part" }],
+  // No selector: the root, though a dialog is drawn inside it.
+  ["popover", { why: "the root holds the trigger and the panel, which mounts only while open: the pass-through names the popover, not the panel" }],
+  ["update-banner", { why: "the confirm it raises is a Dialog of its own: the pass-through names the banner" }],
+]);
+/** `"<id>/<kit>: <what>"` the check would report, kept on purpose, with the reason. Unlike `passThroughTodo`, these are not meant to go. */
+const PASS_THROUGH_EXCEPT: Record<string, string> = {
+  "message/react-native: aria-label lands on a <div>, not the root":
+    "the phone's row is not an accessibility stop (its words, reactions and thread are), so the product's label names the words, the stop that reads the message; `nativeID` and `ref` stay on the row",
+};
+function checkPassThrough() {
+  const at = "pass-through";
+  setReducedMotion(true);
+  const todo = readGeneric().passThroughTodo ?? [];
+  // `"<id>/<kit>: <what>"` → the drawings it failed in.
+  const failed = new Map<string, Set<string>>();
+  const targets: { kit: "react" | "react-native"; platform: Platform; os: OS }[] = [
+    { kit: "react", platform: "web", os: "browser" },
+    { kit: "react", platform: "desktop", os: "mac" },
+    { kit: "react-native", platform: "mobile", os: "ios" },
+    { kit: "react-native", platform: "mobile", os: "android" },
+  ];
+  const ID = "probe-id";
+  const NAME = "Probe name";
+  for (const doc of components) {
+    const { id } = doc;
+    for (const { kit, platform, os } of targets) {
+      if (doc.platforms[platform].status === "not-applicable" || !kitComponent(id, platform)) continue;
+      const mobile = platform === "mobile";
+      const probe = mobile ? { nativeID: ID, accessibilityLabel: NAME } : { id: ID, "aria-label": NAME };
+      const defaults = defaultsFor(usedIds(doc), platform);
+      for (const c of propSets(doc, platform)) {
+        if (c.os && c.os !== os) continue;
+        const drawn = drawQuiet(createElement(DefaultsProvider, { value: defaults }, createElement(Stage, { platform, os, scheme: "light", theme: antfabric, state: c.state, children: createElement(Thing, { id, platform, props: { ...c.props, ...probe } }) })));
+        if (drawn.html === null || waitingFor(drawn.html)) continue;
+        const { document } = parseHTML(`<!doctype html><html><body>${drawn.html}</body></html>`);
+        // The stage: AntFabricRoot's element on the web, the View the phone's Stage wraps the component in.
+        const stage = mobile ? document.body.firstElementChild : document.querySelector("[data-af-platform]");
+        const root = [...(stage?.children ?? [])].find((e) => !/^(?:STYLE|SCRIPT)$/.test(e.tagName) && !e.hasAttribute("hidden"));
+        if (!root) continue;
+        const listed = PASS_THROUGH_TARGET[id]?.kit && PASS_THROUGH_TARGET[id]!.kit !== kit ? undefined : PASS_THROUGH_TARGET[id];
+        const found = !listed ? null : !listed.select ? root : (root.querySelector(listed.select) ?? (root.matches(listed.select) ? root : null));
+        const dialog = document.querySelector('[role="dialog"], [role="alertdialog"]');
+        const [where, target] = found ? [found === root ? "root" : "target", found] : dialog ? ["dialog", dialog] : ["root", root];
+        const fail = (why: string) => {
+          const entry = `${id}/${kit}: ${why}`;
+          (failed.get(entry) ?? failed.set(entry, new Set()).get(entry)!).add(`${platform}/${os} ${c.name}`);
+        };
+        if (listed?.select && !found) fail(`no ${listed.select} is drawn`);
+        const withId = document.querySelectorAll(`[id="${ID}"]`);
+        if (withId.length > 1) fail(`id is drawn ${withId.length} times`);
+        if (target.getAttribute("id") !== ID) fail(withId.length ? `id lands on a <${withId[0]!.tagName.toLowerCase()}>, not the ${where}` : `id is dropped`);
+        const named = target.getAttribute("aria-label");
+        if (named !== NAME) {
+          const elsewhere = document.querySelector(`[aria-label="${NAME}"]`);
+          fail(elsewhere ? `aria-label lands on a <${elsewhere.tagName.toLowerCase()}>, not the ${where}` : named ? `the kit's aria-label wins on the ${where}` : `aria-label is dropped`);
+        }
+      }
+    }
+  }
+  setReducedMotion(false);
+  for (const e of Object.keys(PASS_THROUGH_EXCEPT)) if (!failed.delete(e)) err(at, `PASS_THROUGH_EXCEPT lists "${e}", which no longer happens: take it off`);
+  const now = [...failed.keys()].sort();
+  if (todo.some((e, i) => i > 0 && todo[i - 1]! >= e)) err(GENERIC_AT, "passThroughTodo is not sorted");
+  const seen = (e: string) => [...failed.get(e)!].slice(0, 3).join("; ");
+  for (const e of now) if (!todo.includes(e)) err(at, `${e} (${seen(e)}). A passed \`id\` and \`aria-label\` name the control, the dialog or the root (AUTHORING.md "Pass-through"): fix it, or list "${e}" in passThroughTodo in reports/generic.json`);
+  for (const e of todo) if (!now.includes(e)) err(GENERIC_AT, `passThroughTodo lists "${e}", which now passes: take it off`);
 }
 
 // The documented default of a prop is the kit's: a component drawn with every documented default, then again with one prop left out, draws the same markup. A
@@ -3145,6 +3248,7 @@ if (!only.length || only.includes("code") || only.includes("generic")) {
   checkStylesProof();
   checkPartStyle();
   timed("styles probe", checkStylesProbe);
+  timed("pass-through", checkPassThrough);
 }
 if (!only.length || only.includes("strings")) timed("strings", checkStrings);
 if (!only.length || only.includes("defaults")) timed("defaults", checkDefaults);

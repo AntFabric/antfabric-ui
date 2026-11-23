@@ -28,6 +28,7 @@ export interface SelectItem {
   disabled?: boolean;
 }
 
+/** `nativeID`, the accessibility label and hint, and `ref` name the trigger; `testID` and `style` stay on the root. */
 export interface SelectProps extends RootProps {
   items: SelectItem[];
   /** The chosen item's key. */
@@ -165,7 +166,7 @@ export function Select({
   const { width: caretSize, height: _ch, ...caretRest } = r.caret.view;
   const name = label || placeholder || form?.label || "";
   return (
-    <View testID={partId(testID, "select", "root")} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
+    <View testID={partId(testID, "select", "root")} style={[s.root, r.root.view, style]}>
       {label ? (
         <Text testID={partId(testID, "select", "label")} maxFontSizeMultiplier={fontScale.content} style={[r.label.view, r.label.text]}>
           {label}
@@ -176,11 +177,12 @@ export function Select({
           testID={partId(testID, "select", "trigger")}
           accessibilityRole="button"
           accessibilityLabel={chosen ? `${name}, ${chosen.label}` : name}
-          accessibilityHint={[title, form?.hint].filter(Boolean).join(". ") || undefined}
           accessibilityState={{ disabled: press.disabled, expanded: isOpen }}
           disabled={press.disabled}
           onPress={() => setOpen(!isOpen)}
           {...press.handlers}
+          {...rootProps(rest)}
+          accessibilityHint={[title, form?.hint, rest.accessibilityHint].filter(Boolean).join(". ") || undefined}
           style={[s.trigger, r.trigger.view]}
         >
           {chosen?.icon ? <Icon testID={partId(testID, "select", "icon")} name={chosen.icon} size={iconSize as number} color={icon.text.color} style={Object.keys(iconRest).length ? iconRest : undefined} /> : null}

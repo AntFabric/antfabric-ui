@@ -69,11 +69,11 @@ export function Meter({ value, max = 1, label, kind = "usage", format = "percent
   return (
     <View
       testID={partId(testID, "meter", "root")}
-      {...rootProps(rest)}
       accessible
       accessibilityRole="progressbar"
       accessibilityLabel={label}
       accessibilityValue={known ? { min: 0, max, now: Math.min(max, Math.max(0, value)), text: said } : { text: shown }}
+      {...rootProps(rest)}
       style={[s.root, root.view, style]}
     >
       {!compact ? (

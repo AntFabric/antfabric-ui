@@ -1,14 +1,15 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, Ref } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, row, text, truncate } from "../../lib/style";
 import { useOverlayFocus } from "../../lib/focus";
 import { useInteraction } from "../../lib/interaction";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { Button } from "../actions/button";
 import { IconButton } from "../actions/icon-button";
 
+/** `id`, `aria-*` and `ref` name the dialog (the panel); `className` and `data-*` go on the root, the scrim (`splitRootProps`). */
 export interface BottomSheetProps extends RootProps<HTMLDivElement> {
   /** Empty draws no title row: the handle and the content only. */
   title?: string;
@@ -76,25 +77,31 @@ export function BottomSheet({
   };
   // Focus moves in when the sheet mounts (not when it is drawn already dismissed), Tab stays inside, Esc closes, and focus returns to the opener.
   const focus = useOverlayFocus<HTMLDivElement>({ initial: gone ? false : "first", trap: true, onEscape: close });
+  const pass = splitRootProps(rest);
+  const { ref, ...named } = pass.control as { ref?: Ref<HTMLDivElement> } & Record<string, unknown>;
   // The handle is 5px tall, so a transparent box centred on it reaches the target size without drawing more: a click on it is a click on the handle.
   const height = r.handle.height;
   const handleH = typeof height === "number" ? `${height}px` : (height as string);
   return (
     <div
       data-af-part="root"
-      {...rootProps(rest)}
+      {...pass.root}
       // A press on the scrim above the panel closes it; the keyboard has Esc and the handle.
       onClick={(e) => e.target === e.currentTarget && close()}
       // It fills what it is given (the viewport, the host's layer): the panel sits at the foot and the scrim above it is the backdrop.
       style={css(box, partStyle(r, "root", { flexGrow: 1, alignSelf: "stretch", justifyContent: "flex-end", overflow: "hidden" }), style)}
     >
       <div
-        ref={focus.ref}
+        ref={(el) => {
+          focus.ref.current = el;
+          setRef(ref, el);
+        }}
         role="dialog"
         aria-modal
         data-af-part="panel"
         aria-label={title || undefined}
         aria-hidden={gone || undefined}
+        {...named}
         onKeyDown={focus.onKeyDown}
         onTransitionEnd={(e) => {
           if (gone && e.target === e.currentTarget && e.propertyName === "transform") onDismiss?.();

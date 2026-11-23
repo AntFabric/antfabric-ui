@@ -10,7 +10,8 @@ import { partId, rootProps, type RootProps } from "../../lib/root-props";
 import { fontScale } from "../../lib/type";
 import { useFormField } from "./form-field";
 
-export interface TextAreaProps extends RootProps {
+/** `nativeID`, the accessibility label and hint, and `ref` name the input; `testID` and `style` stay on the root. */
+export interface TextAreaProps extends RootProps<TextInput> {
   /** Visible label and the field's accessibility label. With `hideLabel` it is only the accessibility label. */
   label: string;
   /** The text. Left out, the field keeps its own text, starting from `defaultValue`, and still reports each change. */
@@ -120,7 +121,7 @@ export function TextArea({
   const { placeholderTextColor, ...inputText } = input.text;
   const tagText = partStyle(r, "tag", { text: { lineHeight: (r.tag.text.fontSize as number) * 1.2 } }).text;
   return (
-    <View testID={partId(testID, "text-area", "root")} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
+    <View testID={partId(testID, "text-area", "root")} style={[s.root, r.root.view, style]}>
       {hideLabel ? null : (
         <View style={[s.header, { gap: t.space.sm }]}>
           <Text testID={partId(testID, "text-area", "label")} maxFontSizeMultiplier={fontScale.content} style={[r.label.view, r.label.text]}>
@@ -143,8 +144,6 @@ export function TextArea({
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
           accessibilityLabel={label || placeholder || form?.label}
-          // What is said after the name: the error or the helper, the field's own description and error, and that it is required.
-          accessibilityHint={[showError ? error : helper, form?.hint, required && !form?.required ? str("required") : ""].filter(Boolean).join(". ") || undefined}
           accessibilityState={{ disabled }}
           editable={!disabled && !readOnly}
           maxLength={maxLength > 0 ? maxLength : undefined}
@@ -158,6 +157,9 @@ export function TextArea({
             setFocus(false);
             onBlur?.();
           }}
+          {...rootProps(rest)}
+          // What is said after the name: the error or the helper, the field's own description and error, that it is required, then the product's hint.
+          accessibilityHint={[showError ? error : helper, form?.hint, required && !form?.required ? str("required") : "", rest.accessibilityHint].filter(Boolean).join(". ") || undefined}
           style={[s.input, input.view, inputText]}
         />
       </View>

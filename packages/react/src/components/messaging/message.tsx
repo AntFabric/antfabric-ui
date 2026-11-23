@@ -250,8 +250,8 @@ export function Message({
       role="article"
       data-af-part="root"
       tabIndex={0}
-      {...rootProps(rest)}
       aria-label={s("label", { author, ai: agent ? s("ai") : "", time, state: said, mention: mentionsYou ? s("mentionsYou") : "", unread: unread ? s("unread") : "", pinned: pinned ? s("pinned") : "" })}
+      {...rootProps(rest)}
       // A finger "enters" on every tap, which would flash the bar: touch gets it by long press instead.
       onPointerEnter={(e: PointerEvent<HTMLDivElement>) => {
         if (e.pointerType !== "touch") ui.handlers.onPointerEnter();

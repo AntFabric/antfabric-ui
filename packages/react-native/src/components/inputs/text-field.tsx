@@ -13,7 +13,8 @@ import { Button } from "../actions/button";
 
 export type TextFieldType = "text" | "email" | "password" | "search" | "tel" | "url" | "number";
 
-export interface TextFieldProps extends RootProps {
+/** `nativeID`, the accessibility label and hint, and `ref` name the input; `testID` and `style` stay on the root. */
+export interface TextFieldProps extends RootProps<TextInput> {
   /** Visible label and the field's accessibility label. */
   label?: string;
   value?: string;
@@ -173,7 +174,7 @@ export function TextField({
   const { placeholderTextColor, ...inputText } = input.text;
   const tagText = partStyle(r, "tag", { text: { lineHeight: (r.tag.text.fontSize as number) * 1.2 } }).text;
   return (
-    <View testID={partId(testID, "text-field", "root")} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
+    <View testID={partId(testID, "text-field", "root")} style={[s.root, r.root.view, style]}>
       {label || tag || required ? (
         <View style={[s.header, { gap: t.space.sm }]}>
           {label ? (
@@ -202,8 +203,6 @@ export function TextField({
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
           accessibilityLabel={label || placeholder || form?.label}
-          // What is said after the name: the error or the helper, the field's own description and error, and that it is required.
-          accessibilityHint={[showError ? error : helper, form?.hint, required && !form?.required ? tag || str("required") : ""].filter(Boolean).join(". ") || undefined}
           accessibilityState={{ disabled }}
           editable={!disabled && !readOnly}
           maxLength={maxLength > 0 ? maxLength : undefined}
@@ -218,6 +217,9 @@ export function TextField({
             setFocus(false);
             onBlur?.();
           }}
+          {...rootProps(rest)}
+          // What is said after the name: the error or the helper, the field's own description and error, that it is required, then the product's hint.
+          accessibilityHint={[showError ? error : helper, form?.hint, required && !form?.required ? tag || str("required") : "", rest.accessibilityHint].filter(Boolean).join(". ") || undefined}
           style={[s.input, input.view, inputText]}
         />
         {trailing || revealing ? (

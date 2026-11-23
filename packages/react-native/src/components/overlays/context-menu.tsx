@@ -16,6 +16,7 @@ import { Menu, type MenuItem } from "./menu";
 /** A row of the sheet under the reactions, in Menu's own shape. */
 export type ContextMenuItem = MenuItem;
 
+/** `nativeID`, the accessibility label and hint, and `ref` name the dialog; `testID` and `style` stay on the root. */
 export interface ContextMenuProps extends RootProps {
   /** The quick set, as emoji, in order. Empty draws no reaction row at all (and no +). */
   quickReactions?: string[];
@@ -156,8 +157,8 @@ export function ContextMenu({ quickReactions = [], picked = [], items = [], labe
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <View testID={partId(testID, "context-menu", "root")} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
-      <Enter motion="slide-up" role="dialog" aria-modal accessibilityViewIsModal accessibilityLabel={title || (label ?? str("actions"))}>
+    <View testID={partId(testID, "context-menu", "root")} style={[s.root, r.root.view, style]}>
+      <Enter motion="slide-up" role="dialog" aria-modal accessibilityViewIsModal accessibilityLabel={title || (label ?? str("actions"))} {...rootProps(rest)}>
         {/* The emoji panel's search field is lifted above the keyboard. */}
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <GlassSurface testID={partId(testID, "context-menu", "sheet")} style={[s.sheet, r.sheet.view]} glassStyle={[s.glass, styles?.sheet]}>

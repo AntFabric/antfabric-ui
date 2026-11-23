@@ -64,7 +64,7 @@ export function Sparkline({ data, y, width = 120, height = 32, area = false, mar
   // One point has no line to draw: it is a dot.
   const dot = marker || rows.length === 1 ? (p: { index?: number; cx?: number; cy?: number }) => (p.index === rows.length - 1 ? <circle key="last" cx={p.cx} cy={p.cy} r={t.chart.pointR - 1} fill={color} stroke={t.surface.card} strokeWidth={t.border.wThick} /> : <g key={p.index} />) : false;
   return (
-    <span data-af-part="root" {...rootProps(rest)} role="img" aria-label={said} style={frame}>
+    <span data-af-part="root" role="img" aria-label={said} {...rootProps(rest)} style={frame}>
       <AreaChart accessibilityLayer={false} width={width} height={height} data={rows} margin={{ top: t.chart.pointR, right: edge, bottom: flush ? 0 : t.chart.pointR, left: edge }} style={{ display: "block" }}>
         <YAxis hide domain={[floor, hi + span * AIR]} />
         <Area dataKey="v" type="monotone" stroke={color} strokeWidth={t.chart.sparkW} fill={area ? color : "none"} fillOpacity={FLAT_FILL} dot={dot} activeDot={false} tooltipType="none" {...rechartsMotion(animate, reduced)} />

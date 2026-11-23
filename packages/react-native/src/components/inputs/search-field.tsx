@@ -4,12 +4,13 @@ import { recipes, useControllable, useStrings, type KitStrings } from "@antfabri
 import { createStyles } from "../../theme";
 import { Icon, Spinner } from "../../lib/icon";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
-import { partId, rootProps, type RootProps } from "../../lib/root-props";
+import { partId, rootProps, setRef, type RootProps } from "../../lib/root-props";
 import { fontScale } from "../../lib/type";
 import { useFormField } from "./form-field";
 import { IconButton } from "../actions/icon-button";
 
-export interface SearchFieldProps extends RootProps {
+/** `nativeID`, the accessibility label and hint, and `ref` name the input; `testID` and `style` stay on the root. */
+export interface SearchFieldProps extends RootProps<TextInput> {
   /** What is in the box. The field reports every change, and the ✕ through onClear. */
   value?: string;
   /** Say what is searched, not "Search" — the field is the only hint of what a screen holds. */
@@ -70,18 +71,16 @@ export function SearchField({
   const { width: iconSize, height: _ih, ...iconRest } = r.icon.view;
   const { width: spinSize, height: _sh, ...spinRest } = r.spinner.view;
   return (
-    <View testID={partId(testID, "search-field", "root")} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
+    <View testID={partId(testID, "search-field", "root")} style={[s.root, r.root.view, style]}>
       {busy ? (
         <Spinner testID={partId(testID, "search-field", "spinner")} label={str("loading")} size={spinSize as number} color={r.spinner.text.color} style={Object.keys(spinRest).length ? spinRest : undefined} />
       ) : (
         <Icon testID={partId(testID, "search-field", "icon")} name="search" size={iconSize as number} color={r.icon.text.color} style={Object.keys(iconRest).length ? iconRest : undefined} />
       )}
       <TextInput
-        ref={inputRef}
         testID={partId(testID, "search-field", "input")}
         accessibilityRole="search"
         accessibilityLabel={label || placeholder || form?.label}
-        accessibilityHint={form?.hint}
         maxFontSizeMultiplier={fontScale.content}
         accessibilityState={{ disabled, busy }}
         value={query}
@@ -93,6 +92,12 @@ export function SearchField({
         onSubmitEditing={() => onSubmit?.()}
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
+        {...rootProps(rest)}
+        ref={(el) => {
+          inputRef.current = el;
+          setRef(rest.ref, el);
+        }}
+        accessibilityHint={[form?.hint, rest.accessibilityHint].filter(Boolean).join(". ") || undefined}
         style={[s.input, r.input.view, inputText]}
       />
       {query ? (

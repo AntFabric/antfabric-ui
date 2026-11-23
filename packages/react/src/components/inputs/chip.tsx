@@ -4,12 +4,13 @@ import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { splitRootProps, type RootProps } from "../../lib/root-props";
 import { css, pressable, row, text, truncate } from "../../lib/style";
 
 export type ChipVariant = "filter" | "suggestion" | "object";
 
-export interface ChipProps extends RootProps<HTMLDivElement> {
+/** `id`, `aria-*` and `ref` name the chip's button; `className` and `data-*` go on the root (`splitRootProps`). */
+export interface ChipProps extends RootProps<HTMLButtonElement> {
   label: string;
   icon?: IconName;
   /** filter narrows what you are looking at. suggestion is a prompt under the composer. object is a saved thing (a project, a saved search) and is the only chip allowed the brand colour. */
@@ -113,8 +114,9 @@ export function Chip({
   // The ✕ is its own target: its hover and focus are its own, though it sits on the chip's fill.
   const rx = useRecipe(recipes.chip, { variants: { variant }, state: { hover: x.hovered, focus: x.focused, on }, styles });
   if (gone) return null;
+  const pass = splitRootProps(rest);
   return (
-    <div ref={rootRef} data-af-part="root" {...rootProps(rest)} style={css(root, r.root, style)}>
+    <div ref={rootRef} data-af-part="root" {...pass.root} style={css(root, r.root, style)}>
       <button
         type="button"
         data-af-part="main"
@@ -135,6 +137,7 @@ export function Chip({
           }
         }}
         {...ui.handlers}
+        {...pass.control}
         style={css(main, partStyle(r, "main", ui.disabled && { cursor: "not-allowed" }))}
       >
         {icon && <Icon part="icon" name={icon} style={r.icon} />}

@@ -280,10 +280,22 @@ Six things to know:
   holds one. Open or closed is `expanded` (overlays keep `open`).
 - **Props are the documented ones, `style`, `styles`, `strings` and the pass-through ones.** Every
   component passes `id`, `className`, `ref`, `data-*` and `aria-*` to its root element, after its own
-  attributes, so your `aria-label` names the instance (`data-af-*` is the kit's and is not taken). For a
-  field (`TextField`, `Select`, `Chip`) the root is today the wrapper, not the control. On the phone the
+  attributes, so your `aria-label` names the instance (`data-af-*` is the kit's and is not taken). Where the
+  root wraps the one element that carries the role, `id`, `aria-*` and `ref` go to that element and
+  `className`, `data-*` and `style` stay on the root:
+  - `TextField`, `TextArea`, `SearchField`: the input (the launcher button with `launcher`). A passed `id`
+    replaces the one the kit generates, so its label and helper follow it; inside a `FormField` the
+    FormField's id wins. Your `aria-describedby` is read after the kit's helper and error.
+  - `Select`: the trigger (`role="combobox"`, or the native `<select>` in a phone browser).
+  - `Chip`: the chip's button. `SegmentedControl`: the tab list. `Menu`: the `role="menu"` panel.
+  - `Dialog`, `Sheet`, `BottomSheet`, `CommandPalette` (and the phone's `ContextMenu`): the `role="dialog"`
+    panel, so a sheet with no title is named by your `aria-label`. `Popover` keeps them on its root.
+  - The ready-made charts and KPIs (`BarChart`, `KpiCard`, …): the chart inside its card.
+  On the phone the
   pass-through is `testID` (the root's, and the prefix of its parts' ids: `<testID>.<part>`), `nativeID`,
-  `accessibilityLabel`, `accessibilityHint` and `ref`. No other HTML attribute passes through. The
+  `accessibilityLabel`, `accessibilityHint` and `ref`, routed the same way (`testID` and `style` stay on the
+  root; the phone's `Message` gives `accessibilityLabel` to its words, the stop that reads it). No other
+  HTML attribute passes through. The
   accessible name comes from `label`. `styles` is per part (`styles={{ root: { … } }}`) and `strings` is
   the text the kit draws, for this instance.
 - **A container takes children.** `<Card>…</Card>`, `<Dialog>…</Dialog>`, `<BottomSheet>…</BottomSheet>`.

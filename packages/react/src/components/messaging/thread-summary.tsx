@@ -71,8 +71,8 @@ export function ThreadSummary({ replyCount, lastReply = "", participants = [], u
       type="button"
       data-af-part="root"
       data-af-press
-      {...rootProps(rest)}
       aria-label={label}
+      {...rootProps(rest)}
       onClick={() => onPress?.()}
       {...ui.handlers}
       style={css(rtl(root, dir), r.root, style)}

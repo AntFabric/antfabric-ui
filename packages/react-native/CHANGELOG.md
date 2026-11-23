@@ -53,6 +53,21 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 9: pass-through props
 
+- **A field's `nativeID`, `accessibilityLabel`, `accessibilityHint` and `ref` now reach the control, not its wrapper** (M5). `testID` and `style` stay on the root (`testID` still prefixes every part). `ref` gives:
+  - TextField and TextArea: the `TextInput` (was the wrapper `View`).
+  - SearchField: the `TextInput`.
+  - Select: the trigger `Pressable`.
+  - Chip: the chip's `Pressable` (the ✕ is its own).
+  - SegmentedControl: the tab list `View` (was the wrapper, or the `ScrollView` when `scrollable`).
+  - Checkbox, Switch and RadioGroup: unchanged, their root is already the control.
+- Your `accessibilityHint` is read after the field's own (the error or helper, the FormField's description, "Required"), not instead of it.
+- **Dialog, Sheet, BottomSheet and ContextMenu give the pass-through to the view with `role="dialog"`** (M19), not the scrim. A Sheet with no title names its dialog with `label` (it named the wrapper, so the dialog was unnamed); your `accessibilityLabel` beats both. `ref` is the dialog's view.
+- **Your `accessibilityLabel` wins over the kit's** (M37): AppBadge, InAppBanner, SidebarSection, PermissionPrompt, ThinkingIndicator, SessionState, Skeleton, Meter, ProgressRing, SparkBars and Sparkline wrote their own after the pass-through.
+- PeriodCompare, MetricTabs and Breakdown pass `nativeID`, `accessibilityLabel` and `ref` to the chart's root inside the card; they were dropped (M49).
+- Tabs: a passed `ref` gets the `ScrollView`; it was discarded (L17).
+- Pagination with a page-size or jump Select: the pass-through names the whole pagination, not the pager row under the Selects.
+- OsNotification: every part's `testID` is `<testID>.<part>` when you pass a `testID`, so two banners no longer share ids (L51). Without one they are `os-notification.<part>`, as before.
+
 ### Batch 10: contrast and target size
 
 - **AntFabric's primary buttons now draw dark ink on coral** (`fg.onBrand` by contrast, see core). Brand fills under a dark tenant brand stay white.

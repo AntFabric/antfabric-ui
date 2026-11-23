@@ -61,6 +61,20 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 9: pass-through props
 
+- **A field's `id`, `aria-*` and `ref` now reach the control, not its wrapper** (M5). `className`, `data-*` and `style` stay on the root wrapper. A `<label htmlFor>` of your own, a form's jump to its first invalid field (`ref.current.focus()`) and your `aria-label` now name the control. `ref` gives:
+  - TextField: the `<input>` (`HTMLInputElement`; was the wrapper `<div>`).
+  - TextArea: the `<textarea>` (`HTMLTextAreaElement`).
+  - SearchField: the `<input>`, or the launcher `<button>` with `launcher` (`HTMLInputElement | HTMLButtonElement`).
+  - Select: the trigger `<button role="combobox">`, or the native `<select>` in a phone browser (`HTMLButtonElement | HTMLSelectElement`).
+  - Chip: the chip's `<button>` (`HTMLButtonElement`; the ✕ is a button of its own).
+  - SegmentedControl: the `<div role="tablist">`.
+  - Checkbox, Switch and RadioGroup: unchanged, their root is already the control.
+- A passed `id` on TextField, TextArea and Select replaces the one the kit generates, so the kit's own `<label for>`, `aria-describedby` and the Select's listbox ids follow it. Inside a FormField the FormField's id still wins, since its label points at it. Your `aria-describedby` is read after the kit's helper, error and counter, not instead of them.
+- **Dialog, Sheet, BottomSheet and CommandPalette give `id`, `aria-*` and `ref` to the element with `role="dialog"`**, not the backdrop (M19). A sheet with no title is named by your `aria-label`. `ref` is the panel (it was the scrim). Dialog joins your `aria-describedby` after its body.
+- **Your `aria-label` wins over the kit's** (M37): ListItem, MessageDivider (and its sticky pill), Message, ThreadSummary, Skeleton, SessionState, ProgressRing, SparkBars and Sparkline wrote their own name after the pass-through, so a product's was dropped.
+- Pagination: a passed `ref` no longer replaces the kit's own. With one, focus was lost when Previous or Next became disabled under the keyboard; now it moves to the current page as it does without one.
+- `pnpm check generic` draws every component in both kits with an `id` and an `aria-label` passed through and fails when they do not reach the same element (the control, the dialog or the root), or when the kit's name beats the product's (`passThroughTodo` in `reports/generic.json`, empty).
+
 ### Batch 10: contrast and target size
 
 - **AntFabric's primary buttons now draw dark ink on coral** (`fg.onBrand` by contrast, see core). Brand fills under a dark tenant brand stay white.

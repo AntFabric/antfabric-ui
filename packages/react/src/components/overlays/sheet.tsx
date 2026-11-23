@@ -5,11 +5,12 @@ import { useOverlayFocus } from "../../lib/focus";
 import { OverlayLayer, useLayerHost, useLayerStack } from "../../lib/layer";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, row, text, truncate } from "../../lib/style";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { IconButton } from "../actions/icon-button";
 
 export type SheetSide = "start" | "end";
 
+/** `id`, `aria-*` and `ref` name the dialog (the panel); `className` and `data-*` go on the root, the scrim (`splitRootProps`). */
 export interface SheetProps extends RootProps<HTMLDivElement> {
   /** The sheet is showing. ✕, Esc and a press on the scrim close it (unless `dismissible` is off). */
   open?: boolean;
@@ -131,10 +132,12 @@ function SheetPanel({ side, width, title, subtitle, footer, showClose, label, cl
   const focus = useOverlayFocus<HTMLDivElement>({ trap: true, onEscape: dismissible && !floating ? onClose : undefined, initial: "first" });
   useLayerStack(floating, () => [focus.ref.current], { onEscape: close, onOutside: close });
   const end = side === "end";
+  const pass = splitRootProps(rootRest);
+  const { ref, ...named } = pass.control as Pick<RootProps<HTMLDivElement>, "ref"> & Record<string, unknown>;
   return (
     <div
       data-af-part="root"
-      {...rootProps(rootRest)}
+      {...pass.root}
       style={css(
         row,
         { alignItems: "stretch", justifyContent: end ? "flex-end" : "flex-start", ...enter("fade") },
@@ -146,13 +149,17 @@ function SheetPanel({ side, width, title, subtitle, footer, showClose, label, cl
       )}
     >
       <div
-        ref={focus.ref}
+        ref={(el) => {
+          focus.ref.current = el;
+          setRef(ref, el);
+        }}
         role="dialog"
         aria-modal
         aria-labelledby={title ? `${id}-title` : undefined}
         aria-label={title ? undefined : label}
         tabIndex={-1}
         onKeyDown={focus.onKeyDown}
+        {...named}
         data-af-part="panel"
         style={css(box, { height: "100%", maxWidth: "100%", outline: "none", ...enter(end ? "slide-left" : "slide-right") }, partStyle(r, "panel", width ? { width } : undefined))}
       >
