@@ -57,7 +57,16 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 7: announcements
 
+- **Fixed, announcements:** two messages announced within 50 ms are both read, joined in order, instead of the first being dropped; the same text twice in that beat is read once. A modal no longer makes the page's announcers inert, so an error or a toast said while a dialog is open is read (M3).
+- **Added:** `useAnnounce(text, politeness?, { initial? })` in `lib/announce.ts`: says a status each time its text changes (not on first draw unless `initial`).
+- **Behaviour change, no live regions mounted with their text:** a status is plain text and an announcement. Composer's offline and read-only lines and Message's sending, failed and queued lines (failed and queued are said when they happen, M28); InAppBanner's root is a labelled group and an arriving banner is said (M31); Badge `live` says a change of its count and is always `role="img"` (M40); CommandPalette's offline, searching and no-results lines (no results is said after typing pauses, with the count); Select says "No matches for …" once when the filter empties the list (L1); Dialog's error (said assertively); ConnectionBanner's pill is `role="img"` and says its new name; Pagination's summary (and Table's) is said when it changes; NotificationSchedule's pill is a labelled group and a resume is said too; QuestionPanel's offline line. Markup loses `role="status"`, `role="alert"` and `aria-live` on these parts.
+- **Fixed, UpdateBanner (desktop):** the stage is said once by the banner, not again each time the nav rail folds or unfolds (M18).
+- **Fixed, CommandPalette:** after filtering, the first row is highlighted, as Enter takes it (M17).
+
 ### Batch 8: focus hand-off
+
+- **Fixed, focus hand-off (M1):** a control pressed from the keyboard that goes away, disables or goes inert no longer drops focus to the page. QuestionPanel's Submit spins as Button's `loading` and stays focusable; dismissing a Toast (or its action), an InlineBanner or an InAppBanner, and taking back a sole reaction, hand focus to the nearest control that stays; NotificationSchedule's Resume and the picker's Pause hand it to the menu's first control or the pill; OsNotification's Reply hands it to the reply field; UpdateBanner's Install hands it to the busy card, and the folded rail icon stays focusable while busy (`aria-disabled`, not `disabled`); Esc inside a HoverCard gives it back to the trigger; BottomSheet gives it back to the opener when dismissed, and its slid-away panel is `inert`.
+- **Added:** `focusNear(from)` and `focusDropped()` in `lib/focus.ts`; `useOverlayFocus({ open })` for an overlay that stays drawn while it closes. `useFocusHandoff` also hands off when focus sits on a removed, disabled, inert or hidden element.
 
 ### Batch 9: pass-through props
 

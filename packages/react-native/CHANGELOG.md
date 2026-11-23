@@ -49,7 +49,12 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 7: announcements
 
+- **Added:** `useAnnounce(text, { initial? })` in `lib/a11y.ts`: says a status each time its text changes (not on first draw unless `initial`).
+- **Behaviour change, no live regions:** the kit marks no view `accessibilityLiveRegion` or `role="status"`/`"alert"` with text in it; a status is said through the screen reader's announcement, so iOS and Android hear it once. Composer's offline line and upload hint, and Message's failed and queued lines, are said when they happen (M28); Badge `live` says a change of its count (M40); Select says "No matches for …" once when the filter empties the list (L1); MobileHeader says "Back online" when the connection line goes (L55); ThinkingIndicator's rotating word is no longer read every 2.4 s (M29); AttachmentCard's upload percent is no longer a live region (L25); OsNotification's reply status is said (it said nothing on iOS); QuestionPanel says going offline; Pagination's summary is said when it changes. Dialog, ConnectionBanner, InAppBanner, InlineBanner, Toast, NotificationItem, NotificationSchedule, SessionState and UpdateBanner, which already announced, lose the role.
+
 ### Batch 8: focus hand-off
+
+- **Changed, QuestionPanel:** Submit spins as Button's `loading` while sending, as on the web.
 
 ### Batch 9: pass-through props
 

@@ -168,10 +168,11 @@ export function useModalPage(active: boolean, near: RefObject<HTMLElement | null
     }
     locks += 1;
     // Everything else in the root, beside this layer, is out of reach while it is open; so is a modal layer under this one (a dialog
-    // opened from a sheet), while the other layers (toasts) stay.
+    // opened from a sheet), while the other layers (toasts) stay, and so do the page's announcers (`announce()`), which a root on <body>
+    // has beside it: an error said while the modal is open is still read.
     const own = layer.current;
     const host = own?.parentElement;
-    const quieted = host ? Array.from(host.children).filter((c): c is HTMLElement => c !== own && c instanceof HTMLElement && !c.hasAttribute("data-af-layer") && !c.hasAttribute("inert")) : [];
+    const quieted = host ? Array.from(host.children).filter((c): c is HTMLElement => c !== own && c instanceof HTMLElement && !c.hasAttribute("data-af-layer") && !c.hasAttribute("data-af-announcer") && !c.hasAttribute("inert")) : [];
     quieted.push(...modals.filter((m) => m !== own && !m.hasAttribute("inert")));
     for (const c of quieted) {
       c.setAttribute("inert", "");

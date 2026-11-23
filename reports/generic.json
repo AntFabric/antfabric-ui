@@ -16,5 +16,6 @@
     "antfabric/light: fg.onBrand on brand.hover": "B10: brand.hover is coral.600, a step darker than the fill at rest, so the ink fg.onBrand now takes on coral loses contrast on hover; a lighter hover (coral.400, 5.98:1) is an owner call",
     "antfabric/light: focus.ring on surface.card": "the product's translucent halo; a 3:1 ring is a focus decision outside B10 (neutral's solid ring holds 3:1)",
     "indigo/dark: fg.onBrand on brand.active": "brandValues lifts a brand's pressed colour 60% toward white in dark because brand.active is also the brand's text there; white on it fails. The same split as antfabric's brand.active"
-  }
+  },
+  "liveTodo": []
 }

@@ -1,8 +1,7 @@
-import { useEffect, useRef } from "react";
 import { Text, View, type ViewStyle } from "react-native";
 import { recipes, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
-import { announce } from "../../lib/a11y";
+import { useAnnounce } from "../../lib/a11y";
 import { Icon } from "../../lib/icon";
 import { Enter } from "../../lib/motion";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -63,12 +62,7 @@ export function ConnectionBanner({ state = "offline", surface = "banner", attemp
   const pillWords = off ? str("offLabel") : trying ? str("tryingLabel") : str("onLabel");
   // iOS has no live regions: a change of state is spoken, the card's title and message or the pill's name. Not on first draw of the pill.
   const spoken = surface === "pill" ? pillWords : `${c.title}. ${c.message}`;
-  const first = useRef(true);
-  useEffect(() => {
-    const was = first.current;
-    first.current = false;
-    if (!(surface === "pill" && was)) announce(spoken);
-  }, [spoken]); // eslint-disable-line react-hooks/exhaustive-deps
+  useAnnounce(spoken, { initial: surface !== "pill" });
   if (surface === "pill") {
     const pillText = partStyle(r, "pillText", { text: { color: r.pill.text.color } });
     return (
@@ -76,7 +70,6 @@ export function ConnectionBanner({ state = "offline", surface = "banner", attemp
         <View
           testID={partId(testID, "connection-banner", "pill")}
           accessible
-          role="status"
           accessibilityLabel={pillWords}
           style={[s.pill, r.pill.view]}
         >
@@ -92,7 +85,7 @@ export function ConnectionBanner({ state = "offline", surface = "banner", attemp
   const cardTitle = partStyle(r, "cardTitle", { text: { color: r.card.text.color } });
   return (
     <View {...rootProps(rest)} testID={partId(testID, "connection-banner", "root")} style={[s.root, r.root.view, style]}>
-      <Enter testID={partId(testID, "connection-banner", "card")} motion="slide-down" accessible role="status" style={[s.card, r.card.view]}>
+      <Enter testID={partId(testID, "connection-banner", "card")} motion="slide-down" accessible style={[s.card, r.card.view]}>
         <Icon testID={partId(testID, "connection-banner", "cardIcon")} name={c.icon} size={cardIcon.size} color={r.cardIcon.text.color ?? r.card.text.color} style={cardIcon.rest} />
         <View style={s.body}>
           <Text testID={partId(testID, "connection-banner", "cardTitle")} maxFontSizeMultiplier={fontScale.content} style={[cardTitle.view, cardTitle.text]}>

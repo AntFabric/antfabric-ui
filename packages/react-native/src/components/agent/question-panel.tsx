@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, findNodeHandle, Platform, Pressable, ScrollView, Text, TextInput, View, type ViewStyle } from "react-native";
 import { recipes, useControllable, usePending, useStrings, type KitStrings, type QuestionOption, type ToolArg } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
-import { announce } from "../../lib/a11y";
+import { announce, useAnnounce } from "../../lib/a11y";
 import { usePress } from "../../lib/press";
 import { rootProps, partId, type RootProps } from "../../lib/root-props";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -170,6 +170,8 @@ export function QuestionPanel({
   const armed = field ? entry.trim() !== "" : index >= 0 && (!guarded || matches);
   const canSubmit = armed && !offline && !busy;
 
+  // Going offline while the question waits is said (iOS has no live regions; the footer line is plain text).
+  useAnnounce(!shut && offline && str("offline"));
   // A question that blocks the turn is said when it appears or opens (iOS has no live regions), and takes focus when the product asks.
   const heading = useRef<Text>(null);
   useEffect(() => {
@@ -298,10 +300,10 @@ export function QuestionPanel({
 
       <View testID="question-panel.footer" style={[s.footer, r.footer.view]}>
         {/* Offline replaces the paused line rather than sitting beside it. */}
-        <Text testID="question-panel.status" accessibilityLiveRegion={offline ? "polite" : "none"} style={[s.grow, r.status.view, r.status.text]}>
+        <Text testID="question-panel.status" style={[s.grow, r.status.view, r.status.text]}>
           {offline ? str("offline") : agentName ? str("pausedNamed", { name: agentName }) : str("paused")}
         </Text>
-        <Button label={busy ? str("sending") : str("submit")} variant="primary" size="md" disabled={!canSubmit} onPress={submit} />
+        <Button label={busy ? str("sending") : str("submit")} variant="primary" size="md" loading={busy} disabled={!canSubmit && !busy} onPress={submit} />
       </View>
     </View>
   );

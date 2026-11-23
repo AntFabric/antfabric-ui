@@ -2,6 +2,7 @@ import { useEffect, useRef, type CSSProperties } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { clampPage, pageCountOf, pageRange, pageSlots } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
+import { useAnnounce } from "../../lib/announce";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, setRef, type RootProps } from "../../lib/root-props";
 import { css, row, text } from "../../lib/style";
@@ -67,6 +68,8 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
   const { from, to } = pageRange(at, size, total ?? 0);
   const range = { from, to, total: total ?? 0 };
   const summary = total === undefined ? s("pageOf", { page: at, count }) : compact ? s("rangeOf", range) : s("showing", range);
+  // The summary is said when it changes (a page turned, the size changed), not as a live region that holds it from the start.
+  useAnnounce(summary);
   const sizes = pageSizes && pageSizes.length > 0 ? (pageSizes.includes(size) ? pageSizes : [size, ...pageSizes].sort((a, b) => a - b)) : null;
   return (
     <nav
@@ -79,7 +82,7 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
       }}
       style={css(row, { justifyContent: "space-between" }, (sizes || jump) && { flexWrap: "wrap", gap: t.space.sm }, r.root, style)}
     >
-      <span data-af-part="summary" aria-live="polite" style={css(text, { fontVariantNumeric: "tabular-nums" }, r.summary)}>{summary}</span>
+      <span data-af-part="summary" style={css(text, { fontVariantNumeric: "tabular-nums" }, r.summary)}>{summary}</span>
       {sizes ? (
         <Select
           label={s("rowsPerPage")}

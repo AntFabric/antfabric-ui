@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
+import { focusNear } from "../../lib/focus";
 import { announce } from "../../lib/announce";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
@@ -94,7 +95,10 @@ export function Toast({ message: words, tone = "success", actionLabel = "", dism
   // The toast leaves by itself once pressed; the app hears about it and unmounts it.
   const [gone, setGone] = useControllable(dismissed);
   const r = useRecipe(recipes.toast, { variants: { tone }, styles });
+  // A dismissal from the keyboard hands focus to the nearest control that stays: the pill goes inert at once, and the app unmounts it.
+  const card = useRef<HTMLDivElement>(null);
   const dismiss = () => {
+    focusNear(card.current);
     setGone(true);
     onDismiss?.();
   };
@@ -133,6 +137,7 @@ export function Toast({ message: words, tone = "success", actionLabel = "", dism
   return (
     <div {...rootProps(rest)} style={css(box, { alignSelf: "center", maxWidth: 520 }, style)}>
       <div
+        ref={card}
         data-af-part="root"
         aria-hidden={gone || undefined}
         inert={gone || undefined}
@@ -156,6 +161,7 @@ export function Toast({ message: words, tone = "success", actionLabel = "", dism
             styles={styles}
             onPress={() => {
               // The action puts the toast away too: it is reported as a dismissal, so the app unmounts it and frees its slot.
+              focusNear(card.current);
               setGone(true);
               onAction?.();
               onDismiss?.();

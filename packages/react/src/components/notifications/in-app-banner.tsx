@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { recipes, useControllable, useDirection, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { useAutoFocus } from "../../platform";
 import { t } from "../../tokens";
+import { focusNear } from "../../lib/focus";
+import { useAnnounce } from "../../lib/announce";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { isComposing } from "../../lib/keys";
@@ -124,7 +126,10 @@ export function InAppBanner({
   }
   const [open, setOpen] = useControllable(replying);
   const [draft, setDraft] = useControllable(replyText);
+  // The card goes with its × (and with Escape, and an action that dismisses): focus moves to the nearest control that stays.
+  const cardRef = useRef<HTMLDivElement | null>(null);
   const dismiss = (reason: InAppBannerDismissReason) => {
+    focusNear(cardRef.current);
     setGone(true);
     onDismiss?.(reason);
   };
@@ -148,10 +153,15 @@ export function InAppBanner({
     if (open) fieldRef.current?.focus({ preventScroll: true });
     else if (document.activeElement === document.body || !document.activeElement) actionsRef.current?.querySelector<HTMLElement>("button")?.focus({ preventScroll: true });
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A banner is said when it arrives, politely, as the sender and the preview (a region mounted holding its text is not read); a reply
+  // that fails is said at once.
+  useAnnounce(!gone && [title, context, body].filter(Boolean).join(". "), "polite", { initial: true });
+  useAnnounce(open && error, "assertive", { initial: true });
   return (
-    <div role="status" aria-live="polite" aria-label={s("newNotification")} data-af-part="root" {...rootProps(rest)} style={css(box, r.root, style)}>
+    <div role="group" aria-label={s("newNotification")} data-af-part="root" {...rootProps(rest)} style={css(box, r.root, style)}>
       {!gone && (
         <div
+          ref={cardRef}
           onKeyDown={(e) => {
             // Escape in the reply field closes the reply and keeps the draft; anywhere else in the card it puts the banner away.
             if (e.key !== "Escape" || e.target instanceof HTMLInputElement || e.defaultPrevented || isComposing(e)) return;
@@ -250,7 +260,7 @@ export function InAppBanner({
             </div>
           )}
           {open && error ? (
-            <span role="alert" data-af-part="error" style={css(text, rtl({ paddingLeft: indent }, dir), r.error)}>
+            <span data-af-part="error" style={css(text, rtl({ paddingLeft: indent }, dir), r.error)}>
               {error}
             </span>
           ) : null}

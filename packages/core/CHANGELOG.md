@@ -37,6 +37,8 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 7: announcements
 
+- **Added, strings:** `mobile-header.online` ("Back online"), said when the phone header's connection line goes away (L55). A product that overrides the header's strings may add it.
+
 ### Batch 8: focus hand-off
 
 ### Batch 9: pass-through props

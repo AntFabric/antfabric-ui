@@ -134,7 +134,7 @@ const docs: ComponentDocs = {
   platforms: {
     web: {
       status: "ready",
-      base: "<div role=\"status\" aria-live=\"polite\"> holding a card that slides in from the right with enter(): one <button> that opens it, an IconButton ×, Button actions and an inline reply <input> with Send; Escape dismisses, Enter sends. Inline styles over `t`; `dismissed`, `replying` and `replyText` kept in local state that follows the props. The app hosts it in its own top-right viewport, apart from the action toasts",
+      base: "<div role=\"group\"> named \"New notification\" holding a card that slides in from the right with enter(): one <button> that opens it, an IconButton ×, Button actions and an inline reply <input> with Send; Escape dismisses, Enter sends. Inline styles over `t`; `dismissed`, `replying` and `replyText` kept in local state that follows the props. The app hosts it in its own top-right viewport, apart from the action toasts",
       import: "import { InAppBanner } from \"@antfabric/ui-react\"",
       notes: [
         "Shown only while this tab is visible AND focused (document.visibilityState === 'visible' && document.hasFocus()). A background tab raises the browser notification instead, and the tab title count changes either way.",
@@ -184,7 +184,7 @@ const docs: ComponentDocs = {
     },
     mobile: {
       status: "planned",
-      base: "View (role status, polite live region) with a card that drops in with <Enter motion=\"drop\">, drawn on GlassSurface (Liquid Glass on iOS 26+); a PanResponder swipe up follows the finger and dismisses, the grabber stands in for it, and a Dismiss accessibilityAction and the iOS escape gesture do the same; StyleSheet over useTheme(). The app hosts it over the root stack, with expo-notifications' handleNotification returning shouldShowBanner: false while the app is in front",
+      base: "A labelled View with a card that drops in with <Enter motion=\"drop\">, drawn on GlassSurface (Liquid Glass on iOS 26+); a PanResponder swipe up follows the finger and dismisses, the grabber stands in for it, and a Dismiss accessibilityAction and the iOS escape gesture do the same; StyleSheet over useTheme(). The app hosts it over the root stack, with expo-notifications' handleNotification returning shouldShowBanner: false while the app is in front",
       import: "import { InAppBanner } from \"@antfabric/ui-react-native\"",
       notes: [
         "Fixes a gap: today every foreground notification raises the OS banner (shouldShowBanner: true), including one for the channel you are reading. The handler now asks the router for the open channel / thread and stays silent for it; everything else draws this banner instead of the OS one.",
@@ -213,7 +213,7 @@ const docs: ComponentDocs = {
   a11y: {
     role: "status",
     notes: [
-      "The banner sits in a polite live region that stays on the page (the web's root, the phone's role=status view), so what appears inside it is read as \"Priya Raman in #platform-eng: …\" — never assertive, and it never takes focus. On the phone the same words are also spoken through the screen reader's announcement call, because iOS has no live regions.",
+      "A banner that arrives is announced politely as \"Priya Raman. #platform-eng. …\" (through the page's announcer on the web, the screen reader's announcement call on the phone) — never assertive, and it never takes focus. A failed inline reply is announced at once.",
       "The kit has no auto-dismiss timer: the app owns it and must stop it while the banner has focus or the pointer is on it, and give a screen-reader user longer (WCAG 2.2.1).",
       "Reply moves focus into the field, and Escape in the field closes the reply and keeps the draft without dismissing the banner (Escape elsewhere on the card dismisses it); focus goes back to Reply when the reply closes. These are the web's: the phone has no reply field.",
     ],

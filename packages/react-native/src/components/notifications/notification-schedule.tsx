@@ -143,8 +143,8 @@ export function NotificationSchedule({
   const { width: noteIconSize, height: _nh, ...noteIconRest } = r.noteIcon.view;
   const { width: pillIconSize, height: _ph, ...pillIconRest } = r.pillIcon.view;
   const status = isPaused ? str("status", { until: end }) : str("on");
-  // iOS has no live regions: a pause starting or its end moving is spoken (not on first draw).
-  const said = isPaused ? status : "";
+  // iOS has no live regions: a pause starting, its end moving or a resume is spoken (not on first draw).
+  const said = status;
   const was = useRef(said);
   useEffect(() => {
     if (said && said !== was.current) announce(said);
@@ -197,7 +197,7 @@ export function NotificationSchedule({
           ) : null}
         </View>
       ) : (
-        <View testID={partId(testID, "notification-schedule", "pill")} role="status" accessibilityLabel={status} style={[s.pill, r.pill.view]}>
+        <View testID={partId(testID, "notification-schedule", "pill")} accessibilityLabel={status} style={[s.pill, r.pill.view]}>
           <Icon testID={partId(testID, "notification-schedule", "pillIcon")} name={isPaused ? "moon" : "bell"} size={pillIconSize as number} color={r.pillIcon.text.color} style={Object.keys(pillIconRest).length ? pillIconRest : undefined} />
           <Text testID={partId(testID, "notification-schedule", "pillText")} numberOfLines={1} maxFontSizeMultiplier={fontScale.content} style={[pillText.view, pillText.text]}>
             {status}

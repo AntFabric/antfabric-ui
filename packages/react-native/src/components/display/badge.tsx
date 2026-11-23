@@ -4,6 +4,7 @@ import { createStyles } from "../../theme";
 import { Enter } from "../../lib/motion";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { partId, rootProps, type RootProps } from "../../lib/root-props";
+import { useAnnounce } from "../../lib/a11y";
 
 export type BadgeTone = "brand" | "neutral" | "inverse";
 
@@ -39,8 +40,12 @@ export function Badge({ count = 0, max = 99, dot = false, tone = "brand", label,
   const s = useStyles();
   const str = useStrings("badge", strings);
   const r = useRecipe(recipes.badge, { variants: { tone, dot }, styles });
+  const name = dot ? str("newActivity") : label ? str("countWithLabel", { count, label }) : unread ? str("countUnread", { count }) : str("count", { count });
+  const shown = dot || count > 0;
+  // `live`: a change of the count is said (iOS has no live regions; on Android a region reads the count each time it is drawn).
+  useAnnounce(live && shown && name);
   // Zero draws nothing, never an empty pill.
-  if (!dot && !(count > 0)) return null;
+  if (!shown) return null;
   return (
     // Pops once, on mount: a count that changes swaps its digits without a second pop.
     <Enter
@@ -48,8 +53,7 @@ export function Badge({ count = 0, max = 99, dot = false, tone = "brand", label,
       motion="pop"
       accessible
       accessibilityRole="text"
-      accessibilityLabel={dot ? str("newActivity") : label ? str("countWithLabel", { count, label }) : unread ? str("countUnread", { count }) : str("count", { count })}
-      accessibilityLiveRegion={live ? "polite" : undefined}
+      accessibilityLabel={name}
       {...rootProps(rest)}
       style={[s.root, partStyle(r, "root", { view: dot && s.dot }).view, style]}
     >

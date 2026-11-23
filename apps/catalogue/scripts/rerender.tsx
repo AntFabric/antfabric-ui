@@ -660,6 +660,122 @@ const PENDING_CASES: PendingCase[] = [
   console.log(`the app drives the state: ${PENDING_CASES.length} scripts, ${pendingSteps} steps, ${pendingFound.size} failing`);
 }
 
+/*
+ * Focus hand-off (AUTHORING.md, "Keyboard and focus"): a control pressed from the keyboard that unmounts, disables or goes inert, or whose part
+ * goes away with it, hands focus on: to what replaces it, the row or list it was in, the trigger, or the nearest control that stays. Each case
+ * draws the component on a page between two buttons (Before, After), focuses Before (an overlay's opener), mounts the component, focuses the
+ * control by its name and presses it as a keyboard does (Enter on a button is its click; `key` presses that key on it instead), then passes
+ * the app's answer if there is one. Focus must not have fallen to the page: onto the body, or onto an element that is gone, disabled, inert
+ * or hidden from assistive tech. Failures are `focusTodo` lines, held as the focus ring's are.
+ */
+interface HandoffCase {
+  id: string;
+  platform: "web" | "desktop";
+  props: Record<string, unknown>;
+  /** Events given as spies, so a control whose prop is controlled waits for `answer`. */
+  events?: string[];
+  press: string | number;
+  key?: string;
+  answer?: Record<string, unknown>;
+}
+const HANDOFF_CASES: HandoffCase[] = [
+  // Submit spins as Button's `loading`: blocked, still focusable.
+  { id: "question-panel", platform: "web", props: { value: "deny", sending: false }, events: ["onSubmit"], press: "Submit" },
+  // A dismissed toast or banner goes inert, then the app unmounts it: focus moves to the nearest control that stays.
+  { id: "toast", platform: "web", props: { dismissible: true, actionLabel: "" }, press: "Dismiss" },
+  { id: "toast", platform: "web", props: { dismissible: true, actionLabel: "Undo" }, press: "Undo" },
+  { id: "inline-banner", platform: "web", props: { dismissible: true }, press: "Dismiss" },
+  { id: "in-app-banner", platform: "web", props: {}, press: "Dismiss" },
+  // A sole reaction taken back: the pill goes, focus goes to the next control.
+  { id: "reaction-pill", platform: "web", props: { mine: true, count: 1 }, events: ["onMineChange"], press: 0, answer: { mine: false, count: 0 } },
+  // Resume goes when notifications resume: the pill (or the menu's first row) keeps focus; the picker's Pause goes with the picker.
+  { id: "notification-schedule", platform: "web", props: { surface: "pill", paused: true, until: "9:00" }, press: "Resume" },
+  { id: "notification-schedule", platform: "web", props: { surface: "menu", paused: true, until: "9:00" }, press: "Resume" },
+  { id: "notification-schedule", platform: "web", props: { surface: "menu", paused: false, custom: true }, press: "Pause" },
+  // Reply becomes the field.
+  { id: "os-notification", platform: "desktop", props: { expanded: true, reply: "none" }, press: "Reply" },
+  // Install becomes the progress card (expanded) or a busy rail icon (folded).
+  { id: "update-banner", platform: "desktop", props: { stage: "available" }, events: ["onStageChange", "onApply"], press: 0, answer: { stage: "downloading" } },
+  { id: "update-banner", platform: "desktop", props: { stage: "available", expanded: false }, events: ["onStageChange", "onApply"], press: 0, answer: { stage: "downloading" } },
+  // Esc from inside the card closes it: focus goes back to its trigger.
+  { id: "hover-card", platform: "web", props: { open: true }, press: "Message", key: "Escape" },
+  // The sheet's ✕ slides it away: focus goes back to its opener.
+  { id: "bottom-sheet", platform: "web", props: {}, press: "Close" },
+];
+{
+  let handoffSteps = 0;
+  const nameOfEl = (el: HTMLElement) => el.getAttribute("aria-label") ?? (el.textContent ?? "").trim();
+  const fell = () => {
+    const at = document.activeElement as HTMLElement | null;
+    return !at || at === document.body || !at.isConnected || (at as HTMLButtonElement).disabled === true || !!at.closest('[inert], [hidden], [aria-hidden="true"]');
+  };
+  for (const c of HANDOFF_CASES) {
+    if (only.length && !only.includes(c.id)) continue;
+    const doc = components.find((d) => d.id === c.id);
+    if (!doc || !kitComponent(c.id, c.platform)) {
+      errors++;
+      keep.error(`  ✗ hand-off probe: no component "${c.id}" on ${c.platform}`);
+      continue;
+    }
+    drawn.add(c.id);
+    handoffSteps++;
+    const at = `${c.id}/${c.platform}`;
+    const quiet = logged.length;
+    const spies = Object.fromEntries((c.events ?? []).map((e) => [e, () => undefined]));
+    const defaults = defaultsFor(usedIds(doc), c.platform);
+    const page = (props: Record<string, unknown> | null) =>
+      createElement(DefaultsProvider, { value: defaults }, createElement(Stage, {
+        platform: c.platform,
+        ...PROBE_OS[c.platform],
+        scheme: "light",
+        theme: antfabric,
+        children: [
+          createElement("button", { key: "before", type: "button", "data-probe": "before" }, "Before"),
+          props && createElement(Thing, { key: "thing", id: c.id, platform: c.platform, props: { ...props, ...spies } }),
+          createElement("button", { key: "after", type: "button", "data-probe": "after" }, "After"),
+        ],
+      }));
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    try {
+      await act(async () => root.render(page(null)));
+      await act(async () => host.querySelector<HTMLElement>('[data-probe="before"]')?.focus());
+      await act(async () => root.render(page(c.props)));
+      const all = pressablesOf(host).filter((el) => !el.hasAttribute("data-probe"));
+      const el =
+        typeof c.press === "number"
+          ? all[c.press]
+          : (all.find((e) => nameOfEl(e) === c.press) ?? all.find((e) => nameOfEl(e).startsWith(c.press as string)) ?? all.find((e) => nameOfEl(e).includes(c.press as string)));
+      if (!el) found.focus.add(`${at}: no control "${c.press}" to press (${all.map(nameOfEl).join(" | ").slice(0, 160)})`);
+      else {
+        const named = typeof c.press === "number" ? nameOfEl(el) : c.press;
+        await act(async () => el.focus());
+        if (document.activeElement !== el) found.focus.add(`${at}: "${named}" does not take focus`);
+        else {
+          await act(async () => {
+            if (c.key) el.dispatchEvent(new KeyboardEvent("keydown", { key: c.key, bubbles: true, cancelable: true }));
+            else el.click();
+          });
+          if (c.answer) await act(async () => root.render(page({ ...c.props, ...c.answer })));
+          if (fell()) found.focus.add(`${at}: focus falls to the page after ${c.key ? `${c.key} on` : "pressing"} "${named}"${c.answer ? ` and the answer ${JSON.stringify(c.answer)}` : ""}`);
+          else if (process.env.AF_HANDOFF_DEBUG) {
+            const to = document.activeElement as HTMLElement;
+            keep.error(`    ${at} "${named}" → ${to.tagName.toLowerCase()} ${to.getAttribute("data-af-part") ?? to.getAttribute("data-probe") ?? ""} "${nameOfEl(to).slice(0, 50)}"`);
+          }
+        }
+      }
+    } catch (e) {
+      found.focus.add(`${at}: the hand-off probe threw: ${(e as Error).message.split("\n")[0]}`);
+    } finally {
+      await act(async () => root.unmount());
+      host.remove();
+    }
+    logged.length = quiet;
+  }
+  console.log(`focus hand-off: ${handoffSteps} presses probed`);
+}
+
 // `styles` on the web: a longhand the recipe also writes as a shorthand (`styles.root.backgroundColor` beside the recipe's `background`) must stay
 // through every state, and updating the recipe's value must not warn of the two fighting. Button is mounted with it and driven like a pointer would.
 {

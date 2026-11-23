@@ -180,7 +180,7 @@ export function ThinkingIndicator({ steps = [], agentName = "", words = [], sinc
   );
 
   return (
-    <View testID={partId(testID, "thinking-indicator", "root")} accessible={!hasTrace} accessibilityLiveRegion="polite" accessibilityLabel={announcement} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
+    <View testID={partId(testID, "thinking-indicator", "root")} accessible={!hasTrace} accessibilityLabel={announcement} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
       {hasTrace ? (
         <Pressable
           testID="thinking-indicator.toggle"

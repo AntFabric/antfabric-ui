@@ -1268,6 +1268,8 @@ interface Generic {
   contrastTodo?: Record<string, string>;
   /** `"<id>/<kit>: <what>"`: a passed `id` or `aria-label` that does not reach the element it names (checkPassThrough). */
   passThroughTodo?: string[];
+  /** `"<id>/<platform>: <region>"`: a live region a component mounts with its text (`checkLiveRegions`). */
+  liveTodo?: string[];
 }
 const readGeneric = () => JSON.parse(readFileSync(GENERIC_FILE, "utf8")) as Generic;
 function checkStyles() {
@@ -1416,6 +1418,54 @@ function propSets(doc: ComponentDocs, platform: Platform): { name: string; props
     // A matrix row is its cases (W0): a plain row's values, or the prop bundles a removed enum became.
     ...cases.matrix.flatMap((m) => m.cases.map((c) => ({ name: `${m.prop}=${c.name}`, props: c.props as Record<string, unknown> }))),
   ];
+}
+
+// A status that appears is announced (`announce()`), never a live region mounted with its text (AUTHORING.md, "Keyboard and focus"): a region that
+// arrives already holding its text is not read by most screen readers, and iOS has no live regions at all. A live region is `aria-live` (other than "off")
+// or `role="status" | "alert" | "log"`; on the phone React Native Web writes `accessibilityLiveRegion` as `aria-live` and the alert role as `role="alert"`,
+// so both kits are read from their markup. Every drawing a component page shows is a first render (the rest, the examples, the edge cases, each matrix
+// value), on the web, the desktop and the phone: none may hold a live region with text in it. Text that changes in place (a page count, an upload's
+// percent, a rotating word) is said by `announce()` on the change, not by a region that holds it. `LIVE_EXCEPTIONS` names a region meant to be live from
+// its first render, with its reason (none today). What fails is `liveTodo` in reports/generic.json (`"<id>/<platform>: <region>"`), which only shrinks.
+const LIVE = '[aria-live]:not([aria-live="off"]), [role="status"], [role="alert"], [role="log"]';
+const LIVE_EXCEPTIONS: Record<string, string> = {};
+function checkLiveRegions() {
+  const at = "live regions";
+  setReducedMotion(true);
+  const todo = readGeneric().liveTodo ?? [];
+  if (todo.some((k, i) => i > 0 && todo[i - 1]! >= k)) err(GENERIC_AT, "liveTodo is not sorted");
+  const found = new Map<string, string>();
+  const ids = new Set<string>();
+  for (const doc of components) {
+    for (const platform of PLATFORMS) {
+      if (doc.platforms[platform].status === "not-applicable" || !kitComponent(doc.id, platform)) continue;
+      ids.add(doc.id);
+      const os: OS = platform === "mobile" ? "ios" : platform === "desktop" ? "mac" : "browser";
+      const defaults = defaultsFor(usedIds(doc), platform);
+      for (const c of propSets(doc, platform)) {
+        if (c.os && c.os !== os) continue;
+        const { html } = drawQuiet(createElement(DefaultsProvider, { value: defaults }, createElement(Stage, { platform, os, scheme: "light", theme: antfabric, state: c.state, children: createElement(Thing, { id: doc.id, platform, props: c.props }) })));
+        if (!html || waitingFor(html)) continue;
+        const { document } = parseHTML(`<!doctype html><html><body>${html}</body></html>`);
+        for (const el of document.querySelectorAll(LIVE) as unknown as Element[]) {
+          const text = (el.textContent ?? "").replace(/\s+/g, " ").trim();
+          if (!text) continue;
+          const live = ["role", "aria-live"].map((a) => (el.getAttribute(a) ? `${a}=${el.getAttribute(a)}` : "")).filter(Boolean).join(" ");
+          const part = el.getAttribute("data-af-part") ?? el.getAttribute("data-testid")?.replace(/^.*\./, "") ?? el.tagName.toLowerCase();
+          const key = `${doc.id}/${platform}: ${part} [${live}]`;
+          if (LIVE_EXCEPTIONS[key] || found.has(key)) continue;
+          found.set(key, `${c.name}: "${text.slice(0, 60)}"`);
+        }
+      }
+    }
+  }
+  setReducedMotion(false);
+  if (process.env.AF_TODO_WRITE) {
+    writeFileSync(GENERIC_FILE, JSON.stringify({ ...readGeneric(), liveTodo: [...found.keys()].sort() }, null, 2) + "\n");
+    return console.log(`wrote liveTodo (${found.size}) to ${GENERIC_AT}`);
+  }
+  for (const [key, where] of found) if (!todo.includes(key)) err(`${at} ${key}`, `a live region mounted with its text (${where}). Say it with \`announce()\` in an effect keyed on the change and draw the text plainly (AUTHORING.md), or list "${key}" in liveTodo in ${GENERIC_AT}`);
+  for (const key of todo) if (ids.has(key.split("/")[0]!) && !found.has(key)) err(GENERIC_AT, `liveTodo lists "${key}", which no longer mounts a live region with its text: take it off`);
 }
 
 // `styles` reaches every part, and it wins over everything the kit computes for it (the precedence in AUTHORING.md: recipe, theme override, the kit's own inline
@@ -3249,6 +3299,7 @@ if (!only.length || only.includes("code") || only.includes("generic")) {
   checkPartStyle();
   timed("styles probe", checkStylesProbe);
   timed("pass-through", checkPassThrough);
+  timed("live regions", checkLiveRegions);
 }
 if (!only.length || only.includes("strings")) timed("strings", checkStrings);
 if (!only.length || only.includes("defaults")) timed("defaults", checkDefaults);

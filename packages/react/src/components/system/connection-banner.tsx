@@ -1,8 +1,8 @@
-import { useEffect, useRef, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
-import { announce } from "../../lib/announce";
+import { useAnnounce } from "../../lib/announce";
 import { Spinner } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -70,14 +70,11 @@ export function ConnectionBanner({ state = "offline", surface = "banner", attemp
         : { text: s("online"), label: s("onLabel") };
   const r = useRecipe(recipes["connection-banner"], { variants: { state }, styles });
   // What the banner says is spoken through the page's announcer, as it changes: a strip mounted holding its text is not read, and the
-  // way back (the strip going away) would otherwise be silent. The pill is a live region of its own, mounted before its text changes.
+  // way back (the strip going away) would otherwise be silent. The pill's name is spoken when it changes, not when it is first drawn.
   const spoken =
     surface !== "banner" ? "" : state === "offline" || busy ? message : state === "degraded" ? s("degraded") : state === "back-online" ? s("backOnline") : "";
-  const said = useRef("");
-  useEffect(() => {
-    if (spoken && spoken !== said.current) announce(spoken);
-    said.current = spoken;
-  }, [spoken]); // eslint-disable-line react-hooks/exhaustive-deps
+  useAnnounce(spoken, "polite", { initial: true });
+  useAnnounce(surface === "pill" && pill.label);
   return (
     <div data-af-part="root" {...rootProps(rest)} style={css(box, { width: "100%" }, r.root, style)}>
       {surface === "banner" && (state === "offline" || busy) && (
@@ -125,8 +122,7 @@ export function ConnectionBanner({ state = "offline", surface = "banner", attemp
       {surface === "pill" && (
         <div
           data-af-part="pill"
-          role="status"
-          aria-live="polite"
+          role="img"
           aria-label={pill.label}
           style={css(row, { alignSelf: "flex-start", paddingBlock: t.space.sm, paddingInline: t.space.md }, r.pill)}
         >

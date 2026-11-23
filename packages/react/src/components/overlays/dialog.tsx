@@ -4,6 +4,7 @@ import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, row, text, truncate } from "../../lib/style";
+import { useAnnounce } from "../../lib/announce";
 import { focusables, useOverlayFocus } from "../../lib/focus";
 import { OverlayLayer, useLayerHost, useLayerStack } from "../../lib/layer";
 import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
@@ -166,9 +167,10 @@ function DialogView({
     }
   };
 
+  // An error that arrives is said at once, through the page's announcer (which a modal leaves reachable), not by a region mounted with it.
+  useAnnounce(error, "assertive", { initial: true });
   const errorBox = error && (
     <div
-      role="alert"
       data-af-part="error"
       style={css(
         row,

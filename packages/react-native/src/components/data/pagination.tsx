@@ -2,6 +2,7 @@ import { Text, View, type ViewStyle } from "react-native";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { clampPage, pageCountOf, pageRange, pageSlots } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
+import { useAnnounce } from "../../lib/a11y";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { partId, rootProps, type RootProps } from "../../lib/root-props";
 import { Button } from "../actions/button";
@@ -63,12 +64,14 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
   const { from, to } = pageRange(at, size, total ?? 0);
   const range = { from, to, total: total ?? 0 };
   const summary = total === undefined ? str("pageOf", { page: at, count }) : compact ? str("rangeOf", range) : str("showing", range);
+  // The summary is said when it changes (iOS has no live regions), not on first draw.
+  useAnnounce(summary);
   const sizes = pageSizes && pageSizes.length > 0 ? (pageSizes.includes(size) ? pageSizes : [size, ...pageSizes].sort((a, b) => a - b)) : null;
   // With the choices above it, the pager sits in a wrapper, which is then the root the pass-through names.
   const alone = !sizes && !(jump && count > 1);
   const pager = (
     <View testID={id("root")} {...(alone ? rootProps(rest) : null)} style={[s.root, r.root.view, style]}>
-      <Text testID={id("summary")} accessibilityLiveRegion="polite" style={[r.summary.view, s.summary, r.summary.text]}>{summary}</Text>
+      <Text testID={id("summary")} style={[r.summary.view, s.summary, r.summary.text]}>{summary}</Text>
       <View testID={id("pages")} style={[s.pages, r.pages.view]}>
         <IconButton icon="chevron-left" label={str("previous")} variant="outline" shape="square" size="sm" disabled={at <= 1} onPress={() => go(at - 1)} />
         {compact

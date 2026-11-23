@@ -151,6 +151,8 @@ export const shell = {
     connecting: "Connecting…",
     /** The status line once the OS reports no network. */
     offline: "Offline — showing what’s on this phone",
+    /** Said when the connection comes back (the status line goes away). */
+    online: "Back online",
   },
   "tab-bar": {
     /** The tab list's accessible name. */

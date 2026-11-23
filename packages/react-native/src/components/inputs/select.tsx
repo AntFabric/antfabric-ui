@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import { Dimensions, Pressable, ScrollView, Text, View, type ViewStyle } from "react-native";
 import { recipes, type NativeTokens, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
-import { useBackHandler } from "../../lib/a11y";
+import { announce, useBackHandler } from "../../lib/a11y";
 import { Icon, type IconName } from "../../lib/icon";
 import { Enter } from "../../lib/motion";
 import { usePress } from "../../lib/press";
@@ -157,6 +158,12 @@ export function Select({
   // Android's back button closes the sheet.
   useBackHandler(() => setOpen(false), isOpen);
   const [filter = "", setFilter] = useControllable(query, onQueryChange);
+  // A filter that leaves no rows is said once, when the list empties (iOS has no live regions).
+  const none = isOpen && filter !== "" && !items.length;
+  useEffect(() => {
+    if (none) announce(str("emptyFiltered", { filter }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [none]);
   // A phone has no hover; the trigger takes the wash while pressed (the recipe's `pressed`).
   const r = useRecipe(recipes.select, { state: { pressed: press.pressed, focus: press.focused, invalid: invalid || !!form?.invalid, disabled: press.disabled }, styles });
   const chosen = items.find((i) => i.key === current);

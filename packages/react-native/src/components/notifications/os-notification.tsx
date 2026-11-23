@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Platform, Pressable, Text, TextInput, View, type TextStyle, type ViewStyle } from "react-native";
 import { recipes, useControllable, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
+import { useAnnounce } from "../../lib/a11y";
 import { GlassSurface } from "../../lib/glass";
 import { Icon, Spinner, type IconName } from "../../lib/icon";
 import { Enter } from "../../lib/motion";
@@ -203,8 +204,10 @@ function Status({ os, failed, appName, strings, styles, testID }: { os: Phone; f
   const s = useStyles();
   const str = useStrings("os-notification", strings);
   const r = useRecipe(recipes["os-notification"], { state: { invalid: failed }, styles });
+  // The line is said when it arrives and when sending turns to failed (iOS has no live regions).
+  useAnnounce(failed ? str("replyFailed", { app: appName }) : str("sendingText"), { initial: true });
   return (
-    <View role="status" aria-live="polite" style={s.status}>
+    <View style={s.status}>
       {failed ? <Icon testID={partId(testID, "os-notification", "statusIcon")} name="circle-alert" size={14} color={r.statusIcon.text.color} style={Object.keys(r.statusIcon.view).length ? r.statusIcon.view : undefined} /> : null}
       <Text testID={partId(testID, "os-notification", "statusText")} style={[face(os), { flexShrink: 1 }, r.statusText.view, r.statusText.text]}>
         {failed ? str("replyFailed", { app: appName }) : str("sendingText")}

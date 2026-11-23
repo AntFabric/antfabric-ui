@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent, type PointerEvent } from "react";
 import { recipes, usePending, useDirection, useStrings, type IconActionItem, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric/ui-core";
 import { t } from "../../tokens";
+import { useAnnounce } from "../../lib/announce";
 import { Icon } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { useInteraction } from "../../lib/interaction";
@@ -205,6 +206,9 @@ export function Message({
   const bar = highlighted ? { boxShadow: `inset ${end}3px 0 0 0 ${t.brand.default}` } : mentionsYou ? { boxShadow: `inset ${end}2px 0 0 0 ${t.border.brand}` } : null;
   // What a screen reader hears of the row's state, after who and when.
   const said = state === "sending" ? s("saidSending") : state === "failed" ? s("saidFailed") : state === "queued" ? s("saidQueued") : "";
+  // A send that fails, or waits for the connection, is said when it happens (the status line is plain text): not for a message that came
+  // that way, and not "Sending…" for every message sent.
+  useAnnounce(state === "failed" ? s("failed") : state === "queued" ? s("queued") : "", state === "failed" ? "assertive" : "polite");
 
   // The hover state flips on every pointer move; the cards and pills below only depend on their data, so they are built once per
   // change of it, through handlers that read the latest props (a stable identity, which lets the memoised children skip the render).
@@ -369,13 +373,13 @@ export function Message({
           />
         )}
         {state === "sending" && (
-          <div aria-live="polite" data-af-part="statusLine" style={css(statusLine, r.statusLine)}>
+          <div data-af-part="statusLine" style={css(statusLine, r.statusLine)}>
             <Icon part="statusIcon" name="clock" size={r.statusIcon.width} style={r.statusIcon} />
             <span style={text}>{s("sending")}</span>
           </div>
         )}
         {state === "failed" && (
-          <div role="alert" data-af-part="statusLine" style={css(statusLine, r.statusLine)}>
+          <div data-af-part="statusLine" style={css(statusLine, r.statusLine)}>
             <Icon part="statusIcon" name="circle-alert" size={r.statusIcon.width} style={r.statusIcon} />
             <span style={text}>{s("failed")}</span>
             <span aria-hidden data-af-part="statusSep" style={css(text, r.statusSep)}>
@@ -393,7 +397,7 @@ export function Message({
           </div>
         )}
         {state === "queued" && (
-          <div aria-live="polite" data-af-part="statusLine" style={css(statusLine, r.statusLine)}>
+          <div data-af-part="statusLine" style={css(statusLine, r.statusLine)}>
             <Icon part="statusIcon" name="cloud-off" size={r.statusIcon.width} style={r.statusIcon} />
             <span style={text}>{s("queued")}</span>
             <span aria-hidden data-af-part="statusSep" style={css(text, r.statusSep)}>

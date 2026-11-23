@@ -133,7 +133,7 @@ const docs: ComponentDocs = {
   a11y: {
     notes: [
       "The title is the screen's heading (accessibilityRole header) and the first thing VoiceOver reads after the back control.",
-      "The bell's name carries the count: 'Notifications, 3 unread'. The connection line is a polite live region on Android and is also announced once when it appears, since iOS has no live regions.",
+      "The bell's name carries the count: 'Notifications, 3 unread'. The connection line is plain text, announced when it appears or changes, and \"Back online\" is announced when it goes (iOS has no live regions, so neither phone uses one).",
       "Header titles grow with Dynamic Type up to 1.3x so they stay on one line; the rows and buttons are not fixed-height.",
       "The status bar and its clock are a picture, hidden from the accessibility tree and off by default: the system draws the real one. The header does not read the device's safe-area insets itself; the app pads it by the top inset.",
     ],

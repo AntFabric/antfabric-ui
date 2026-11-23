@@ -1,6 +1,7 @@
-import { useEffect, useId, useState, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { cap, recipes, useControllable, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
+import { focusNear } from "../../lib/focus";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -96,6 +97,13 @@ export function ReactionPill({
     });
   };
   const n = count + (on === mine ? 0 : on ? 1 : -1);
+  // A sole reaction taken back takes its pill with it: focus, fallen to the page, moves to the nearest control that stays. The pill's own
+  // root (`stays`, its parent) is still there to measure from.
+  const shown = variant === "add" || n > 0;
+  const stays = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!shown) focusNear(stays.current);
+  }, [shown]);
   const [rested, setRested] = useState(false);
   // The card is hoverable (the pointer can move onto it to read it) and Escape dismisses it until the pointer or focus leaves.
   const [overCard, setOverCard] = useState(false);
@@ -161,6 +169,9 @@ export function ReactionPill({
           aria-busy={pending || undefined}
           aria-disabled={pending || undefined}
           disabled={ui.disabled}
+          ref={(el) => {
+            if (el) stays.current = el.parentElement;
+          }}
           onClick={() => toggle()}
           {...ui.handlers}
           style={css(look, enter("pop"))}

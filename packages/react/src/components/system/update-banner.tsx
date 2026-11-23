@@ -2,6 +2,7 @@ import { useEffect, useId, type CSSProperties, type ReactNode } from "react";
 import { usePlatform } from "../../platform";
 import { ART_UPDATE, recipes, useDirection, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
+import { useFocusHandoff } from "../../lib/focus";
 import { announce } from "../../lib/announce";
 import { Icon, Spinner } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
@@ -129,11 +130,8 @@ function Card({
   const title = stage === "downloading" ? s("downloading") : stage === "installing" ? s("installing") : stage === "ready" ? s("ready") : stage === "failed" ? s("failed") : s("available");
   const detail = stage === "downloading" ? (progress >= 0 ? s("downloadingPercent", { percent: progress }) : s("downloadingUnknown")) : stage === "failed" ? error : s("versionTag", { version });
   const action = stage === "available" ? s("installLabel", { version }) : stage === "ready" ? s("restartLabel", { version }) : s("retryLabel");
-  // A change of stage is spoken through the page's announcer, and a failure carries its reason: a status mounted holding its text is not
-  // read, and a button's own name would hide the sentence around it. Progress is not read out percent by percent.
-  useEffect(() => {
-    announce(stage === "failed" ? `${title}. ${error}` : title, stage === "failed" ? "assertive" : "polite");
-  }, [stage]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Install (or Retry) becomes the busy card when the updater starts: focus, fallen to the page, follows onto it.
+  const working = useFocusHandoff<HTMLDivElement>(busy);
   const children: ReactNode = (
     <>
       <Art styles={styles} />
@@ -152,7 +150,7 @@ function Card({
   // Not clickable while the updater is working: it says what is happening, and when.
   if (busy) {
     return (
-      <div aria-busy data-af-part="card" style={css(rtl(card, dir), partStyle(r, "card", enter("fade")))}>
+      <div ref={working} tabIndex={-1} aria-busy data-af-part="card" style={css(rtl(card, dir), partStyle(r, "card", enter("fade")))}>
         {children}
       </div>
     );
@@ -183,21 +181,18 @@ function RailIcon({ stage, pending, styles, strings, onPress }: { stage: UpdateB
   const busy = stage === "downloading" || stage === "installing";
   const ui = useInteraction({ disabled: busy });
   const dot = stage === "available" || stage === "ready" || stage === "failed";
+  // Busy, the icon stays in the tab order (aria-disabled, not disabled), so a keyboard press on it keeps its place.
   const r = useRecipe(recipes["update-banner"], { variants: { stage }, state: { hover: ui.hovered, focus: ui.focused }, styles });
   const title = stage === "downloading" ? s("downloading") : stage === "installing" ? s("installing") : stage === "ready" ? s("ready") : stage === "failed" ? s("failed") : s("available");
-  useEffect(() => {
-    announce(title, stage === "failed" ? "assertive" : "polite");
-  }, [stage]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <button
       type="button"
       data-af-press
       aria-label={title}
       title={title}
-      disabled={ui.disabled}
-      aria-busy={pending || undefined}
-      aria-disabled={pending || undefined}
-      onClick={() => !pending && onPress()}
+      aria-busy={pending || busy || undefined}
+      aria-disabled={pending || busy || undefined}
+      onClick={() => !pending && !busy && onPress()}
       {...ui.handlers}
       data-af-part="railIcon"
       style={css(pressable, { alignItems: "center", justifyContent: "center" }, partStyle(r, "railIcon", ui.disabled && { cursor: "default" }))}
@@ -260,6 +255,14 @@ export function UpdateBanner({
   useEffect(() => {
     if (webLine) announce(webLine, current === "failed" ? "assertive" : "polite");
   }, [webLine]); // eslint-disable-line react-hooks/exhaustive-deps
+  // The desktop's stage is spoken through the page's announcer when it appears and as it changes, and a failure carries its reason: a status
+  // mounted holding its text is not read, and a button's own name would hide the sentence around it. Said here, not by the card or the rail
+  // icon, so folding or unfolding the rail (one replaces the other) says nothing again. Progress is not read out percent by percent.
+  const stageTitle = current === "downloading" ? s("downloading") : current === "installing" ? s("installing") : current === "ready" ? s("ready") : current === "failed" ? s("failed") : s("available");
+  const deskLine = platform !== "web" && shown ? (current === "failed" ? `${stageTitle}. ${error || s("errorDefault")}` : stageTitle) : "";
+  useEffect(() => {
+    if (deskLine) announce(deskLine, current === "failed" ? "assertive" : "polite");
+  }, [current, platform]); // eslint-disable-line react-hooks/exhaustive-deps
   if (platform === "web") {
     return (
       <div data-af-part="root" {...rootProps(rest)} style={css(box, { maxWidth: "100%" }, r.root, style)}>

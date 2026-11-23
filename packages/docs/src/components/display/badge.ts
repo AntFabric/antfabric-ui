@@ -47,7 +47,7 @@ const docs: ComponentDocs = {
   platforms: {
     web: {
       status: "ready",
-      base: "<span role=\"img\"> (role status when `live`) named by the count and what it counts, inline styles over `t`; pops in with enter(\"pop\")",
+      base: "<span role=\"img\"> named by the count and what it counts, inline styles over `t`; pops in with enter(\"pop\")",
       import: "import { Badge } from \"@antfabric/ui-react\"",
       notes: [
         "The same total also drives the tab title, \"(3) AntFabric\", and the favicon dot — see Tab badge.",
@@ -65,7 +65,7 @@ const docs: ComponentDocs = {
     },
     mobile: {
       status: "ready",
-      base: "<Enter motion=\"pop\"> (an Animated.View; a polite live region only when `live`), StyleSheet over useTheme()",
+      base: "<Enter motion=\"pop\"> (an Animated.View; `live` announces a change of its count), StyleSheet over useTheme()",
       import: "import { Badge } from \"@antfabric/ui-react-native\"",
       notes: [
         "The same total is the home-screen icon badge, set with expo-notifications setBadgeCountAsync and kept in step by the server's push payload.",
@@ -77,7 +77,7 @@ const docs: ComponentDocs = {
     role: "img",
     notes: [
       "The number is hidden; the label says what it counts, e.g. \"3 unread mentions\". With no label the name is the count alone (\"3\"), or \"3 unread\" with `unread`.",
-      "Not a live region by default: `live` makes it role status (web) or a polite live region (phone). Never announce every increment — the parent row's label carries the count.",
+      "Never a live region: `live` announces a change of the count politely (through the page's announcer on the web, the screen reader's announcement on the phone), not its first draw. Never announce every increment — the parent row's label carries the count.",
     ],
   },
   examples: [

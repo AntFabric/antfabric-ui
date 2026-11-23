@@ -7,7 +7,7 @@ import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { useInteraction } from "../../lib/interaction";
 import { box, css, enter, input, pressable, row, rtl, text } from "../../lib/style";
-import { announce } from "../../lib/announce";
+import { announce, useAnnounce } from "../../lib/announce";
 import { useRovingKeys } from "../../lib/roving";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { IconButton } from "../actions/icon-button";
@@ -200,6 +200,9 @@ export function Composer({
     lastBucket.current = bucket;
     if (bucket !== "none" && lengthHint) announce(lengthHint, bucket === "over" ? "assertive" : "polite");
   }, [bucket, lengthHint]);
+  // Going offline, or the channel locking, while the composer is on screen is said; the line itself is plain text.
+  useAnnounce(offline && s("offline"));
+  useAnnounce(locked && (mode === "archived" ? s("archivedTitle") : s("readonlyTitle")));
   const send = () => {
     // Send is disabled while a file uploads; a press or Enter in that window says why.
     if (typed && uploading && !tooLong && !offline) announce(s("uploadWaiting"));
@@ -262,13 +265,13 @@ export function Composer({
         </div>
       )}
       {offline && (
-        <div role="status" aria-live="polite" data-af-part="offline" style={css(row, text, r.offline, enter("rise"))}>
+        <div data-af-part="offline" style={css(row, text, r.offline, enter("rise"))}>
           <Icon part="offlineIcon" name="wifi-off" size={r.offlineIcon.width} color={r.offlineIcon.color} style={r.offlineIcon} />
           <span style={css(text, { flex: 1 })}>{s("offline")}</span>
         </div>
       )}
       {locked && (
-        <div role="status" data-af-part="locked" style={css(row, { padding: "13px 15px" }, r.locked)}>
+        <div data-af-part="locked" style={css(row, { padding: "13px 15px" }, r.locked)}>
           <Icon part="lockedIcon" name={mode === "archived" ? "archive" : "lock"} size={r.lockedIcon.width} color={r.lockedIcon.color} style={r.lockedIcon} />
           <div style={css(box, { flex: 1, gap: t.space["3xs"] })}>
             <span data-af-part="lockedTitle" style={css(text, r.lockedTitle)}>

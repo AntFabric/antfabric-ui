@@ -95,8 +95,6 @@ export function InlineBanner({
       <Animated.View
         {...rootProps(rest)}
         testID={partId(testID, "inline-banner", "root")}
-        // A failure is announced at once (`role="alert"` is the accessibility role alert); the other tones wait for a pause.
-        role={alert ? "alert" : "status"}
         accessibilityElementsHidden={gone}
         importantForAccessibility={gone ? "no-hide-descendants" : "auto"}
         style={[s.root, r.root.view, { opacity: fade }, gone && { pointerEvents: "none" }, style]}

@@ -124,7 +124,6 @@ export function Toast({ message, tone = "success", actionLabel = "", dismissed =
     <View {...rootProps(rest)} style={[s.root, style]}>
       <Enter motion="drop">
         <AnimatedPressable
-          role={tone === "error" ? "alert" : "status"}
           accessibilityLabel={message}
           accessibilityHint={str("dismiss")}
           accessibilityElementsHidden={gone}

@@ -252,7 +252,7 @@ export function NotificationItem({
         </View>
       ) : null}
       {approval !== "" && outcome ? (
-        <Enter motion="fade" testID={partId(testID, "notification-item", "decided")} role="status" style={[s.decided, r.decided.view]}>
+        <Enter motion="fade" testID={partId(testID, "notification-item", "decided")} style={[s.decided, r.decided.view]}>
           <Icon
             testID={partId(testID, "notification-item", "decidedIcon")}
             name={outcome === "approved" ? "circle-check" : outcome === "declined" ? "circle-x" : "clock"}

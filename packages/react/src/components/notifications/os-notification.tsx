@@ -1,8 +1,9 @@
-import { useEffect, type CSSProperties, type ReactNode } from "react";
+import { useEffect, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { recipes, useControllable, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
+import { useFocusHandoff } from "../../lib/focus";
 import { Icon, Spinner } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { isComposing } from "../../lib/keys";
@@ -186,9 +187,11 @@ interface ReplyProps {
   styles?: PartStyles<"os-notification">;
   onChange: (text: string) => void;
   onSend: () => void;
+  /** The field, for the hand-off from Reply. */
+  fieldRef?: RefObject<HTMLInputElement | null>;
 }
 
-function ReplyRow({ os, sender, placeholder, value, sending, strings, styles, onChange, onSend }: ReplyProps) {
+function ReplyRow({ os, sender, placeholder, value, sending, strings, styles, onChange, onSend, fieldRef }: ReplyProps) {
   const s = useStrings("os-notification", strings);
   const field = useInteraction({ disabled: sending });
   const send = useInteraction({ disabled: !value || sending });
@@ -198,6 +201,7 @@ function ReplyRow({ os, sender, placeholder, value, sending, strings, styles, on
   return (
     <div style={css(row, { gap: t.space.xs }, win && { padding: "0 16px 8px" })}>
       <input
+        ref={fieldRef}
         data-af-input
         value={value}
         placeholder={placeholder}
@@ -295,6 +299,8 @@ export function OsNotification({
   const said = preview && body ? s("withBody", { label: withContext, body }) : withContext;
   const typing = !!replyAction && (replying === "typing" || replying === "sending");
   const status = !!replyAction && (replying === "sending" || replying === "failed");
+  // Reply swaps the buttons for the field: focus, fallen to the page, follows into it.
+  const replyField = useFocusHandoff<HTMLInputElement>(typing);
 
   const press = (a: OsNotificationAction) => (a.reply ? setReplying("typing") : onAction?.(a));
   const send = () => {
@@ -336,7 +342,7 @@ export function OsNotification({
       </div>
     );
   const replyRow = (placeholder: string) => (
-    <ReplyRow os={os} sender={sender} placeholder={placeholder} value={draft} sending={replying === "sending"} strings={strings} styles={styles} onChange={setDraft} onSend={send} />
+    <ReplyRow os={os} sender={sender} placeholder={placeholder} value={draft} sending={replying === "sending"} strings={strings} styles={styles} onChange={setDraft} onSend={send} fieldRef={replyField} />
   );
 
   return (

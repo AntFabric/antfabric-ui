@@ -69,7 +69,7 @@ const docs: ComponentDocs = {
     },
     mobile: {
       status: "ready",
-      base: "<Enter motion=\"slide-down\"> card (role status, polite live region) with an Icon and two Texts, StyleSheet over useTheme(), for under the screen header; the pill is a read-only labelled View for HeaderActions",
+      base: "<Enter motion=\"slide-down\"> card (its words announced, no live region) with an Icon and two Texts, StyleSheet over useTheme(), for under the screen header; the pill is a read-only labelled View for HeaderActions",
       import: "import { ConnectionBanner } from \"@antfabric/ui-react-native\"",
       notes: [
         "Offline is a normal mode for a capture app, so it reads as reassurance on a neutral surface — no alarm colour, no Retry: the capture queue drains itself on the reconnect edge.",
@@ -84,7 +84,7 @@ const docs: ComponentDocs = {
     role: "status",
     notes: [
       "A change of state is spoken politely, never interrupting, and never as an alert: nothing here is an error. On the web the strip's message, the degraded note and \"Back online\" go through the page's own announcer when the state changes (a strip mounted holding its text is not read, and the way back would otherwise be silent). On the phone the card's title and message are spoken by the screen reader's announcement call, and the card is role=status.",
-      "The pill is a status element that stays on the page, so its text changing is read: web role=status with aria-live=polite, on the phone role=status and an announcement of its new name. Its label is a sentence (\"No connection to the backend\"), not the colour.",
+      "The pill is a labelled picture that stays on the page (role=img on the web); a change of its name is announced (not on first draw). Its label is a sentence (\"No connection to the backend\"), not the colour.",
       "The strip's spinner is hidden from assistive technology; the message says what is happening.",
     ],
   },
