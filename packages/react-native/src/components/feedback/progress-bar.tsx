@@ -49,7 +49,7 @@ const useStyles = createStyles(() => ({
 }));
 
 export function ProgressBar({
-  value = 40,
+  value,
   indeterminate = false,
   label,
   tone = "brand",
@@ -67,7 +67,8 @@ export function ProgressBar({
   const { t } = useTheme();
   const s = useStyles();
   const str = useStrings("progress-bar", strings);
-  const unknown = indeterminate || Number.isNaN(value);
+  // No value yet (a NaN too) is an unknown size, drawn moving, never a made-up percent.
+  const unknown = indeterminate || value === undefined || Number.isNaN(value);
   const pct = unknown ? 0 : Math.min(100, Math.max(0, value));
   const r = useRecipe(recipes["progress-bar"], { variants: { tone }, styles });
   const reduceMotion = useReducedMotion();

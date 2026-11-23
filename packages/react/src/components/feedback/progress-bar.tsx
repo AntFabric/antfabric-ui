@@ -37,7 +37,7 @@ export interface ProgressBarProps extends RootProps<HTMLDivElement> {
 const track: CSSProperties = { ...box, flexDirection: "row", height: 5, overflow: "hidden" };
 
 export function ProgressBar({
-  value = 40,
+  value,
   indeterminate = false,
   label,
   tone = "brand",
@@ -52,7 +52,8 @@ export function ProgressBar({
   ...rest
 }: ProgressBarProps) {
   const s = useStrings("progress-bar", strings);
-  const unknown = indeterminate || Number.isNaN(value);
+  // No value yet (a NaN too) is an unknown size, drawn moving, never a made-up percent.
+  const unknown = indeterminate || value === undefined || Number.isNaN(value);
   const pct = unknown ? 0 : Math.min(100, Math.max(0, value));
   const r = useRecipe(recipes["progress-bar"], { variants: { tone }, styles });
   const dir = useDirection();
