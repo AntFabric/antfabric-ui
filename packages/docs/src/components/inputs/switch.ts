@@ -111,7 +111,7 @@ const docs: ComponentDocs = {
     label: "{label}",
     notes: [
       "role=switch with aria-checked; announced \"Notification sound, switch, on\". The track is hidden: the state is in aria-checked.",
-      "The description is the control's aria-describedby (the phone: its accessibilityHint); inside a FormField the field's description and error follow it.",
+      "The description is the control's aria-describedby (the phone: its accessibilityHint); inside a FormField the field's description and error follow it, and on the web and desktop the switch takes its aria-invalid and aria-required.",
       "The thumb travels toward the end edge, so it moves the other way in a right-to-left tree. The on state is brand-coloured against a grey off track, and keyboard focus draws a ring on the track.",
     ],
   },
