@@ -160,7 +160,14 @@ export function pageSlots(page: number, count: number): PageSlot[] {
  */
 export function rowIds(shown: readonly Row[], rows: readonly Row[], rowKey: string): string[] {
   const index = new Map(rows.map((row, i) => [row, i]));
-  return shown.map((row, i) => String(row[rowKey] ?? index.get(row) ?? i));
+  // A row's own key wins; the index of a keyless row takes a `#` until it is no row's own key, so ticking one never ticks another.
+  const own = new Set(rows.filter((row) => row[rowKey] != null).map((row) => String(row[rowKey])));
+  const spare = (i: number) => {
+    let id = String(i);
+    while (own.has(id)) id = `#${id}`;
+    return id;
+  };
+  return shown.map((row, i) => (row[rowKey] != null ? String(row[rowKey]) : spare(index.get(row) ?? i)));
 }
 
 /** The ids of a page with all of them ticked, some of them, or none. */

@@ -85,7 +85,7 @@ export function GaugeChart({ value, max = 1, target, title, subtitle = "", headl
       r={r} viewAsTable={str("viewAsTable")} viewAsChart={str("viewAsChart")}
       title={title}
       subtitle={subtitle}
-      headline={headline && { format, ...headline }}
+      headline={headline && { format, ...headline, value: headline.format === undefined ? shown(headline.value) : headline.value }}
       table={!loading && g.known ? { data: [{ measure: title, value: shown(value), ...(hasTarget ? { target: shown(target!) } : {}) }], x: "measure", y: hasTarget ? ["value", "target"] : ["value"], format, labels: { value: str("value"), target: str("target") }, xLabel: str("measure") } : null}
       style={style}
     >

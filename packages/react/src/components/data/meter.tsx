@@ -40,14 +40,14 @@ export function Meter({ value, max = 1, label, kind = "usage", format = "percent
   const locale = useLocale();
   const known = Number.isFinite(value) && Number.isFinite(max) && max > 0;
   const share = known ? value / max : 0;
-  const tone = meterTone(kind, share, thresholds);
+  // No value has no state: an empty score is not critical, in the fill, the icon or the words.
+  const tone = known ? meterTone(kind, share, thresholds) : "ok";
   const reading = meterReading(value, max, formatWords, format, locale);
   const shown = reading.kind === "unavailable" ? s("unavailable") : reading.kind === "of" ? s("valueOfMax", { value: reading.value, max: reading.max }) : reading.value;
   const fill = tone === "warning" ? t.data.warning : tone === "danger" ? t.data.negative : null;
   // The state is spoken as well as drawn: the fill's colour is never the only signal.
   const said = tone === "warning" ? s("stateWarning", { value: shown }) : tone === "danger" ? s("stateDanger", { value: shown }) : shown;
-  // No value has no state to mark (an empty score would read as critical).
-  const mark = showState && known && tone !== "ok" ? <Icon name={tone === "danger" ? "circle-alert" : "triangle-alert"} size={t.icon.sizeMd} color={fill ?? undefined} style={{ marginRight: t.space["2xs"] }} /> : null;
+  const mark = showState && tone !== "ok" ? <Icon name={tone === "danger" ? "circle-alert" : "triangle-alert"} size={t.icon.sizeMd} color={fill ?? undefined} style={{ marginRight: t.space["2xs"] }} /> : null;
   const valueText = <span data-af-part="value" style={css(text, partStyle(r, "value", { fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap", ...(mark ? { display: "inline-flex", alignItems: "center" } : {}) }))}>{mark}{shown}</span>;
   return (
     <div data-af-part="root" {...rootProps(rest)} style={css(box, partStyle(r, "root", { alignSelf: "stretch" }, compact ? { flexDirection: "row", alignItems: "center" } : { minWidth: t.kpi.meterMinW }), style)}>

@@ -53,7 +53,8 @@ export function Meter({ value, max = 1, label, kind = "usage", format = "percent
   const locale = useLocale();
   const known = Number.isFinite(value) && Number.isFinite(max) && max > 0;
   const share = known ? value / max : 0;
-  const tone = meterTone(kind, share, thresholds);
+  // No value has no state: an empty score is not critical, in the fill, the icon or the words.
+  const tone = known ? meterTone(kind, share, thresholds) : "ok";
   const reading = meterReading(value, max, formatWords, format, locale);
   const shown = reading.kind === "unavailable" ? str("unavailable") : reading.kind === "of" ? str("valueOfMax", { value: reading.value, max: reading.max }) : reading.value;
   const fill = tone === "warning" ? t.data.warning : tone === "danger" ? t.data.negative : null;
@@ -62,8 +63,7 @@ export function Meter({ value, max = 1, label, kind = "usage", format = "percent
   const track = partStyle(r, "track", { view: compact && { width: t.kpi.meterCompactW, flexShrink: 0 } });
   const bar = partStyle(r, "fill", { view: [{ width: `${Math.min(1, Math.max(0, share)) * 100}%` }, fill !== null && { backgroundColor: fill }] });
   const said = tone === "warning" ? str("stateWarning", { value: shown }) : tone === "danger" ? str("stateDanger", { value: shown }) : shown;
-  // No value has no state to mark (an empty score would read as critical).
-  const mark = showState && known && tone !== "ok" ? <Icon name={tone === "danger" ? "circle-alert" : "triangle-alert"} size={t.icon.sizeMd} color={fill ?? t.fg.body} style={s.mark} /> : null;
+  const mark = showState && tone !== "ok" ? <Icon name={tone === "danger" ? "circle-alert" : "triangle-alert"} size={t.icon.sizeMd} color={fill ?? t.fg.body} style={s.mark} /> : null;
   const readout = <Text testID={partId(testID, "meter", "value")} maxFontSizeMultiplier={fontScale.chrome} style={[value$.view, value$.text]}>{shown}</Text>;
   const valueText = mark ? <View style={s.valueRow}>{mark}{readout}</View> : readout;
   return (

@@ -623,6 +623,8 @@ function checkChart() {
   same("rowIds, rows without the field are their index (M51)", rowIds(keyless, keyless, "key"), ["0", "1", "2"]);
   same("rowIds, the index is the row's own, sorted or paged (M51)", rowIds([keyless[2]!, keyless[0]!], keyless, "key"), ["2", "0"]);
   same("rowIds, the field when it is there", rowIds([{ key: "acc-1" }, { key: 7 }], [{ key: "acc-1" }, { key: 7 }], "key"), ["acc-1", "7"]);
+  const mixed = [{ key: "1", name: "A" }, { name: "B" }, { key: "#1", name: "C" }];
+  same("rowIds, a keyless row's index never takes a row's own key", rowIds(mixed, mixed, "key"), ["1", "##1", "#1"]);
   same("rowIds, ticking one keyless row ticks one (M51)", pickState(rowIds(keyless, keyless, "key"), toggleRow(rowIds(keyless, keyless, "key")[1]!, [])), { all: false, some: true });
   same("withoutSign on a name", withoutSign("percent"), { type: "percent", sign: false });
   same("withoutSign keeps options", withoutSign({ type: "percent", digits: 0, sign: true }), { type: "percent", digits: 0, sign: false });
