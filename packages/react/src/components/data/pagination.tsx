@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { clampPage, pageCountOf, pageRange, pageSlots } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
@@ -50,9 +50,13 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
   const nav = useRef<HTMLElement>(null);
   const count = pageCount ?? pageCountOf(total ?? 0, size);
   const at = clampPage(current ?? 1, count);
+  // Whether keyboard focus was in the pager when it turned the page: only then may the pager move it (a page set by the app, or turned while nothing was focused, leaves focus alone).
+  const ours = useRef(false);
   const go = (n: number) => {
     const next = clampPage(n, count);
-    if (next !== at) setCurrent(next);
+    if (next === at) return;
+    ours.current = !!nav.current?.contains(document.activeElement);
+    setCurrent(next);
   };
   // Previous and next are disabled on the first and the last page. A keyboard user who pressed the one that just became disabled would
   // lose their place, so focus moves to the page button that is current (or to the other arrow in a compact pager).
@@ -60,6 +64,8 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
   useEffect(() => {
     if (was.current === at) return;
     was.current = at;
+    if (!ours.current) return;
+    ours.current = false;
     const el = document.activeElement as HTMLButtonElement | null;
     if (el && el !== document.body && !el.disabled) return;
     const box = nav.current;
@@ -71,6 +77,8 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
   // The summary is said when it changes (a page turned, the size changed), not as a live region that holds it from the start.
   useAnnounce(summary);
   const sizes = pageSizes && pageSizes.length > 0 ? (pageSizes.includes(size) ? pageSizes : [size, ...pageSizes].sort((a, b) => a - b)) : null;
+  // One item a page, built again only when the count changes.
+  const pages = useMemo(() => (jump ? Array.from({ length: count }, (_, i) => ({ key: String(i + 1), label: String(i + 1) })) : []), [jump, count]);
   return (
     <nav
       data-af-part="root"
@@ -102,7 +110,7 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
           size="sm"
           value={String(at)}
           searchable={count > SEARCHABLE_AFTER}
-          items={Array.from({ length: count }, (_, i) => ({ key: String(i + 1), label: String(i + 1) }))}
+          items={pages}
           onValueChange={(key) => go(Number(key))}
           style={{ width: "auto" }}
         />
