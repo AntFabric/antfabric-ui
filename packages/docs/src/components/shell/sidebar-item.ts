@@ -141,14 +141,14 @@ const docs: ComponentDocs = {
     },
     desktop: {
       status: "ready",
-      base: "The same @antfabric/ui-react component as the web: a <button> row (6/10 padding, radius.row) + Avatar, Badge and the ⋮ IconButton as a sibling; inline styles over t, states from useInteraction. active is kept by the row (useControllable) and toggled by a press; a surrounding section decides through selectedName",
+      base: "The same @antfabric/ui-react component as the web: a <button> row (6/10 padding, radius.row) + Avatar, Badge and the ⋮ IconButton as a sibling; inline styles over t, states from useInteraction. active is the app's (a press reports onPress and never makes the row current itself); a surrounding section decides through selectedName",
       import: "import { SidebarItem } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Unread is asked first: a channel you have open can still gather unread (window in the background) and then it is bold AND selected.",
         "The ⋮ is a sibling button laid over the row's right end, never a button inside a button; the row reserves its room only while it is shown, so it never covers the count. The catalogue draws it with actionsVisible.",
         "Muted and typing are new in this spec — today's sidebar has neither. Draft (pencil, fg.faint at 5.33:1, never an opacity) and the # / lock / face rules are today's.",
         "The external-organisation glyph is new; it stays on even when the row is muted, because who can read the channel is not a notification preference.",
-        "Pressing the row makes it `active` (the grey selected fill fades in) and leaves it active if pressed again: the current page is not a toggle. Inside a sidebar-section the section's `selected` decides instead, through `selectedName`, so only one row is ever open.",
+        "Pressing the row reports onPress; the app navigates and passes `active` (the grey selected fill fades in), so a row never claims to be current before the page is. Inside a sidebar-section the section's `selected` decides instead, through `selectedName`, so only one row is ever open.",
       ],
       keyboard: [
         {
