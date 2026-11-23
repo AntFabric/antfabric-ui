@@ -120,7 +120,10 @@ function SidebarItemView({
   });
   const meta = (named: string) => <Icon part="metaIcon" name={named} size={r.metaIcon.width} style={r.metaIcon} />;
   // The row's one accessible name: '#design-crit, 3 mentions, muted, draft'. Each part that applies is added through `withDetail`.
+  // The face's sparkle and presence dot are said in words too: an agent, or someone away, is not only a colour.
+  const face = !avatar ? "" : agent ? s("agent") : presence === "active" ? s("presenceActive") : presence === "away" ? s("presenceAway") : presence === "dnd" ? s("presenceDnd") : presence === "offline" ? s("presenceOffline") : "";
   const details = [
+    face,
     description,
     mentions > 0 ? s("withMentions", { count: mentions }) : unread && !muted ? s("unread") : "",
     muted ? s("muted") : "",

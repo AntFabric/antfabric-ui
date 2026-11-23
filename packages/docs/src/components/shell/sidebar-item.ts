@@ -200,6 +200,7 @@ const docs: ComponentDocs = {
     notes: [
       "A button on every platform (there is no href prop): the row reports `onPress` and the app navigates. Middle-click and open-in-new-tab are the app's to add.",
       "The whole row is one accessible name: '#design-crit, 3 mentions, muted, draft'. The glyph and the badge's own number are hidden so nothing is read twice.",
+      "A row with `avatar` says its face in words, after the name: 'Fabric, AI agent' for the sparkle, 'Lena Fischer, away' for the presence dot. Neither is colour or shape alone.",
       "The open conversation has aria-current=\"page\" (selected on the phone); selection is never carried by colour alone. Pressing the open row leaves it open.",
       "Web and desktop: with `onMenu` the row's ⋮ appears while the row has pointer hover or keyboard focus and stays in the tab order; the context menu and Shift+F10 or the Menu key on the row also call `onMenu`.",
       "Phone: `onLongPress` is also an accessibility action, 'Options for #design-crit', so a screen reader, Voice Control or Switch Control user can run it.",

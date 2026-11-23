@@ -114,7 +114,10 @@ export function SidebarItem({
   const kindIcon = glyphOf(partStyle(r, "kindIcon", { view: s.kindIcon }));
   const meta = glyphOf(r.metaIcon);
   const typed = typingText || str("typing");
+  // The face's sparkle and presence dot are said in words too: an agent, or someone away, is not only a colour.
+  const face = !avatar ? "" : agent ? str("agent") : presence === "active" ? str("presenceActive") : presence === "away" ? str("presenceAway") : presence === "dnd" ? str("presenceDnd") : presence === "offline" ? str("presenceOffline") : "";
   const details = [
+    face,
     description,
     mentions > 0 ? str("withMentions", { count: mentions }) : unread && !muted ? str("unread") : "",
     muted ? str("muted") : "",

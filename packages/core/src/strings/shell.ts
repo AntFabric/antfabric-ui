@@ -17,6 +17,16 @@ export const shell = {
     typing: "typing…",
     /** The accessible name of the row's ⋮ button (web and desktop), and of the phone's long-press accessibility action. */
     options: "Options for {name}",
+    /** Read after the name when the row's face wears the agent sparkle. */
+    agent: "AI agent",
+    /** Read after the name for the face's green presence dot. */
+    presenceActive: "active",
+    /** Read after the name for the away dot. */
+    presenceAway: "away",
+    /** Read after the name for the do-not-disturb dot. */
+    presenceDnd: "do not disturb",
+    /** Read after the name for the offline ring. */
+    presenceOffline: "offline",
   },
   "sidebar-section": {
     /** The + action's name when the section has no `addLabel` of its own. */
@@ -113,6 +123,16 @@ export const shell = {
     searchHint: "Search ({keys})",
     /** The profile button's accessible name and tooltip: it opens the profile and sign-out menu. */
     profile: "{name}, profile and sign out",
+    /** The profile button's accessible name while its face shows a presence: the name, the presence word, then what it opens. */
+    profileWithPresence: "{name}, {presence}, profile and sign out",
+    /** The presence word for the face's green dot. */
+    presenceActive: "active",
+    /** The presence word for the away dot. */
+    presenceAway: "away",
+    /** The presence word for the do-not-disturb dot. */
+    presenceDnd: "do not disturb",
+    /** The presence word for the offline ring. */
+    presenceOffline: "offline",
   },
   "title-bar": {
     /** The bar's accessible name. */

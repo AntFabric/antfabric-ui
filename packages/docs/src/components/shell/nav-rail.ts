@@ -256,6 +256,7 @@ const docs: ComponentDocs = {
       "Drill-in: the list is a <nav> named for where it is ('Mode', or 'Channels sections'). The top tile is a button named 'Channels. Back to the main menu', so the destination is announced where the logo was.",
       "Drill-in: opening a destination or going back replaces the pressed row, so focus moves to the row that is now current instead of falling to the page. Escape in a destination's sections goes back.",
       "The workspace chip and the profile button are menu buttons (aria-haspopup=\"menu\"); their aria-expanded follows `workspaceMenuOpen` and `profileMenuOpen`, which the app sets while its menu is open.",
+      "The profile button says the face's presence in words: 'Priya Raman, active, profile and sign out' (`profileWithPresence`); with `presence: \"none\"` it is 'Priya Raman, profile and sign out'.",
       "The destination list scrolls when it does not fit, so the utilities and the profile stay in view. Every row, the utilities and the profile draw a focus ring.",
     ],
   },

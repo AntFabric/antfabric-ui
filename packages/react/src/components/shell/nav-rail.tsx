@@ -474,7 +474,14 @@ export function NavRail({
           type="button"
           data-af-part="profile"
           data-af-press
-          aria-label={s("profile", { name: userName })}
+          aria-label={
+            presence === "none"
+              ? s("profile", { name: userName })
+              : s("profileWithPresence", {
+                  name: userName,
+                  presence: presence === "active" ? s("presenceActive") : presence === "away" ? s("presenceAway") : presence === "dnd" ? s("presenceDnd") : s("presenceOffline"),
+                })
+          }
           title={s("profile", { name: userName })}
           aria-haspopup="menu"
           aria-expanded={profileMenuOpen}
