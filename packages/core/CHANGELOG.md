@@ -40,6 +40,13 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 10: contrast and target size
 
+- `fg.onBrand` is picked by contrast for every theme: white where white reaches 4.5:1 on `brand.default`, otherwise ink (`fg.strong`'s `#0e1828`). AntFabric's coral takes ink (white was 3.42:1), so **AntFabric's primary buttons, brand badges, ticked checkboxes and other brand fills now draw dark ink**. `brandValues` always writes `fg.onBrand`; `defineTheme` derives it in each scheme where a theme's `brand` or `tokens` set `brand.default`, unless its own `tokens` set `fg.onBrand` (`onBrandFor` in `src/brand.ts`, not exported). (H14)
+- New token `os.onFill` (white in both themes): the text an OS imitation draws on its own fills (the macOS menu highlight, the red badge, the Windows close button, a tray menu's hovered row, the lock and home screens). Those recipes, and the danger swipe and toast's error mark (now `danger.fg`), no longer read `fg.onBrand`, so they stay white.
+- Light-scheme chart and data colours hold 3:1 on the card (WCAG 1.4.11), each darkened in OKLCH on its own hue: `chart.series2` #d67b04, `series4` #0aa57f, `series6` #b78c01, `series7` #3b95f0, `chart.previous` #7b94b0 (and #506f9b in dark), `chart.other` charcoal.450, `data.positive` #02a860, `data.warning` #d77c03. `chart.track` is a ground, not a mark, and keeps its value. (M42)
+- 24px pointer targets on web and desktop (WCAG 2.2 2.5.8): `control.hIconSm` is 24 on the desktop (was 20; IconButton `sm`, Toast's close, ProgressBar's header) and `chip.removeSize` 24 on web and desktop (was 20). The `checkbox` recipe's root is at least `control.hit` square, and `notification-item`'s `rowAction` at least `control.hit` tall, on web and desktop (`neutral` had these; they moved into the schema). (M10, M50, L53)
+- `kitCss` documents that a field's outline is taken off by `[data-af-input]:focus`, never inline, so the forced-colours outline reaches a focused field (H15).
+- `pnpm check tokens` measures contrast for `antfabric`, `neutral` and two brand probes in both schemes; `reports/generic.json` `contrastTodo` lists the six pairs that still fall short (brand hover and pressed under ink, the translucent focus halo).
+
 ### Batch 11: React Native overlays
 
 ### Batch 12: per-component fixes

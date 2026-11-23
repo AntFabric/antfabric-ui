@@ -487,7 +487,7 @@
                   "radius": "$radius.circle",
                   "bg": "$brand.default",
                   "borderWidth": "$border.wThick",
-                  "borderColor": "$fg.onBrand"
+                  "borderColor": "$os.onFill"
                 }
               }
             }
@@ -496,11 +496,16 @@
             "on": ["desktop", "mobile"],
             "base": { "fg": "$fg.onBrand" },
             "platforms": {
-              "mac": { "base": { "size": "$text.bodySm", "weight": "$font.weightSemibold" } },
+              "mac": { "base": { "size": "$text.bodySm", "weight": "$font.weightSemibold", "fg": "$os.onFill" } },
               "windows": { "base": { "size": "$osBadge.winLabel", "weight": "$font.weightBold" } },
               "linux": { "base": { "size": "$osBadge.linuxLabel", "weight": "$font.weightBold" } },
               "mobile": {
-                "base": { "size": "$osBadge.iosLabel", "line": "$osBadge.iosLabel", "weight": "$font.weightMedium" }
+                "base": {
+                  "size": "$osBadge.iosLabel",
+                  "line": "$osBadge.iosLabel",
+                  "weight": "$font.weightMedium",
+                  "fg": "$os.onFill"
+                }
               }
             }
           },
@@ -550,7 +555,7 @@
           "tabIcon": { "on": ["web"], "base": { "fg": "$fg.muted" } },
           "tabTitle": { "on": ["web"], "base": { "size": "$text.caption", "fg": "$fg.strong" } },
           "favicon": { "on": ["web"], "base": { "square": "$osBadge.browserFavicon" } },
-          "label": { "on": ["mobile"], "base": { "fg": "$fg.onBrand", "weight": "$font.weightMedium" } }
+          "label": { "on": ["mobile"], "base": { "fg": "$os.onFill", "weight": "$font.weightMedium" } }
         },
         "reads": ["$osBadge.winDot", "$identity.indigo", "$identity.ink", "$os.iosLabelShadow", "$font.weightBold"],
         "tokens": [
@@ -575,6 +580,7 @@
           "os.browserTab",
           "os.iosLabelShadow",
           "os.notificationBg",
+          "os.onFill",
           "osBadge.androidDot",
           "osBadge.androidDotInset",
           "osBadge.browserFavicon",
@@ -1003,7 +1009,7 @@
             "platforms": {
               "mac": {
                 "base": { "height": "$osMenu.macItemH", "radius": "$radius.tag" },
-                "states": { "on": { "bg": "$os.macAccent", "fg": "$fg.onBrand" } }
+                "states": { "on": { "bg": "$os.macAccent", "fg": "$os.onFill" } }
               },
               "windows": {
                 "base": { "height": "$control.hSm", "radius": "$radius.tag" },
@@ -1069,7 +1075,6 @@
           "control.hXs",
           "fg.body",
           "fg.faint",
-          "fg.onBrand",
           "fg.strong",
           "fg.subtle",
           "font.sans",
@@ -1083,6 +1088,7 @@
           "os.macAccent",
           "os.notificationBg",
           "os.notificationFg",
+          "os.onFill",
           "os.wallpaper",
           "osMenu.browserMenuW",
           "osMenu.linuxDropW",
@@ -5574,7 +5580,11 @@
         "styles": {
           "root": {
             "base": { "gap": "$choice.gap", "paddingY": "$choice.padY", "font": "$font.sans" },
-            "states": { "disabled": { "opacity": "$opacity.disabled" } }
+            "states": { "disabled": { "opacity": "$opacity.disabled" } },
+            "platforms": {
+              "web": { "base": { "minHeight": "$control.hit", "minWidth": "$control.hit" } },
+              "desktop": { "base": { "minHeight": "$control.hit", "minWidth": "$control.hit" } }
+            }
           },
           "box": {
             "base": {
@@ -10035,7 +10045,8 @@
           "$chart.sliceRadius",
           "$chart.sliceLift",
           "$chart.partMinW",
-          "$opacity.muted"
+          "$opacity.muted",
+          "$control.hit"
         ],
         "tokens": [
           "border.subtle",
@@ -14294,8 +14305,7 @@
         },
         "marks": {
           "type": "boolean",
-          "description": "Each series gets its own dash pattern and marker shape besides its colour, in the plot and in the legend's key, so two series are never told apart by hue alone. Markers are left off past 40 points. Off by default: the plot keeps its plain lines.",
-          "default": false
+          "description": "Each series gets its own dash pattern and marker shape besides its colour, in the plot and in the legend's key, so two series are never told apart by hue alone (WCAG 1.4.1). Markers are left off past 40 points. Left out, it is on for two or more series and off for one; `false` keeps plain lines where the product labels the series another way."
         },
         "target": {
           "type": "number",
@@ -14452,7 +14462,7 @@
         "notes": [
           "The figure is named by the sentence core's `summarize` writes from the rows: dates read as a trend (rose, fell, held, and where it peaked), categories as highest and lowest. It is heard, not printed: in the light theme most series colours sit under 3:1 against the card, so the tooltip and \"View as table\" give the numbers without colour.",
           "\"View as table\" is the other way in: the same rows in Table, with real headers. It is a Button, so it is reached by keyboard and named by what it will do.",
-          "With `marks`, a series is told apart by its dash and marker as well as its colour (the first is solid with a round marker, the next dashed with a square, and so on), and the legend's key draws the same. Without it, the tooltip and the table are the relief for series that are close in hue.",
+          "With `marks` (on by default for two or more series), a series is told apart by its dash and marker as well as its colour (the first is solid with a round marker, the next dashed with a square, and so on), and the legend's key draws the same. With `marks={false}`, the tooltip and the table are the relief for series that are close in hue.",
           "The legend says what it toggles: each entry is a button that is pressed while the series is on (\"Resolved, pressed\"), and an entry that is off is struck through and faint, not only dimmer. The last series showing cannot be turned off, so a chart is never blank because of a press.",
           "On the web the plot is a stop for the arrow keys (recharts' accessibility layer): the tooltip moves point to point, and the plot draws a focus edge from the tokens while the keyboard is in it. The phone's plot is one image; the sentence and the table carry it.",
           "The tooltip is drawn with `role=\"tooltip\"` on the web and is never the only place a value is: the table has every one."
@@ -17135,8 +17145,8 @@
         },
         "showState": {
           "type": "boolean",
-          "description": "An icon beside the value in the caution (triangle) and critical (circle) states, so the state is not the fill's colour alone. The spoken value says it either way (\"78%, caution\").",
-          "default": false
+          "description": "An icon beside the value in the caution (triangle) and critical (circle) states, so the state is not the fill's colour alone (WCAG 1.4.1). On by default; `false` leaves the colour and the spoken value to say it (\"78%, caution\"), for a product that prints the state beside the meter itself.",
+          "default": true
         },
         "compact": {
           "type": "boolean",
@@ -19207,6 +19217,7 @@
           "rowAction": {
             "on": ["web", "desktop"],
             "base": {
+              "minHeight": "$control.hit",
               "radius": "$radius.control",
               "borderWidth": "$border.wHairline",
               "borderColor": "$border.subtle",
@@ -19222,7 +19233,7 @@
           "swipeAction": { "on": ["mobile"], "base": { "bg": "$surface.inverse", "fg": "$fg.onInverse" } },
           "swipeDanger": {
             "on": ["mobile"],
-            "base": { "bg": "$danger.solid", "fg": "$fg.onBrand" },
+            "base": { "bg": "$danger.solid", "fg": "$danger.fg" },
             "states": { "pressed": { "bg": "$danger.solidHover" } }
           },
           "swipeIcon": { "on": ["mobile"], "base": { "square": "$icon.size" } },
@@ -19236,6 +19247,8 @@
           "border.wThick",
           "brand.default",
           "brand.softHover",
+          "control.hit",
+          "danger.fg",
           "danger.solid",
           "danger.solidHover",
           "dot.size",
@@ -28355,7 +28368,7 @@
             "base": { "height": "$control.hit", "bg": "$danger.default" },
             "states": { "focus": { "shadow": "$shadow.focus" } }
           },
-          "dangerLabel": { "base": { "size": "$text.body", "weight": "$font.weightMedium", "fg": "$fg.onBrand" } }
+          "dangerLabel": { "base": { "size": "$text.body", "weight": "$font.weightMedium", "fg": "$danger.fg" } }
         },
         "tokens": [
           "border.subtle",
@@ -28364,10 +28377,10 @@
           "brand.tint",
           "control.hit",
           "danger.default",
+          "danger.fg",
           "fg.body",
           "fg.faint",
           "fg.muted",
-          "fg.onBrand",
           "fg.strong",
           "font.weightMedium",
           "font.weightNormal",
@@ -32868,8 +32881,8 @@
               "windows": {
                 "base": { "width": "$osWindow.winCaptionW", "fg": "$fg.body" },
                 "states": {
-                  "hover": { "bg": "$os.winClose", "fg": "$fg.onBrand" },
-                  "pressed": { "bg": "$os.winClosePressed", "fg": "$fg.onBrand" },
+                  "hover": { "bg": "$os.winClose", "fg": "$os.onFill" },
+                  "pressed": { "bg": "$os.winClosePressed", "fg": "$os.onFill" },
                   "focus": { "shadow": "$shadow.focus" }
                 }
               },
@@ -32904,7 +32917,6 @@
           "control.hXs",
           "fg.body",
           "fg.faint",
-          "fg.onBrand",
           "fg.strong",
           "fg.subtle",
           "font.sans",
@@ -32918,6 +32930,7 @@
           "os.macLightEdge",
           "os.macMax",
           "os.macMin",
+          "os.onFill",
           "os.winClose",
           "os.winClosePressed",
           "osWindow.linuxCaption",
@@ -33191,7 +33204,7 @@
             "variants": {
               "tone": {
                 "success": { "bg": "$brand.default" },
-                "error": { "bg": "$danger.solid" },
+                "error": { "bg": "$danger.solid", "fg": "$danger.fg" },
                 "info": { "fg": "$fg.onInverse" }
               }
             }
@@ -33220,6 +33233,7 @@
           "brand.default",
           "control.hIconSm",
           "control.hit",
+          "danger.fg",
           "danger.solid",
           "fg.onBrand",
           "fg.onInverse",
@@ -33921,7 +33935,7 @@
                   "radius": "$osTray.macRowRadius",
                   "size": "$text.bodySm"
                 },
-                "states": { "hover": { "bg": "$info.default", "fg": "$fg.onBrand" }, "disabled": { "fg": "$fg.faint" } }
+                "states": { "hover": { "bg": "$info.default", "fg": "$os.onFill" }, "disabled": { "fg": "$fg.faint" } }
               },
               "linux": { "base": { "height": "$osTray.linuxRowH", "radius": "$osTray.linuxRowRadius" } }
             }
@@ -33969,7 +33983,6 @@
           "border.wHairline",
           "fg.faint",
           "fg.muted",
-          "fg.onBrand",
           "fg.strong",
           "font.weightMedium",
           "hover.surface",
@@ -33977,6 +33990,7 @@
           "os.macClose",
           "os.notificationBg",
           "os.notificationFg",
+          "os.onFill",
           "os.wallpaper",
           "osTray.glyph",
           "osTray.glyphRadius",
