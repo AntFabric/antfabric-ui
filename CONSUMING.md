@@ -78,6 +78,19 @@ import { AntFabricRoot } from "@antfabric/ui-react";
 The stylesheet is injected with the root as a hoisted `<style href="antfabric-ui">` (React 19), so it
 is server-rendered in the `<head>` and added once however many roots there are.
 
+**A strict Content Security Policy.** The root takes no `nonce`, and every component draws with inline
+`style` attributes, which a nonce does not cover. The page's `style-src` needs `'unsafe-inline'`. With
+`css={false}` you can ship the sheet as a file of your own, but the inline styles still need it.
+
+**React Server Components** (the Next.js App Router). Every file of both kits starts with `"use client"`,
+so a Server Component can import a component from any entry (the root, `./data`, `./shell`, `./chat`) and
+render it as a client component. It can pass only what a server can send to the client: data, not
+functions, so a component with `onPress` belongs in a client file. The root's helpers (`t`, `rootAttrs`)
+are client references there; use them in client files. `@antfabric/ui-core` does not carry the directive
+and its root and `./chart` do not load in the server graph yet (they call React's client API when they
+load); `./dtcg` and `./antfabric` do. Put `AntFabricRoot`, and the `defineTheme` call or `themes` import,
+in a `"use client"` file (say `providers.tsx`) and render that from the layout.
+
 For AntFabric's own look (an AntFabric app or plugin), pass the theme once, at the root:
 
 ```tsx
@@ -139,7 +152,7 @@ export default function App() {
 }
 ```
 
-An app that passes `themes.antfabric` loads Figtree instead (`Figtree-Regular`, `-Medium`, `-SemiBold`, `-Bold`, `-ExtraBold`, from `@antfabric/ui-core/fonts/Figtree-*.ttf`; the headline face is Satoshi, section 5). A theme with its own fonts loads those (section 6). Skip this and the phone draws the system font, and Expo logs an error for each family name the theme asks for.
+An app that passes `themes.antfabric` loads Figtree instead (`Figtree-Regular`, `-Medium`, `-SemiBold`, `-Bold`, `-ExtraBold`, from `@antfabric/ui-core/fonts/Figtree-*.ttf`; the headline face is Satoshi, section 5). A theme with its own fonts loads those (section 6). Charts from `./data` are the exception: their text is Geist on every theme, so an app that draws them also loads the four `Geist-*` files above, whatever its theme. Skip this and the phone draws the system font, and Expo logs an error for each family name the theme asks for.
 
 - `scheme`: `"light"` or `"dark"`. Pass the device's `useColorScheme()` or the user's choice.
 - `strings`, `locale`: the kit's built-in text for the whole tree, per component id (`{ "text-field": { required: "Obligatoire" } }`); a component's own `strings` prop overrides it for one instance. Both roots take them.
@@ -156,7 +169,7 @@ Under `neutral`, the default, body text and headlines are Geist, which ships wit
 
 - **Geist and Figtree ship with `@antfabric/ui-core`** (OFL): Geist is `neutral`'s face, Figtree `themes.antfabric`'s. For Geist, `@antfabric/ui-core/fonts.css` declares one variable face (`Geist-Variable.woff2`, weights 100 to 900, so a 450 draws as a 450) for the web and the desktop, and the four static TTFs are at `@antfabric/ui-core/fonts/Geist-*.ttf` for the phone (section 4). For Figtree, `@antfabric/ui-core/fonts.css` declares it for the web and the desktop (section 3), and the five TTFs are at `@antfabric/ui-core/fonts/Figtree-*.ttf` for the phone (section 4). In Tauri the bundler copies them like any other asset.
 - **Satoshi does not ship**: its licence forbids passing the files on, so it is not in this repository either. Without it, headlines fall back to Figtree. An app that holds a Satoshi licence loads its own copy: on the web, `@font-face { font-family: "Satoshi"; src: url(Satoshi-Variable.woff2) format("woff2"); font-weight: 300 900; }`; on the phone, `Satoshi-Regular`, `Satoshi-Medium`, `Satoshi-Bold` and `Satoshi-Black` (`.otf`) in the same `useFonts` call. The kit maps semibold to `Satoshi-Medium`, since Satoshi has no SemiBold.
-- **A product with its own type** (not AntFabric) loads its own families and names them in the brand (section 6); it can skip Satoshi, and Figtree too if both faces are replaced (and Geist, if `extends` is not `neutral` or the fonts are replaced).
+- **A product with its own type** (not AntFabric) loads its own families and names them in the brand (section 6); it can skip Satoshi, and Figtree too if both faces are replaced (and Geist, if `extends` is not `neutral` or the fonts are replaced, and the phone app draws no charts: their text is Geist on every theme).
 
 ## 6. Your product's look: colours and fonts
 
@@ -265,9 +278,14 @@ Six things to know:
 - **A changed value is `on<Prop>Change`; a press is `onPress()`.** No component has `onChange`.
   An item in a list carries a `key`, and a prop that names an item (`value`, `selected`, `current`)
   holds one. Open or closed is `expanded` (overlays keep `open`).
-- **Props are the documented ones, `style`, `styles` and `strings`.** No `className`, `ref`, `aria-*`,
-  `data-*` or other HTML attribute passes through. The accessible name comes from `label`. `styles` is
-  per part (`styles={{ root: { … } }}`) and `strings` is the text the kit draws, for this instance.
+- **Props are the documented ones, `style`, `styles`, `strings` and the pass-through ones.** Every
+  component passes `id`, `className`, `ref`, `data-*` and `aria-*` to its root element, after its own
+  attributes, so your `aria-label` names the instance (`data-af-*` is the kit's and is not taken). For a
+  field (`TextField`, `Select`, `Chip`) the root is today the wrapper, not the control. On the phone the
+  pass-through is `testID` (the root's, and the prefix of its parts' ids: `<testID>.<part>`), `nativeID`,
+  `accessibilityLabel`, `accessibilityHint` and `ref`. No other HTML attribute passes through. The
+  accessible name comes from `label`. `styles` is per part (`styles={{ root: { … } }}`) and `strings` is
+  the text the kit draws, for this instance.
 - **A container takes children.** `<Card>…</Card>`, `<Dialog>…</Dialog>`, `<BottomSheet>…</BottomSheet>`.
   A component has no AntFabric sample as a default: pass the icon, the avatar, the actions you want.
 - **Events carry documented arguments, not DOM events.** `onPress()`, `onValueChange(value)`.

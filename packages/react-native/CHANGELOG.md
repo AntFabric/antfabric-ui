@@ -12,6 +12,11 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 4: packaging and icons
 
+- The types resolve under `moduleResolution: node16` and `nodenext`: the `.d.ts` files' relative imports name their `.js` (H11).
+- Every published file starts with `"use client"`, as the web kit's do; Metro ignores it (H12).
+- Each `.js` file ships with its source map (L72).
+- CONSUMING.md: charts from `./data` draw their text in Geist on every theme, so an app on `themes.antfabric` that draws them loads the `Geist-*` files beside Figtree (M56); `testID`, `nativeID`, `accessibilityLabel`, `accessibilityHint` and `ref` pass through to a component's root (L71).
+
 ### Batch 5: data core
 
 ### Batch 6: the app drives the state

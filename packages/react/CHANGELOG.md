@@ -12,6 +12,11 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 4: packaging and icons
 
+- The types resolve under `moduleResolution: node16` and `nodenext`: the `.d.ts` files' relative imports name their `.js` (H11).
+- Every published file starts with `"use client"`, so a React Server Component (the Next.js App Router) can import the kit from any entry (H12).
+- Each `.js` file ships with its source map (L72).
+- CONSUMING.md: `id`, `className`, `ref`, `data-*` and `aria-*` do pass through to a component's root (L71); a strict CSP needs `style-src 'unsafe-inline'`, since the kit draws with inline styles and the root takes no `nonce`.
+
 ### Batch 5: data core
 
 ### Batch 6: the app drives the state

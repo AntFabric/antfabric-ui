@@ -3,7 +3,9 @@
  * a throwaway project outside the repository, then
  *   (a) server-renders `<AntFabricRoot><Button/></AntFabricRoot>` from `@antfabric/ui-react`,
  *   (b) loads `@antfabric/ui-core`, `@antfabric/ui-core/dtcg`, `@antfabric/ui-core/chart`, `@antfabric/ui-core/tokens.json` and the fonts `fonts.css` names,
- *   (c) type-checks a small consumer file against each package's published `.d.ts`,
+ *   (c) type-checks a small consumer file against each package's published `.d.ts`, under `moduleResolution` bundler and nodenext; checks
+ *       that every file of the kits starts with `"use client"` and none of core's does, that every `.js` has its source map, and which of
+ *       core's entries load in Node under the `react-server` condition (those that do not are listed in `SERVER_TODO`),
  *   (d) proves the data subpaths are the only way to reach the chart libraries: a consumer that imports only the kits' root entries,
  *       bundled by esbuild, holds no recharts, react-native-gifted-charts, gifted-charts-core or d3 module (and one that imports a
  *       `/data` entry does, so the proof is not an empty one), and the published `exports` carry `./data`,
@@ -200,7 +202,7 @@ import { defineTheme, themeCss, themes, tokensCss, tokenVars, type Scheme, type 
 import { antfabric, antfabricStrings } from "@antfabric/ui-core/antfabric";
 import { tokensDtcg } from "@antfabric/ui-core/dtcg";
 import { fmt, niceScale, type FormatSpec, type Scale } from "@antfabric/ui-core/chart";
-import tokens from "@antfabric/ui-core/tokens.json";
+import tokens from "@antfabric/ui-core/tokens.json" with { type: "json" };
 
 const props: ButtonProps = { label: "Send", variant: "primary", onPress: () => {} };
 // @ts-expect-error variant is a closed union
@@ -323,8 +325,35 @@ export { bad };
 const base = { target: "ES2022", module: "ESNext", moduleResolution: "Bundler", jsx: "react-jsx", strict: true, noEmit: true, skipLibCheck: true, resolveJsonModule: true, noUncheckedIndexedAccess: true, verbatimModuleSyntax: true };
 writeFileSync(join(app, "tsconfig.web.json"), JSON.stringify({ compilerOptions: { ...base, lib: ["ES2022", "DOM", "DOM.Iterable"] }, files: ["web.tsx"] }));
 writeFileSync(join(app, "tsconfig.native.json"), JSON.stringify({ compilerOptions: { ...base, lib: ["ES2022"], types: ["react-native"] }, files: ["native.tsx"] }));
-for (const cfg of ["web", "native"]) run(join(app, "node_modules/.bin/tsc"), ["-p", `tsconfig.${cfg}.json`], app, `tsc against the ${cfg} consumer file`);
-console.log("  tsc: web.tsx (react with its item types, react/data, react/shell, react/chat, core, core/dtcg, tokens.json) and native.tsx (react-native, react-native/data, react-native/shell, react-native/chat, core) type-check against the published .d.ts");
+// The same two files under Node's own resolution (`nodenext`), which follows only relative imports that name their file.
+const nodenext = { ...base, module: "NodeNext", moduleResolution: "NodeNext" };
+writeFileSync(join(app, "tsconfig.web-nodenext.json"), JSON.stringify({ compilerOptions: { ...nodenext, lib: ["ES2022", "DOM", "DOM.Iterable"] }, files: ["web.tsx"] }));
+writeFileSync(join(app, "tsconfig.native-nodenext.json"), JSON.stringify({ compilerOptions: { ...nodenext, lib: ["ES2022"], types: ["react-native"] }, files: ["native.tsx"] }));
+for (const cfg of ["web", "native", "web-nodenext", "native-nodenext"]) run(join(app, "node_modules/.bin/tsc"), ["-p", `tsconfig.${cfg}.json`], app, `tsc against the ${cfg} consumer file`);
+console.log("  tsc: web.tsx (react with its item types, react/data, react/shell, react/chat, core, core/dtcg, tokens.json) and native.tsx (react-native, react-native/data, react-native/shell, react-native/chat, core) type-check against the published .d.ts, under moduleResolution bundler and nodenext");
+
+// Server components: every file of the kits starts with "use client" (a server file that imports one gets a client boundary, not
+// a crash), core's do not, and each core entry either loads in Node under the `react-server` condition (React's server build, which
+// has no createContext or useState) or is listed below as one that does not yet. A listed one that loads must come off the list.
+const SERVER_TODO = { ".": "state.ts and strings/react.ts call createContext at module scope", "./chart": "tween.ts imports useState, and its chunk holds state.ts" };
+for (const name of NAMES) {
+  const dist = join(app, "node_modules/@antfabric", `ui-${name}`, "dist");
+  for (const f of readdirSync(dist, { recursive: true }).filter((f) => f.endsWith(".js"))) {
+    const code = readFileSync(join(dist, f), "utf8");
+    const client = code.startsWith('"use client";');
+    if (name === "core" ? client : !client) fail(`${name}: dist/${f} ${client ? "starts" : "does not start"} with "use client"`);
+    if (!code.includes(`//# sourceMappingURL=${f.split("/").pop()}.map`) || !statSync(join(dist, `${f}.map`), { throwIfNoEntry: false })) fail(`${name}: dist/${f} has no source map`);
+  }
+}
+const serverLoads = {};
+for (const sub of Object.keys(read(join(app, "node_modules/@antfabric/ui-core/package.json")).exports).filter((s) => !/json|css|\*/.test(s))) {
+  const spec = sub === "." ? "@antfabric/ui-core" : `@antfabric/ui-core/${sub.slice(2)}`;
+  const r = spawnSync("node", ["--conditions=react-server", "--input-type=module", "-e", `await import(${JSON.stringify(spec)});`], { cwd: app, encoding: "utf8" });
+  serverLoads[sub] = r.status === 0;
+  if (r.status !== 0 && !SERVER_TODO[sub]) fail(`core: ${spec} does not load under the react-server condition\n${r.stderr.split("\n").slice(0, 6).join("\n")}`);
+  if (r.status === 0 && SERVER_TODO[sub]) fail(`core: ${spec} now loads under the react-server condition; take "${sub}" off SERVER_TODO in scripts/verify-packages.mjs`);
+}
+console.log(`  server: every react and react-native dist file starts with "use client", none of core's do, every .js has its .map; under react-server core ${Object.entries(serverLoads).map(([s, ok]) => `${s} ${ok ? "loads" : "does not (listed)"}`).join(", ")}`);
 
 // The published .d.ts files reference only the package itself, its dependency and its peers.
 const allowed = {
