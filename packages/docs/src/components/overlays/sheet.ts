@@ -74,7 +74,7 @@ const docs: ComponentDocs = {
     showClose: {
       type: "boolean",
       default: true,
-      description: "Draws the ✕ in the header.",
+      description: "Draws the ✕ in the header. On the phone the ✕ sits beside the title, so a sheet with no title draws none there: it is put away by its handle, a drag down, a press on the scrim or Android's back.",
     },
     label: {
       type: "string",
@@ -111,6 +111,7 @@ const docs: ComponentDocs = {
       base: "The BottomSheet, with the title, the ✕, the subtitle at the top of the body and the footer under it; `side` and `width` are the web's. Drawn where it is mounted, as the BottomSheet is: the app presents it (a Modal or its navigator's sheet)",
       import: "import { Sheet } from \"@antfabric/ui-react-native\"",
       alternative: "BottomSheet",
+      notes: ["The ✕ is drawn in the title row, so it needs a `title`: a sheet named only by `label` has its handle (named Dismiss) and the drag down instead."],
     },
   },
   a11y: {
@@ -144,6 +145,11 @@ const docs: ComponentDocs = {
       title: "A window narrower than the sheet",
       platforms: ["web", "desktop"],
       handling: "The panel is never wider than the window: on a phone-width browser it fills it.",
+    },
+    {
+      title: "A right-click, or a press on the scrim's scrollbar",
+      platforms: ["web", "desktop"],
+      handling: "A press on the scrim cancels only when the primary button goes down and comes up on it. A right-click or middle-click, a press on the scrollbar of a scrim that scrolls, and a drag that starts on the scrim and ends in the panel (selecting its text) leave it open.",
     },
     {
       title: "Something must be finished first",

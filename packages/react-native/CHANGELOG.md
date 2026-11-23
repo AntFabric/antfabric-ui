@@ -98,6 +98,10 @@ A component never shows the result of a request before the app confirms it (S2, 
 - A nested `ThemeProvider` (the way to scope `strings`) keeps the parent's `scheme`, `os` and `osVersion` when it is not given them. Before, it reset them to light and the device, so a chart under it drew light on a dark screen (M4).
 - `createStyles` holds each component's StyleSheet weakly by its token object, so the sheets of a theme that `resolveTokens` has let go of (a live theme picker) are freed. Before, the cache grew with every theme (M53).
 - `fontScale.control` is 2: a button's, chip's, field's or segment's label grows with Dynamic Type and Android's font scale up to 200% (WCAG 1.4.4). Before, it stopped at 150%. Those controls take `minHeight`, so the grown label fits. `fontScale.chrome` (tab bar labels, badges, axis ticks) stays 1.3 (M54).
+- Tabs: a `value` no tab has (or none) chooses no tab and draws no bar, as the docs said; the kit selected the first tab, even a disabled one. A disabled tab's dimming is part of the `tab` part, so `styles.tab` can restyle it (M23, owner decision).
+- Popover: the backdrop is named Close (`common`'s close; Popover takes `strings`), not the trigger's label, and the panel is placed again when the window's size changes (the phone turned) (L16, L19).
+- UpdateBanner: the restart sheet takes screen-reader focus at its title when it opens, and the escape gesture puts it away (L16).
+- BottomSheet: a sheet put away is hidden from TalkBack too (`importantForAccessibility`), not only from VoiceOver (L16).
 
 ## 1.0.0
 

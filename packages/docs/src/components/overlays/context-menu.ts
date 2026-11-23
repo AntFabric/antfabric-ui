@@ -105,6 +105,11 @@ const docs: ComponentDocs = {
       type: "event",
       args: "emoji: string",
     },
+    onMoreReactions: {
+      type: "event",
+      platforms: ["web", "desktop"],
+      description: "The + after the quick set was pressed. The kit draws no emoji picker on web and desktop: the app opens its own (the message row's Add a reaction picker) and reacts through it. The phone's + opens the kit's emoji panel instead (picking).",
+    },
     onSelect: {
       type: "event",
       args: "item: ContextMenuItem",
@@ -131,7 +136,19 @@ const docs: ComponentDocs = {
         },
         {
           keys: "↑ / ↓",
-          action: "Moves between rows; ← / → move across the quick reactions",
+          action: "Moves between rows; ↑ from the first row (↓ from the last) moves to the quick reactions, and ↓ (↑) from them back to the rows",
+        },
+        {
+          keys: "← / → · Home / End",
+          action: "Move across the quick reactions and the +",
+        },
+        {
+          keys: "Enter / Space",
+          action: "On a quick reaction: reacts; on the +: calls onMoreReactions",
+        },
+        {
+          keys: "Tab",
+          action: "Closes, from the rows and from the quick reactions",
         },
         {
           keys: "Esc",
@@ -157,6 +174,10 @@ const docs: ComponentDocs = {
         {
           keys: "Ctrl+click",
           action: "Same as right-click on macOS",
+        },
+        {
+          keys: "↑ / ↓ · ← / →",
+          action: "As on the web: ↑ from the first row reaches the quick reactions, ← → move across them",
         },
         {
           keys: "Esc",

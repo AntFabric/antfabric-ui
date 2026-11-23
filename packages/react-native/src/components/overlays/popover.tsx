@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Modal, Pressable, View, type LayoutRectangle, type ViewStyle } from "react-native";
-import { recipes, useControllable } from "@antfabric/ui-core";
+import { Dimensions, Modal, Pressable, View, type LayoutRectangle, type ViewStyle } from "react-native";
+import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Enter } from "../../lib/motion";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -36,6 +36,8 @@ export interface PopoverProps extends RootProps {
   children?: ReactNode;
   /** Per-part styles over the theme: `{ root: {…}, panel: {…} }`. */
   styles?: PartStyles<"popover">;
+  /** This popover's built-in text (the backdrop's name, `common`'s close) over the tree's and the English defaults. */
+  strings?: Partial<KitStrings["popover"]>;
   style?: ViewStyle;
 }
 
@@ -68,11 +70,13 @@ export function Popover({
   triggerLabel = "Open",
   children,
   styles,
+  strings,
   style,
   testID,
   ...rest
 }: PopoverProps) {
   const s = useStyles();
+  const str = useStrings("popover", strings);
   const { t } = useTheme();
   const r = useRecipe(recipes.popover, { variants: { bare }, styles });
   const [shown = false, setShown] = useControllable(open, onOpenChange);
@@ -85,8 +89,13 @@ export function Popover({
 
   // The trigger is measured each time the panel shows, however it was opened (its own press or the `open` prop): until then the panel is
   // drawn unseen, so it is never left invisible over a backdrop that takes the next tap.
+  // A turn of the phone (or a split-screen resize) moves the trigger, so it is measured again then.
   useEffect(() => {
-    if (floating && shown) trigger.current?.measureInWindow((x, y, w, h) => setAt({ x, y, width: w, height: h }));
+    if (!floating || !shown) return;
+    const measure = () => trigger.current?.measureInWindow((x, y, w, h) => setAt({ x, y, width: w, height: h }));
+    measure();
+    const sub = Dimensions.addEventListener("change", measure);
+    return () => sub.remove();
   }, [floating, shown]);
 
   const toggle = () => setShown(!shown);
@@ -132,7 +141,7 @@ export function Popover({
           <Pressable
             style={s.backdrop}
             accessibilityRole="button"
-            accessibilityLabel={label || triggerLabel}
+            accessibilityLabel={str("close")}
             onPress={() => setShown(false)}
             onLayout={(e) => setScreen({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}
           />

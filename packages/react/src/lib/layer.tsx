@@ -10,7 +10,7 @@ import { isComposing } from "./keys";
  * - On the server (and the first client render of a hydrated page) there is no root to find yet: the overlay is drawn in place, as the
  *   catalogue's pictures and the render snapshots draw it. After that it moves into the layer before the browser paints.
  * - A stack keeps the overlays that are open in the order they opened: only the top one takes Esc (that nothing focused inside took) and
- *   a press outside.
+ *   a press outside: the primary button going down and coming up outside it (never a right-click, nor a press on a scrollbar).
  * - A modal layer locks the page's scroll (counted, so stacked modals release it once) and makes the rest of its root `inert`, a modal
  *   layer under it included.
  */
@@ -96,25 +96,54 @@ function onKey(e: KeyboardEvent) {
   top[1]();
 }
 
-function onPress(e: PointerEvent) {
+/** `target` is outside `entry`'s elements, and not on a toast (ToastRegion), which is not outside the overlay under it. */
+function outside(entry: Entry, target: EventTarget | null): boolean {
+  const node = target as Node | null;
+  if (node && entry.inside().some((el) => el?.contains(node))) return false;
+  return !(node instanceof Element && node.closest("[data-af-layer-passive]"));
+}
+
+/** The press landed on the target's own scrollbar (a scrim that scrolls a tall dialog): past its client box, inside its border box. */
+function onScrollbar(e: PointerEvent): boolean {
+  const el = e.target;
+  if (!(el instanceof HTMLElement) || !el.clientWidth || (el.scrollHeight <= el.clientHeight && el.scrollWidth <= el.clientWidth)) return false;
+  const box = el.getBoundingClientRect();
+  const x = e.clientX - box.left - el.clientLeft;
+  const y = e.clientY - box.top - el.clientTop;
+  return x < 0 || y < 0 || x > el.clientWidth || y > el.clientHeight;
+}
+
+/** The top overlay a press outside began over: a press outside is the primary button going down, and coming up, outside it. */
+let pressedOver: Entry | null = null;
+
+function onDown(e: PointerEvent) {
+  pressedOver = null;
+  // A right-click, a middle-click and a press on a scrollbar are not a press outside.
+  if (e.button !== 0) return;
   const top = topWith("onOutside");
-  if (!top) return;
-  const target = e.target as Node | null;
-  if (target && top[0].inside().some((el) => el?.contains(target))) return;
-  // A press on a toast (ToastRegion) is not a press outside the overlay under it.
-  if (target instanceof Element && target.closest("[data-af-layer-passive]")) return;
-  top[1]();
+  if (top && outside(top[0], e.target) && !onScrollbar(e)) pressedOver = top[0];
+}
+
+function onUp(e: PointerEvent) {
+  const began = pressedOver;
+  pressedOver = null;
+  if (!began || e.button !== 0) return;
+  // A press that began outside and was dragged into the panel (selecting its text) is not one either.
+  const top = topWith("onOutside");
+  if (top && top[0] === began && outside(began, e.target)) top[1]();
+}
+
+function onCancel() {
+  pressedOver = null;
 }
 
 function listen(on: boolean) {
   if (typeof document === "undefined") return;
-  if (on) {
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("pointerdown", onPress, true);
-  } else {
-    document.removeEventListener("keydown", onKey);
-    document.removeEventListener("pointerdown", onPress, true);
-  }
+  const method = on ? "addEventListener" : "removeEventListener";
+  document[method]("keydown", onKey as EventListener);
+  document[method]("pointerdown", onDown as EventListener, true);
+  document[method]("pointerup", onUp as EventListener, true);
+  document[method]("pointercancel", onCancel, true);
 }
 
 /**

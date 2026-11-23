@@ -37,7 +37,8 @@ function Retry({ styles, strings, onPress }: { styles?: PartStyles<"connection-b
       data-af-part="retry"
       type="button"
       data-af-press
-      aria-label={s("tryNowLabel")}
+      // Named by its words (WCAG 2.5.3); the longer sentence is its description and tooltip.
+      title={s("tryNowLabel")}
       onClick={() => onPress()}
       {...ui.handlers}
       style={css(pressable, { flexShrink: 0, justifyContent: "center", textDecoration: "underline" }, partStyle(r, "retry", ui.hovered && { opacity: 0.75 }))}

@@ -378,6 +378,11 @@ const docs: ComponentDocs = {
       handling: "The CTA disables the moment it is pressed; the request carries an idempotency key. The spinner appears after 300 ms and stays at least 400 ms. While in flight, Cancel, Esc and the scrim do nothing — closing would hide the outcome. After 8 s the label reads \"Still deleting…\". A failure keeps the dialog open with the reason inline, and the same button retries.",
     },
     {
+      title: "A right-click, or a press on the scrim's scrollbar",
+      platforms: ["web", "desktop"],
+      handling: "A press on the scrim cancels only when the primary button goes down and comes up on it. A right-click or middle-click, a press on the scrollbar of a scrim that scrolls, and a drag that starts on the scrim and ends in the panel (selecting its text) leave it open.",
+    },
+    {
       title: "Esc and focus",
       platforms: ["web", "desktop"],
       handling: "Esc is Cancel and closes only the topmost layer — an open menu first, then the confirm, then the form beneath. Tab and Shift+Tab wrap inside the panel; with nothing focusable, Tab does nothing rather than escaping. On close, focus returns to the control that opened it, or to the pane heading if that control is gone. In macOS full screen, Esc is consumed by the app before the system sees it, so cancelling a dialog never also exits full screen.",

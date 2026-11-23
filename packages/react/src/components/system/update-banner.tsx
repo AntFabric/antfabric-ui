@@ -160,8 +160,8 @@ function Card({
       <button
         type="button"
         data-af-press
-        aria-label={action}
-        aria-describedby={`${ids}-title ${ids}-detail`}
+        // Named by what it shows (WCAG 2.5.3: a voice user says the words they see); what a press does is its description and tooltip.
+        aria-labelledby={`${ids}-title ${ids}-detail`}
         title={action}
         aria-busy={pending || undefined}
         aria-disabled={pending || undefined}

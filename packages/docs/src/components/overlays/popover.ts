@@ -130,7 +130,11 @@ const docs: ComponentDocs = {
       status: "ready",
       base: "A Pressable round the trigger; while open, the panel is drawn in a transparent Modal over the screen, placed from the trigger's measureInWindow and flipped where there is no room. A press on the backdrop and Android's back close it",
       import: "import { Popover } from \"@antfabric/ui-react-native\"",
-      notes: ["`modal` marks the panel accessibilityViewIsModal, so a screen reader stays inside it."],
+      notes: [
+        "`modal` marks the panel accessibilityViewIsModal, so a screen reader stays inside it.",
+        "The backdrop is a button named Close (`common`'s close), so a screen reader can put the panel away as a press outside does.",
+        "Placed once it is measured: from the trigger's window position when it opens, and again when the window's size changes (the phone turned, a split screen resized). It does not follow a scroll under it, which the Modal stops anyway.",
+      ],
     },
   },
   a11y: {
@@ -167,6 +171,16 @@ const docs: ComponentDocs = {
       title: "Opened from a dialog",
       platforms: ["web", "desktop"],
       handling: "The popover is above the dialog in the layer stack: Esc and a press outside close the popover first, and the dialog keeps its own.",
+    },
+    {
+      title: "A dialog or popover opened from the panel",
+      platforms: ["web", "desktop"],
+      handling: "A layer opened from the panel's content is drawn in the overlay layer, outside the popover in the page, though React passes its clicks up through the popover. Only a press on the trigger toggles the popover: a click inside the inner layer leaves it open, and the inner layer, on top of the stack, takes Esc and a press outside first.",
+    },
+    {
+      title: "A right-click, or a drag that ends inside",
+      platforms: ["web", "desktop"],
+      handling: "A press outside is the primary button going down and coming up outside the panel and its trigger. A right-click, a middle-click, a press on a scrollbar and a drag from outside into the panel (selecting its text) leave it open.",
     },
     {
       title: "The page scrolls while it is open",

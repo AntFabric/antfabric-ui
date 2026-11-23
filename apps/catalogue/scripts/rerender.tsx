@@ -1084,6 +1084,107 @@ const HANDOFF_CASES: HandoffCase[] = [
       }
       await m.done();
     }
+    // A link row takes Space, as every other row does.
+    if (want("menu")) {
+      drawn.add("menu");
+      const chosen: unknown[] = [];
+      const items = [
+        { label: "Open in a new window", href: "/channels/platform-eng" },
+        { label: "Copy link" },
+      ];
+      const m = await mountWeb(createElement(Kit.Menu, { label: "Message actions", items, onSelect: (item: unknown) => void chosen.push(item) }));
+      const link = m.host.querySelector<HTMLElement>('a[role="menuitem"]');
+      if (!link) found.keys.add("menu/web: no link row drawn in the Space probe");
+      else {
+        await act(async () => link.focus());
+        const ev = await press(" ");
+        if (chosen.length !== 1) found.keys.add("menu/web: Space on a link row does not choose it");
+        else if (!ev.defaultPrevented) found.keys.add("menu/web: Space on a link row is left to scroll the page");
+      }
+      await m.done();
+    }
+    // The quick reactions are a stop of the menu's arrows: ↑ from the first row, ← → across, ↓ back; Tab closes; + reports itself.
+    if (want("context-menu")) {
+      drawn.add("context-menu");
+      const closed: unknown[] = [];
+      const more: unknown[] = [];
+      const items = [{ label: "Reply in thread" }, { label: "Copy text" }];
+      const m = await mountWeb(createElement(Kit.ContextMenu, { quickReactions: ["👍", "🎉"], items, onClose: () => closed.push(1), onMoreReactions: () => more.push(1) }));
+      const group = m.host.querySelector<HTMLElement>('[role="group"]');
+      const rows = Array.from(m.host.querySelectorAll<HTMLElement>('[role="menuitem"]'));
+      const reactions = Array.from(group?.querySelectorAll<HTMLElement>("button") ?? []);
+      if (!group || rows.length !== 2 || reactions.length !== 3) found.keys.add("context-menu/web: no quick reactions and rows drawn in the arrows probe");
+      else {
+        await act(async () => rows[0]!.focus());
+        await press("ArrowUp");
+        if (document.activeElement !== reactions[0]) found.keys.add("context-menu/web: ↑ from the first row does not reach the quick reactions");
+        else {
+          await press("ArrowRight");
+          if (document.activeElement !== reactions[1]) found.keys.add("context-menu/web: → does not move across the quick reactions");
+          await press("ArrowDown");
+          if (document.activeElement !== rows[0]) found.keys.add("context-menu/web: ↓ from the quick reactions does not go back to the first row");
+        }
+        await act(async () => rows[1]!.focus());
+        await press("ArrowDown");
+        if (document.activeElement !== reactions[0]) found.keys.add("context-menu/web: ↓ from the last row does not reach the quick reactions");
+        await act(async () => reactions[2]!.click());
+        if (more.length !== 1) found.keys.add("context-menu/web: + does not call onMoreReactions");
+        await act(async () => reactions[0]!.focus());
+        await press("Tab");
+        if (closed.length !== 1) found.keys.add("context-menu/web: Tab from the quick reactions does not close the menu");
+      }
+      await m.done();
+    }
+    // A click inside a layer opened from the panel (an inner modal Dialog) is not a press on the popover's trigger.
+    if (want("popover")) {
+      drawn.add("popover");
+      const changes: unknown[] = [];
+      const inner = createElement(Kit.Dialog, { modal: true, kind: "form", title: "Save this filter", body: "Name it to find it again." });
+      const m = await mountWeb(createElement(Kit.Popover, { open: true, label: "Filters", onOpenChange: (open: boolean) => void changes.push(open), content: inner, children: createElement("button", { type: "button" }, "Filters") }));
+      const dialog = Array.from(document.querySelectorAll<HTMLElement>('[role="dialog"], [role="alertdialog"]')).find((el) => el.getAttribute("aria-modal") === "true");
+      if (!dialog) found.keys.add("popover/web: no inner modal Dialog drawn in the nested-layer probe");
+      else {
+        await act(async () => dialog.click());
+        if (changes.length) found.keys.add(`popover/web: a click inside a Dialog opened from the panel calls onOpenChange(${String(changes[0])})`);
+      }
+      await m.done();
+    }
+    // A press on the scrim cancels only with the primary button, down and up on the scrim (L15).
+    if (want("dialog")) {
+      drawn.add("dialog");
+      const cancels: unknown[] = [];
+      const m = await mountWeb(createElement(Kit.Dialog, { modal: true, kind: "form", title: "Move AF-1182", body: "Pick a project.", onCancel: () => cancels.push(1) }));
+      const panel = Array.from(document.querySelectorAll<HTMLElement>('[aria-modal="true"]')).at(-1);
+      const scrim = panel?.closest<HTMLElement>('[data-af-part="root"]');
+      if (!panel || !scrim) found.keys.add("dialog/web: no scrim drawn in the scrim-press probe");
+      else {
+        const fire = async (el: HTMLElement, type: string, button: number) => act(async () => void el.dispatchEvent(new PointerEvent(type, { bubbles: true, button, pointerId: 1, pointerType: "mouse" })));
+        await fire(scrim, "pointerdown", 2);
+        await fire(scrim, "pointerup", 2);
+        if (cancels.length) found.keys.add("dialog/web: a right-click on the scrim cancels");
+        await fire(scrim, "pointerdown", 0);
+        await fire(panel, "pointerup", 0);
+        if (cancels.length) found.keys.add("dialog/web: a press from the scrim that ends in the panel cancels");
+        await fire(scrim, "pointerdown", 0);
+        await fire(scrim, "pointerup", 0);
+        if (cancels.length !== 1) found.keys.add("dialog/web: a primary press on the scrim does not cancel");
+      }
+      await m.done();
+    }
+    // A value no tab has chooses none, and the first enabled tab is the strip's tab stop.
+    if (want("tabs")) {
+      drawn.add("tabs");
+      const items = [
+        { key: "messages", label: "Messages", disabled: true },
+        { key: "pinned", label: "Pinned" },
+      ];
+      const m = await mountWeb(createElement(Kit.Tabs, { items, value: "thread" }));
+      const tabs = Array.from(m.host.querySelectorAll<HTMLElement>('[role="tab"]'));
+      if (tabs.some((el) => el.getAttribute("aria-selected") === "true")) found.keys.add("tabs/web: a value no tab has selects a tab");
+      const stops = tabs.filter((el) => el.tabIndex === 0);
+      if (stops.length !== 1 || stops[0] !== tabs[1]) found.keys.add("tabs/web: with none chosen, the first enabled tab is not the one tab stop");
+      await m.done();
+    }
   } catch (e) {
     errors++;
     keep.error(`  ✗ layered keys probe: ${(e as Error).message}`);

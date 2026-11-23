@@ -61,6 +61,7 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 - `formatShortcut` reads the plus key: `"Mod++"` (or `"Shift+Plus"`) is `⌘+` on a Mac and `Ctrl+Plus` elsewhere. Before, it threw off the Mac, which crashed the render of any menu item or button with that shortcut (M52).
 - `formatShortcut(keys, "browser")` still reads as Ctrl, since a server render cannot know the visitor's machine. The web kit now gives the visitor's OS as `usePlatform().shortcutOs` (L73).
 - `initials` keeps the first character whole as a person sees it (`Intl.Segmenter`, or `Array.from` where there is none): `"🦊 Fox"` is `🦊F`, a ZWJ family or a flag stays one glyph. Before, an emoji was cut in half and drew `�` (L39).
+- Strings: an empty `popover` group, so the phone's Popover takes `strings` for its backdrop's name (`common`'s `close`). The doc comments of `connection-banner.tryNowLabel` and `update-banner.installLabel`, `restartLabel` and `retryLabel` say they are now descriptions, not names; the English text is unchanged (L16, L18).
 
 ## 1.0.0
 

@@ -133,7 +133,7 @@ const docs: ComponentDocs = {
   a11y: {
     notes: [
       "A change of stage is spoken when it happens, through the page's own announcer on the web and desktop (a failure assertively, with the updater's reason read out after the title) and through the screen reader's announcement call on the phone for a failure, the latest-version note and the store notice. Progress is not read out percent by percent. The card is not a live region itself: one that arrives holding its text is not read.",
-      "The card's button is named by the whole action (\"Restart to update to version 0.43.0\") and described by the title and the detail line, so reaching it reads the failure too. The web's reload line is announced the same way.",
+      "The card's button is named by what it shows, its title and its detail line (\"Restart to update v0.43.0\"), so a voice user says the words they see (WCAG 2.5.3) and reaching it reads the failure too; the whole action (\"Restart to update to version 0.43.0\") is its description and tooltip. The web's reload line is announced the same way.",
       "On the phone Android's back button puts the restart sheet away.",
       "The detail line truncates for sighted readers only; the full error is in the DOM and in the tooltip.",
     ],

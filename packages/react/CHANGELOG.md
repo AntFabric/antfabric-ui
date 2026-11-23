@@ -106,6 +106,12 @@ A component never shows the result of a request before the app confirms it (S2, 
 - The focus ring shows when a key is pressed on a control focused by a click, as `:focus-visible` does. A shortcut with ⌘, Ctrl or Alt held does not show it (L68).
 - Hover and press end when a control becomes disabled, so it is not drawn hovered when it is enabled again (L69).
 - IconButton, Menu and MenuButton no longer throw where there is no `matchMedia` (jsdom in Jest or Vitest); they treat the pointer as fine there (L8, in part: Select still needs `matchMedia`, and SegmentedControl and the data components' frame need `ResizeObserver`).
+- Popover: a click inside a layer opened from the panel (an inner Dialog or Popover) no longer closes it; only a press on the trigger toggles it (M13).
+- ContextMenu: the quick reactions are reachable from the keyboard: ↑ from the first row (↓ from the last) moves into them, ← → (Home, End) across them, ↓ (↑) back to the rows; Tab closes from them as from the rows. The + calls a new event `onMoreReactions` (web and desktop), where the app opens its own emoji picker; it did nothing before (M14).
+- Tabs: a `value` no tab has (or none) chooses no tab and draws no bar, as the docs said; the kit selected the first tab, even a disabled one. The first enabled tab is then the strip's tab stop. Pass the key of the tab you want chosen (M23, owner decision).
+- Menu: a link row (`href`) takes Space as every other row does (L14).
+- Dialog, Sheet, Popover: a press outside (the scrim) closes only when the primary button goes down and comes up outside. A right-click, a middle-click, a press on the scrim's scrollbar or a drag that ends in the panel leave it open (L15).
+- UpdateBanner: the card is named by its title and detail, what it shows; the action ("Install the update, version …") is its description and tooltip. ConnectionBanner: Try now is named by its words, "Try reconnecting now" its description and tooltip (L18, WCAG 2.5.3).
 
 ## 1.0.0
 
