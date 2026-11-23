@@ -2754,6 +2754,26 @@ function checkThemes() {
   throws("a value that breaks out of its declaration", () => defineTheme({ name: "Typo", extends: null, tokens: { shared: { radius: { card: "4px;}body{display:none" } } } }), ["Typo", "radius.card"]);
   throws("a bad brand colour", () => defineTheme({ name: "Typo", extends: null, brand: { primary: "teal" } }), ["Typo", "brand"]);
   throws("a bad mono family", () => defineTheme({ name: "Typo", extends: null, fonts: { mono: "Mono; color: red" } }), ["Typo", "fonts"]);
+  // A hand-picked brand colour is a colour: hex, rgb() or hsl(), never a url or a word, naming the theme and the field.
+  for (const field of ["soft", "softHover", "onSoft", "tint"] as const) {
+    throws(`a brand ${field} that is a url`, () => defineTheme({ name: "Typo", extends: null, brand: { [field]: { light: "url(https://x)", dark: "#000" } } }), ["Typo", "brand", `brand.${field}.light`]);
+    throws(`a brand ${field} that is a word`, () => defineTheme({ name: "Typo", extends: null, brand: { [field]: { light: "#000", dark: "teal" } } }), ["Typo", "brand", `brand.${field}.dark`]);
+  }
+  for (const ok of ["#fde8e8", "#fde8e880", "rgba(159,166,255,.14)", "rgb(0 0 0 / 0.1)", "hsl(210 40% 96%)", "hsla(210, 40%, 96%, .5)"])
+    defineTheme({ name: "Fine", extends: null, brand: { soft: { light: ok, dark: ok }, softHover: { light: ok, dark: ok }, onSoft: { light: ok, dark: ok }, tint: { light: ok, dark: ok } } });
+  // A length the phone reads as a number, given in a unit React Native has none for, throws when the phone's tokens are resolved (the web keeps it).
+  for (const [what, value] of [
+    ["a rem", "0.5rem"],
+    ["an em", "1em"],
+    ["a percentage", "10%"],
+    ["a calc", "calc(4px + 2px)"],
+  ] as const) {
+    const remTheme = defineTheme({ name: "Rem", extends: null, tokens: { shared: { radius: { card: value } }, profiles: { mobile: { radius: { card: value } } } } });
+    throws(`${what} on the phone`, () => resolveTokens("mobile", "light", { os: "ios", theme: remTheme }), ["Rem", "radius.card", value]);
+    resolveTokens("web", "light", { theme: remTheme });
+  }
+  if ((flat(resolveTokens("mobile", "light", { os: "ios", theme: defineTheme({ name: "Round", extends: null, tokens: { profiles: { mobile: { radius: { card: "50%" } } } } }) })) as Record<string, unknown>)["radius.card"] !== 9999)
+    err(at, "a theme's 50% radius on the phone is not the circle radius 9999");
   // A value that a stylesheet reads past its declaration: an escaped brace swallows every later block, a comment or an unclosed quote,
   // parenthesis or bracket does the same. Each throws naming the theme, the layer, the path and the character.
   for (const [what, value, ch] of [
@@ -2765,6 +2785,20 @@ function checkThemes() {
     ["an unclosed parenthesis", "rgb(0 0 0", "("],
     ["an unclosed bracket", "a[b", "["],
     ["a stray closing parenthesis", "red)", ")"],
+    ["a newline", "red\nblue", "U+000A"],
+    ["a carriage return", "red\rblue", "U+000D"],
+    ["a tab", "red\tblue", "U+0009"],
+    ["a delete character", "red\u007f", "U+007F"],
+    ["a url", "url(https://x.test/a.png)", "url("],
+    ["an uppercase url with a space", "URL (https://x.test/a.png)", "url("],
+    ["an image-set", "image-set(\"https://x.test/a.png\" 1x)", "image-set("],
+    ["a -webkit-image-set", "-webkit-image-set(\"https://x.test/a.png\" 1x)", "-webkit-image-set("],
+    ["an image", "image(\"https://x.test/a.png\")", "image("],
+    ["a src", "src(\"https://x.test/a.png\")", "src("],
+    ["an element", "element(#logo)", "element("],
+    ["a cross-fade", "cross-fade(red, blue)", "cross-fade("],
+    ["an at-sign", "@import", "@"],
+    ["an important", "red !important", "!"],
   ] as const) {
     throws(`a value with ${what}`, () => defineTheme({ name: "Typo", extends: null, tokens: { schemes: { light: { fg: { body: value } } } } }), ["Typo", "tokens.schemes.light", "fg.body", ch]);
     throws(`a sans family with ${what}`, () => defineTheme({ name: "Typo", extends: null, fonts: { sans: `Foo${value}` } }), ["Typo", "fonts", "Foo"]);
