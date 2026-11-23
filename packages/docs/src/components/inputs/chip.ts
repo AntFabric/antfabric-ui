@@ -133,7 +133,7 @@ const docs: ComponentDocs = {
         },
         {
           gesture: "Tap ✕",
-          action: "Removes; the ✕ has a 44pt hitSlop",
+          action: "Asks to remove (onRemove); the ✕ has a 44pt hitSlop, which the chip's row takes too so iOS reaches it",
         },
       ],
     },

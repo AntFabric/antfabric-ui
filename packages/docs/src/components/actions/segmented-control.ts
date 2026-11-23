@@ -153,7 +153,7 @@ const docs: ComponentDocs = {
       "Each segment is role=tab with aria-selected / accessibilityState.selected. The count chip is hidden and joins the tab's name instead: \"Mentions, 3\".",
       "The strip is one tab stop; the arrow keys move to the neighbouring segment and choose it, and Home and End go to the first and last. In a right-to-left tree ArrowRight goes to the previous segment. A key held with Alt, Cmd, Ctrl or Shift is not taken. There is no live region: the panel change is the feedback.",
       "Web and desktop: each tab's id is the strip's id (or a generated one) and its key (`inbox-view-mentions`); given `panel`, the chosen tab points at that panel with aria-controls, and the panel names itself with aria-labelledby set to the chosen tab's id.",
-      "On the phone each segment's touch area is grown to 44pt without drawing more.",
+      "On the phone each segment's touch area is grown to 44pt without drawing more; the strip takes the same slop, since iOS drops a touch outside a parent before asking its children (a scrollable strip's ScrollView still clips it). VoiceOver and TalkBack never read a container's name, so each tab says the strip's label after its own, as its hint.",
     ],
   },
   examples: [

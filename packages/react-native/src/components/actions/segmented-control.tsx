@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Animated, I18nManager, PanResponder, Pressable, ScrollView, Text, View, type ViewStyle } from "react-native";
+import { Animated, I18nManager, PanResponder, Platform, Pressable, ScrollView, Text, View, type ViewStyle } from "react-native";
 import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { GlassSurface } from "../../lib/glass";
@@ -55,11 +55,13 @@ interface SegmentProps {
   styles?: PartStyles<"segmented-control">;
   strings?: Partial<KitStrings["segmented-control"]>;
   testID?: string;
+  /** The strip's name, said after each tab's on iOS and Android, where a container's own name is never read. */
+  group?: string;
   pick: () => void;
   place: (slot: { x: number; y: number; w: number; h: number }) => void;
 }
 
-function Segment({ item, chosen, full, pick, place, styles, strings, testID }: SegmentProps) {
+function Segment({ item, chosen, full, pick, place, styles, strings, testID, group }: SegmentProps) {
   const { t } = useTheme();
   const s = useStyles();
   const str = useStrings("segmented-control", strings);
@@ -73,6 +75,7 @@ function Segment({ item, chosen, full, pick, place, styles, strings, testID }: S
       accessibilityRole="tab"
       accessibilityLabel={n > 0 ? str("labelWithCount", { label: item.label, count: n }) : item.label}
       accessibilityState={{ selected: chosen }}
+      accessibilityHint={group || undefined}
       hitSlop={typeof tab.view.height === "number" ? hitSlopTo(t.control.hit, tab.view.height) : undefined}
       onPress={pick}
       onLayout={(e) => {
@@ -96,11 +99,16 @@ function Segment({ item, chosen, full, pick, place, styles, strings, testID }: S
 }
 
 export function SegmentedControl({ items, value, full = false, scrollable = false, label = "", onValueChange, styles, strings, style, testID, ...rest }: SegmentedControlProps) {
-  const { glass } = useTheme();
+  const { t, glass } = useTheme();
   const s = useStyles();
   const r = useRecipe(recipes["segmented-control"], { styles });
   const [current = "", setCurrent] = useControllable(value, onValueChange);
   const at = items.findIndex((i) => i.key === current);
+  // Each tab's slop reaches 44pt, but iOS tests a touch against the parents first and drops one outside their bounds: the track and the
+  // root, as tall as the tabs, take the same slop so it is reached. A scrolling strip's ScrollView still clips it.
+  const slop = typeof r.tab.view.height === "number" ? hitSlopTo(t.control.hit, r.tab.view.height) : undefined;
+  // iOS and Android never read a container's name, so each tab says the strip's after its own; the web reads the tablist's.
+  const group = Platform.OS === "web" ? "" : (rest.accessibilityLabel as string | undefined) || label;
 
   // iOS 26's selection lens: dragging across the strip lifts the chosen card into clear glass that
   // follows the finger and settles on the segment under it. A plain tap still lands on the segment.
@@ -144,7 +152,7 @@ export function SegmentedControl({ items, value, full = false, scrollable = fals
   ).current;
 
   const strip = (
-    <View testID={partId(testID, "segmented-control", "track")} accessibilityRole="tablist" accessibilityLabel={label || undefined} {...rootProps(rest)} {...(lensOn ? responder.panHandlers : null)} style={[s.track, partStyle(r, "track", { view: full && { flexGrow: 1 } }).view]}>
+    <View testID={partId(testID, "segmented-control", "track")} accessibilityRole="tablist" accessibilityLabel={label || undefined} hitSlop={slop} {...rootProps(rest)} {...(lensOn ? responder.panHandlers : null)} style={[s.track, partStyle(r, "track", { view: full && { flexGrow: 1 } }).view]}>
       {items.map((item, i) => (
         <Segment
           key={item.key}
@@ -154,6 +162,7 @@ export function SegmentedControl({ items, value, full = false, scrollable = fals
           styles={styles}
           strings={strings}
           testID={testID}
+          group={group}
           pick={() => setCurrent(item.key)}
           place={(slot) => {
             slots.current[i] = slot;
@@ -175,7 +184,7 @@ export function SegmentedControl({ items, value, full = false, scrollable = fals
       </ScrollView>
     );
   }
-  return <View style={[s.root, full && { alignSelf: "stretch" }, style]}>
+  return <View hitSlop={slop} style={[s.root, full && { alignSelf: "stretch" }, style]}>
       {strip}
     </View>;
 }
