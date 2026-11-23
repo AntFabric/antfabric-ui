@@ -74,8 +74,9 @@ export function BottomSheet({
     setGone(true);
     onClose?.();
   };
-  // Focus moves in when the sheet mounts (not when it is drawn already dismissed), Tab stays inside, Esc closes, and focus returns to the opener.
-  const focus = useOverlayFocus<HTMLDivElement>({ initial: gone ? false : "first", trap: true, onEscape: close });
+  // Focus moves in when the sheet mounts (not when it is drawn already dismissed), Tab stays inside, Esc closes, and focus returns to the
+  // opener when it is dismissed (while it slides away, before the app unmounts it).
+  const focus = useOverlayFocus<HTMLDivElement>({ initial: gone ? false : "first", trap: true, onEscape: close, open: !gone });
   // The handle is 5px tall, so a transparent box centred on it reaches the target size without drawing more: a click on it is a click on the handle.
   const height = r.handle.height;
   const handleH = typeof height === "number" ? `${height}px` : (height as string);
@@ -95,6 +96,7 @@ export function BottomSheet({
         data-af-part="panel"
         aria-label={title || undefined}
         aria-hidden={gone || undefined}
+        inert={gone || undefined}
         onKeyDown={focus.onKeyDown}
         onTransitionEnd={(e) => {
           if (gone && e.target === e.currentTarget && e.propertyName === "transform") onDismiss?.();

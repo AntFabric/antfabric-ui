@@ -2,6 +2,7 @@ import { useEffect, useId, type CSSProperties, type ReactNode } from "react";
 import { usePlatform } from "../../platform";
 import { ART_UPDATE, recipes, useDirection, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
+import { useFocusHandoff } from "../../lib/focus";
 import { announce } from "../../lib/announce";
 import { Icon, Spinner } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
@@ -129,6 +130,8 @@ function Card({
   const title = stage === "downloading" ? s("downloading") : stage === "installing" ? s("installing") : stage === "ready" ? s("ready") : stage === "failed" ? s("failed") : s("available");
   const detail = stage === "downloading" ? (progress >= 0 ? s("downloadingPercent", { percent: progress }) : s("downloadingUnknown")) : stage === "failed" ? error : s("versionTag", { version });
   const action = stage === "available" ? s("installLabel", { version }) : stage === "ready" ? s("restartLabel", { version }) : s("retryLabel");
+  // Install (or Retry) becomes the busy card when the updater starts: focus, fallen to the page, follows onto it.
+  const working = useFocusHandoff<HTMLDivElement>(busy);
   const children: ReactNode = (
     <>
       <Art styles={styles} />
@@ -147,7 +150,7 @@ function Card({
   // Not clickable while the updater is working: it says what is happening, and when.
   if (busy) {
     return (
-      <div aria-busy data-af-part="card" style={css(rtl(card, dir), partStyle(r, "card", enter("fade")))}>
+      <div ref={working} tabIndex={-1} aria-busy data-af-part="card" style={css(rtl(card, dir), partStyle(r, "card", enter("fade")))}>
         {children}
       </div>
     );
@@ -178,6 +181,7 @@ function RailIcon({ stage, pending, styles, strings, onPress }: { stage: UpdateB
   const busy = stage === "downloading" || stage === "installing";
   const ui = useInteraction({ disabled: busy });
   const dot = stage === "available" || stage === "ready" || stage === "failed";
+  // Busy, the icon stays in the tab order (aria-disabled, not disabled), so a keyboard press on it keeps its place.
   const r = useRecipe(recipes["update-banner"], { variants: { stage }, state: { hover: ui.hovered, focus: ui.focused }, styles });
   const title = stage === "downloading" ? s("downloading") : stage === "installing" ? s("installing") : stage === "ready" ? s("ready") : stage === "failed" ? s("failed") : s("available");
   return (
@@ -186,10 +190,9 @@ function RailIcon({ stage, pending, styles, strings, onPress }: { stage: UpdateB
       data-af-press
       aria-label={title}
       title={title}
-      disabled={ui.disabled}
-      aria-busy={pending || undefined}
-      aria-disabled={pending || undefined}
-      onClick={() => !pending && onPress()}
+      aria-busy={pending || busy || undefined}
+      aria-disabled={pending || busy || undefined}
+      onClick={() => !pending && !busy && onPress()}
       {...ui.handlers}
       data-af-part="railIcon"
       style={css(pressable, { alignItems: "center", justifyContent: "center" }, partStyle(r, "railIcon", ui.disabled && { cursor: "default" }))}

@@ -34,6 +34,11 @@ export interface OverlayFocusOptions {
   onEscape?: () => void;
   /** Return focus to what had it before the overlay opened, when it closes (default `true`); when that is gone, to the nearest place still there. */
   restore?: boolean;
+  /**
+   * For an overlay that stays mounted while it closes (a sheet drawn sliding away until the app unmounts it): `false` is the close, and
+   * focus goes back then, as it would on the unmount. Default `true`.
+   */
+  open?: boolean;
 }
 
 /**
@@ -46,7 +51,7 @@ export interface OverlayFocusOptions {
  *
  * A component with its own key handling calls `focus.onKeyDown(e)` from it.
  */
-export function useOverlayFocus<T extends HTMLElement = HTMLElement>({ initial = "first", trap = false, onEscape, restore = true }: OverlayFocusOptions = {}): {
+export function useOverlayFocus<T extends HTMLElement = HTMLElement>({ initial = "first", trap = false, onEscape, restore = true, open = true }: OverlayFocusOptions = {}): {
   ref: RefObject<T | null>;
   onKeyDown: (e: KeyboardEvent) => void;
 } {
@@ -56,6 +61,7 @@ export function useOverlayFocus<T extends HTMLElement = HTMLElement>({ initial =
   pick.current = initial;
   const escape = useRef(onEscape);
   escape.current = onEscape;
+  const giveBack = useRef(() => {});
 
   useEffect(() => {
     const panel = ref.current;
@@ -69,7 +75,7 @@ export function useOverlayFocus<T extends HTMLElement = HTMLElement>({ initial =
       const target = how === "panel" ? panel : how === "first" ? focusables(panel)[0] : how(panel);
       (target ?? (how === "first" ? panel : null))?.focus({ preventScroll: true });
     }
-    return () => {
+    giveBack.current = () => {
       if (!restore || !opener) return;
       const at = document.activeElement;
       // Only when focus is still ours to give back: inside the closing panel, or dropped to the page when the panel went.
@@ -79,9 +85,14 @@ export function useOverlayFocus<T extends HTMLElement = HTMLElement>({ initial =
       const near = around.find((el) => el.isConnected);
       if (near) (focusables(near)[0] ?? near.closest<HTMLElement>("[data-af-platform]"))?.focus({ preventScroll: true });
     };
+    return () => giveBack.current();
     // Once per opening: the panel is the overlay's lifetime.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // Closed while still drawn: focus goes back now, not when the app unmounts it.
+  useEffect(() => {
+    if (!open) giveBack.current();
+  }, [open]);
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Escape" && escape.current && !e.defaultPrevented && !isComposing(e)) {
@@ -120,9 +131,29 @@ export function useOverlayFocus<T extends HTMLElement = HTMLElement>({ initial =
 export function useFocusHandoff<T extends HTMLElement = HTMLElement>(swapped: boolean): RefObject<T | null> {
   const ref = useRef<T | null>(null);
   useEffect(() => {
-    if (!swapped || typeof document === "undefined") return;
-    const at = document.activeElement;
-    if (!at || at === document.body) ref.current?.focus({ preventScroll: true });
+    if (swapped && focusDropped()) ref.current?.focus({ preventScroll: true });
   }, [swapped]);
   return ref;
+}
+
+/**
+ * Focus has fallen to the page: it is on nothing or the body, or on an element that is gone, disabled, inert or hidden from assistive tech
+ * (a browser moves focus off the first three to the body; the last it leaves where nobody can see it).
+ */
+export function focusDropped(): boolean {
+  if (typeof document === "undefined") return false;
+  const at = document.activeElement as HTMLElement | null;
+  return !at || at === document.body || !at.isConnected || (at as HTMLButtonElement).disabled === true || !!at.closest('[inert], [hidden], [aria-hidden="true"]');
+}
+
+/**
+ * Hands focus to the control nearest `from` that stays, when focus is inside `from` or has fallen to the page: the first control after it in
+ * Tab order within its AntFabric root, else the last one before it. For a part that goes with the control pressed in it (a dismissed toast or
+ * banner, a reaction taken back to none): call it in the press handler, before the part goes, or after, with an element that is still there.
+ */
+export function focusNear(from: Element | null | undefined): void {
+  if (!from?.isConnected || (!from.contains(document.activeElement) && !focusDropped())) return;
+  const all = focusables(from.closest<HTMLElement>("[data-af-platform]") ?? document.body).filter((el) => !from.contains(el));
+  const next = all.find((el) => from.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) ?? all.reverse().find((el) => from.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING);
+  next?.focus({ preventScroll: true });
 }

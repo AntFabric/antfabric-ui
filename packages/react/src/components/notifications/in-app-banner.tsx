@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { recipes, useControllable, useDirection, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { useAutoFocus } from "../../platform";
 import { t } from "../../tokens";
+import { focusNear } from "../../lib/focus";
 import { useAnnounce } from "../../lib/announce";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
@@ -125,7 +126,10 @@ export function InAppBanner({
   }
   const [open, setOpen] = useControllable(replying);
   const [draft, setDraft] = useControllable(replyText);
+  // The card goes with its × (and with Escape, and an action that dismisses): focus moves to the nearest control that stays.
+  const cardRef = useRef<HTMLDivElement | null>(null);
   const dismiss = (reason: InAppBannerDismissReason) => {
+    focusNear(cardRef.current);
     setGone(true);
     onDismiss?.(reason);
   };
@@ -157,6 +161,7 @@ export function InAppBanner({
     <div role="group" aria-label={s("newNotification")} data-af-part="root" {...rootProps(rest)} style={css(box, r.root, style)}>
       {!gone && (
         <div
+          ref={cardRef}
           onKeyDown={(e) => {
             // Escape in the reply field closes the reply and keeps the draft; anywhere else in the card it puts the banner away.
             if (e.key !== "Escape" || e.target instanceof HTMLInputElement || e.defaultPrevented || isComposing(e)) return;

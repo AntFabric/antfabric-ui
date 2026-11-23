@@ -268,14 +268,19 @@ export const switchRecipe = defineRecipe({
   - A composite group (menu, menubar, toolbar, tablist, radiogroup, listbox) is one tab stop and moves with the arrows:
     `useRovingKeys` from `lib/roving.ts`. A listbox driven from a field moves `aria-activedescendant`. `keysTodo` lists the ones that do not.
   - An overlay keeps `useOverlayFocus` from `lib/focus.ts`: focus in when it opens (unless the tree says `autoFocus={false}`), Tab trapped
-    when modal, Escape, focus back to the opener when it closes. A focused control that is replaced by something else hands focus on
-    (`useFocusHandoff`).
+    when modal, Escape, focus back to the opener when it closes (an overlay drawn sliding away before the app unmounts it passes `open`).
+    A focused control that is replaced by something else hands focus on (`useFocusHandoff`); a busy control stays focusable
+    (`aria-disabled`, Button's `loading`), never `disabled`; a control whose own part goes with it (a dismissed toast or banner) hands
+    focus to the nearest control that stays (`focusNear`). The re-render pass presses each such control from the keyboard and fails when
+    focus falls to the page (`focusTodo`).
   - Escape goes to the innermost handler that uses it: a handler that consumes Escape (or Enter) calls `e.preventDefault()`, and returns
     first when `isComposing(e)` (`lib/keys.ts`), since an IME's keys are its own. An overlay drawn in the layer (`useLayerStack`) takes
     Escape from the stack, which reads only what nothing inside prevented and gives it to the top overlay; it passes no `onEscape` to
     `useOverlayFocus` while it floats.
   - A status that appears is announced: `announce()` from `lib/announce.ts` on the web (never a live region mounted with its text) and
-    from `lib/a11y.ts` on the phone (iOS has no live regions).
+    from `lib/a11y.ts` on the phone (iOS has no live regions). A status that changes in place is `useAnnounce(text)` (both kits): said
+    on each new text, not on the first render unless `initial`. The text stays plain: no component draws `aria-live`, `role="status"`,
+    `role="alert"` or `accessibilityLiveRegion` with text in it, and `pnpm check generic` fails on one in any first render (`liveTodo`).
 - **Composition:** import sibling components from their files (`../actions/button`), never from the
   kit's index.
 - **Icons** are lucide names in kebab case, drawn with the kit's `<Icon name>`; every icon prop is an `IconName`,
