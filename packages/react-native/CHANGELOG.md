@@ -95,6 +95,15 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 12: per-component fixes
 
+- RadioGroup: the drawn question is read on iOS and Android, before the options. VoiceOver and TalkBack never read a View's own name, so the group's label was lost and the legend was hidden (H21). SegmentedControl: each tab says the strip's `label` as its hint there, for the same reason.
+- TextField, SearchField and Select: inside a FormField the field's visible label names the control, not the placeholder (WCAG 2.5.3; M6).
+- Chip and SegmentedControl: the 44pt touch area is reached. iOS drops a touch outside a parent's bounds before asking its children, so the chip's row and the strip now take the same slop as the controls inside (M11). A `scrollable` strip's ScrollView still clips it.
+- TextField: `type="password"` with `autoComplete="new-password"` sets iOS's `newPassword`, so a sign-up field is offered a strong new password, not the saved one (M12). A `required` field with a `tag` says "Required" in its hint; the tag is read where it is drawn (L7).
+- Select: opening a searchable select focuses its search field (otherwise the screen reader lands on the sheet's title), and closing puts VoiceOver and TalkBack back on the trigger (L2).
+- Chip: only a `filter` chip toggles `selected` (L3). The ✕ only reports `onRemove`: the chip stays until your app drops it from its list or sets `removed` (L4).
+- SegmentedControl: the iOS 26 lens keeps its drag when the parent re-renders mid-gesture (L11).
+- Fab: a Fab disabled while it wiggles drops the press and does not fire (L12).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:
