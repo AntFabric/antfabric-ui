@@ -518,12 +518,14 @@ export function Table({ columns, rows, rowKey = "key", sort, onSortChange, selec
     <div data-af-part="root" {...rootProps(rest)} ref={setRoot} style={css(box, { minHeight: 0 }, r.root, style)}>
       <div
         data-af-part="scroll"
+        data-af-scroll
         role="region"
         aria-label={label}
         tabIndex={0}
         onFocus={(e) => own(e) && ui.handlers.onFocus(e)}
         onBlur={(e) => own(e) && ui.handlers.onBlur()}
-        style={css(box, { overflow: "auto", outline: "none" }, maxHeight !== undefined && { maxHeight }, r.scroll)}
+        // Its browser outline is taken off by the kit's sheet (`[data-af-scroll]:focus`), not inline, so forced colours can draw one; the recipe's ring is the focus otherwise.
+        style={css(box, { overflow: "auto" }, maxHeight !== undefined && { maxHeight }, r.scroll)}
       >
         <table aria-busy={loading} style={grid}>
           <caption style={visuallyHidden}>{label}</caption>
