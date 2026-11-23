@@ -43,9 +43,11 @@ const docs: ComponentDocs = {
     },
     onAction: {
       type: "event",
+      description: "The action (Undo, View) was pressed. The toast goes too, so onDismiss follows it.",
     },
     onDismiss: {
       type: "event",
+      description: "The toast went: Dismiss, the ×, its duration running out, or its action (after onAction). The app unmounts it, which frees its slot.",
     },
     onPauseChange: {
       type: "event",

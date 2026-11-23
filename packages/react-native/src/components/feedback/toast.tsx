@@ -91,9 +91,11 @@ export function Toast({ message, tone = "success", actionLabel = "", dismissed =
     run.start();
     return () => run.stop();
   }, [gone, out, t.duration.base]);
+  // The action puts the toast away too: it is reported as a dismissal, so the app unmounts it and frees its slot.
   const act = () => {
     setGone(true);
     onAction?.();
+    onDismiss?.();
   };
   const dismiss = () => {
     setGone(true);
