@@ -22,10 +22,10 @@ export interface ChipProps extends RootProps {
   count?: number;
   /** Adds a ✕ with its own label ("Remove From: Sam Lee") as a second target. */
   removable?: boolean;
-  /** The ✕ was tapped: the chip is gone. In the app the caller drops the chip from its list on onRemove. */
+  /** The chip has been removed and draws nothing. The ✕ only reports `onRemove`: the app drops the chip from its list, or sets this. */
   removed?: boolean;
   disabled?: boolean;
-  /** Called with `selected` as the tap leaves it: flipped. */
+  /** filter: called with `selected` as the tap leaves it, flipped. A suggestion or object chip never changes `selected` itself. */
   onSelectedChange?: (selected: boolean) => void;
   /** The chip was tapped. Its `selected` changes through `onSelectedChange`. */
   onPress?: () => void;
@@ -69,7 +69,6 @@ export function Chip({
   const press = usePress({ disabled });
   const x = usePress({ disabled });
   const [on = false, setOn] = useControllable(selected, onSelectedChange);
-  const [gone, setGone] = useControllable(removed);
   const pressing = press.pressed || x.pressed;
   // A phone has no hover. A press washes an unchosen chip; a chosen one keeps its fill and only bounces.
   const r = useRecipe(recipes.chip, {
@@ -78,7 +77,7 @@ export function Chip({
     styles,
   });
   const rx = useRecipe(recipes.chip, { variants: { variant }, state: { focus: x.focused, on }, styles });
-  if (gone) return null;
+  if (removed) return null;
   const root = partStyle(r, "root", { view: pressing && { transform: [{ scale: 0.96 }] }, text: [s.label, { lineHeight: (r.root.text.fontSize as number) * 1.2 }] });
   const countStyle = partStyle(r, "count", { text: { fontVariant: ["tabular-nums"] } });
   const ink = r.root.text.color;
@@ -96,7 +95,8 @@ export function Chip({
         disabled={press.disabled}
         hitSlop={drawn ? hitSlopTo(t.control.hit, drawn) : undefined}
         onPress={() => {
-          setOn(!on);
+          // Only a filter toggles: a suggestion's or an object's `selected` is the app's highlight, never left on by a tap.
+          if (variant === "filter") setOn(!on);
           onPress?.();
         }}
         {...rootProps(rest)}
@@ -121,10 +121,8 @@ export function Chip({
           accessibilityState={{ disabled: x.disabled }}
           disabled={x.disabled}
           hitSlop={hitSlopTo(t.control.hit, removeSize as number, removeSize as number)}
-          onPress={() => {
-            setGone(true);
-            onRemove?.();
-          }}
+          // The ✕ only reports: the chip stays until the app drops it.
+          onPress={() => onRemove?.()}
           {...x.handlers}
           style={[s.remove, partStyle(rx, "remove", { view: x.focused && { opacity: 1 } }).view]}
         >
