@@ -17,7 +17,7 @@ export interface SearchFieldProps extends RootProps<HTMLInputElement | HTMLButto
   value?: string;
   /** Say what is searched, not "Search" — the field is the only hint of what a screen holds. */
   placeholder?: string;
-  /** Accessible name when it should differ from the placeholder. Falls back to the placeholder. */
+  /** Accessible name when it should differ from the placeholder. Falls back to a FormField's label, then the placeholder. */
   label?: string;
   /** A key that focuses or opens this search, written once as Mod+K or /. Shown on hover and focus while the field is empty. */
   shortcut?: string;
@@ -77,8 +77,8 @@ export function SearchField({
   const ui = useInteraction({ disabled });
   const [query = "", setQuery] = useControllable(value, onValueChange);
   const name = label || placeholder;
-  // Inside a FormField, with no name of its own, the field's label names it.
-  const named = name ? { "aria-label": name } : form ? { "aria-labelledby": form.labelId } : {};
+  // Its own label first; inside a FormField the field's visible label beats the placeholder (WCAG 2.5.3); else the placeholder.
+  const named = label ? { "aria-label": label } : form ? { "aria-labelledby": form.labelId } : placeholder ? { "aria-label": placeholder } : {};
   const isFocused = focused || ui.focused;
   const inputRef = useRef<HTMLInputElement>(null);
   const pass = splitRootProps(rest);

@@ -202,7 +202,8 @@ export function TextField({
           onChangeText={(next) => setText(next)}
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
-          accessibilityLabel={label || placeholder || form?.label}
+          // Inside a FormField its visible label beats the placeholder (WCAG 2.5.3).
+          accessibilityLabel={label || form?.label || placeholder || undefined}
           accessibilityState={{ disabled }}
           editable={!disabled && !readOnly}
           maxLength={maxLength > 0 ? maxLength : undefined}

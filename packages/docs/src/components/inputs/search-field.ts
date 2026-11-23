@@ -22,7 +22,7 @@ const docs: ComponentDocs = {
     label: {
       type: "string",
       default: "",
-      description: "Accessible name when it should differ from the placeholder. Falls back to the placeholder.",
+      description: "Accessible name when it should differ from the placeholder. Falls back to a FormField's label, then the placeholder.",
     },
     shortcut: {
       type: "string",
@@ -161,11 +161,11 @@ const docs: ComponentDocs = {
   },
   a11y: {
     role: "searchbox",
-    label: "{label || placeholder}",
+    label: "{label || FormField label || placeholder}",
     notes: [
       "The glass is decoration. While busy it becomes a progressbar named by strings.search-field.loading (\"Loading\"; a product that wants \"Searching\" sets it).",
       "Enter submits and Escape clears the text, then blurs on the second press. When the clear button goes away with the text, focus moves to the field.",
-      "Inside a FormField with no label or placeholder of its own, the field's label names it, and it takes the field's description, error, aria-invalid and aria-required. Result counts are the product's to announce.",
+      "Inside a FormField with no label of its own, the field's visible label names it (never the placeholder, WCAG 2.5.3), and it takes the field's description, error, aria-invalid and aria-required. Result counts are the product's to announce.",
     ],
   },
   examples: [

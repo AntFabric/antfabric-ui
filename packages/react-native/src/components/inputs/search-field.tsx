@@ -15,7 +15,7 @@ export interface SearchFieldProps extends RootProps<TextInput> {
   value?: string;
   /** Say what is searched, not "Search" — the field is the only hint of what a screen holds. */
   placeholder?: string;
-  /** Accessibility label when it should differ from the placeholder. Falls back to the placeholder. */
+  /** Accessibility label when it should differ from the placeholder. Falls back to a FormField's label, then the placeholder. */
   label?: string;
   /** A search is in flight: the glass becomes a spinner. Off for instant filtering. */
   busy?: boolean;
@@ -80,7 +80,8 @@ export function SearchField({
       <TextInput
         testID={partId(testID, "search-field", "input")}
         accessibilityRole="search"
-        accessibilityLabel={label || placeholder || form?.label}
+        // Inside a FormField its visible label beats the placeholder (WCAG 2.5.3).
+        accessibilityLabel={label || form?.label || placeholder || undefined}
         maxFontSizeMultiplier={fontScale.content}
         accessibilityState={{ disabled, busy }}
         value={query}

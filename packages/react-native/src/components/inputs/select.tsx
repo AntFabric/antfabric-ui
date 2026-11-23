@@ -171,7 +171,8 @@ export function Select({
   const icon = partStyle(r, "icon", { text: { color: tint(t, chosen?.color) } });
   const { width: iconSize, height: _ih, ...iconRest } = icon.view;
   const { width: caretSize, height: _ch, ...caretRest } = r.caret.view;
-  const name = label || placeholder || form?.label || "";
+  // Inside a FormField its visible label beats the placeholder (WCAG 2.5.3).
+  const name = label || form?.label || placeholder || "";
   return (
     <View testID={partId(testID, "select", "root")} style={[s.root, r.root.view, style]}>
       {label ? (

@@ -267,7 +267,7 @@ const docs: ComponentDocs = {
   },
   a11y: {
     role: "combobox",
-    label: "{label || placeholder}",
+    label: "{label || FormField label || placeholder}",
     notes: [
       "Web and desktop: the trigger is role=combobox with aria-haspopup=listbox, aria-expanded and aria-activedescendant; rows are role=option with aria-selected. Arrow keys, Home, End, Enter, Space and typing a letter work from the trigger; Escape closes and keeps focus on the trigger; Tab closes.",
       "A searchable select moves focus into the filter when it opens. The filter names the list it drives (aria-controls) and the row under the cursor (aria-activedescendant); the arrow keys and Enter work from it, Escape clears the text and then closes, and Tab moves on and closes the panel.",
