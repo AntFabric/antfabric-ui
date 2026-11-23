@@ -129,11 +129,6 @@ function Card({
   const title = stage === "downloading" ? s("downloading") : stage === "installing" ? s("installing") : stage === "ready" ? s("ready") : stage === "failed" ? s("failed") : s("available");
   const detail = stage === "downloading" ? (progress >= 0 ? s("downloadingPercent", { percent: progress }) : s("downloadingUnknown")) : stage === "failed" ? error : s("versionTag", { version });
   const action = stage === "available" ? s("installLabel", { version }) : stage === "ready" ? s("restartLabel", { version }) : s("retryLabel");
-  // A change of stage is spoken through the page's announcer, and a failure carries its reason: a status mounted holding its text is not
-  // read, and a button's own name would hide the sentence around it. Progress is not read out percent by percent.
-  useEffect(() => {
-    announce(stage === "failed" ? `${title}. ${error}` : title, stage === "failed" ? "assertive" : "polite");
-  }, [stage]); // eslint-disable-line react-hooks/exhaustive-deps
   const children: ReactNode = (
     <>
       <Art styles={styles} />
@@ -185,9 +180,6 @@ function RailIcon({ stage, pending, styles, strings, onPress }: { stage: UpdateB
   const dot = stage === "available" || stage === "ready" || stage === "failed";
   const r = useRecipe(recipes["update-banner"], { variants: { stage }, state: { hover: ui.hovered, focus: ui.focused }, styles });
   const title = stage === "downloading" ? s("downloading") : stage === "installing" ? s("installing") : stage === "ready" ? s("ready") : stage === "failed" ? s("failed") : s("available");
-  useEffect(() => {
-    announce(title, stage === "failed" ? "assertive" : "polite");
-  }, [stage]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <button
       type="button"
@@ -260,6 +252,14 @@ export function UpdateBanner({
   useEffect(() => {
     if (webLine) announce(webLine, current === "failed" ? "assertive" : "polite");
   }, [webLine]); // eslint-disable-line react-hooks/exhaustive-deps
+  // The desktop's stage is spoken through the page's announcer when it appears and as it changes, and a failure carries its reason: a status
+  // mounted holding its text is not read, and a button's own name would hide the sentence around it. Said here, not by the card or the rail
+  // icon, so folding or unfolding the rail (one replaces the other) says nothing again. Progress is not read out percent by percent.
+  const stageTitle = current === "downloading" ? s("downloading") : current === "installing" ? s("installing") : current === "ready" ? s("ready") : current === "failed" ? s("failed") : s("available");
+  const deskLine = platform !== "web" && shown ? (current === "failed" ? `${stageTitle}. ${error || s("errorDefault")}` : stageTitle) : "";
+  useEffect(() => {
+    if (deskLine) announce(deskLine, current === "failed" ? "assertive" : "polite");
+  }, [current, platform]); // eslint-disable-line react-hooks/exhaustive-deps
   if (platform === "web") {
     return (
       <div data-af-part="root" {...rootProps(rest)} style={css(box, { maxWidth: "100%" }, r.root, style)}>

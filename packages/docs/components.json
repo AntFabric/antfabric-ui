@@ -3018,7 +3018,7 @@
         "role": "img",
         "notes": [
           "The number is hidden; the label says what it counts, e.g. \"3 unread mentions\". With no label the name is the count alone (\"3\"), or \"3 unread\" with `unread`.",
-          "Not a live region by default: `live` makes it role status (web) or a polite live region (phone). Never announce every increment — the parent row's label carries the count."
+          "Never a live region: `live` announces a change of the count politely (through the page's announcer on the web, the screen reader's announcement on the phone), not its first draw. Never announce every increment — the parent row's label carries the count."
         ]
       },
       "examples": [
@@ -3048,7 +3048,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "<span role=\"img\"> (role status when `live`) named by the count and what it counts, inline styles over `t`; pops in with enter(\"pop\")",
+          "base": "<span role=\"img\"> named by the count and what it counts, inline styles over `t`; pops in with enter(\"pop\")",
           "import": "import { Badge } from \"@antfabric/ui-react\"",
           "notes": [
             "The same total also drives the tab title, \"(3) AntFabric\", and the favicon dot — see Tab badge.",
@@ -3066,7 +3066,7 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "<Enter motion=\"pop\"> (an Animated.View; a polite live region only when `live`), StyleSheet over useTheme()",
+          "base": "<Enter motion=\"pop\"> (an Animated.View; `live` announces a change of its count), StyleSheet over useTheme()",
           "import": "import { Badge } from \"@antfabric/ui-react-native\"",
           "notes": [
             "The same total is the home-screen icon badge, set with expo-notifications setBadgeCountAsync and kept in step by the server's push payload.",
@@ -7946,7 +7946,7 @@
           "Send exposes its disabled state. Pressing Send or Enter while a file uploads announces \"Waiting for the upload to finish\"; the hint under the box says the same.",
           "The length counter is drawn, not read on every keystroke: it is announced when the draft crosses 100, 50 and 10 characters left, and when it goes over.",
           "The formatting toolbar is one group: arrow keys, Home and End move between its buttons (web and desktop).",
-          "The offline line is a polite live region, so a screen-reader user hears why the send did not go.",
+          "Going offline (and the channel locking) is announced when it happens, so a screen-reader user hears why the send will not go; the line itself is plain text.",
           "Read-only and archived notices replace the box entirely, so there is no field to land in that cannot be used.",
           "`disabled` disables the field and every tool. On the phone the toolbar buttons are 36pt drawn with a touch area that stops short of 44pt until IconButton grows its hit area from the drawn size."
         ]
@@ -8374,7 +8374,7 @@
         "role": "status",
         "notes": [
           "A change of state is spoken politely, never interrupting, and never as an alert: nothing here is an error. On the web the strip's message, the degraded note and \"Back online\" go through the page's own announcer when the state changes (a strip mounted holding its text is not read, and the way back would otherwise be silent). On the phone the card's title and message are spoken by the screen reader's announcement call, and the card is role=status.",
-          "The pill is a status element that stays on the page, so its text changing is read: web role=status with aria-live=polite, on the phone role=status and an announcement of its new name. Its label is a sentence (\"No connection to the backend\"), not the colour.",
+          "The pill is a labelled picture that stays on the page (role=img on the web); a change of its name is announced (not on first draw). Its label is a sentence (\"No connection to the backend\"), not the colour.",
           "The strip's spinner is hidden from assistive technology; the message says what is happening."
         ]
       },
@@ -8462,7 +8462,7 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "<Enter motion=\"slide-down\"> card (role status, polite live region) with an Icon and two Texts, StyleSheet over useTheme(), for under the screen header; the pill is a read-only labelled View for HeaderActions",
+          "base": "<Enter motion=\"slide-down\"> card (its words announced, no live region) with an Icon and two Texts, StyleSheet over useTheme(), for under the screen header; the pill is a read-only labelled View for HeaderActions",
           "import": "import { ConnectionBanner } from \"@antfabric/ui-react-native\"",
           "notes": [
             "Offline is a normal mode for a capture app, so it reads as reassurance on a neutral surface — no alarm colour, no Retry: the capture queue drains itself on the reconnect edge.",
@@ -13199,7 +13199,7 @@
       "a11y": {
         "role": "status",
         "notes": [
-          "The banner sits in a polite live region that stays on the page (the web's root, the phone's role=status view), so what appears inside it is read as \"Priya Raman in #platform-eng: …\" — never assertive, and it never takes focus. On the phone the same words are also spoken through the screen reader's announcement call, because iOS has no live regions.",
+          "A banner that arrives is announced politely as \"Priya Raman. #platform-eng. …\" (through the page's announcer on the web, the screen reader's announcement call on the phone) — never assertive, and it never takes focus. A failed inline reply is announced at once.",
           "The kit has no auto-dismiss timer: the app owns it and must stop it while the banner has focus or the pointer is on it, and give a screen-reader user longer (WCAG 2.2.1).",
           "Reply moves focus into the field, and Escape in the field closes the reply and keeps the draft without dismissing the banner (Escape elsewhere on the card dismisses it); focus goes back to Reply when the reply closes. These are the web's: the phone has no reply field."
         ]
@@ -13318,7 +13318,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "<div role=\"status\" aria-live=\"polite\"> holding a card that slides in from the right with enter(): one <button> that opens it, an IconButton ×, Button actions and an inline reply <input> with Send; Escape dismisses, Enter sends. Inline styles over `t`; `dismissed`, `replying` and `replyText` kept in local state that follows the props. The app hosts it in its own top-right viewport, apart from the action toasts",
+          "base": "<div role=\"group\"> named \"New notification\" holding a card that slides in from the right with enter(): one <button> that opens it, an IconButton ×, Button actions and an inline reply <input> with Send; Escape dismisses, Enter sends. Inline styles over `t`; `dismissed`, `replying` and `replyText` kept in local state that follows the props. The app hosts it in its own top-right viewport, apart from the action toasts",
           "import": "import { InAppBanner } from \"@antfabric/ui-react\"",
           "notes": [
             "Shown only while this tab is visible AND focused (document.visibilityState === 'visible' && document.hasFocus()). A background tab raises the browser notification instead, and the tab title count changes either way.",
@@ -13350,7 +13350,7 @@
         },
         "mobile": {
           "status": "planned",
-          "base": "View (role status, polite live region) with a card that drops in with <Enter motion=\"drop\">, drawn on GlassSurface (Liquid Glass on iOS 26+); a PanResponder swipe up follows the finger and dismisses, the grabber stands in for it, and a Dismiss accessibilityAction and the iOS escape gesture do the same; StyleSheet over useTheme(). The app hosts it over the root stack, with expo-notifications' handleNotification returning shouldShowBanner: false while the app is in front",
+          "base": "A labelled View with a card that drops in with <Enter motion=\"drop\">, drawn on GlassSurface (Liquid Glass on iOS 26+); a PanResponder swipe up follows the finger and dismisses, the grabber stands in for it, and a Dismiss accessibilityAction and the iOS escape gesture do the same; StyleSheet over useTheme(). The app hosts it over the root stack, with expo-notifications' handleNotification returning shouldShowBanner: false while the app is in front",
           "import": "import { InAppBanner } from \"@antfabric/ui-react-native\"",
           "notes": [
             "Fixes a gap: today every foreground notification raises the OS banner (shouldShowBanner: true), including one for the channel you are reading. The handler now asks the router for the open channel / thread and stays silent for it; everything else draws this banner instead of the OS one.",
@@ -13719,7 +13719,7 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "A View (role status, polite live region) with <Enter motion=\"fade\">, the action under the message as the kit's Button (sm) and the kit's IconButton for Dismiss; dismissing fades it with Animated.timing",
+          "base": "A View (its words announced, no live region) with <Enter motion=\"fade\">, the action under the message as the kit's Button (sm) and the kit's IconButton for Dismiss; dismissing fades it with Animated.timing",
           "import": "import { InlineBanner } from \"@antfabric/ui-react-native\"",
           "notes": [
             "Today's InfoBanner: a sunken strip (surface.muted), 12 × 8 padding, radius 8, a 16pt faint icon nudged 2pt down against the first line, one sentence and no heading. It has no bottom margin — the next SectionHeader owns the gap.",
@@ -18240,7 +18240,7 @@
       "a11y": {
         "notes": [
           "The title is the screen's heading (accessibilityRole header) and the first thing VoiceOver reads after the back control.",
-          "The bell's name carries the count: 'Notifications, 3 unread'. The connection line is a polite live region on Android and is also announced once when it appears, since iOS has no live regions.",
+          "The bell's name carries the count: 'Notifications, 3 unread'. The connection line is plain text, announced when it appears or changes, and \"Back online\" is announced when it goes (iOS has no live regions, so neither phone uses one).",
           "Header titles grow with Dynamic Type up to 1.3x so they stay on one line; the rows and buttons are not fixed-height.",
           "The status bar and its clock are a picture, hidden from the accessibility tree and off by default: the system draws the real one. The header does not read the device's safe-area insets itself; the app pads it by the top inset."
         ]
@@ -21003,7 +21003,7 @@
         "role": "navigation (web, desktop)",
         "label": "\"Pages\"; previous and next are \"Previous page\" and \"Next page\", the pages are \"Page 3\" with the current one marked aria-current (web) or selected (phone)",
         "notes": [
-          "The summary is a polite live region, so paging announces \"Showing 6–10 of 48\" without moving focus.",
+          "The summary is announced politely when it changes, so paging says \"Showing 6–10 of 48\" without moving focus; it is plain text, not a live region.",
           "On the first page previous is disabled, on the last next is. When the button a keyboard user pressed becomes disabled, focus moves to the current page button (or, in a compact pager, to the other arrow) so they keep their place.",
           "`pageSizes` and `jump` are labelled Selects (\"Rows per page\", \"Go to page\").",
           "The gap between page numbers is hidden from screen readers."
@@ -33397,7 +33397,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "The ink pill: a role=status / alert <div> with aria-live, rising in with enter(\"rise\"); Undo, Dismiss and the × are <button>s with hover and focus from useInteraction. Pressing one keeps `dismissed` inside and fades it back down; placement and the timer are the app's",
+          "base": "The ink pill: a <div> (its message said through the page's announcer, never a live region of its own), rising in with enter(\"rise\"); Undo, Dismiss and the × are <button>s with hover and focus from useInteraction. Pressing one keeps `dismissed` inside and fades it back down; placement and the timer are the app's",
           "import": "import { Toast } from \"@antfabric/ui-react\"",
           "notes": [
             "Bottom-centre, 24px up, one at a time. The fixed viewport is pointer-events: none and only the pill takes clicks, so the strip never eats the composer's clicks.",
@@ -33418,7 +33418,7 @@
           "import": "import { Toast } from \"@antfabric/ui-react\"",
           "notes": [
             "Today: one ink pill, bottom-centred, 5.2 s, Dismiss on the right. A second toast REPLACES the first (one timer).",
-            "The mark follows toastTone (ADR-4734): a failure no longer wears a tick. aria-live follows it too — polite for success, assertive for a refusal.",
+            "The mark follows toastTone (ADR-4734): a failure no longer wears a tick. The announcement follows it too — polite for success, assertive for a refusal.",
             "A progress toast (\"Refreshing…\", ADR-0783) has no timer and a 700 ms floor; finishing never wipes a different toast raised meanwhile.",
             "Dismiss's fill is derived from the toast's own ink, so it survives the inverse surface turning light in the dark themes.",
             "Copy rules live in toast-copy.ts: names cut to 32 characters on a word boundary, refusal codes mapped to plain sentences, log-line-shaped upstream messages never shown.",

@@ -189,7 +189,7 @@ function Meta({ p, compact }: { p: Card; compact: boolean }) {
         </Text>
       ) : null}
       {p.status === "uploading" ? (
-        <Text testID="attachment-card.meta" numberOfLines={1} accessibilityLiveRegion="polite" style={[meta.view, meta.text]}>
+        <Text testID="attachment-card.meta" numberOfLines={1} style={[meta.view, meta.text]}>
           {compact ? str("ofSize", { percent: pct, size: p.size }) : str("uploading", { percent: pct, size: p.size })}
         </Text>
       ) : null}

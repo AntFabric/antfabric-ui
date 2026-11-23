@@ -3,7 +3,7 @@ import { recipes, useControllable, usePending, useDirection, useStrings, type Ki
 import { t } from "../../tokens";
 import { useAutoFocus } from "../../platform";
 import { useInteraction } from "../../lib/interaction";
-import { announce } from "../../lib/announce";
+import { announce, useAnnounce } from "../../lib/announce";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -225,6 +225,8 @@ export function QuestionPanel({
     rows.current[at]?.focus();
   };
 
+  // Going offline while the question waits is said (the footer line is plain text).
+  useAnnounce(!shut && offline && s("offline"));
   // A question that blocks the turn is said when it appears or opens, and takes focus when the product asks it to.
   useEffect(() => {
     if (shut || busy) return;
@@ -386,10 +388,11 @@ export function QuestionPanel({
 
       <div data-af-part="footer" style={css(row, r.footer)}>
         {/* Offline replaces the paused line rather than sitting beside it. */}
-        <span role={offline ? "status" : undefined} data-af-part="status" style={css(text, { flex: 1 }, r.status)}>
+        <span data-af-part="status" style={css(text, { flex: 1 }, r.status)}>
           {offline ? s("offline") : agentName ? s("pausedNamed", { name: agentName }) : s("paused")}
         </span>
-        <Button label={busy ? s("sending") : s("submit")} variant="primary" size="md" disabled={!canSubmit} onPress={submit} />
+        {/* Sending is Button's `loading`: blocked but still focusable, so a keyboard press on Submit keeps its place. */}
+        <Button label={busy ? s("sending") : s("submit")} variant="primary" size="md" loading={busy} disabled={!canSubmit && !busy} onPress={submit} />
       </div>
     </div>
   );

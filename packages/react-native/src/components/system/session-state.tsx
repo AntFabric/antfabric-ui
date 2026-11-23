@@ -128,7 +128,7 @@ export function SessionState({
         </Text>
       )}
       {state === "waiting" ? (
-        <View testID={partId(testID, "session-state", "wait")} role="status" accessibilityState={{ busy: true }} style={[s.wait, r.wait.view]}>
+        <View testID={partId(testID, "session-state", "wait")} accessibilityState={{ busy: true }} style={[s.wait, r.wait.view]}>
           <Spinner testID={partId(testID, "session-state", "spinner")} decorative size={spinner.size} color={r.wait.text.color} style={spinner.rest} />
           <Text testID={partId(testID, "session-state", "waitText")} maxFontSizeMultiplier={fontScale.content} style={[waitText.view, waitText.text]}>
             {str("waitingBrowser")}
@@ -136,7 +136,7 @@ export function SessionState({
         </View>
       ) : null}
       {offline || (error && !open) ? (
-        <Text testID={partId(testID, "session-state", "note")} role="status" maxFontSizeMultiplier={fontScale.content} style={[s.note, r.note.view, r.note.text]}>
+        <Text testID={partId(testID, "session-state", "note")} maxFontSizeMultiplier={fontScale.content} style={[s.note, r.note.view, r.note.text]}>
           {offline ? str("offline") : error}
         </Text>
       ) : null}

@@ -122,9 +122,9 @@ export function NotificationSchedule({
     onResume?.();
   };
   const r = useRecipe(recipes["notification-schedule"], { variants: { paused: isPaused }, styles });
-  // The paused line in the menu arrives holding its text, which is not read: it is said when a pause starts or its end moves. (The pill
-  // is a status that stays on the page, so its own text change is read.)
-  const said = surface === "menu" && isPaused ? s("status", { until: end }) : "";
+  // The paused line arrives holding its text, which is not read: it is said when a pause starts, its end moves or it is resumed (not on
+  // first draw). The pill is plain text too.
+  const said = isPaused ? s("status", { until: end }) : s("on");
   const was = useRef(said);
   useEffect(() => {
     if (said && said !== was.current) announce(said);
@@ -170,7 +170,7 @@ export function NotificationSchedule({
           )}
         </div>
       ) : (
-        <div role="status" aria-label={isPaused ? s("status", { until: end }) : s("on")} data-af-part="pill" style={css(pill, r.pill)}>
+        <div role="group" aria-label={isPaused ? s("status", { until: end }) : s("on")} data-af-part="pill" style={css(pill, r.pill)}>
           <Icon part="pillIcon" name={isPaused ? "moon" : "bell"} size={r.pillIcon.width} style={r.pillIcon} />
           <span data-af-part="pillText" style={css(text, truncate(1), r.pillText)}>
             {isPaused ? s("status", { until: end }) : s("on")}

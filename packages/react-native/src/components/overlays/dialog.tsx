@@ -113,7 +113,7 @@ export function Dialog({
     const node = Platform.OS === "web" || !heading.current ? null : findNodeHandle(heading.current);
     if (node) AccessibilityInfo.setAccessibilityFocus(node);
   }, []);
-  // An error that arrives is said: iOS has no live regions, so the alert role alone reads nothing.
+  // An error that arrives is said: iOS has no live regions, and a view mounted with the alert role is not read everywhere.
   useEffect(() => {
     if (error) announce(error);
   }, [error]);
@@ -145,7 +145,7 @@ export function Dialog({
           <View style={s.content}>{typeof children === "string" || typeof children === "number" ? <Text testID={partId(testID, "dialog", "body")} style={[r.body.view, r.body.text]}>{children}</Text> : children}</View>
         ) : null}
         {error ? (
-          <View testID={partId(testID, "dialog", "error")} accessibilityRole="alert" style={[s.error, r.error.view]}>
+          <View testID={partId(testID, "dialog", "error")} style={[s.error, r.error.view]}>
             <Icon testID={partId(testID, "dialog", "errorIcon")} name="circle-alert" size={errorIcon.size} color={r.errorIcon.text.color ?? r.error.text.color} style={errorIcon.rest} />
             <Text testID={partId(testID, "dialog", "errorText")} style={[s.errorText, r.errorText.view, r.errorText.text]}>{error}</Text>
           </View>

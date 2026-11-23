@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Platform, Pressable, Text, View, type TextStyle, type ViewStyle } from "react-native";
 import { recipes, useStrings, type IconActionItem, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
@@ -111,9 +111,14 @@ export function MobileHeader({
   const me = usePress();
   // A phone has no hover, so there is none here.
   const r = useRecipe(recipes["mobile-header"], { state: { focus: me.focused }, styles });
-  // iOS has no live regions: the connection line is also said when it appears or changes.
+  // iOS has no live regions: the connection line is said when it appears or changes, and the way back online when it goes.
+  const was = useRef<MobileHeaderConnection | null>(null);
   useEffect(() => {
+    const before = was.current;
+    was.current = connection;
+    if (before === connection) return;
     if (connection !== "online") announce(connection === "connecting" ? str("connecting") : str("offline"));
+    else if (before !== null) announce(str("online"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connection]);
   const android = os === "android";
@@ -193,7 +198,7 @@ export function MobileHeader({
       </View>
 
       {connection !== "online" ? (
-        <View testID={partId(testID, "mobile-header", "connection")} role="status" accessibilityLiveRegion="polite" style={[s.connection, r.connection.view]}>
+        <View testID={partId(testID, "mobile-header", "connection")} style={[s.connection, r.connection.view]}>
           {connection === "connecting" ? (
             <Spinner testID={partId(testID, "mobile-header", "connectionIcon")} {...glyphOf(r.connectionIcon)} />
           ) : (

@@ -3,14 +3,31 @@ import { AccessibilityInfo, BackHandler, Platform, type Insets } from "react-nat
 
 /**
  * Says `message` to VoiceOver and TalkBack. A status component (a toast, a banner, a connection change, a decided approval) calls it when
- * its message appears: iOS has no live regions, so without it nothing is read. On Android a view's `accessibilityLiveRegion` does the same
- * for text that changes in place; this is for text that arrives.
+ * its message appears or changes: iOS has no live regions, so without it nothing is read, and the kit marks no view
+ * `accessibilityLiveRegion` (Android only), so both phones hear the same thing once.
  *
  *   useEffect(() => announce(s("restored")), []);
  */
 export function announce(message: string): void {
   if (!message || Platform.OS === "web") return;
   AccessibilityInfo.announceForAccessibility?.(message);
+}
+
+/**
+ * Announces `message` each time it changes to a new text ("" or nothing says nothing): a status that changes in place (a send that failed, a
+ * page count, offline), drawn as plain text beside it, with no `accessibilityLiveRegion` (Android only, and it reads text that merely ticks).
+ * Not on the first render unless `initial`: what was there when the screen came is not news.
+ *
+ *   useAnnounce(status === "failed" ? str("failed") : "");
+ */
+export function useAnnounce(message: string | false | null | undefined, { initial = false }: { initial?: boolean } = {}): void {
+  const said = useRef<string | false | null | undefined>(initial ? undefined : message);
+  useEffect(() => {
+    if (message && message !== said.current) announce(message);
+    said.current = message;
+    // Keyed on the text: the same words drawn again are not said again.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message]);
 }
 
 /**

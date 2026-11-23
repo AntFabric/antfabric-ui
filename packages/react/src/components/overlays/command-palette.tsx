@@ -7,7 +7,7 @@ import { useInteraction } from "../../lib/interaction";
 import { isComposing } from "../../lib/keys";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, input, pressable, row, text, truncate } from "../../lib/style";
-import { announce } from "../../lib/announce";
+import { announce, useAnnounce } from "../../lib/announce";
 import { useOverlayFocus } from "../../lib/focus";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { Avatar, type AvatarIdentity, type AvatarPresence } from "../display/avatar";
@@ -163,7 +163,8 @@ export function CommandPalette({
   const [pick, setPick] = useControllable(selected);
   const all = groups.flatMap((g) => g.items);
   const isOn = (item: CommandPaletteItem) => (pick ? item.key === pick : !!item.selected);
-  const current = all.find(isOn);
+  // What Enter takes is what is highlighted: the picked row, else (after filtering it away, or before any pick) the first.
+  const current = all.find(isOn) ?? all[0];
   const optionId = (item: CommandPaletteItem) => `${id}-${all.indexOf(item)}`;
   const choose = (item: CommandPaletteItem) => {
     setPick(pick === "" && item.selected ? "" : item.key);
@@ -175,14 +176,18 @@ export function CommandPalette({
   const focus = useOverlayFocus<HTMLDivElement>({ trap: true, initial: () => field.current, onEscape: () => onClose?.() });
   const asking = !groups[0] && !loading && q !== "" && ask;
 
-  // How many results there are, said once when typing pauses: never per keystroke, never as a region that arrives holding its text.
+  // How many results there are (or that there are none), said once when typing pauses: never per keystroke, never as a region that
+  // arrives holding its text.
   const count = all.length;
   useEffect(() => {
-    if (q === "" || loading || count === 0) return;
-    const wait = setTimeout(() => announce(s("resultCount", { count })), 400);
+    if (q === "" || loading) return;
+    const wait = setTimeout(() => announce(count ? s("resultCount", { count }) : ask ? s("emptyAsk", { name: agentName }) : s("empty")), 400);
     return () => clearTimeout(wait);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, count, loading]);
+
+  // Offline is news when the palette opens with it, and when it changes while open.
+  useAnnounce(offline && s("offline"), "polite", { initial: true });
 
   const keyboard = (e: KeyboardEvent) => {
     // An IME's Enter commits its candidate and its Escape cancels it: neither chooses, clears or closes.
@@ -196,7 +201,7 @@ export function CommandPalette({
       document.getElementById(optionId(next))?.scrollIntoView({ block: "nearest" });
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (current ?? all[0]) choose((current ?? all[0])!);
+      if (current) choose(current);
       else if (q && !loading && ask) onAsk?.(q);
     } else if (e.key === "Escape") {
       e.preventDefault();
@@ -269,7 +274,7 @@ export function CommandPalette({
           </div>
         )}
         {offline && (
-          <div role="status" data-af-part="offline" style={css(row, { gap: t.space.sm, paddingBlock: t.space.sm, paddingInline: t.space.lgXl }, r.offline)}>
+          <div data-af-part="offline" style={css(row, { gap: t.space.sm, paddingBlock: t.space.sm, paddingInline: t.space.lgXl }, r.offline)}>
             <Icon part="offlineIcon" name="wifi-off" style={r.offlineIcon} />
             <span data-af-part="offlineText" style={css(text, r.offlineText)}>{s("offline")}</span>
           </div>
@@ -283,7 +288,7 @@ export function CommandPalette({
               {g.items.map((item) => {
                 const keys = platform === "web" && item.webShortcut ? item.webShortcut : item.shortcut;
                 return (
-                  <Option key={item.key} id={optionId(item)} label={item.hint ? s("option", { label: item.label, hint: item.hint }) : item.label} selected={isOn(item)} styles={styles} onPress={() => choose(item)}>
+                  <Option key={item.key} id={optionId(item)} label={item.hint ? s("option", { label: item.label, hint: item.hint }) : item.label} selected={item === current} styles={styles} onPress={() => choose(item)}>
                     <span aria-hidden data-af-part="slot" style={css(slotLook, r.slot)}>
                       {item.avatar ? (
                         <Avatar name={item.label} identity={item.identity ?? "indigo"} presence={item.presence ?? "none"} agent={item.agent ?? false} style={{ width: t.palette.slot, height: t.palette.slot, fontSize: t.text.micro }} />
@@ -303,14 +308,14 @@ export function CommandPalette({
             </div>
           ))}
           {loading && (
-            <div role="status" aria-live="polite" data-af-part="loading" style={css(row, { gap: t.space.sm, paddingBlock: t.space.smMd }, r.loading)}>
+            <div data-af-part="loading" style={css(row, { gap: t.space.sm, paddingBlock: t.space.smMd }, r.loading)}>
               <Spinner decorative part="loadingSpinner" label={s("searching")} style={r.loadingSpinner} />
               <span data-af-part="loadingText" style={css(text, r.loadingText)}>{s("loadingText")}</span>
             </div>
           )}
           {empty && (
             <div style={css(box, { alignItems: "center", gap: t.space.md, padding: t.space.md })}>
-              <span role="status" aria-live="polite" data-af-part="emptyText" style={css(text, { paddingTop: t.space.sm, textAlign: "center" }, r.emptyText)}>
+              <span data-af-part="emptyText" style={css(text, { paddingTop: t.space.sm, textAlign: "center" }, r.emptyText)}>
                 {q ? (ask ? s("emptyAsk", { name: agentName }) : s("empty")) : s("prompt")}
               </span>
               {q && ask && (

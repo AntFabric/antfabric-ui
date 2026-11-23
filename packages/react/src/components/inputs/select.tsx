@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useId, useRef, useState, useSyncExternalS
 import { cssVarName, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { useAutoFocus, usePlatform } from "../../platform";
 import { t } from "../../tokens";
+import { announce } from "../../lib/announce";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { isComposing } from "../../lib/keys";
@@ -196,6 +197,12 @@ export function Select({
   const [isOpen = false, setOpen] = useControllable(open, onOpenChange);
   const [active, setActive] = useControllable(activeKey);
   const [filter = "", setFilter] = useControllable(query, onQueryChange);
+  // A filter that leaves no rows is said once, when the list empties (not on each further keystroke).
+  const none = isOpen && filter !== "" && !items.length;
+  useEffect(() => {
+    if (none) announce(s("emptyFiltered", { filter }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [none]);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);

@@ -86,7 +86,7 @@ const docs: ComponentDocs = {
     role: "navigation (web, desktop)",
     label: "\"Pages\"; previous and next are \"Previous page\" and \"Next page\", the pages are \"Page 3\" with the current one marked aria-current (web) or selected (phone)",
     notes: [
-      "The summary is a polite live region, so paging announces \"Showing 6–10 of 48\" without moving focus.",
+      "The summary is announced politely when it changes, so paging says \"Showing 6–10 of 48\" without moving focus; it is plain text, not a live region.",
       "On the first page previous is disabled, on the last next is. When the button a keyboard user pressed becomes disabled, focus moves to the current page button (or, in a compact pager, to the other arrow) so they keep their place.",
       "`pageSizes` and `jump` are labelled Selects (\"Rows per page\", \"Go to page\").",
       "The gap between page numbers is hidden from screen readers.",

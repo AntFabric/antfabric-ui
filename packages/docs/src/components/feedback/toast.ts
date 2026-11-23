@@ -59,7 +59,7 @@ const docs: ComponentDocs = {
   platforms: {
     web: {
       status: "ready",
-      base: "The ink pill: a role=status / alert <div> with aria-live, rising in with enter(\"rise\"); Undo, Dismiss and the × are <button>s with hover and focus from useInteraction. Pressing one keeps `dismissed` inside and fades it back down; placement and the timer are the app's",
+      base: "The ink pill: a <div> (its message said through the page's announcer, never a live region of its own), rising in with enter(\"rise\"); Undo, Dismiss and the × are <button>s with hover and focus from useInteraction. Pressing one keeps `dismissed` inside and fades it back down; placement and the timer are the app's",
       import: "import { Toast } from \"@antfabric/ui-react\"",
       notes: [
         "Bottom-centre, 24px up, one at a time. The fixed viewport is pointer-events: none and only the pill takes clicks, so the strip never eats the composer's clicks.",
@@ -80,7 +80,7 @@ const docs: ComponentDocs = {
       import: "import { Toast } from \"@antfabric/ui-react\"",
       notes: [
         "Today: one ink pill, bottom-centred, 5.2 s, Dismiss on the right. A second toast REPLACES the first (one timer).",
-        "The mark follows toastTone (ADR-4734): a failure no longer wears a tick. aria-live follows it too — polite for success, assertive for a refusal.",
+        "The mark follows toastTone (ADR-4734): a failure no longer wears a tick. The announcement follows it too — polite for success, assertive for a refusal.",
         "A progress toast (\"Refreshing…\", ADR-0783) has no timer and a 700 ms floor; finishing never wipes a different toast raised meanwhile.",
         "Dismiss's fill is derived from the toast's own ink, so it survives the inverse surface turning light in the dark themes.",
         "Copy rules live in toast-copy.ts: names cut to 32 characters on a word boundary, refusal codes mapped to plain sentences, log-line-shaped upstream messages never shown.",

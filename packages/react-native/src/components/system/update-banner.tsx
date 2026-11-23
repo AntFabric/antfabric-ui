@@ -122,7 +122,7 @@ export function UpdateBanner({
           <Text testID={partId(testID, "update-banner", "versionText")} maxFontSizeMultiplier={fontScale.content} style={[s.versionText, r.versionText.view, r.versionText.text]}>{str.parts("appVersion", { version: appVersion })}</Text>
         </View>
         {current === "failed" ? (
-          <Text testID={partId(testID, "update-banner", "error")} accessibilityRole="alert" maxFontSizeMultiplier={fontScale.content} style={[r.error.view, r.error.text]}>
+          <Text testID={partId(testID, "update-banner", "error")} maxFontSizeMultiplier={fontScale.content} style={[r.error.view, r.error.text]}>
             {error || str("errorDefault")}
           </Text>
         ) : null}

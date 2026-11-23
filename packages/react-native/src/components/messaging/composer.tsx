@@ -5,7 +5,7 @@ import { createStyles } from "../../theme";
 import { Icon } from "../../lib/icon";
 import { Enter } from "../../lib/motion";
 import { usePress } from "../../lib/press";
-import { announce } from "../../lib/a11y";
+import { announce, useAnnounce } from "../../lib/a11y";
 import { rootProps, partId, type RootProps } from "../../lib/root-props";
 import { fontScale } from "../../lib/type";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -239,6 +239,9 @@ export function Composer({
   const r = useRecipe(recipes.composer, { variants: { mode }, state: { focus: inside || focused, invalid: tooLong }, styles });
   // `placeholderTextColor` is the TextInput's prop, not a style.
   const { placeholderTextColor, ...inputText } = r.input.text;
+  // Going offline, or the channel locking, while the composer is on screen is said; the line itself is plain text.
+  useAnnounce(offline && str("offline"));
+  useAnnounce(locked && (mode === "archived" ? str("archivedTitle") : str("readonlyTitle")));
   const send = () => {
     // Send is disabled while a file uploads; a tap in that window says why (iOS has no live region for the hint).
     if (typed && uploading && !tooLong && !offline) announce(str("uploadWaiting"));
@@ -261,7 +264,7 @@ export function Composer({
         </Enter>
       ) : null}
       {offline ? (
-        <Enter motion="rise" testID="composer.offline" accessibilityLiveRegion="polite" style={[s.offline, r.offline.view]}>
+        <Enter motion="rise" testID="composer.offline" style={[s.offline, r.offline.view]}>
           <Icon testID="composer.offlineIcon" name="wifi-off" {...iconOf(r.offlineIcon.view)} color={r.offlineIcon.text.color} />
           <Text style={[r.offline.text, s.offlineText]}>{str("offline")}</Text>
         </Enter>
@@ -350,7 +353,7 @@ export function Composer({
         <View style={s.below}>
           {mode === "thread" ? <AlsoSend on={also} to={alsoSendTo || str("conversation")} onToggle={() => setAlso(!also)} strings={strings} styles={styles} /> : null}
           {uploading ? (
-            <Text testID="composer.hint" accessibilityLiveRegion="polite" style={[r.hint.view, r.hint.text]}>
+            <Text testID="composer.hint" style={[r.hint.view, r.hint.text]}>
               {str("uploadWaiting")}
             </Text>
           ) : null}

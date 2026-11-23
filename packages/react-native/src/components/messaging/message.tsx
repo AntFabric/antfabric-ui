@@ -1,6 +1,7 @@
 import { I18nManager, Pressable, Text, View, type AccessibilityActionEvent, type ViewStyle } from "react-native";
 import { recipes, usePending, useStrings, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
+import { useAnnounce } from "../../lib/a11y";
 import { Icon } from "../../lib/icon";
 import { usePress } from "../../lib/press";
 import { rootProps, partId, type RootProps } from "../../lib/root-props";
@@ -188,6 +189,8 @@ export function Message({
 
   // What a screen reader hears of the row's state, after who and when.
   const said = state === "sending" ? str("saidSending") : state === "failed" ? str("saidFailed") : state === "queued" ? str("saidQueued") : "";
+  // A send that fails, or waits for the connection, is said when it happens (iOS has no live regions): not for a message that came that way.
+  useAnnounce(state === "failed" ? str("failed") : state === "queued" ? str("queued") : "");
   // The message's own words are one stop for a screen reader: who, when, what state, the words, edited, and a summary of what hangs off
   // it. Its reactions, attachments and thread are stops of their own after it, so each can be reached and used.
   const named = attachments.map((a) => a.name || a.title || a.domain || "").filter(Boolean).join(", ");
@@ -315,13 +318,13 @@ export function Message({
           />
         ) : null}
         {state === "sending" ? (
-          <View testID={partId(testID, "message", "statusLine")} accessibilityLiveRegion="polite" style={[s.statusLine, r.statusLine.view]}>
+          <View testID={partId(testID, "message", "statusLine")} style={[s.statusLine, r.statusLine.view]}>
             <Icon testID={partId(testID, "message", "statusIcon")} name="clock" {...statusIcon} color={ink} />
             <Text maxFontSizeMultiplier={fontScale.content} style={r.statusLine.text}>{str("sending")}</Text>
           </View>
         ) : null}
         {state === "failed" ? (
-          <View testID={partId(testID, "message", "statusLine")} accessibilityRole="alert" style={[s.statusLine, r.statusLine.view]}>
+          <View testID={partId(testID, "message", "statusLine")} style={[s.statusLine, r.statusLine.view]}>
             <Icon testID={partId(testID, "message", "statusIcon")} name="circle-alert" {...statusIcon} color={ink} />
             <Text maxFontSizeMultiplier={fontScale.content} style={r.statusLine.text}>{str("failed")}</Text>
             <Text testID={partId(testID, "message", "statusSep")} style={[r.statusLine.text, r.statusSep.view, r.statusSep.text]}>
@@ -339,7 +342,7 @@ export function Message({
           </View>
         ) : null}
         {state === "queued" ? (
-          <View testID={partId(testID, "message", "statusLine")} accessibilityLiveRegion="polite" style={[s.statusLine, r.statusLine.view]}>
+          <View testID={partId(testID, "message", "statusLine")} style={[s.statusLine, r.statusLine.view]}>
             <Icon testID={partId(testID, "message", "statusIcon")} name="cloud-off" {...statusIcon} color={ink} />
             <Text maxFontSizeMultiplier={fontScale.content} style={r.statusLine.text}>{str("queued")}</Text>
             <Text testID={partId(testID, "message", "statusSep")} style={[r.statusLine.text, r.statusSep.view, r.statusSep.text]}>
