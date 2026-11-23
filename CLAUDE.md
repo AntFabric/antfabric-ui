@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-AntFabric UI is one component library for AntFabric's web (TanStack Start), desktop (Tauri) and mobile (Expo) apps, written as real components: `@antfabric/ui-react` serves web and desktop, `@antfabric/ui-react-native` serves the phone. Both take the same props. An Astro catalogue (`apps/catalogue`) draws the components themselves, live, on each platform's tab (the phone kit through React Native Web), and shows each one's flows. Neither app consumes the kits yet. The packages are published to npm (`RELEASING.md`).
+AntFabric UI is one component library for AntFabric's web (TanStack Start), desktop (Tauri) and mobile (Expo) apps, written as real components: `@antfabric/ui-react` serves web and desktop, `@antfabric/ui-react-native` serves the phone. Both take the same props. An Astro catalogue (`apps/catalogue`) draws the components themselves, live, on each platform's tab (the phone kit through React Native Web), and shows each one's flows. Neither app consumes the kits yet. The packages are published to npm (`RELEASING.md`). The other root guides: `AUTHORING.md` (how a component is written), `CONSUMING.md` (how an app installs and themes the kits) and `MIGRATION.md` (0.1 to 1.0, every rename).
 
 ## Commands
 
@@ -20,6 +20,7 @@ pnpm check code                   # kit props against the docs, the API conventi
 pnpm check conventions            # only the API conventions (reports/api/conventions.md) and their ratchet
 pnpm literals:tighten             # lower literals.allow.json to the current counts (never raises one)
 pnpm typecheck                    # tsc over core, docs, both kits and the catalogue
+pnpm describe [id|tokens [group]] [--json]  # one component's props, parts, recipe, examples, flows and files (or a token group) in one read
 pnpm frames <id> [platform] [os]  # where each flow frame's `press` lands
 pnpm rerender [id…]               # only the re-render pass of `check`
 pnpm report [--json]              # token reads, literals and branches per component (design-system baseline)
@@ -29,6 +30,8 @@ pnpm build:packages [core|react|react-native]  # the three publishable packages 
 pnpm verify:packages              # build, pnpm pack, install the tarballs in a scratch project, render and type-check
 pnpm preview
 ```
+
+`pnpm check` with no argument runs everything. Its arguments narrow it to sections and component ids, combined freely: a component id (`button`) renders that component only; the section names are `tokens`, `primitives`, `palette`, `chart`, `agent`, `architecture`, `literals`, `helpers`, `themes` (alias `brand`), `code`, `conventions`, `generic`, `strings`, `defaults`, `recipes`, `docs`, `screens` and `parity`. Flags: `--update-snapshot`, `--no-rerender` (keeps the `@mounted` keys as saved), `--quiet` (no warnings), `--timing`. The typecheck always runs first, so a narrowed check is still not instant. Start with `pnpm describe <id>` before reading a component's files.
 
 There is no linter and no unit-test framework. `pnpm check` is the test suite (about a minute):
 
