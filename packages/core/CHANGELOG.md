@@ -58,6 +58,12 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 12: per-component fixes
 
+- `fmt`: where `Intl.NumberFormat` lacks `signDisplay` or `notation: "compact"` (Hermes may), the signed percent and the compact formats fall back to `exceptZero` and `shortNumber` (both exported), probed once. `points` no longer needs either option. (L59)
+- `moved` takes a `locale`, so a spoken change matches the printed one (`11,3 %`). (L62)
+- `segmentsOf` and `goalsOf` give each item a `key` (`keysOf`: the label, then `label#2` for a repeat). `summarizeSegments` and `totalOf` take segments without one. (L66)
+- `SERIES_MARKS` entries carry a `texture` (`MarkTexture`), drawn with `texturePath` and `TEXTURE`; `radarPoint` places a value on the phone's radar; `meterIcon` is Meter's state icon, shared with GaugeChart. (M45, M46)
+- `kitCss`: `[data-af-scroll]:focus{outline:none}`, so a keyboard-reached scroll region keeps the forced-colours outline.
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:

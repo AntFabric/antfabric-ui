@@ -95,6 +95,15 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 12: per-component fixes
 
+- `BarChart`: new `marks`, left out on for two or more series: each series past the first is textured over its colour (an svg pattern laid in each bar and the legend's swatch). Pass `marks={false}` for flat fills. (M46)
+- `RadarChart`: new `marks`, left out on for two or more series: a dash per outline and a marker shape at each axis (drawn by the kit over gifted-charts' polygons), and the same in the legend's key. (M46)
+- `GaugeChart`: new `showState`, default `true`: Meter's icon beside the value in caution and critical, and the state said in the summary. New strings `stateWarning`, `stateDanger`. (M45)
+- `LineChart` with `marks` draws the five marker shapes the legend shows (was a circle and a square), and a `null` or non-numeric value is a gap in the line, not a point at zero. (L58, L63)
+- `SparkBars` draws values below zero: a mixed range hangs its losses under a zero line, an all-negative one hangs every bar from the top (was a broken scale). (L63)
+- `DonutChart`: the segment switch sits beside the row's button instead of inside it, so a screen reader reaches it. (M50)
+- `Table` draws its sort bar only when a column sorts or rows can be ticked. (L66)
+- `PeriodCompare` says its change in the locale. `GoalRings`, `DonutChart`, `Breakdown`, `Sparkline`, `SparkBars` and `Pagination`: as the React kit. (L62, L66, L67)
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:

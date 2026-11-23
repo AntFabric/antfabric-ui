@@ -99,6 +99,15 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 12: per-component fixes
 
+- `BarChart`: new `marks`, left out on for two or more series: each series past the first is filled with a texture over its colour (lines rising, lines falling, both, dots), in the bars and in the legend's swatch, so series are not told apart by hue alone. Pass `marks={false}` for flat fills. (M46)
+- `RadarChart`: new `marks`, left out on for two or more series: each series gets LineChart's dash and marker shape, in its outline, at each axis and in the legend's key. Pass `marks={false}` for plain outlines. (M46)
+- `GaugeChart`: new `showState`, default `true`: Meter's icon beside the value in the caution and critical states, and the state said in the summary ("84%, caution"). Pass `showState={false}` to leave the icon off; the words stay. New strings `stateWarning`, `stateDanger`. (M45)
+- `Pagination` moves focus after a page change only when the pager had it, so a page set by the app no longer takes focus; the jump Select's items are built once per page count. (L56, L67)
+- `MetricTabs` names its tabs and panel with `useId`, so two tab sets whose titles are not Latin no longer share ids. (L57)
+- `Table`: the scroll region's outline comes off in the kit's sheet (`[data-af-scroll]:focus`), not inline, so Windows High Contrast shows its focus.
+- `KpiCard`: a figure written short ($1.3B) gives a screen reader the whole one. `GoalRings`: a lit goal shows its real share in the middle (116%), not 100%. `Sparkline` and `SparkBars` say their default label with the kit's format words.
+- `DonutChart`, `Breakdown` and `GoalRings`: two rows with one name are two items. The second is named `Name#2` in `hidden` and `selected`. (L66)
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:
