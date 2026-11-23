@@ -846,6 +846,118 @@ const HANDOFF_CASES: HandoffCase[] = [
 }
 
 /*
+ * The web root once mounted, and what a consumer's own tests run it in. Each failure is an error:
+ *   - a theme's sheet is in <head> once while any root draws it, and gone when the last one unmounts (a live colour picker made one per colour);
+ *   - a chart under an AntFabricProvider nested (to scope strings) in a dark root is drawn as under the root itself, not light;
+ *   - with no `matchMedia` (jsdom: Jest, Vitest) a control that reads the pointer mounts;
+ *   - hover ends when a control is disabled, so it is not hovered when enabled again;
+ *   - focus a pointer gave (no `:focus-visible`) draws the ring once a key is pressed, not on a shortcut with a modifier, not after blur.
+ */
+{
+  const ReactKit = await import("@antfabric/ui-react");
+  const ReactData = await import("@antfabric/ui-react/data");
+  const { useInteraction } = await import("../../../packages/react/src/lib/interaction");
+  const fail = (m: string) => {
+    errors++;
+    keep.error(`  ✗ ${m}`);
+  };
+  const mount = async () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    return {
+      host,
+      render: (el: ReturnType<typeof createElement>) => act(async () => root.render(el)),
+      done: async () => {
+        await act(async () => root.unmount());
+        host.remove();
+      },
+    };
+  };
+  logged.length = 0;
+
+  const [a, b] = [defineTheme({ name: "Sheet A", brand: { primary: "#0f766e" } }), defineTheme({ name: "Sheet B", brand: { primary: "#b45309" } })];
+  const sheets = (id: string) => [...document.head.querySelectorAll("style[data-href]")].filter((s) => (s.getAttribute("data-href") ?? "").split(" ").includes(`antfabric-ui-${id}`)).length;
+  const roots: Awaited<ReturnType<typeof mount>>[] = [];
+  for (const theme of [a, a, b]) {
+    const m = await mount();
+    await m.render(createElement(ReactKit.AntFabricRoot, { theme, css: "theme", children: "x" }));
+    roots.push(m);
+  }
+  const counts = () => `${sheets(a.id)}/${sheets(b.id)}`;
+  if (counts() !== "1/1") fail(`two roots in theme A and one in B leave ${counts()} sheets (A/B) in <head>, not 1/1`);
+  await roots[0]!.done();
+  if (counts() !== "1/1") fail(`one of two roots in theme A unmounted leaves ${counts()} sheets (A/B), not 1/1`);
+  await roots[1]!.done();
+  if (counts() !== "0/1") fail(`the last root in theme A unmounted leaves ${counts()} sheets (A/B), not 0/1`);
+  await roots[2]!.done();
+  if (counts() !== "0/0") fail(`every root unmounted leaves ${counts()} sheets (A/B), not 0/0`);
+
+  const sparkline = (scheme: "light" | "dark", nested: boolean) => {
+    const chart = createElement(ReactData.Sparkline, { data: [{ v: 1 }, { v: 3 }, { v: 2 }], y: "v", label: "Trend" });
+    return createElement(ReactKit.AntFabricRoot, { scheme, theme: antfabric, children: nested ? createElement(ReactKit.AntFabricProvider, { strings: { "text-field": { required: "Obligatoire" } }, children: chart }) : chart });
+  };
+  const drawn: string[] = [];
+  for (const [scheme, nested] of [["dark", true], ["dark", false], ["light", false]] as const) {
+    const m = await mount();
+    await m.render(sparkline(scheme, nested));
+    drawn.push(foldIds(m.host.querySelector("svg")?.outerHTML ?? ""));
+    await m.done();
+  }
+  if (!drawn[0] || drawn[1] === drawn[2]) fail("the nested-provider probe draws no chart, or one that is the same in light and dark (it proves nothing)");
+  else if (drawn[0] !== drawn[1]) fail("a Sparkline under an AntFabricProvider nested in a dark AntFabricRoot is not drawn as under the root itself");
+
+  const media = globalThis.matchMedia;
+  delete (globalThis as { matchMedia?: unknown }).matchMedia;
+  try {
+    const m = await mount();
+    await m.render(createElement(Stage, { platform: "web", os: "browser", scheme: "light", theme: antfabric, children: createElement(ReactKit.IconButton, { icon: "x", label: "Close" }) }));
+    if (!m.host.querySelector("button")) fail("IconButton drew no button where there is no matchMedia");
+    await m.done();
+  } catch (e) {
+    fail(`IconButton throws where there is no matchMedia (jsdom): ${(e as Error).message}`);
+  } finally {
+    globalThis.matchMedia = media;
+  }
+
+  const Probe = ({ disabled }: { disabled?: boolean }) => {
+    const i = useInteraction({ disabled });
+    return createElement("button", { ...i.handlers, "data-hovered": String(i.hovered), "data-focused": String(i.focused) });
+  };
+  {
+    const m = await mount();
+    await m.render(createElement(Probe));
+    const el = m.host.querySelector("button")!;
+    await act(async () => void el.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, pointerId: 1, pointerType: "mouse" })));
+    await act(async () => void el.dispatchEvent(new PointerEvent("pointerenter", { bubbles: false, pointerId: 1, pointerType: "mouse" })));
+    const hoveredFirst = el.getAttribute("data-hovered");
+    await m.render(createElement(Probe, { disabled: true }));
+    await m.render(createElement(Probe, { disabled: false }));
+    if (hoveredFirst !== "true") fail("the hover probe could not hover its button (it proves nothing)");
+    else if (el.getAttribute("data-hovered") !== "false") fail("useInteraction is still hovered after disabled, then enabled again, with no pointer over it");
+
+    // A pointer's focus: this one element answers `:focus-visible` with no, as a browser does after a click.
+    const matches = el.matches.bind(el);
+    el.matches = (s: string) => (s === ":focus-visible" ? false : matches(s));
+    const key = (init: KeyboardEventInit) => act(async () => void el.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, ...init })));
+    await act(async () => el.focus());
+    const afterClick = el.getAttribute("data-focused");
+    await key({ metaKey: true });
+    const afterShortcut = el.getAttribute("data-focused");
+    await key({});
+    const afterKey = el.getAttribute("data-focused");
+    await act(async () => el.blur());
+    await key({});
+    const afterBlur = el.getAttribute("data-focused");
+    if (`${afterClick} ${afterShortcut} ${afterKey} ${afterBlur}` !== "false false true false")
+      fail(`useInteraction focused after a click, ⌘ a key, a key, blur and a key is ${afterClick} ${afterShortcut} ${afterKey} ${afterBlur}, not false false true false`);
+    await m.done();
+  }
+  for (const l of logged) fail(`web root probes warned: ${l.split("\n")[0]!.slice(0, 200)}`);
+  logged.length = 0;
+}
+
+/*
  * Keys across layers, on the web (the desktop draws the same kit file), in the setups a single component never shows: an Escape meant for a
  * Select inside a modal Dialog closes the Select and leaves the Dialog; Tab and Shift+Tab stay inside a modal whose controls are a roving
  * group (a Sheet holding only a RadioGroup, the CommandPalette from its field); an Enter that commits an IME composition submits nothing.
