@@ -1,5 +1,5 @@
 import { Pressable, Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useLocale, useStrings, type KitStrings, type Person } from "@antfabric/ui-core";
+import { recipes, useLocale, useStrings, type KitStrings, type Person } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon } from "../../lib/icon";
 import { Enter } from "../../lib/motion";
@@ -22,8 +22,8 @@ export interface ThreadSummaryProps extends RootProps {
   /** You follow this thread: the bell and "Following". */
   following?: boolean;
   /**
-   * Called with `following` as the tap leaves it: given `following` as well, the line is
-   * controlled and the tap changes nothing here; on its own it flips Following.
+   * @deprecated Never called: opening a thread is not following it, and nothing on this line changes `following`. It stays
+   * accepted through 1.x so no product breaks, and goes at 2.0.
    */
   onFollowingChange?: (following: boolean) => void;
   /** Pushes the thread screen. */
@@ -44,13 +44,12 @@ const useStyles = createStyles((t) => ({
   meta: { flexShrink: 1 },
 }));
 
-export function ThreadSummary({ replyCount, lastReply = "", participants = [], unreadCount = 0, following, onFollowingChange, onPress, strings, styles, style, testID, ...rest }: ThreadSummaryProps) {
+export function ThreadSummary({ replyCount, lastReply = "", participants = [], unreadCount = 0, following: follow = false, onFollowingChange: _onFollowingChange, onPress, strings, styles, style, testID, ...rest }: ThreadSummaryProps) {
   const locale = useLocale();
   const { t } = useTheme();
   const str = useStrings("thread-summary", strings);
   const s = useStyles();
   const press = usePress();
-  const [follow = false, setFollow] = useControllable(following, onFollowingChange);
   const r = useRecipe(recipes["thread-summary"], { state: { pressed: press.pressed, focus: press.focused }, styles });
   const root = partStyle(r, "root", { view: press.pressed ? { opacity: 0.7 } : undefined });
   // An icon's size is its width and height; what else `styles` sets on it goes on the glyph.
@@ -73,10 +72,7 @@ export function ThreadSummary({ replyCount, lastReply = "", participants = [], u
       {...rootProps(rest)}
       accessibilityRole="button"
       accessibilityLabel={rest.accessibilityLabel ?? label}
-      onPress={() => {
-        setFollow(!follow);
-        onPress?.();
-      }}
+      onPress={() => onPress?.()}
       {...press.handlers}
       style={[s.root, root.view, style]}
     >

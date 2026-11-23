@@ -66,11 +66,11 @@ const docs: ComponentDocs = {
     expanded: { type: "boolean", default: true, description: "The question is shown. False shrinks it to a bar with waitingLabel (the root, folded). The question is still open: answering is the only way out." },
     autoFocus: { type: "boolean", default: false, description: "Moves focus to the question (its title; the phone's screen reader focus) when it appears or expands: for a question that blocks the turn. Either way the question is announced." },
     offline: { type: "boolean", default: false, description: "Submit waits and the footer says why. Rows and typing still work." },
-    sending: { type: "boolean", default: false, description: "The answer is on its way: Submit reads Sending… and everything locks, so a second press cannot send a second answer. Pressing Submit sets it; the app removes the panel." },
+    sending: { type: "boolean", default: false, description: "The answer is on its way: Submit reads Sending… and everything locks, so a second press cannot send a second answer. A press on Submit shows the same until the app answers; the app removes the panel." },
     onValueChange: { type: "event", args: "value: string", changes: "value" },
     onTypedChange: { type: "event", args: "typed: string", changes: "typed" },
     onExpandedChange: { type: "event", args: "expanded: boolean", changes: "expanded" },
-    onSubmit: { type: "event", args: "answer: string", description: "The chosen row's key, or the typed answer trimmed. A gated tool reads approve or deny; a choice sends the option's key; a consent sends the sentence the app maps it to." },
+    onSubmit: { type: "event", args: "answer: string", description: "The chosen row's key, or the typed answer trimmed. A gated tool reads approve or deny; a choice sends the option's key; a consent sends the sentence the app maps it to. Reports the request: the panel reads Sending… until the app answers with `sending` or `offline` (or the promise the handler returns settles), so a send that fails comes back to Submit with the answer still chosen." },
   },
   platforms: {
     web: {

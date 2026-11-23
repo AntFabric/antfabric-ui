@@ -49,7 +49,7 @@ export interface ListItemProps extends RootProps {
   /** A hairline under the row, for card-less lists. */
   divider?: boolean;
   role?: ListItemRole;
-  /** Called with `selected` as the tap leaves it: a tap toggles it. */
+  /** Called with `selected` as the tap leaves it: a tap toggles it on a selection row (role option or checkbox) only. */
   onSelectedChange?: (selected: boolean) => void;
   /** The row was tapped. Opening what the row stands for is the caller's. */
   onPress?: () => void;
@@ -143,7 +143,8 @@ export function ListItem({
       accessibilityState={role === "checkbox" ? { disabled: press.disabled, checked: on } : { disabled: press.disabled, selected: on }}
       disabled={press.disabled}
       onPress={() => {
-        setOn(!on);
+        // Only a selection row (an option, a checkbox) toggles; a link, button or menu row's `selected` is the app's.
+        if (role === "option" || role === "checkbox") setOn(!on);
         onPress?.();
       }}
       onLongPress={onLongPress ? () => onLongPress() : undefined}

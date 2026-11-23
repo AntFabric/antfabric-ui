@@ -58,7 +58,7 @@ const docs: ComponentDocs = {
     loading: {
       type: "boolean",
       default: false,
-      description: "The confirm is in flight: its button spins, Cancel, Esc and the scrim do nothing until it settles.",
+      description: "The confirm is in flight: its button spins and cannot be pressed again. Cancel, Esc and the scrim still cancel, so the app can abandon the request. A press on the CTA shows the same until the app answers, without this prop.",
     },
     error: {
       type: "string",
@@ -96,6 +96,7 @@ const docs: ComponentDocs = {
     },
     onConfirm: {
       type: "event",
+      description: "Reports the request; the CTA spins until the app answers, by closing the dialog, with a new `error` or `loading`, or by settling the promise the handler returns. A failure with the same `error` as before needs the promise.",
     },
     onCancel: {
       type: "event",
@@ -104,7 +105,7 @@ const docs: ComponentDocs = {
   platforms: {
     web: {
       status: "ready",
-      base: "A <div role=\"alertdialog\"> (confirm) or \"dialog\" (form), aria-modal, labelled by its <h2> and described by the body, on a 3px-blurred scrim; inline styles over `t`; Button and IconButton. Tab wraps inside, Esc cancels, Mod+Enter submits a form, and Cancel (a form: its first field) takes focus on open; pops in with enter(\"pop\") over a fading scrim; `loading` through useControllable",
+      base: "A <div role=\"alertdialog\"> (confirm) or \"dialog\" (form), aria-modal, labelled by its <h2> and described by the body, on a 3px-blurred scrim; inline styles over `t`; Button and IconButton. Tab wraps inside, Esc cancels, Mod+Enter submits a form, and Cancel (a form: its first field) takes focus on open; pops in with enter(\"pop\") over a fading scrim; a press waits for the app's answer through usePending (`loading` or a new `error` ends it)",
       import: "import { Dialog } from \"@antfabric/ui-react\"",
       notes: [
         "The backdrop blurs 3px. With `modal` the dialog is drawn in the overlay layer of its AntFabricRoot (the theme applies, no overflow clips it): the scrim covers the window, the page behind does not scroll (the body and the box the page scrolls in) and the rest of the root is inert; only the top dialog takes Esc and a press on the scrim. Without `modal` it is drawn where it is mounted, and those belong to the host.",
@@ -140,7 +141,7 @@ const docs: ComponentDocs = {
         "Confirm layout: 24 / 20 / 20 padding, 20px corners, a 42px glyph tile, a display-font title, the body at 13px, and the two buttons right-aligned at equal widths (DialogActions).",
         "The CTA is solid danger-coloured for every confirm whose glyph is a bin; Log out, Disconnect and Remove from your list stay on the brand fill because they destroy nothing.",
         "Focus: on mount the first control takes focus (a confirm's Cancel, a form's first field; the panel when it holds nothing focusable), Tab wraps inside, and the opener gets focus back on unmount if it is still on the page.",
-        "In the catalogue the panel pops in over a fading scrim, and pressing the CTA sets `loading`: its button spins and Cancel and Close go quiet, as while the request is in flight.",
+        "In the catalogue the panel pops in over a fading scrim, and pressing the CTA spins it until the app answers; Cancel and Close stay live, as while the request is in flight.",
         "Escape runs through the app's Escape ladder: a popover menu first, then the confirm, then the form under it — one layer per press.",
       ],
       keyboard: [
@@ -160,14 +161,14 @@ const docs: ComponentDocs = {
     },
     mobile: {
       status: "ready",
-      base: "A bottom sheet: <Enter motion=\"slide-up\"> (role alertdialog or dialog, accessibilityViewIsModal) over a fading scrim, StyleSheet over useTheme(); the CTA and Cancel as full-width Buttons, IconButton to close; `loading` through useControllable",
+      base: "A bottom sheet: <Enter motion=\"slide-up\"> (role alertdialog or dialog, accessibilityViewIsModal) over a fading scrim, StyleSheet over useTheme(); the CTA and Cancel as full-width Buttons, IconButton to close; a press waits for the app's answer through usePending (`loading` or a new `error` ends it)",
       import: "import { Dialog } from \"@antfabric/ui-react-native\"",
       notes: [
         "Title row 16 under the handle, message 28 above the buttons, then the CTA and an outlined Cancel, both 56pt and full width — Cancel under the CTA, where the thumb rests after reading.",
         "tone danger is the red destructive button; tone primary is for an approval (granting an agent permission), which must not look like a hazard.",
         "No glyph tile on the phone; the title carries the question.",
         "Closing puts the keyboard away too.",
-        "In the catalogue the sheet slides up, and pressing the CTA sets `loading`: it spins and Cancel and Close go quiet.",
+        "In the catalogue the sheet slides up, and pressing the CTA spins it until the app answers; Cancel and Close stay live.",
       ],
       gestures: [
         {

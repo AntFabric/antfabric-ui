@@ -61,12 +61,11 @@ const docs: ComponentDocs = {
     onStageChange: {
       type: "event",
       args: "stage: UpdateBannerStage",
-      changes: "stage",
-      description: "Called with `stage` as the press leaves it: downloading after Install or Retry (desktop), checking after Check again (phone). Given `stage` too, the notice is controlled and the updater's own events move it; otherwise it moves itself.",
+      description: "Reports the request a press makes: downloading after Install or Retry (desktop), checking after Check again (phone). The notice never moves `stage` itself: the pressed control spins until the app answers with a new `stage` or `error` (or the promise onApply or onCheck returns settles), so a check or retry that fails the same way again comes back to where it was.",
     },
     onApply: {
       type: "event",
-      description: "Desktop: install the waiting release, or retry a failed one. Phone: open the store for a store-required version.",
+      description: "Desktop: install the waiting release, or retry a failed one; the card spins until the app answers with `stage` or `error`, or the promise the handler returns settles. Phone: open the store for a store-required version.",
     },
     onRestart: {
       type: "event",
@@ -75,6 +74,7 @@ const docs: ComponentDocs = {
     onCheck: {
       type: "event",
       platforms: ["mobile"],
+      description: "Check again: reports the request; the button spins until the app answers with `stage` (checking, latest, failed) or `error`, or the promise the handler returns settles.",
     },
   },
   platforms: {
@@ -95,12 +95,12 @@ const docs: ComponentDocs = {
     },
     desktop: {
       status: "ready",
-      base: "A <button> card (role=\"status\", or \"alert\" when failed) for the foot of the nav rail, inline styles over `t`, rising in with enter(\"rise\"); a non-pressable busy card while downloading or installing; a 40px rail <button> with a dot when collapsed. Hover and focus from useInteraction, `stage` through useControllable; the app drives it from the Tauri updater plugin",
+      base: "A <button> card (role=\"status\", or \"alert\" when failed) for the foot of the nav rail, inline styles over `t`, rising in with enter(\"rise\"); a non-pressable busy card while downloading or installing; a 40px rail <button> with a dot when collapsed. Hover and focus from useInteraction; `stage` is the app's (a press waits through usePending); the app drives it from the Tauri updater plugin",
       import: "import { UpdateBanner } from \"@antfabric/ui-react\"",
       notes: [
         "Renders nothing unless a release is genuinely waiting: a failed launch check, or a shell with no updater configured, stays idle and silent.",
         "No dismiss, by the owner's design (ADR-0294): a waiting update stays until it is installed or the app restarts.",
-        "The card rises in. Pressing Update available (or a failed one) moves it to downloading at once and calls onApply; downloading → installing → ready then follow the updater's events through `stage`. The busy card is not pressable. Restart to update calls onRestart, which relaunches.",
+        "The card rises in. Pressing Update available (or a failed one) calls onStageChange(\"downloading\") and onApply and spins until the app passes the next `stage`; downloading → installing → ready follow the updater's events through `stage`. The busy card is not pressable. Restart to update calls onRestart, which relaunches.",
         "The title must fit a 127 px column at the 15 px top of the type ladder — every stage title is one line, nowrap.",
         "Collapsed rail: the same glyph with a dot, never a number — there is only ever one release waiting.",
         "The running app re-checks periodically, not only at launch; an app nobody quits otherwise never learns a release exists.",
@@ -114,12 +114,12 @@ const docs: ComponentDocs = {
     },
     mobile: {
       status: "ready",
-      base: "A View card with the kit's Button, StyleSheet over useTheme(); the Restart to apply? sheet slides up with <Enter motion=\"slide-up\"> and follows a downward drag (PanResponder + Animated) to put itself away. `stage` and `confirm` through useControllable; the app drives it from expo-updates",
+      base: "A View card with the kit's Button, StyleSheet over useTheme(); the Restart to apply? sheet slides up with <Enter motion=\"slide-up\"> and follows a downward drag (PanResponder + Animated) to put itself away. `confirm` through useControllable; `stage` is the app's (Check again waits through usePending), driven from expo-updates",
       import: "import { UpdateBanner } from \"@antfabric/ui-react-native\"",
       notes: [
         "OTA updates replace the JavaScript only. A change to native code bumps runtimeVersion, and the phone is then told to update from the store — an OTA cannot deliver it.",
         "Restarting is optional: an update that has downloaded applies on its own the next time the app opens.",
-        "In the catalogue Check for updates moves latest or failed to checking, Restart to apply update sets `confirm` so the sheet slides up, and Later puts it away.",
+        "In the catalogue Check for updates spins until the app answers (the flows pass `stage: \"checking\"`), Restart to apply update sets `confirm` so the sheet slides up, and Later puts it away.",
         "In a development build expo-updates rejects every call, so the card says \"Updates are not enabled in this build.\" rather than pretending it checked.",
       ],
       gestures: [

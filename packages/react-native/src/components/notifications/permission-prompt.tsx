@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { recipes, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { announce } from "../../lib/a11y";
 import { GlassSurface } from "../../lib/glass";
@@ -19,8 +19,8 @@ export interface PermissionPromptProps extends RootProps {
   permission?: PermissionPromptPermission;
   /** card is the prompt on its own. sheet: the prompt IS the bottom sheet — full width, top corners rounded, a grab handle. */
   presentation?: PermissionPromptPresentation;
-  /** Runs the OS request — from this tap, never on load. */
-  onAllow?: () => void;
+  /** Runs the OS request, from this tap, never on load. Turn on spins until the app passes the answer as `permission`, or the returned promise settles. */
+  onAllow?: () => void | Promise<unknown>;
   onLater?: () => void;
   /** iOS provisional authorisation: deliver quietly to Notification Center without asking. */
   onQuiet?: () => void;
@@ -60,8 +60,10 @@ export function PermissionPrompt({ permission = "default", presentation = "card"
   const { os, glass } = useTheme();
   const s = useStyles();
   const str = useStrings("permission-prompt", strings);
-  // Turn on shows the on state at once; the app's next `permission` (the OS's real answer) takes over.
-  const [state, setState] = useControllable(permission);
+  // Turn on reports the request and spins until the app passes the OS's answer as `permission` (or the promise settles): a dismissed
+  // prompt leaves it as it was, and the prompt never says on before the OS does.
+  const state = permission;
+  const { pending, run } = usePending([permission]);
   const sheet = presentation === "sheet";
   const ios = os === "ios";
   const titleKey = state === "unsupported" ? "titleUnsupportedBuild" : state === "denied" ? "titleOff" : state === "granted" ? "titleOn" : "titleAsk";
@@ -117,10 +119,8 @@ export function PermissionPrompt({ permission = "default", presentation = "card"
               label={str("turnOn")}
               iconLeading="bell"
               full
-              onPress={() => {
-                setState("granted");
-                onAllow?.();
-              }}
+              loading={pending}
+              onPress={() => run(onAllow)}
             />
           ) : null}
           {state === "default" && ios ? <Button label={str("quiet")} variant="ghost" full onPress={() => onQuiet?.()} /> : null}

@@ -139,6 +139,7 @@ const docs: ComponentDocs = {
     playing: {
       type: "boolean",
       default: false,
+      description: "The voice note is playing: Pause shows. Play and Pause report it through onPlayingChange, and the app starts or stops the audio.",
     },
     compact: {
       type: "boolean",
@@ -161,12 +162,17 @@ const docs: ComponentDocs = {
     onStatusChange: {
       type: "event",
       args: "status: AttachmentCardStatus",
-      changes: "status",
-      description: "Called with `status` as Retry leaves it (uploading). Given `status` too, the card is controlled; otherwise Retry turns it back to uploading itself.",
+      description: "Retry reports the request: called with uploading. The card never moves `status` itself: Retry spins until the app passes the new `status`, `error` or `progress` (or the promise onRetry returns settles), so a retry that fails again offers Retry again.",
     },
     onRetry: {
       type: "event",
-      description: "Retry was pressed on a failed upload: the app starts it again.",
+      description: "Retry was pressed on a failed upload: the app starts it again and answers with `status`. Retry spins until it does, or until the promise the handler returns settles.",
+    },
+    onPlayingChange: {
+      type: "event",
+      args: "playing: boolean",
+      changes: "playing",
+      description: "Called with `playing` as Play or Pause leaves it: the app starts or stops the voice note. Given `playing` too, the button is controlled; on its own it flips itself.",
     },
     onCancel: {
       type: "event",
@@ -206,7 +212,7 @@ const docs: ComponentDocs = {
         "The FileRow shape: 40px letter badge in the family colour, name in 13 SemiBold, \"PDF document · 2.4 MB\", a 26px Download. 320 wide, 100% on narrow panes.",
         "Downloads go to the OS Downloads folder through Tauri's dialog/fs plugins and announce themselves with a native notification when the window is not focused.",
         "Files already opened are kept in the app data cache, so they reopen offline; uncached files show \"You're offline. This file will download when you're back.\"",
-        "In the catalogue, Retry on a failed upload sets `status` to uploading (the error line gives way to the progress track), and the voice note's play button toggles `playing`.",
+        "In the catalogue, Retry on a failed upload spins until the app answers (the flows pass `status`), and the voice note's play button toggles `playing` and reports it through onPlayingChange.",
       ],
       keyboard: [
         {

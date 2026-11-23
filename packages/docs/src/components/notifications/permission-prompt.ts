@@ -30,7 +30,7 @@ const docs: ComponentDocs = {
     },
     onAllow: {
       type: "event",
-      description: "Runs the OS request — from this click, never on load.",
+      description: "Runs the OS request, from this click, never on load. Reports the request: Turn on spins until the app passes the OS's answer as `permission` (or the promise the handler returns settles). A dismissed OS prompt leaves `permission` as it was, and the prompt returns to asking; it never says on before the OS does.",
     },
     onLater: {
       type: "event",
@@ -55,13 +55,13 @@ const docs: ComponentDocs = {
   platforms: {
     web: {
       status: "ready",
-      base: "<div role=\"region\"> card with an <h2> title, inline styles over `t`; Button actions; `permission` kept in local state that follows the prop, so Turn on shows the on state at once; pops in with enter(); the blocked-in-browser hint is drawn aria-hidden. The app runs Notification.requestPermission() inside onAllow and watches navigator.permissions.query({ name: 'notifications' })",
+      base: "<div role=\"region\"> card with an <h2> title, inline styles over `t`; Button actions; `permission` is the app's (the OS's answer): Turn on spins (usePending) until it arrives, and the new title is said only then; pops in with enter(); the blocked-in-browser hint is drawn aria-hidden. The app runs Notification.requestPermission() inside onAllow and watches navigator.permissions.query({ name: 'notifications' })",
       import: "import { PermissionPrompt } from \"@antfabric/ui-react\"",
       notes: [
         "Shown in the notification rail and once as a dismissible card on the home screen after the first DM or mention arrives — never as a prompt on page load.",
         "The OS prompt is requested only from the Turn on click: Safari and Firefox refuse a request without a user gesture, and Chrome switches a site that prompts on load to its quiet UI (a crossed bell in the address bar) that most people never see.",
         "Denied cannot be undone from the page — no API reopens the prompt. The card says where the switch is and offers Check again, which re-reads Notification.permission.",
-        "In the catalogue, Turn on notifications sets `permission` to granted (the browser would ask first), so the prompt turns into the on state with Send a test notification. The card pops in.",
+        "In the catalogue, Turn on notifications spins until the app answers; the flows pass `permission: \"granted\"`, the on state with Send a test notification. The card pops in.",
       ],
       keyboard: [
         {
@@ -80,7 +80,7 @@ const docs: ComponentDocs = {
         "Linux: no permission model. If no notification server is running (some tiling setups), notify-rust fails silently; the test button is how a person finds out.",
         "Linux has no settings page to open, so when notifications are off there the card offers Send a test notification instead of a settings button.",
         "The rail's own switches (Notification sound, Show Notifications) are a separate, per-machine setting and are not this permission.",
-        "Turn on notifications sets `permission` to granted in the catalogue (macOS would ask first); the card pops in.",
+        "Turn on notifications spins until the app passes the OS's answer (the flows pass granted); the card pops in.",
       ],
       keyboard: [
         {
@@ -99,7 +99,7 @@ const docs: ComponentDocs = {
         "Android 13+ needs the POST_NOTIFICATIONS runtime permission; Android 12 and earlier are allowed by default, so the sheet skips straight to granted there.",
         "Coming back from Settings with notifications allowed turns the Profile switch on without a second tap (awaitingSettings).",
         "iOS 26+: Liquid Glass — the surface is drawn through expo-glass-effect's GlassView (gated on its availability check; the material itself follows the device's Clear / Tinted, Reduce Transparency and Increase Contrast settings). iOS 18 and earlier keep today's blur/opaque look. Only the sheet presentation takes glass; the card stays opaque so the explanation reads cleanly wherever it sits.",
-        "Turn on notifications sets `permission` to granted in the catalogue (the OS would ask first). The card pops in; the sheet presentation pops too, because one template root carries one entrance — the kit slides the sheet up.",
+        "Turn on notifications spins until the app passes the OS's answer (the flows pass granted). The card pops in; the sheet presentation pops too, because one template root carries one entrance — the kit slides the sheet up.",
       ],
       gestures: [
         {

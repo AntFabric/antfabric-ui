@@ -110,7 +110,7 @@ const docs: ComponentDocs = {
     dismissed: {
       type: "boolean",
       default: false,
-      description: "Dismissed: × or Mark as read on web and desktop, a swipe up on the phone (the catalogue uses the grabber). The banner leaves and nothing is drawn.",
+      description: "Dismissed: × or Mark as read on web and desktop, a swipe up on the phone (the catalogue uses the grabber). The banner leaves and nothing is drawn, until the next notification: a new title, context, body or time shows again, back at this prop.",
     },
     onOpen: {
       type: "event",

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Animated, PanResponder, Platform, Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { recipes, useControllable, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { announce, useBackHandler } from "../../lib/a11y";
 import { Icon } from "../../lib/icon";
@@ -22,13 +22,14 @@ export interface UpdateBannerProps extends RootProps {
   appVersion: string;
   /** The Restart to apply? sheet is open. */
   confirm?: boolean;
-  /** Called with `stage` as Check again leaves it (checking). */
+  /** Reports the request Check again makes (checking). The card waits for the app to pass the new `stage`; it never moves it. */
   onStageChange?: (stage: UpdateBannerStage) => void;
   /** Open the store for a store-required version. */
   onApply?: () => void;
   /** Restart now: reload onto the downloaded update. */
   onRestart?: () => void;
-  onCheck?: () => void;
+  /** Check again: the button spins until the app answers with `stage` or `error`, or the promise settles. */
+  onCheck?: () => void | Promise<unknown>;
   /** Per-part styles over the theme: `{ root: {…}, card: {…}, versionRow: {…}, sheet: {…} }`. */
   styles?: PartStyles<"update-banner">;
   /** This card's built-in text (the version line, the notes, the buttons, the restart sheet) over the tree's and the English defaults. */
@@ -77,7 +78,7 @@ function useSwipeDown(onDismiss: () => void) {
 }
 
 export function UpdateBanner({
-  stage,
+  stage: current = "available",
   version,
   error,
   appVersion,
@@ -96,8 +97,9 @@ export function UpdateBanner({
   const s = useStyles();
   const str = useStrings("update-banner", strings);
   const r = useRecipe(recipes["update-banner"], { styles });
-  // Check for updates moves the card to checking at once; Restart to apply opens the sheet and Later puts it away.
-  const [current = "available", setStage] = useControllable(stage, onStageChange);
+  // Check again reports the request and spins until the app answers (the stage is expo-updates'); Restart to apply opens the sheet and
+  // Later puts it away, which is the card's own.
+  const { pending, run } = usePending([current, error]);
   const [confirm, setConfirm] = useControllable(confirmProp);
   const swipe = useSwipeDown(() => setConfirm(false));
   const busy = current === "checking" || current === "downloading" || current === "available";
@@ -140,11 +142,17 @@ export function UpdateBanner({
             size="lg"
             variant="secondary"
             iconLeading="cloud-download"
-            loading={busy}
-            onPress={() => {
-              setStage("checking");
-              onCheck?.();
-            }}
+            loading={busy || pending}
+            onPress={() =>
+              run(
+                onStageChange || onCheck
+                  ? () => {
+                      onStageChange?.("checking");
+                      return onCheck?.();
+                    }
+                  : undefined,
+              )
+            }
           />
         ) : null}
         {current === "store-required" ? (

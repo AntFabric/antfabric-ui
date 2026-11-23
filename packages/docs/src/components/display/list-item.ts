@@ -108,7 +108,7 @@ const docs: ComponentDocs = {
       type: "event",
       args: "selected: boolean",
       changes: "selected",
-      description: "Called with `selected` as the press leaves it (a press toggles it).",
+      description: "Called with `selected` as the press leaves it: a press toggles it on a selection row (role option or checkbox) only. A link, button or menu row never changes `selected` itself; it is the app's (the open conversation).",
     },
     onPress: {
       type: "event",
@@ -129,7 +129,7 @@ const docs: ComponentDocs = {
         "A row that opens a conversation is an <a href>, so middle-click and ⌘-click open it in a new tab; the open one carries aria-current=\"page\".",
         "Hover reveals the row's ⋯ menu and its mark-as-read affordance; the same actions are on the row's context menu and in the keyboard map, so hover is never the only way in.",
         "pointer: coarse raises min-height to 44px on touch laptops.",
-        "Pressing toggles `selected` (through useControllable, so the catalogue preview is interactive): a link or button row's grey fill fades in, an option row's check pops in. Opening the conversation is the caller's.",
+        "Pressing an option or checkbox row toggles `selected` (through useControllable, so the catalogue preview is interactive): an option row's check pops in, a checkbox row ticks. A link or button row's grey fill is the app's `selected`: opening the conversation is the caller's, and the row never marks itself current.",
         "A checkbox row is one <button role=\"checkbox\" aria-checked>: the box is drawn inside it, not a second control, so a click anywhere on the row ticks it.",
       ],
       keyboard: [
@@ -159,7 +159,7 @@ const docs: ComponentDocs = {
         "Sidebar rows are 30px with a 7px radius fill; the ⋮ is hover-revealed and the unread count slides beside it (2026-10-06).",
         "FileRow is the two-line, tiled case: a 36px chip, the name in semibold, middot-joined provenance (\"Figma · Nuthan · yesterday · 4.2 MB\"), and the channel trailing. Today's chip is coral-soft; this spec draws it grey because coral is reserved for \"needs you\" — owner to confirm.",
         "Right-click opens the same menu as the ⋮ (native-feeling context menu, drawn in-app).",
-        "Pressing toggles `selected`: the surface.selected fill fades in over 120ms, or the option's check pops in.",
+        "Pressing an option or checkbox row toggles `selected` (the option's check pops in); a link or button row's surface.selected fill, fading in over 120ms, is the app's `selected`.",
         "A checkbox row (ForwardMessage, CreateChannel's invite list) is a <button role=\"checkbox\"> with the box drawn inside, as CreateChannel does (ADR-0527).",
       ],
       keyboard: [
@@ -190,7 +190,7 @@ const docs: ComponentDocs = {
         "Every glyph sits in a tile: 36 by default, 32 on Settings. The tile is surface.muted so it reads on both a white card and the page (ADR-8910).",
         "Title and subtitle wrap to two lines rather than truncating to one — a phone row has the height.",
         "What desktop reveals on hover is on a swipe (Mark read, Mute) and on long-press; both are also accessibilityActions so VoiceOver and TalkBack users can reach them (ADR-9418). The kit's `onLongPress` is the long press, and it adds the accessibility action itself.",
-        "Tapping toggles `selected`: the trailing check pops in (a picker's chosen row); the 0.6 press dim eases back.",
+        "Tapping an option or checkbox row toggles `selected`: the trailing check pops in (a picker's chosen row); a link or button row never grows one on its own. The 0.6 press dim eases back.",
         "A checkbox row is one Pressable with the kit's tick box trailing: the 20pt brand box fills and its tick pops in, and the whole row is the 44pt target.",
       ],
       gestures: [

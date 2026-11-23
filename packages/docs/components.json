@@ -1966,7 +1966,11 @@
           "description": "How many waveform bars have played; those are coral.",
           "default": 0
         },
-        "playing": { "type": "boolean", "default": false },
+        "playing": {
+          "type": "boolean",
+          "description": "The voice note is playing: Pause shows. Play and Pause report it through onPlayingChange, and the app starts or stops the audio.",
+          "default": false
+        },
         "compact": {
           "type": "boolean",
           "description": "The staged chip in the composer tray: thumbnail or badge, name, size or progress, and Remove.",
@@ -1984,11 +1988,19 @@
         "onDownload": { "type": "event", "platforms": ["web", "desktop"] },
         "onStatusChange": {
           "type": "event",
-          "description": "Called with `status` as Retry leaves it (uploading). Given `status` too, the card is controlled; otherwise Retry turns it back to uploading itself.",
-          "args": "status: AttachmentCardStatus",
-          "changes": "status"
+          "description": "Retry reports the request: called with uploading. The card never moves `status` itself: Retry spins until the app passes the new `status`, `error` or `progress` (or the promise onRetry returns settles), so a retry that fails again offers Retry again.",
+          "args": "status: AttachmentCardStatus"
         },
-        "onRetry": { "type": "event", "description": "Retry was pressed on a failed upload: the app starts it again." },
+        "onRetry": {
+          "type": "event",
+          "description": "Retry was pressed on a failed upload: the app starts it again and answers with `status`. Retry spins until it does, or until the promise the handler returns settles."
+        },
+        "onPlayingChange": {
+          "type": "event",
+          "description": "Called with `playing` as Play or Pause leaves it: the app starts or stops the voice note. Given `playing` too, the button is controlled; on its own it flips itself.",
+          "args": "playing: boolean",
+          "changes": "playing"
+        },
         "onCancel": {
           "type": "event",
           "description": "Cancel an upload in progress, remove a staged file, or remove a link's preview (Remove preview, web and desktop)."
@@ -2443,7 +2455,7 @@
             "The FileRow shape: 40px letter badge in the family colour, name in 13 SemiBold, \"PDF document · 2.4 MB\", a 26px Download. 320 wide, 100% on narrow panes.",
             "Downloads go to the OS Downloads folder through Tauri's dialog/fs plugins and announce themselves with a native notification when the window is not focused.",
             "Files already opened are kept in the app data cache, so they reopen offline; uncached files show \"You're offline. This file will download when you're back.\"",
-            "In the catalogue, Retry on a failed upload sets `status` to uploading (the error line gives way to the progress track), and the voice note's play button toggles `playing`."
+            "In the catalogue, Retry on a failed upload spins until the app answers (the flows pass `status`), and the voice note's play button toggles `playing` and reports it through onPlayingChange."
           ],
           "keyboard": [
             { "keys": "Enter / Space", "action": "Opens the preview" },
@@ -9223,7 +9235,7 @@
         },
         "loading": {
           "type": "boolean",
-          "description": "The confirm is in flight: its button spins, Cancel, Esc and the scrim do nothing until it settles.",
+          "description": "The confirm is in flight: its button spins and cannot be pressed again. Cancel, Esc and the scrim still cancel, so the app can abandon the request. A press on the CTA shows the same until the app answers, without this prop.",
           "default": false
         },
         "error": {
@@ -9260,7 +9272,10 @@
           "description": "Esc, a press on the scrim, the phone's handle, Android's back and the screen reader's escape gesture cancel it. Off for a step that must be answered with one of its buttons.",
           "default": true
         },
-        "onConfirm": { "type": "event" },
+        "onConfirm": {
+          "type": "event",
+          "description": "Reports the request; the CTA spins until the app answers, by closing the dialog, with a new `error` or `loading`, or by settling the promise the handler returns. A failure with the same `error` as before needs the promise."
+        },
         "onCancel": { "type": "event" }
       },
       "parts": [
@@ -9601,7 +9616,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A <div role=\"alertdialog\"> (confirm) or \"dialog\" (form), aria-modal, labelled by its <h2> and described by the body, on a 3px-blurred scrim; inline styles over `t`; Button and IconButton. Tab wraps inside, Esc cancels, Mod+Enter submits a form, and Cancel (a form: its first field) takes focus on open; pops in with enter(\"pop\") over a fading scrim; `loading` through useControllable",
+          "base": "A <div role=\"alertdialog\"> (confirm) or \"dialog\" (form), aria-modal, labelled by its <h2> and described by the body, on a 3px-blurred scrim; inline styles over `t`; Button and IconButton. Tab wraps inside, Esc cancels, Mod+Enter submits a form, and Cancel (a form: its first field) takes focus on open; pops in with enter(\"pop\") over a fading scrim; a press waits for the app's answer through usePending (`loading` or a new `error` ends it)",
           "import": "import { Dialog } from \"@antfabric/ui-react\"",
           "notes": [
             "The backdrop blurs 3px. With `modal` the dialog is drawn in the overlay layer of its AntFabricRoot (the theme applies, no overflow clips it): the scrim covers the window, the page behind does not scroll (the body and the box the page scrolls in) and the rest of the root is inert; only the top dialog takes Esc and a press on the scrim. Without `modal` it is drawn where it is mounted, and those belong to the host.",
@@ -9625,7 +9640,7 @@
             "Confirm layout: 24 / 20 / 20 padding, 20px corners, a 42px glyph tile, a display-font title, the body at 13px, and the two buttons right-aligned at equal widths (DialogActions).",
             "The CTA is solid danger-coloured for every confirm whose glyph is a bin; Log out, Disconnect and Remove from your list stay on the brand fill because they destroy nothing.",
             "Focus: on mount the first control takes focus (a confirm's Cancel, a form's first field; the panel when it holds nothing focusable), Tab wraps inside, and the opener gets focus back on unmount if it is still on the page.",
-            "In the catalogue the panel pops in over a fading scrim, and pressing the CTA sets `loading`: its button spins and Cancel and Close go quiet, as while the request is in flight.",
+            "In the catalogue the panel pops in over a fading scrim, and pressing the CTA spins it until the app answers; Cancel and Close stay live, as while the request is in flight.",
             "Escape runs through the app's Escape ladder: a popover menu first, then the confirm, then the form under it — one layer per press."
           ],
           "keyboard": [
@@ -9636,14 +9651,14 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "A bottom sheet: <Enter motion=\"slide-up\"> (role alertdialog or dialog, accessibilityViewIsModal) over a fading scrim, StyleSheet over useTheme(); the CTA and Cancel as full-width Buttons, IconButton to close; `loading` through useControllable",
+          "base": "A bottom sheet: <Enter motion=\"slide-up\"> (role alertdialog or dialog, accessibilityViewIsModal) over a fading scrim, StyleSheet over useTheme(); the CTA and Cancel as full-width Buttons, IconButton to close; a press waits for the app's answer through usePending (`loading` or a new `error` ends it)",
           "import": "import { Dialog } from \"@antfabric/ui-react-native\"",
           "notes": [
             "Title row 16 under the handle, message 28 above the buttons, then the CTA and an outlined Cancel, both 56pt and full width — Cancel under the CTA, where the thumb rests after reading.",
             "tone danger is the red destructive button; tone primary is for an approval (granting an agent permission), which must not look like a hazard.",
             "No glyph tile on the phone; the title carries the question.",
             "Closing puts the keyboard away too.",
-            "In the catalogue the sheet slides up, and pressing the CTA sets `loading`: it spins and Cancel and Close go quiet."
+            "In the catalogue the sheet slides up, and pressing the CTA spins it until the app answers; Cancel and Close stay live."
           ],
           "gestures": [
             { "gesture": "Tap the CTA", "action": "Confirms, then closes" },
@@ -13007,7 +13022,7 @@
         },
         "dismissed": {
           "type": "boolean",
-          "description": "Dismissed: × or Mark as read on web and desktop, a swipe up on the phone (the catalogue uses the grabber). The banner leaves and nothing is drawn.",
+          "description": "Dismissed: × or Mark as read on web and desktop, a swipe up on the phone (the catalogue uses the grabber). The banner leaves and nothing is drawn, until the next notification: a new title, context, body or time shows again, back at this prop.",
           "default": false
         },
         "onOpen": { "type": "event" },
@@ -15091,7 +15106,7 @@
         },
         "onSelectedChange": {
           "type": "event",
-          "description": "Called with `selected` as the press leaves it (a press toggles it).",
+          "description": "Called with `selected` as the press leaves it: a press toggles it on a selection row (role option or checkbox) only. A link, button or menu row never changes `selected` itself; it is the app's (the open conversation).",
           "args": "selected: boolean",
           "changes": "selected"
         },
@@ -15408,7 +15423,7 @@
             "A row that opens a conversation is an <a href>, so middle-click and ⌘-click open it in a new tab; the open one carries aria-current=\"page\".",
             "Hover reveals the row's ⋯ menu and its mark-as-read affordance; the same actions are on the row's context menu and in the keyboard map, so hover is never the only way in.",
             "pointer: coarse raises min-height to 44px on touch laptops.",
-            "Pressing toggles `selected` (through useControllable, so the catalogue preview is interactive): a link or button row's grey fill fades in, an option row's check pops in. Opening the conversation is the caller's.",
+            "Pressing an option or checkbox row toggles `selected` (through useControllable, so the catalogue preview is interactive): an option row's check pops in, a checkbox row ticks. A link or button row's grey fill is the app's `selected`: opening the conversation is the caller's, and the row never marks itself current.",
             "A checkbox row is one <button role=\"checkbox\" aria-checked>: the box is drawn inside it, not a second control, so a click anywhere on the row ticks it."
           ],
           "keyboard": [
@@ -15426,7 +15441,7 @@
             "Sidebar rows are 30px with a 7px radius fill; the ⋮ is hover-revealed and the unread count slides beside it (2026-10-06).",
             "FileRow is the two-line, tiled case: a 36px chip, the name in semibold, middot-joined provenance (\"Figma · Nuthan · yesterday · 4.2 MB\"), and the channel trailing. Today's chip is coral-soft; this spec draws it grey because coral is reserved for \"needs you\" — owner to confirm.",
             "Right-click opens the same menu as the ⋮ (native-feeling context menu, drawn in-app).",
-            "Pressing toggles `selected`: the surface.selected fill fades in over 120ms, or the option's check pops in.",
+            "Pressing an option or checkbox row toggles `selected` (the option's check pops in); a link or button row's surface.selected fill, fading in over 120ms, is the app's `selected`.",
             "A checkbox row (ForwardMessage, CreateChannel's invite list) is a <button role=\"checkbox\"> with the box drawn inside, as CreateChannel does (ADR-0527)."
           ],
           "keyboard": [
@@ -15445,7 +15460,7 @@
             "Every glyph sits in a tile: 36 by default, 32 on Settings. The tile is surface.muted so it reads on both a white card and the page (ADR-8910).",
             "Title and subtitle wrap to two lines rather than truncating to one — a phone row has the height.",
             "What desktop reveals on hover is on a swipe (Mark read, Mute) and on long-press; both are also accessibilityActions so VoiceOver and TalkBack users can reach them (ADR-9418). The kit's `onLongPress` is the long press, and it adds the accessibility action itself.",
-            "Tapping toggles `selected`: the trailing check pops in (a picker's chosen row); the 0.6 press dim eases back.",
+            "Tapping an option or checkbox row toggles `selected`: the trailing check pops in (a picker's chosen row); a link or button row never grows one on its own. The 0.6 press dim eases back.",
             "A checkbox row is one Pressable with the kit's tick box trailing: the 20pt brand box fills and its tick pops in, and the whole row is the 44pt target."
           ],
           "gestures": [
@@ -16089,11 +16104,13 @@
         },
         "onStatusChange": {
           "type": "event",
-          "description": "Retry on a failed message: called with `status` as the press leaves it (sending). Given this too, the row is controlled; otherwise it goes back to sending itself.",
-          "args": "status: MessageStatus",
-          "changes": "status"
+          "description": "Retry on a failed message reports the request: called with sending. The row never moves `status` itself: Retry goes busy until the app passes the new `status` (or the promise onRetry returns settles), so a retry that fails again leaves Retry and Delete ready.",
+          "args": "status: MessageStatus"
         },
-        "onRetry": { "type": "event", "description": "Retry was pressed on a failed message: the app posts it again." },
+        "onRetry": {
+          "type": "event",
+          "description": "Retry was pressed on a failed message: the app posts it again, and answers with `status` (sending, then sent or failed). Retry is busy until it does, or until the promise the handler returns settles."
+        },
         "onDelete": {
           "type": "event",
           "description": "Delete on a failed or queued message: removes only the unsent copy."
@@ -16104,7 +16121,7 @@
         },
         "onReact": {
           "type": "event",
-          "description": "A quick reaction on the bar or a reaction pill was pressed: toggle yours with this emoji. The server owns the counts, so this is a request: pass the new `reactions` when the server answers.",
+          "description": "A quick reaction on the bar or a reaction pill was pressed: toggle yours with this emoji. The server owns the counts, so this is a request: the pill is busy, still showing the old count, until the app passes the new `reactions` (or the promise the handler returns settles), and a rejected reaction stays as it was.",
           "args": "emoji: string"
         },
         "onAddReaction": {
@@ -16565,7 +16582,7 @@
             "The hover wash is a CSS :hover on the row — never an inline background, which would beat it — and the unread wash is painted off a data-unread attribute for the same reason.",
             "Every message has a permalink (…/c/platform-eng/p/<id>); Copy link in ⋯ copies it, and opening it scrolls to and highlights the row.",
             "A background tab still receives messages; the tab title count and favicon dot change, the row does not animate in until the tab is visible.",
-            "Pressing a reaction toggles yours (each pill keeps its own state), and Retry on a failed message moves it back to sending. The row itself does not toggle `hovered` on a press: in an app that would leave a bar behind on a row the pointer has left, so hover, focus inside the row, or the prop draw it.",
+            "Pressing a reaction toggles yours (each pill keeps its own state), and Retry on a failed message goes busy until the app answers (the flows pass `status`). The row itself does not toggle `hovered` on a press: in an app that would leave a bar behind on a row the pointer has left, so hover, focus inside the row, or the prop draw it.",
             "Not in the kit yet: Message has no events for the bar's quick reactions, Add a reaction, Forward or ⋯, nor for a reaction pill's toggle (the spec defines none), so those are inert or local inside Message; the body is plain text, not RichText."
           ],
           "keyboard": [
@@ -19082,7 +19099,7 @@
         },
         "approval": {
           "type": "enum",
-          "description": "\"\" is not a request. pending shows Approve / Decline in the row; the rest are its outcomes.",
+          "description": "\"\" is not a request. pending shows Approve / Decline in the row; the rest are its outcomes, and only the app sets them: a press spins until it does.",
           "default": "",
           "options": ["", "pending", "approving", "approved", "declined", "expired"]
         },
@@ -19094,8 +19111,14 @@
         "onOpen": { "type": "event" },
         "onMarkRead": { "type": "event" },
         "onClear": { "type": "event" },
-        "onApprove": { "type": "event" },
-        "onDecline": { "type": "event" }
+        "onApprove": {
+          "type": "event",
+          "description": "Reports the request; Approve spins and Decline locks until the app answers with `approval` (approving, approved, declined, expired) or the promise the handler returns settles. A failure that leaves `approval` at pending brings both buttons back."
+        },
+        "onDecline": {
+          "type": "event",
+          "description": "Reports the request; Decline spins and Approve locks until the app answers with `approval`, or the promise the handler returns settles."
+        }
       },
       "parts": [
         "root",
@@ -19439,7 +19462,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "<div role=\"listitem\"> holding one full-width <button> that opens it (one accessible name for the row), Avatar with a kind badge or the glyph tile, and Mark as read / Clear buttons positioned over the row's end that fade in while `revealed`, hovered or focused within; Approve / Decline are Button. Inline styles over `t`, states from useInteraction; `read`, `revealed` and `approval` kept in local state that follows the props",
+          "base": "<div role=\"listitem\"> holding one full-width <button> that opens it (one accessible name for the row), Avatar with a kind badge or the glyph tile, and Mark as read / Clear buttons positioned over the row's end that fade in while `revealed`, hovered or focused within; Approve / Decline are Button. Inline styles over `t`, states from useInteraction; `read` and `revealed` kept in local state that follows the props; `approval` is the app's, and Approve / Decline spin (usePending) until it answers",
           "import": "import { NotificationItem } from \"@antfabric/ui-react\"",
           "notes": [
             "The row's actions mount on :hover AND :focus-within — mounting on hover alone puts nothing in the tab order for a keyboard user, and leaving them always mounted puts two buttons per row in it.",
@@ -19460,7 +19483,7 @@
             "Hover actions are mounted only while the pointer is on the row (React state, not CSS :hover), absolutely positioned so appearing never reflows the text. This spec adds focus-within as a second trigger.",
             "A thread reply leads its preview with \"Replied in a thread\" — read from the same parentMessageId the click uses, so what the row says and where it goes cannot disagree.",
             "Approve / Decline in the row is new: agent approvals have no rail affordance today.",
-            "In the catalogue, pressing a row sets `read` (the tint and dot fade) and toggles `revealed`, so the hover actions fade in; Mark as read sets `read`, and Approve / Decline set `approval`, which swaps the buttons for the outcome line."
+            "In the catalogue, pressing a row sets `read` (the tint and dot fade) and toggles `revealed`, so the hover actions fade in; Mark as read sets `read`, and Approve / Decline spin until the app answers (the flows pass `approval`, which swaps the buttons for the outcome line)."
           ],
           "keyboard": [
             { "keys": "Up / Down", "action": "Moves between rows" },
@@ -21611,7 +21634,10 @@
           "options": ["card", "sheet"],
           "platforms": ["mobile"]
         },
-        "onAllow": { "type": "event", "description": "Runs the OS request — from this click, never on load." },
+        "onAllow": {
+          "type": "event",
+          "description": "Runs the OS request, from this click, never on load. Reports the request: Turn on spins until the app passes the OS's answer as `permission` (or the promise the handler returns settles). A dismissed OS prompt leaves `permission` as it was, and the prompt returns to asking; it never says on before the OS does."
+        },
         "onLater": { "type": "event" },
         "onQuiet": {
           "type": "event",
@@ -21926,13 +21952,13 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "<div role=\"region\"> card with an <h2> title, inline styles over `t`; Button actions; `permission` kept in local state that follows the prop, so Turn on shows the on state at once; pops in with enter(); the blocked-in-browser hint is drawn aria-hidden. The app runs Notification.requestPermission() inside onAllow and watches navigator.permissions.query({ name: 'notifications' })",
+          "base": "<div role=\"region\"> card with an <h2> title, inline styles over `t`; Button actions; `permission` is the app's (the OS's answer): Turn on spins (usePending) until it arrives, and the new title is said only then; pops in with enter(); the blocked-in-browser hint is drawn aria-hidden. The app runs Notification.requestPermission() inside onAllow and watches navigator.permissions.query({ name: 'notifications' })",
           "import": "import { PermissionPrompt } from \"@antfabric/ui-react\"",
           "notes": [
             "Shown in the notification rail and once as a dismissible card on the home screen after the first DM or mention arrives — never as a prompt on page load.",
             "The OS prompt is requested only from the Turn on click: Safari and Firefox refuse a request without a user gesture, and Chrome switches a site that prompts on load to its quiet UI (a crossed bell in the address bar) that most people never see.",
             "Denied cannot be undone from the page — no API reopens the prompt. The card says where the switch is and offers Check again, which re-reads Notification.permission.",
-            "In the catalogue, Turn on notifications sets `permission` to granted (the browser would ask first), so the prompt turns into the on state with Send a test notification. The card pops in."
+            "In the catalogue, Turn on notifications spins until the app answers; the flows pass `permission: \"granted\"`, the on state with Send a test notification. The card pops in."
           ],
           "keyboard": [{ "keys": "Enter / Space", "action": "Activates the focused button" }]
         },
@@ -21946,7 +21972,7 @@
             "Linux: no permission model. If no notification server is running (some tiling setups), notify-rust fails silently; the test button is how a person finds out.",
             "Linux has no settings page to open, so when notifications are off there the card offers Send a test notification instead of a settings button.",
             "The rail's own switches (Notification sound, Show Notifications) are a separate, per-machine setting and are not this permission.",
-            "Turn on notifications sets `permission` to granted in the catalogue (macOS would ask first); the card pops in."
+            "Turn on notifications spins until the app passes the OS's answer (the flows pass granted); the card pops in."
           ],
           "keyboard": [{ "keys": "Enter / Space", "action": "Activates the focused button" }]
         },
@@ -21960,7 +21986,7 @@
             "Android 13+ needs the POST_NOTIFICATIONS runtime permission; Android 12 and earlier are allowed by default, so the sheet skips straight to granted there.",
             "Coming back from Settings with notifications allowed turns the Profile switch on without a second tap (awaitingSettings).",
             "iOS 26+: Liquid Glass — the surface is drawn through expo-glass-effect's GlassView (gated on its availability check; the material itself follows the device's Clear / Tinted, Reduce Transparency and Increase Contrast settings). iOS 18 and earlier keep today's blur/opaque look. Only the sheet presentation takes glass; the card stays opaque so the explanation reads cleanly wherever it sits.",
-            "Turn on notifications sets `permission` to granted in the catalogue (the OS would ask first). The card pops in; the sheet presentation pops too, because one template root carries one entrance — the kit slides the sheet up."
+            "Turn on notifications spins until the app passes the OS's answer (the flows pass granted). The card pops in; the sheet presentation pops too, because one template root carries one entrance — the kit slides the sheet up."
           ],
           "gestures": [{ "gesture": "Swipe the sheet down", "action": "Same as Not now" }]
         }
@@ -22734,7 +22760,7 @@
         },
         "sending": {
           "type": "boolean",
-          "description": "The answer is on its way: Submit reads Sending… and everything locks, so a second press cannot send a second answer. Pressing Submit sets it; the app removes the panel.",
+          "description": "The answer is on its way: Submit reads Sending… and everything locks, so a second press cannot send a second answer. A press on Submit shows the same until the app answers; the app removes the panel.",
           "default": false
         },
         "onValueChange": { "type": "event", "args": "value: string", "changes": "value" },
@@ -22742,7 +22768,7 @@
         "onExpandedChange": { "type": "event", "args": "expanded: boolean", "changes": "expanded" },
         "onSubmit": {
           "type": "event",
-          "description": "The chosen row's key, or the typed answer trimmed. A gated tool reads approve or deny; a choice sends the option's key; a consent sends the sentence the app maps it to.",
+          "description": "The chosen row's key, or the typed answer trimmed. A gated tool reads approve or deny; a choice sends the option's key; a consent sends the sentence the app maps it to. Reports the request: the panel reads Sending… until the app answers with `sending` or `offline` (or the promise the handler returns settles), so a send that fails comes back to Submit with the answer still chosen.",
           "args": "answer: string"
         }
       },
@@ -24254,7 +24280,7 @@
         },
         "onMineChange": {
           "type": "event",
-          "description": "Called with `mine` as the press leaves it: flipped, for a reaction (the add pill never calls it). Given `mine` too, the pill is controlled and the caller's count is the truth; otherwise it flips itself and moves its count by one.",
+          "description": "Called with `mine` as the press leaves it: flipped, for a reaction (the add pill never calls it). Given `mine` too, the pill is controlled and this reports the request: it is busy (aria-busy) and shows the caller's `mine` and `count` until the app passes new ones (or the promise the handler returns settles), so a rejected reaction stays as it was. On its own it flips itself and moves its count by one.",
           "args": "mine: boolean",
           "changes": "mine"
         },
@@ -25955,7 +25981,7 @@
         "biometricAvailable": { "type": "boolean", "default": true, "platforms": ["mobile"] },
         "unlocked": {
           "type": "boolean",
-          "description": "The lock was just passed: the tile turns to an open lock in success green, the buttons go, and the app comes forward. What the Unlock button does in the catalogue; in the app onUnlock fires and the lock screen leaves.",
+          "description": "The lock was just passed: the tile turns to an open lock in success green, the buttons go, and the app comes forward. The app's answer to onUnlock: the button spins until the app passes it (or a new `error`), then the lock screen leaves.",
           "default": false,
           "platforms": ["mobile"]
         },
@@ -25969,9 +25995,16 @@
           "description": "No backend answering: Sign in would do nothing, so the card says so.",
           "default": false
         },
-        "onSignIn": { "type": "event" },
+        "onSignIn": {
+          "type": "event",
+          "description": "Reports the request; Sign in spins until the app answers with `state` (waiting), `error` or `offline`, or settles the promise the handler returns. The card never turns to waiting on its own."
+        },
         "onCancel": { "type": "event" },
-        "onUnlock": { "type": "event", "platforms": ["mobile"] },
+        "onUnlock": {
+          "type": "event",
+          "description": "Reports the request; Unlock spins until the app answers with `unlocked` or `error`, or settles the promise the handler returns. The lock never opens on its own.",
+          "platforms": ["mobile"]
+        },
         "onSignOut": { "type": "event" }
       },
       "parts": ["root", "tile", "tileIcon", "title", "body", "wait", "spinner", "waitText", "note", "actions"],
@@ -26155,7 +26188,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A role=\"region\" card named by its title, inline styles over `t`, popping in with enter(\"pop\"), with the kit's Button; Sign in again turns it to waiting (`state` through useControllable) while the route's same-tab OIDC redirect runs (TanStack Start beforeLoad → /sign-in?next=…)",
+          "base": "A role=\"region\" card named by its title, inline styles over `t`, popping in with enter(\"pop\"), with the kit's Button; Sign in again reports the request and spins (usePending) until the app sets `state` to waiting while the route's same-tab OIDC redirect runs (TanStack Start beforeLoad → /sign-in?next=…)",
           "import": "import { SessionState } from \"@antfabric/ui-react\"",
           "notes": [
             "Sign in again keeps the URL: the current path rides in next= and the router sends the person back to it. Only a same-origin path is accepted, never an absolute URL, so the parameter cannot become an open redirect.",
@@ -26172,7 +26205,7 @@
             "Only the hand-off id rides the custom-scheme URL — never a token. A callback whose state does not match the sign-in this window started is refused.",
             "The reason line uses the gateway's refusal CODE, never its message: an ordinary expiry, account_suspended, or account_deleted.",
             "\"Open the browser again\" and Cancel on the waiting card are new; today the Login screen says \"Signing you in…\" and waits.",
-            "In the catalogue the card pops in, and Login with AntFabric (Sign in again on the web) sets `state` to waiting, which is what the person sees while the browser has them."
+            "In the catalogue the card pops in, and Login with AntFabric (Sign in again on the web) spins until the app answers; the flows pass `state: \"waiting\"`, which is what the person sees while the browser has them."
           ],
           "keyboard": [
             { "keys": "Enter", "action": "Activates the primary button" },
@@ -26181,13 +26214,13 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "<Enter motion=\"pop\"> card, StyleSheet over useTheme(), with the kit's Button; `state` and `unlocked` through useControllable. The app runs expo-auth-session (ASWebAuthenticationSession / Custom Tabs) and expo-local-authentication around it",
+          "base": "<Enter motion=\"pop\"> card, StyleSheet over useTheme(), with the kit's Button; `state` and `unlocked` are the app's: Sign in and Unlock spin (usePending) until it answers. The app runs expo-auth-session (ASWebAuthenticationSession / Custom Tabs) and expo-local-authentication around it",
           "import": "import { SessionState } from \"@antfabric/ui-react-native\"",
           "notes": [
             "The lock screen auto-prompts for Face ID / fingerprint when it opens, and falls back to the passcode when the hardware is missing or nothing is enrolled.",
             "Signing in or out never draws a login screen at someone who is mid-sign-in: while the keychain read or the profile flush is outstanding, a loader shows instead.",
             "Sign out unregisters this phone's push token first, or the next person would receive the previous person's notifications.",
-            "In the catalogue the card pops in; Login with AntFabric sets `state` to waiting, and Unlock (or Use passcode) sets `unlocked`, so the tile turns to an open lock and the buttons go."
+            "In the catalogue the card pops in; Login with AntFabric and Unlock (or Use passcode) spin until the app answers; the flows pass `state: \"waiting\"` and `unlocked: true`, so the tile turns to an open lock and the buttons go."
           ],
           "gestures": [{ "gesture": "Swipe the sign-in sheet down", "action": "Cancels; nothing is signed in" }]
         }
@@ -26806,14 +26839,14 @@
         },
         "desktop": {
           "status": "ready",
-          "base": "The same @antfabric/ui-react component as the web: a <button> row (6/10 padding, radius.row) + Avatar, Badge and the ⋮ IconButton as a sibling; inline styles over t, states from useInteraction. active is kept by the row (useControllable) and toggled by a press; a surrounding section decides through selectedName",
+          "base": "The same @antfabric/ui-react component as the web: a <button> row (6/10 padding, radius.row) + Avatar, Badge and the ⋮ IconButton as a sibling; inline styles over t, states from useInteraction. active is the app's (a press reports onPress and never makes the row current itself); a surrounding section decides through selectedName",
           "import": "import { SidebarItem } from \"@antfabric/ui-react/shell\"",
           "notes": [
             "Unread is asked first: a channel you have open can still gather unread (window in the background) and then it is bold AND selected.",
             "The ⋮ is a sibling button laid over the row's right end, never a button inside a button; the row reserves its room only while it is shown, so it never covers the count. The catalogue draws it with actionsVisible.",
             "Muted and typing are new in this spec — today's sidebar has neither. Draft (pencil, fg.faint at 5.33:1, never an opacity) and the # / lock / face rules are today's.",
             "The external-organisation glyph is new; it stays on even when the row is muted, because who can read the channel is not a notification preference.",
-            "Pressing the row makes it `active` (the grey selected fill fades in) and leaves it active if pressed again: the current page is not a toggle. Inside a sidebar-section the section's `selected` decides instead, through `selectedName`, so only one row is ever open."
+            "Pressing the row reports onPress; the app navigates and passes `active` (the grey selected fill fades in), so a row never claims to be current before the page is. Inside a sidebar-section the section's `selected` decides instead, through `selectedName`, so only one row is ever open."
           ],
           "keyboard": [
             { "keys": "Enter / Space", "action": "Opens the conversation" },
@@ -32454,9 +32487,8 @@
         },
         "onFollowingChange": {
           "type": "event",
-          "description": "Called with `following` as the press leaves it. Given `following` too, the line is controlled and the press changes nothing on it; on its own (the catalogue, where opening is navigation) the press flips Following.",
-          "args": "following: boolean",
-          "changes": "following"
+          "description": "Deprecated, never called: opening a thread is not following it, so the press only calls onPress and `following` is always the app's. Accepted through 1.x so no product breaks; it goes at 2.0.",
+          "args": "following: boolean"
         },
         "onPress": {
           "type": "event",
@@ -32624,7 +32656,7 @@
           "notes": [
             "Opens the thread in the right-hand panel and updates the URL (…/c/platform-eng/t/<id>), so a thread is a link that can be pasted, bookmarked and opened in a new tab with ⌘-click.",
             "Hover lifts it to a card edge (Slack's) so it reads as a button and not as the message's text.",
-            "Opening the thread is navigation, so in the catalogue a press toggles `following` instead (what Follow / Unfollow in the thread's ⋯ does): the bell and 'Following' fade in or out."
+            "Opening the thread is navigation, so in the catalogue a press only reports onPress; `following` comes from the app (Follow / Unfollow in the thread's ⋯), never from opening."
           ],
           "keyboard": [
             { "keys": "Enter / Space", "action": "Opens the thread panel" },
@@ -33158,8 +33190,14 @@
           "description": "How long the toast stays, in milliseconds, before it dismisses itself and fires onDismiss. 0 keeps it until it is dismissed. The clock stops while the pointer is on the toast or focus is inside it (web and desktop) and runs twice as long while a screen reader is on (phone).",
           "default": 0
         },
-        "onAction": { "type": "event" },
-        "onDismiss": { "type": "event" },
+        "onAction": {
+          "type": "event",
+          "description": "The action (Undo, View) was pressed. The toast goes too, so onDismiss follows it."
+        },
+        "onDismiss": {
+          "type": "event",
+          "description": "The toast went: Dismiss, the ×, its duration running out, or its action (after onAction). The app unmounts it, which frees its slot."
+        },
         "onPauseChange": {
           "type": "event",
           "description": "The pointer or focus entered the toast (true) or both left (false): for an app that keeps its own timer.",
@@ -34566,19 +34604,22 @@
         },
         "onStageChange": {
           "type": "event",
-          "description": "Called with `stage` as the press leaves it: downloading after Install or Retry (desktop), checking after Check again (phone). Given `stage` too, the notice is controlled and the updater's own events move it; otherwise it moves itself.",
-          "args": "stage: UpdateBannerStage",
-          "changes": "stage"
+          "description": "Reports the request a press makes: downloading after Install or Retry (desktop), checking after Check again (phone). The notice never moves `stage` itself: the pressed control spins until the app answers with a new `stage` or `error` (or the promise onApply or onCheck returns settles), so a check or retry that fails the same way again comes back to where it was.",
+          "args": "stage: UpdateBannerStage"
         },
         "onApply": {
           "type": "event",
-          "description": "Desktop: install the waiting release, or retry a failed one. Phone: open the store for a store-required version."
+          "description": "Desktop: install the waiting release, or retry a failed one; the card spins until the app answers with `stage` or `error`, or the promise the handler returns settles. Phone: open the store for a store-required version."
         },
         "onRestart": {
           "type": "event",
           "description": "Desktop: Restart to update relaunches onto the installed release. Web: Reload. Phone: Restart now in the sheet."
         },
-        "onCheck": { "type": "event", "platforms": ["mobile"] }
+        "onCheck": {
+          "type": "event",
+          "description": "Check again: reports the request; the button spins until the app answers with `stage` (checking, latest, failed) or `error`, or the promise the handler returns settles.",
+          "platforms": ["mobile"]
+        }
       },
       "parts": [
         "root",
@@ -34959,12 +35000,12 @@
         },
         "desktop": {
           "status": "ready",
-          "base": "A <button> card (role=\"status\", or \"alert\" when failed) for the foot of the nav rail, inline styles over `t`, rising in with enter(\"rise\"); a non-pressable busy card while downloading or installing; a 40px rail <button> with a dot when collapsed. Hover and focus from useInteraction, `stage` through useControllable; the app drives it from the Tauri updater plugin",
+          "base": "A <button> card (role=\"status\", or \"alert\" when failed) for the foot of the nav rail, inline styles over `t`, rising in with enter(\"rise\"); a non-pressable busy card while downloading or installing; a 40px rail <button> with a dot when collapsed. Hover and focus from useInteraction; `stage` is the app's (a press waits through usePending); the app drives it from the Tauri updater plugin",
           "import": "import { UpdateBanner } from \"@antfabric/ui-react\"",
           "notes": [
             "Renders nothing unless a release is genuinely waiting: a failed launch check, or a shell with no updater configured, stays idle and silent.",
             "No dismiss, by the owner's design (ADR-0294): a waiting update stays until it is installed or the app restarts.",
-            "The card rises in. Pressing Update available (or a failed one) moves it to downloading at once and calls onApply; downloading → installing → ready then follow the updater's events through `stage`. The busy card is not pressable. Restart to update calls onRestart, which relaunches.",
+            "The card rises in. Pressing Update available (or a failed one) calls onStageChange(\"downloading\") and onApply and spins until the app passes the next `stage`; downloading → installing → ready follow the updater's events through `stage`. The busy card is not pressable. Restart to update calls onRestart, which relaunches.",
             "The title must fit a 127 px column at the 15 px top of the type ladder — every stage title is one line, nowrap.",
             "Collapsed rail: the same glyph with a dot, never a number — there is only ever one release waiting.",
             "The running app re-checks periodically, not only at launch; an app nobody quits otherwise never learns a release exists."
@@ -34973,12 +35014,12 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "A View card with the kit's Button, StyleSheet over useTheme(); the Restart to apply? sheet slides up with <Enter motion=\"slide-up\"> and follows a downward drag (PanResponder + Animated) to put itself away. `stage` and `confirm` through useControllable; the app drives it from expo-updates",
+          "base": "A View card with the kit's Button, StyleSheet over useTheme(); the Restart to apply? sheet slides up with <Enter motion=\"slide-up\"> and follows a downward drag (PanResponder + Animated) to put itself away. `confirm` through useControllable; `stage` is the app's (Check again waits through usePending), driven from expo-updates",
           "import": "import { UpdateBanner } from \"@antfabric/ui-react-native\"",
           "notes": [
             "OTA updates replace the JavaScript only. A change to native code bumps runtimeVersion, and the phone is then told to update from the store — an OTA cannot deliver it.",
             "Restarting is optional: an update that has downloaded applies on its own the next time the app opens.",
-            "In the catalogue Check for updates moves latest or failed to checking, Restart to apply update sets `confirm` so the sheet slides up, and Later puts it away.",
+            "In the catalogue Check for updates spins until the app answers (the flows pass `stage: \"checking\"`), Restart to apply update sets `confirm` so the sheet slides up, and Later puts it away.",
             "In a development build expo-updates rejects every call, so the card says \"Updates are not enabled in this build.\" rather than pretending it checked."
           ],
           "gestures": [{ "gesture": "Swipe the sheet down", "action": "Same as Later" }]

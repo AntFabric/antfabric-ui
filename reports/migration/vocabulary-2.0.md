@@ -17,3 +17,4 @@ The renames `reports/api/conventions.md` §8 decides, waiting for the next major
 | Menu, HoverCard | `placement: "below" \| "above"` / `"down" \| "up"` | `side: "bottom" \| "top"` |
 | Tooltip | `side` | `side` (kept) with `align` |
 | InlineBanner, UpdateBanner, ConnectionBanner, Toast | `onDismiss()` | `onDismiss(reason?)` |
+| ThreadSummary | `onFollowingChange` (deprecated in 1.1, never called) | removed: opening a thread is not following it |

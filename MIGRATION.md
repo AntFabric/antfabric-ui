@@ -275,6 +275,39 @@ The cross-cutting renames, one row per rule, with what each touched. [`reports/a
 - **Types.** `IconName` is `string | IconComponent` in both kits (and core's items). Code that reads an item's `icon` as a string narrows it first (`typeof item.icon === "string"`).
 - **Check:** in development the console has no `no icon "…"` warning, and `grep -rn "data-af-missing-icon"` over your rendered HTML (or `missing-icon:` testIDs on the phone) finds nothing.
 
+## 1.0 → 1.1: the app drives the state
+
+A component no longer shows the result of a request before the app confirms it. A press that asks for something shows a pending state on
+the pressed control and reports the request; the outcome is drawn only from the props you pass. Pending ends when you pass a new value of
+the props below, or when the promise your handler returns settles. So either return a promise, or answer with the props.
+
+| Component | The press | Pass, as the answer | Before |
+|---|---|---|---|
+| Dialog | the CTA spins (`onConfirm`) | close it, or a new `error` or `loading` | the CTA set `loading` itself; Cancel, ✕, Esc and the scrim went dead |
+| SessionState | Sign in (`onSignIn`), Unlock on the phone (`onUnlock`) | `state="waiting"`, `unlocked`, `error`, `offline` | the card turned to waiting, or unlocked, itself |
+| UpdateBanner | Install and Retry (`onStageChange("downloading")`, `onApply`); Check again (`onStageChange("checking")`, `onCheck`) | `stage`, `error`, `progress` | the banner moved `stage` itself |
+| PermissionPrompt | Turn on (`onAllow`) | `permission` (the OS's answer) | it showed on, and said so, at once |
+| NotificationItem | Approve, Decline (`onApprove`, `onDecline`) | `approval` | it showed Approved or Declined at once |
+| Message | Retry (`onStatusChange("sending")`, `onRetry`); a reaction pill (`onReact`) | `status`; `reactions` | it went back to sending itself; the pill flipped itself |
+| AttachmentCard | Retry (`onStatusChange("uploading")`, `onRetry`) | `status`, `error`, `progress` | it went back to uploading itself |
+| ReactionPill (with `mine` and `onMineChange`) | the pill (`onMineChange`) | `mine`, `count` | — (controlled already drew the app's; the pill is now busy meanwhile) |
+| QuestionPanel | Submit (`onSubmit`) | `sending`, `offline` | it stayed Sending… until `sending` was pulsed |
+
+- **Return a promise** from the handler when the request can fail without changing a prop (a retry that fails with the same error, an
+  approval the server refuses, an OS prompt the person dismisses): `onRetry={() => resend(message)}` where `resend` returns its promise.
+  Settling, either way, ends the pending state, and the props you pass then are what is drawn.
+- **Or answer with the props.** A handler that returns nothing and never changes a prop leaves the control pending: Cancel, ✕ and Escape
+  stay live meanwhile, but the CTA does not come back.
+- **Pass the outcome props.** Where a component used to move a prop itself, it no longer does: `UpdateBanner stage`, `Message status`,
+  `AttachmentCard status`, `SessionState state` and `unlocked`, `PermissionPrompt permission`, `NotificationItem approval`. `onStageChange` and
+  `onStatusChange` keep their names and report what was asked for; their docs no longer declare `changes`.
+- **Also in this batch:** a SidebarItem never makes itself current (pass `active`, or the section's `selected`); a ListItem that is a link,
+  button or menu row never toggles `selected` (only `option` and `checkbox` rows do); ThreadSummary's press no longer flips `following`, and
+  `onFollowingChange` is deprecated and never called; Toast's action also fires `onDismiss`; InAppBanner shows a new notification after a
+  dismissal; AttachmentCard's voice note reports Play and Pause through the new `onPlayingChange`.
+- **Check:** press each of these with your handler stubbed to return a rejected promise: the control spins, then comes back as it was, and
+  no outcome (Approved, Unlocked, Notifications are on, Downloading) is drawn or announced.
+
 ## Checks you can run
 
 One per step. Each says what you should see.

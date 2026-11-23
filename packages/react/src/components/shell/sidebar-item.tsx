@@ -1,5 +1,5 @@
 import { memo, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { recipes, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
@@ -110,8 +110,8 @@ function SidebarItemView({
     e.preventDefault();
     onMenu();
   };
-  const [on, setOn] = useControllable(active);
-  const open = selectedName ? selectedName === name : on;
+  // Current is the app's (or the surrounding section's): a press reports itself and never makes the row current on its own.
+  const open = selectedName ? selectedName === name : active;
   const dim = muted ? 0.35 : 0.55;
   const r = useRecipe(recipes["sidebar-item"], {
     variants: { active: open, unread: unread && !muted, muted },
@@ -150,11 +150,7 @@ function SidebarItemView({
         title={name}
         aria-label={said}
         aria-current={open ? "page" : undefined}
-        onClick={() => {
-          // The current page is not a toggle: pressing the row again leaves it current.
-          setOn(true);
-          onPress?.();
-        }}
+        onClick={() => onPress?.()}
         onKeyDown={asked}
         {...ui.handlers}
         style={css(

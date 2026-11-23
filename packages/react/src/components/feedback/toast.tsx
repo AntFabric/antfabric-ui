@@ -155,8 +155,10 @@ export function Toast({ message: words, tone = "success", actionLabel = "", dism
             label={actionLabel}
             styles={styles}
             onPress={() => {
+              // The action puts the toast away too: it is reported as a dismissal, so the app unmounts it and frees its slot.
               setGone(true);
               onAction?.();
+              onDismiss?.();
             }}
           />
         )}

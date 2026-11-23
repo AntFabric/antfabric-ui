@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { recipes, useControllable, useDirection, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
 import { Icon, type IconName } from "../../lib/icon";
@@ -44,8 +44,10 @@ export interface NotificationItemProps extends RootProps<HTMLDivElement> {
   onOpen?: () => void;
   onMarkRead?: () => void;
   onClear?: () => void;
-  onApprove?: () => void;
-  onDecline?: () => void;
+  /** Reports the request; Approve spins until the app answers with `approval` (or the returned promise settles). */
+  onApprove?: () => void | Promise<unknown>;
+  /** Reports the request; Decline spins until the app answers with `approval` (or the returned promise settles). */
+  onDecline?: () => void | Promise<unknown>;
   /** This row's built-in text (its accessible name, Approve and Decline, the outcome line, the row actions) over the tree's and the English defaults. */
   strings?: Partial<KitStrings["notification-item"]>;
   /** Per-part styles over the theme: `{ root: {…}, title: {…} }`. */
@@ -111,10 +113,15 @@ export function NotificationItem({
 }: NotificationItemProps) {
   const s = useStrings("notification-item", strings);
   const ui = useInteraction();
-  // What a press changes shows at once; the app's next props (from the server) take over when they come.
+  // Read and revealed are the row's own look and show at once; the app's next props take over when they come.
   const [isRead, setRead] = useControllable(read);
   const [open, setOpen] = useControllable(revealed);
-  const [decision, setDecision] = useControllable(approval);
+  // Approve and Decline report the request and spin until the app passes the answer as `approval` (or the promise settles): the row never
+  // says approved before the server does.
+  const decision = approval;
+  const { pending, run } = usePending([approval]);
+  const [asked, setAsked] = useState<"approve" | "decline">("approve");
+  const waiting = decision === "approving" || pending;
   const [pointer, setPointer] = useState(false);
   const [within, setWithin] = useState(false);
   const face = leading === "avatar";
@@ -201,20 +208,22 @@ export function NotificationItem({
             variant="ink"
             size="sm"
             iconLeading="check"
-            loading={decision === "approving"}
+            loading={decision === "approving" || (pending && asked === "approve")}
+            disabled={pending && asked === "decline"}
             onPress={() => {
-              setDecision("approved");
-              onApprove?.();
+              setAsked("approve");
+              run(onApprove);
             }}
           />
           <Button
             label={s("decline")}
             variant="secondary"
             size="sm"
-            disabled={decision === "approving"}
+            loading={pending && asked === "decline"}
+            disabled={waiting && !(pending && asked === "decline")}
             onPress={() => {
-              setDecision("declined");
-              onDecline?.();
+              setAsked("decline");
+              run(onDecline);
             }}
           />
         </div>

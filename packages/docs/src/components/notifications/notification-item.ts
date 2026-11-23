@@ -79,7 +79,7 @@ const docs: ComponentDocs = {
       type: "enum",
       options: ["", "pending", "approving", "approved", "declined", "expired"],
       default: "",
-      description: "\"\" is not a request. pending shows Approve / Decline in the row; the rest are its outcomes.",
+      description: "\"\" is not a request. pending shows Approve / Decline in the row; the rest are its outcomes, and only the app sets them: a press spins until it does.",
     },
     decidedOn: {
       type: "string",
@@ -97,15 +97,17 @@ const docs: ComponentDocs = {
     },
     onApprove: {
       type: "event",
+      description: "Reports the request; Approve spins and Decline locks until the app answers with `approval` (approving, approved, declined, expired) or the promise the handler returns settles. A failure that leaves `approval` at pending brings both buttons back.",
     },
     onDecline: {
       type: "event",
+      description: "Reports the request; Decline spins and Approve locks until the app answers with `approval`, or the promise the handler returns settles.",
     },
   },
   platforms: {
     web: {
       status: "ready",
-      base: "<div role=\"listitem\"> holding one full-width <button> that opens it (one accessible name for the row), Avatar with a kind badge or the glyph tile, and Mark as read / Clear buttons positioned over the row's end that fade in while `revealed`, hovered or focused within; Approve / Decline are Button. Inline styles over `t`, states from useInteraction; `read`, `revealed` and `approval` kept in local state that follows the props",
+      base: "<div role=\"listitem\"> holding one full-width <button> that opens it (one accessible name for the row), Avatar with a kind badge or the glyph tile, and Mark as read / Clear buttons positioned over the row's end that fade in while `revealed`, hovered or focused within; Approve / Decline are Button. Inline styles over `t`, states from useInteraction; `read` and `revealed` kept in local state that follows the props; `approval` is the app's, and Approve / Decline spin (usePending) until it answers",
       import: "import { NotificationItem } from \"@antfabric/ui-react\"",
       notes: [
         "The row's actions mount on :hover AND :focus-within — mounting on hover alone puts nothing in the tab order for a keyboard user, and leaving them always mounted puts two buttons per row in it.",
@@ -135,7 +137,7 @@ const docs: ComponentDocs = {
         "Hover actions are mounted only while the pointer is on the row (React state, not CSS :hover), absolutely positioned so appearing never reflows the text. This spec adds focus-within as a second trigger.",
         "A thread reply leads its preview with \"Replied in a thread\" — read from the same parentMessageId the click uses, so what the row says and where it goes cannot disagree.",
         "Approve / Decline in the row is new: agent approvals have no rail affordance today.",
-        "In the catalogue, pressing a row sets `read` (the tint and dot fade) and toggles `revealed`, so the hover actions fade in; Mark as read sets `read`, and Approve / Decline set `approval`, which swaps the buttons for the outcome line.",
+        "In the catalogue, pressing a row sets `read` (the tint and dot fade) and toggles `revealed`, so the hover actions fade in; Mark as read sets `read`, and Approve / Decline spin until the app answers (the flows pass `approval`, which swaps the buttons for the outcome line).",
       ],
       keyboard: [
         {

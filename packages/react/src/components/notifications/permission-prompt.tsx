@@ -1,5 +1,5 @@
 import { useEffect, useRef, type CSSProperties } from "react";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { recipes, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
@@ -16,8 +16,8 @@ export interface PermissionPromptProps extends RootProps<HTMLDivElement> {
   permission?: PermissionPromptPermission;
   /** The site the browser's permission prompt names, drawn in the address-bar picture of a blocked tab. "" draws none. */
   origin?: string;
-  /** Runs the OS request — from this click, never on load. */
-  onAllow?: () => void;
+  /** Runs the OS request, from this click, never on load. Turn on spins until the app passes the answer as `permission`, or the returned promise settles. */
+  onAllow?: () => void | Promise<unknown>;
   onLater?: () => void;
   onOpenSettings?: () => void;
   onTest?: () => void;
@@ -40,8 +40,10 @@ const chip: CSSProperties = { ...row };
 export function PermissionPrompt({ permission = "default", origin = "", onAllow, onLater, onOpenSettings, onTest, onCheckAgain, strings, styles, style, ...rest }: PermissionPromptProps) {
   const { os } = usePlatform();
   const s = useStrings("permission-prompt", strings);
-  // Turn on shows the on state at once; the app's next `permission` (the OS's real answer) takes over.
-  const [state, setState] = useControllable(permission);
+  // Turn on reports the request and spins until the app passes the OS's answer as `permission` (or the promise settles): a dismissed
+  // prompt leaves it as it was, and the prompt never says on before the OS does.
+  const state = permission;
+  const { pending, run } = usePending([permission]);
   // What the prompt says on this OS, for this answer. Windows and Linux never ask: there, not-yet-asked is already on.
   const silentOs = os === "windows" || os === "linux";
   const ask = state === "default" && !silentOs;
@@ -142,10 +144,8 @@ export function PermissionPrompt({ permission = "default", origin = "", onAllow,
             <Button
               label={s("turnOn")}
               iconLeading="bell"
-              onPress={() => {
-                setState("granted");
-                onAllow?.();
-              }}
+              loading={pending}
+              onPress={() => run(onAllow)}
             />
           )}
           {c.ask && <Button label={s("notNow")} variant="ghost" onPress={() => onLater?.()} />}

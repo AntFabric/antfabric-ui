@@ -33,6 +33,8 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 6: the app drives the state
 
+- New `usePending(answer)` (re-exported by both kits): `const { pending, run } = usePending([status, error])`, then `run(onRetry)`. `run` sets `pending` and calls the handler; pending clears when the promise the handler returns settles (either way) or when a value in `answer` changes, compared as `useControllable` compares (a re-render with equal props is not an answer). A press while pending does nothing, and with no handler nothing is pending. The kits use it so a component never shows the result of a request before the app confirms it (S2). MIGRATION.md, "1.0 → 1.1: the app drives the state".
+
 ### Batch 7: announcements
 
 ### Batch 8: focus hand-off
