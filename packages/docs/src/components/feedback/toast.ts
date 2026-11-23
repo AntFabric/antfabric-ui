@@ -199,6 +199,16 @@ const docs: ComponentDocs = {
   ],
   edgeCases: [
     {
+      title: "The message changes while it is shown",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "A toast whose `message` changes in place (\"Uploading 2 files…\" becomes \"2 files uploaded\") is announced again, and on the web and desktop its `duration` starts again, so the new words get their full time.",
+    },
+    {
+      title: "A theme's ink in another colour form",
+      platforms: ["mobile"],
+      handling: "The Undo and Dismiss chips are the pill's ink at a low alpha; the ink may be #rgb, #rrggbb (with or without alpha), rgb() or hsl(), and a colour name leaves the chips unfilled rather than drawing a wrong colour.",
+    },
+    {
       title: "Several toasts at once",
       platforms: ["web", "desktop", "mobile"],
       handling: "Never a stack. Web and desktop show the newest and drop the older — except that a success never replaces an error still in its first 2 s; it waits behind it. Mobile queues oldest-first, 4 s each. Identical messages raised within the window collapse into one (\"Link copied\" three times shows once).",

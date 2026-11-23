@@ -34,10 +34,21 @@ export interface ToastProps extends RootProps {
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-/** A hex colour at an alpha, for the chips mixed from the toast's own ink. */
-const mix = (hex: string, a: number) => {
-  const n = parseInt(hex.slice(1, 7), 16);
-  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+/**
+ * The toast's ink at an alpha, for the chips mixed from it. Takes #rgb, #rgba, #rrggbb, #rrggbbaa, rgb(), rgba(), hsl() and hsla() (the
+ * ink's own alpha is replaced); a colour it cannot read (a name) leaves the chip unfilled rather than a wrong colour.
+ */
+const mix = (colour: string, a: number) => {
+  const v = colour.trim();
+  const hex = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(v)?.[1];
+  if (hex) {
+    const full = hex.length <= 4 ? [...hex].map((c) => c + c).join("") : hex;
+    const n = parseInt(full.slice(0, 6), 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+  }
+  const fn = /^(rgb|hsl)a?\(\s*([^,\s/)]+)[\s,]+([^,\s/)]+)[\s,]+([^,\s/)]+)/i.exec(v);
+  if (fn) return `${fn[1]!.toLowerCase()}a(${fn[2]!.replace(/deg$/i, "")},${fn[3]},${fn[4]},${a})`;
+  return "transparent";
 };
 
 /** Layout no token decides; what the tokens decide (fill, ink, type, insets, the action's padding) is the recipe's. The chips are the pill's ink mixed (see the recipe). */
