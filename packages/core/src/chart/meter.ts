@@ -19,6 +19,9 @@ export function meterTone(kind: MeterKind, share: number, thresholds: MeterThres
   return share <= thresholds.danger ? "danger" : share <= thresholds.warning ? "warning" : "ok";
 }
 
+/** The icon a caution or a critical state wears beside its value (Meter, GaugeChart), so the state is not the colour alone; none while it is fine. */
+export const meterIcon = (tone: "ok" | "warning" | "danger"): "triangle-alert" | "circle-alert" | null => (tone === "danger" ? "circle-alert" : tone === "warning" ? "triangle-alert" : null);
+
 const isPercent = (format: FormatSpec | undefined) => format === "percent" || (typeof format === "object" && format.type === "percent");
 
 /** What a meter's value reads as, before it has words: the share (`42%`), the value of the capacity (`9.4` of `10 GB`), or nothing to show. */
