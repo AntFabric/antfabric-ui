@@ -77,7 +77,10 @@ export interface ComposerProps extends RootProps<HTMLDivElement> {
   onAction?: (action: IconActionItem) => void;
   /** A staged attachment's card was pressed (the preview). */
   onAttachmentOpen?: (attachment: Attachment) => void;
-  /** A staged attachment's download was pressed. */
+  /**
+   * Never called: a staged file is the sender's own, so its chip has no download (a ready chip's body calls `onAttachmentOpen`).
+   * @deprecated Kept so 1.x code compiles; removed in 2.0.
+   */
   onAttachmentDownload?: (attachment: Attachment) => void;
   /** A staged attachment's remove or cancel was pressed: take it out of `attachments`. */
   onAttachmentCancel?: (attachment: Attachment) => void;
@@ -191,6 +194,8 @@ export function Composer({
   const offline = mode === "offline";
   const typed = draft.trim() !== "";
   const sendable = typed && !uploading && !tooLong && !offline && !disabled;
+  // Only the upload stands in the way: Send stays pressable (aria-disabled), so a press says why it waits.
+  const waiting = typed && uploading && !tooLong && !offline && !disabled;
   // The counter is read at a few thresholds (100, 50, 10 left, then over), not on every keystroke.
   const left = /\d/.test(lengthHint) ? Number(lengthHint.replace(/[^\d]/g, "")) : null;
   const bucket = tooLong ? "over" : left === null ? "none" : left <= 10 ? "10" : left <= 50 ? "50" : left <= 100 ? "100" : "none";
@@ -204,8 +209,8 @@ export function Composer({
   useAnnounce(offline && s("offline"));
   useAnnounce(locked && (mode === "archived" ? s("archivedTitle") : s("readonlyTitle")));
   const send = () => {
-    // Send is disabled while a file uploads; a press or Enter in that window says why.
-    if (typed && uploading && !tooLong && !offline) announce(s("uploadWaiting"));
+    // Send waits while a file uploads; a press or Enter in that window says why.
+    if (waiting) announce(s("uploadWaiting"));
     if (!sendable) return;
     const words = draft;
     // Cleared in the same tick as the press, so a double press cannot send twice.
@@ -260,7 +265,7 @@ export function Composer({
             {s("editing")}
           </span>
           <span data-af-part="editHint" style={css(text, r.editHint)}>
-            {s.parts("editHint", { save: formatShortcut("Enter", os) })}
+            {s.parts("editHint", { save: formatShortcut(sendKey === "mod-enter" ? "Mod+Enter" : "Enter", os) })}
           </span>
         </div>
       )}
@@ -373,7 +378,8 @@ export function Composer({
               icon={editing ? "check" : "send"}
               label={editing ? s("save") : s("sendMessage")}
               variant={sendable ? "solid" : "ghost"}
-              disabled={!sendable}
+              disabled={!sendable && !waiting}
+              aria-disabled={waiting || undefined}
               onPress={send}
               style={{ flexShrink: 0, ...rtl({ marginLeft: t.space["2xs"] }, dir) }}
             />

@@ -223,6 +223,8 @@ export function Composer({
   const offline = mode === "offline";
   const typed = draft.trim() !== "";
   const sendable = typed && !uploading && !tooLong && !offline && !disabled;
+  // Only the upload stands in the way: Send stays pressable, so a tap says why it waits.
+  const waiting = typed && uploading && !tooLong && !offline && !disabled;
   // The counter is read at a few thresholds (100, 50, 10 left, then over), not on every keystroke.
   const left = /\d/.test(lengthHint) ? Number(lengthHint.replace(/[^\d]/g, "")) : null;
   const bucket = tooLong ? "over" : left === null ? "none" : left <= 10 ? "10" : left <= 50 ? "50" : left <= 100 ? "100" : "none";
@@ -244,7 +246,7 @@ export function Composer({
   useAnnounce(locked && (mode === "archived" ? str("archivedTitle") : str("readonlyTitle")));
   const send = () => {
     // Send is disabled while a file uploads; a tap in that window says why (iOS has no live region for the hint).
-    if (typed && uploading && !tooLong && !offline) announce(str("uploadWaiting"));
+    if (waiting) announce(str("uploadWaiting"));
     if (!sendable) return;
     const words = draft;
     // Cleared in the same tick as the tap, so a double tap cannot send twice.
@@ -345,7 +347,7 @@ export function Composer({
               </Text>
             ) : null}
             {record && !editing ? <IconButton icon="mic" label={str("record")} disabled={offline || disabled} onPress={() => onRecord?.()} style={s.bar} /> : null}
-            <IconButton icon={editing ? "check" : "send"} label={editing ? str("save") : str("sendMessage")} variant={sendable ? "solid" : "ghost"} disabled={!sendable} onPress={send} style={s.bar} />
+            <IconButton icon={editing ? "check" : "send"} label={editing ? str("save") : str("sendMessage")} variant={sendable ? "solid" : "ghost"} disabled={!sendable && !waiting} onPress={send} style={s.bar} />
           </View>
         </View>
       ) : null}
