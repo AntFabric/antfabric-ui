@@ -490,6 +490,76 @@ function checkLiterals() {
   }
 }
 
+// Text and marks hold their contrast in both shipped themes and two tenant probes, light and dark (WCAG 1.4.3 and 1.4.11): 4.5:1 for text on the
+// brand fill (at rest, hovered and pressed) and body text on the surfaces, 3:1 for a chart mark and the focus ring on the card. A colour with alpha
+// is laid over what it sits on first. What fails today and is out of reach is in `contrastTodo` (reports/generic.json) with its reason; the list only shrinks.
+function checkContrast() {
+  const at = "contrast";
+  const todo = readGeneric().contrastTodo ?? {};
+  type RGBA = [number, number, number, number];
+  const parse = (v: string): RGBA => {
+    const s = v.trim();
+    const h = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(s)?.[1];
+    if (h) {
+      const full = h.length <= 4 ? [...h].map((c) => c + c).join("") : h;
+      const n = [0, 2, 4, 6].map((i) => (i < full.length ? parseInt(full.slice(i, i + 2), 16) : 255));
+      return [n[0]!, n[1]!, n[2]!, n[3]! / 255];
+    }
+    const m = /^rgba?\(\s*([\d.]+)\s*[,\s]\s*([\d.]+)\s*[,\s]\s*([\d.]+)(?:\s*[,/]\s*([\d.]+)(%?))?\s*\)$/i.exec(s);
+    if (!m) throw new Error(`"${v}" is not a colour the contrast check reads`);
+    const a = m[4] === undefined ? 1 : Number(m[4]) / (m[5] ? 100 : 1);
+    return [Number(m[1]), Number(m[2]), Number(m[3]), a];
+  };
+  const over = ([r, g, b, a]: RGBA, [R, G, B]: RGBA): RGBA => [r * a + R * (1 - a), g * a + G * (1 - a), b * a + B * (1 - a), 1];
+  const lum = ([r, g, b]: RGBA) => {
+    const l = [r, g, b].map((v) => v / 255).map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * l[0]! + 0.7152 * l[1]! + 0.0722 * l[2]!;
+  };
+  const ratio = (a: RGBA, b: RGBA) => {
+    const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p) as [number, number];
+    return (x + 0.05) / (y + 0.05);
+  };
+  const SURFACES = ["surface.page", "surface.card", "surface.raised", "surface.sidebar"];
+  const MARKS = [...Array.from({ length: 8 }, (_, i) => `chart.series${i + 1}`), "chart.previous", "chart.other", "data.accent", "data.positive", "data.negative", "data.warning", "focus.ring"];
+  const pairs: [fg: string, bg: string, min: number][] = [
+    ...["brand.default", "brand.hover", "brand.active"].map((bg) => ["fg.onBrand", bg, 4.5] as [string, string, number]),
+    ...["fg.body", "fg.muted"].flatMap((fg) => SURFACES.map((bg) => [fg, bg, 4.5] as [string, string, number])),
+    ...MARKS.map((fg) => [fg, "surface.card", 3] as [string, string, number]),
+  ];
+  const probes: [string, Theme][] = [
+    ["antfabric", antfabric],
+    ["neutral", themes.neutral],
+    ["indigo", defineTheme({ name: "Indigo", brand: { primary: "#4F46E5" } })],
+    ["yellow", defineTheme({ name: "Yellow", brand: { primary: "#FACC15" } })],
+  ];
+  const seen = new Set<string>();
+  const rows: string[] = [];
+  for (const [name, theme] of probes)
+    for (const scheme of ["light", "dark"] as const) {
+      // The web's values (not `resolveTokens`, whose memo is bounded and would push out what `checkBrand` holds it to).
+      const values = tokenValues("web", scheme, undefined, theme);
+      const get = (path: string) => parse(values[cssVarName(path)]!);
+      const page = over(get("surface.page"), scheme === "light" ? [255, 255, 255, 1] : [0, 0, 0, 1]);
+      for (const [fg, bg, min] of pairs) {
+        const ground = bg === "surface.page" ? page : over(get(bg), page);
+        const r = ratio(over(get(fg), ground), ground);
+        const key = `${name}/${scheme}: ${fg} on ${bg}`;
+        seen.add(key);
+        const listed = key in todo;
+        if (r + 0.005 < min && !listed) err(at, `${key} is ${r.toFixed(2)}:1, under ${min}:1. Fix the token, or list "${key}" in contrastTodo in reports/generic.json with the reason`);
+        else if (r + 0.005 >= min && listed) err(GENERIC_AT, `contrastTodo lists "${key}", which now holds ${r.toFixed(2)}:1: take it off`);
+        else if (listed) rows.push(`${key} ${r.toFixed(2)}:1`);
+      }
+    }
+  const keys = Object.keys(todo);
+  if (keys.some((k, i) => i > 0 && keys[i - 1]! >= k)) err(GENERIC_AT, "contrastTodo is not sorted");
+  for (const [k, why] of Object.entries(todo)) {
+    if (!seen.has(k)) err(GENERIC_AT, `contrastTodo: "${k}" is not a pair the contrast check measures`);
+    if (!why.trim()) err(GENERIC_AT, `contrastTodo: "${k}" has no reason`);
+  }
+  if (!quiet && rows.length) console.warn(`  ! ${at}: (contrastTodo) ${rows.join("; ")}`);
+}
+
 // A chart palette whose colours sit too light or too close together fails the people it is for: a series that vanishes on the card, two that merge for someone who cannot tell red from green.
 function checkPalette() {
   const at = "palette";
@@ -1191,6 +1261,8 @@ interface Generic {
   defaultsTodo?: string[];
   /** `{ "<id>": ["<rule>: <detail>", …] }`: the API conventions (reports/api/conventions.md) a component still breaks. */
   conventionsTodo?: Record<string, string[]>;
+  /** `{ "<theme>/<scheme>: <fg> on <bg>": "<reason>" }`: the pairs `checkContrast` measures that fall short today. */
+  contrastTodo?: Record<string, string>;
 }
 const readGeneric = () => JSON.parse(readFileSync(GENERIC_FILE, "utf8")) as Generic;
 function checkStyles() {
@@ -2485,8 +2557,8 @@ function checkBrand() {
     const fb = flat(b);
     return Object.keys({ ...fa, ...fb }).filter((k) => fa[k] !== fb[k]).sort();
   };
-  // fg.onBrand moves only for a primary too light for white, so it is in the family but not expected to move for the sample tenant.
-  const family = [...BRAND_PATHS].filter((p) => p !== "fg.onBrand").sort();
+  // fg.onBrand is ink on AntFabric's coral (white fails 4.5:1 there), so it moves for the sample tenant's dark teal (white) and not for a light primary (ink).
+  const family = [...BRAND_PATHS].sort();
   const same = (got: string[], want: string[], what: string) => {
     if (got.join() !== want.join()) err(at, `${what}: moved ${got.join(", ") || "nothing"}; expected ${want.join(", ") || "nothing"}`);
   };
@@ -2520,7 +2592,7 @@ function checkBrand() {
     const onBrand = (primary: string) => (flat(through({ primary })) as Record<string, string>)["fg.onBrand"];
     if (onBrand(brand.primary!) !== "#ffffff") err(at, `${where}: fg.onBrand on ${brand.primary} is ${onBrand(brand.primary!)}, not white`);
     if (onBrand("#f2c94c") !== "#0e1828") err(at, `${where}: fg.onBrand on a light yellow brand is ${onBrand("#f2c94c")}, not ink`);
-    same(moved(plain, through({ primary: "#f2c94c" })), [...family.filter((p) => !p.startsWith("accent.")), "fg.onBrand"].sort(), `${where} light primary`);
+    same(moved(plain, through({ primary: "#f2c94c" })), family.filter((p) => !p.startsWith("accent.") && p !== "fg.onBrand"), `${where} light primary`);
     // A hand-picked tint wins over the derived one.
     const pick = { light: "#e6f4f1", dark: "#12302c" };
     const picked = flat(through({ primary: brand.primary, soft: pick })) as Record<string, string>;
@@ -3037,6 +3109,7 @@ if (!only.length || only.includes("tokens")) checkTokenMap();
 if (!only.length || only.includes("tokens") || only.includes("primitives")) checkPrimitives();
 if (!only.length || only.includes("tokens")) checkTokensJson();
 if (!only.length || only.includes("tokens") || only.includes("palette")) checkPalette();
+if (!only.length || only.includes("tokens")) checkContrast();
 if (!only.length || only.includes("chart")) checkChart();
 
 // A token the Foundations page cannot place (no section, or two) fails the site build, which `check` does not run.

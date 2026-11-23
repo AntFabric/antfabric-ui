@@ -162,7 +162,7 @@ function Entries({ desk, items, highlight, onChoose, styles, tabFirst = false }:
             <>
               <Icon part="entryIcon" name="check" size={r.entryIcon.width} style={partStyle(r, "entryIcon", { opacity: item.checked ? 1 : 0 })} />
               <span style={rtl(itemLabel, dir)}>{item.label}</span>
-              {item.shortcut ? <Kbd keys={item.shortcut} tone="bare" style={css({ alignSelf: "center" }, mac && on && { color: t.fg.onBrand })} /> : null}
+              {item.shortcut ? <Kbd keys={item.shortcut} tone="bare" style={css({ alignSelf: "center" }, mac && on && { color: t.os.onFill })} /> : null}
               {item.submenu && <Icon part="entryIcon" name={dir === "rtl" ? "chevron-left" : "chevron-right"} size={r.entryIcon.width} style={partStyle(r, "entryIcon", { opacity: 0.7 })} />}
             </>
           )}

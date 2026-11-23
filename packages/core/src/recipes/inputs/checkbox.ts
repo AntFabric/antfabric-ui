@@ -11,6 +11,8 @@ export const checkbox = defineRecipe({
     root: {
       base: { gap: "$choice.gap", paddingY: "$choice.padY", font: "$font.sans" },
       states: { disabled: { opacity: "$opacity.disabled" } },
+      // A box drawn without its label is still a 24px target on the web and the desktop (WCAG 2.2 2.5.8); the phone reaches 44pt by hitSlop.
+      platforms: { web: { base: { minHeight: "$control.hit", minWidth: "$control.hit" } }, desktop: { base: { minHeight: "$control.hit", minWidth: "$control.hit" } } },
     },
     box: {
       base: { square: "$checkbox.size", radius: "$checkbox.radius", borderWidth: "$border.wThick", borderColor: "$border.default", bg: "transparent", fg: "$fg.onBrand" },

@@ -38,6 +38,12 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 10: contrast and target size
 
+- **AntFabric's primary buttons now draw dark ink on coral** (`fg.onBrand` by contrast, see core). Brand fills under a dark tenant brand stay white.
+- `LineChart`: `marks` left out is on for two or more series and off for one (was off). Pass `marks={false}` for plain lines. (M46)
+- `Meter`: `showState` defaults to `true` (was `false`): the caution and critical states draw their icon. (M45)
+- The chart and data colours that changed in core (light scheme, and `chart.previous` in dark) reach the phone through `useTheme().t`.
+- The app badge's iOS count, the home-screen label and the danger swipe action read `os.onFill` / `danger.fg` and stay white.
+
 ### Batch 11: React Native overlays
 
 - Android back closes the innermost overlay first: `useBackHandler` adds its listener once each time an overlay opens, not on every render, so a Select open inside a BottomSheet closes before the sheet (H16).

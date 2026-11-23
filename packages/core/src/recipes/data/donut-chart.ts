@@ -29,5 +29,5 @@ export const donutChart = defineRecipe({
     value: { base: { size: "$text.title", line: "$text.titleLine", weight: "$font.weightSemibold", fg: "$fg.faint" }, states: { on: { fg: "$fg.strong" } } },
     share: { base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" }, states: { on: { fg: "$fg.muted" } } },
   },
-  reads: [...chartReads, "$chart.font", "$chart.other", "$chart.donutSize", "$chart.sliceGap", "$chart.sliceRadius", "$chart.sliceLift", "$chart.partMinW", "$opacity.muted"],
+  reads: [...chartReads, "$chart.font", "$chart.other", "$chart.donutSize", "$chart.sliceGap", "$chart.sliceRadius", "$chart.sliceLift", "$chart.partMinW", "$opacity.muted", "$control.hit"],
 });

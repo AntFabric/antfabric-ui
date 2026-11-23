@@ -43,8 +43,8 @@ const docs: ComponentDocs = {
     },
     showState: {
       type: "boolean",
-      default: false,
-      description: "An icon beside the value in the caution (triangle) and critical (circle) states, so the state is not the fill's colour alone. The spoken value says it either way (\"78%, caution\").",
+      default: true,
+      description: "An icon beside the value in the caution (triangle) and critical (circle) states, so the state is not the fill's colour alone (WCAG 1.4.1). On by default; `false` leaves the colour and the spoken value to say it (\"78%, caution\"), for a product that prints the state beside the meter itself.",
     },
     compact: {
       type: "boolean",

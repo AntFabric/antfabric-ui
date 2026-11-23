@@ -11,7 +11,7 @@ export default function MobileLockScreen() {
   const android = os === "android";
   const clock = android ? 64 : 88;
   // White on the wallpaper in either scheme; on-brand is the token that stays white.
-  const ink = t.fg.onBrand;
+  const ink = t.os.onFill;
   return (
     <View style={{ flex: 1, alignItems: "center", paddingTop: android ? t.space["2xs"] : t.space.lg }}>
       <Text style={[font("semibold"), { fontSize: 18, color: ink, opacity: 0.9 }]}>{android ? "Thu, 29 Oct" : "Thursday 29 October"}</Text>

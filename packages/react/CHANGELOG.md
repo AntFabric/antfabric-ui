@@ -46,6 +46,13 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 10: contrast and target size
 
+- **AntFabric's primary buttons now draw dark ink on coral** (`fg.onBrand` by contrast, see core). Brand fills under a dark tenant brand stay white.
+- `LineChart`: `marks` left out is on for two or more series and off for one (was off), so series are told apart by dash and marker as well as hue. Pass `marks={false}` for plain lines. (M46)
+- `Meter`: `showState` defaults to `true` (was `false`): the caution and critical states draw their icon. Pass `showState={false}` for the old look. (M45)
+- 24px targets: a label-less Checkbox is 24 × 24 (was 15 × 23), a Chip's ✕ 24 (was 20), IconButton `sm` 24 on the desktop (was 20), NotificationItem's row actions at least 24 tall, and DonutChart's swatch toggle 24 × 24 centred on the swatch (was 14 × 16). (M10, M50, L53)
+- Fields (TextField, TextArea, SearchField, Composer, CommandPalette and the others built on the `input` style) no longer carry an inline `outline: none`; `kitCss` takes the outline off instead, so in Windows High Contrast a focused field shows the forced-colours outline, not only its caret. (H15)
+- The macOS menu highlight, the Windows close button, the tray menu's hovered row and the app badge's OS fills read the new `os.onFill` and stay white.
+
 ### Batch 11: React Native overlays
 
 - BottomSheet fills what it is given: the 375px frame and the room above the panel were the catalogue's demo stage, and now are the catalogue's. A tall sheet reaches the top of its box. A press on the scrim above the panel closes it, and the new `dismissible` (default `true`) turns off the ×, the handle, the scrim and Esc together (M20, H17).

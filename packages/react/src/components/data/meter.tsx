@@ -24,7 +24,7 @@ export interface MeterProps extends RootProps<HTMLDivElement> {
   thresholds?: MeterThresholds;
   /** Just a short track with the value beside it, for a row of a table or a list that already names what it is. The label stays the track's accessible name. */
   compact?: boolean;
-  /** An icon beside the value in the caution and critical states, so the state is not the fill's colour alone. The spoken value always says it. */
+  /** An icon beside the value in the caution and critical states, so the state is not the fill's colour alone. On by default. The spoken value always says it. */
   showState?: boolean;
   /** Per-part styles over the theme: `{ root: {…}, head: {…}, label: {…}, value: {…}, track: {…}, fill: {…} }`. */
   styles?: PartStyles<"meter">;
@@ -33,7 +33,7 @@ export interface MeterProps extends RootProps<HTMLDivElement> {
   style?: CSSProperties;
 }
 
-export function Meter({ value, max = 1, label, kind = "usage", format = "percent", thresholds, compact = false, showState = false, styles, strings, style, ...rest }: MeterProps) {
+export function Meter({ value, max = 1, label, kind = "usage", format = "percent", thresholds, compact = false, showState = true, styles, strings, style, ...rest }: MeterProps) {
   const r = useRecipe(recipes.meter, { variants: { kind }, styles });
   const s = useStrings("meter", strings);
   const formatWords: FormatWords = { unavailable: s("unavailable"), points: ({ value }) => s("formatPoints", { value }), duration: ({ minutes, seconds }) => s("formatDuration", { minutes, seconds }) };

@@ -30,6 +30,6 @@ export const swipeRow = defineRecipe({
     action: { base: { height: "$control.hit", bg: "$surface.muted" }, states: { focus: { shadow: "$shadow.focus" } } },
     actionLabel: { base: { size: "$text.body", weight: "$font.weightMedium", fg: "$fg.body" } },
     dangerAction: { base: { height: "$control.hit", bg: "$danger.default" }, states: { focus: { shadow: "$shadow.focus" } } },
-    dangerLabel: { base: { size: "$text.body", weight: "$font.weightMedium", fg: "$fg.onBrand" } },
+    dangerLabel: { base: { size: "$text.body", weight: "$font.weightMedium", fg: "$danger.fg" } },
   },
 });

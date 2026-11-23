@@ -19,7 +19,7 @@ export const iconButton = defineRecipe({
         variant: {
           ghost: { states: { hover, pressed } },
           soft: { bg: "$surface.muted", fg: "$fg.body", states: { hover, pressed } },
-          // Pressed deepens the coral, as Button's primary does; the grey wash would leave a white glyph on grey.
+          // Pressed deepens the coral, as Button's primary does; the grey wash would leave the brand's ink on grey.
           solid: { bg: "$brand.default", fg: "$fg.onBrand", states: { hover: { bg: "$brand.hover", fg: "$fg.onBrand" }, pressed: { bg: "$brand.active" } } },
           outline: { borderWidth: "$border.wHairline", borderColor: "$border.muted", bg: "$surface.card", states: { hover, pressed } },
         },
