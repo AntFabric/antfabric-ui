@@ -40,7 +40,11 @@ export const visuallyHidden: CSSProperties = { position: "absolute", width: 1, h
 
 export const text: CSSProperties = { display: "block", boxSizing: "border-box", margin: 0, minWidth: 0, overflowWrap: "anywhere" };
 
-/** An <input> or <textarea> with no chrome of its own; the component draws the field. */
+/**
+ * An <input> or <textarea> with no chrome of its own; the component draws the field. The element carries `data-af-input`: `kitCss` takes the
+ * browser's focus outline off it, except in forced colours, where that outline is the only focus a field shows (an inline `outline: none`
+ * would beat the forced-colours rule).
+ */
 export const input: CSSProperties = {
   appearance: "none",
   borderWidth: 0,
@@ -56,7 +60,6 @@ export const input: CSSProperties = {
   margin: 0,
   padding: 0,
   minWidth: 0,
-  outline: "none",
   boxSizing: "border-box",
   resize: "none",
 };

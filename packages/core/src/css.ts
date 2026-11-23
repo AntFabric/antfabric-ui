@@ -146,6 +146,10 @@ export function tokenValues(platform: keyof typeof tokens.profiles, scheme: Sche
  * Focus is drawn by each component as a box-shadow ring, which Windows High Contrast (forced colours) removes; there the
  * `forced-colors` block draws a system-coloured outline on whatever has keyboard focus, and a thin Highlight outline on the current,
  * selected, checked or pressed item, whose fill the mode also removes (WCAG 2.4.7, 1.4.11).
+ *
+ * A field's browser outline is taken off here (`[data-af-input]:focus`), never inline: an inline `outline: none` beats every rule in a sheet,
+ * so in forced colours a focused field showed only its caret. The forced-colours rule is the more specific (`[data-af-platform]` in front),
+ * so it wins there and the field gets its CanvasText outline; outside forced colours the kit's own ring is the focus.
  */
 export const kitCss = `
 @keyframes af-spin{to{transform:rotate(360deg)}}
