@@ -99,6 +99,14 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 12: per-component fixes
 
+- A nested `AntFabricProvider` (the way to scope `strings`) or `AntFabricRoot` keeps the parent's `platform`, `os`, `osVersion` and `scheme` when it is not given them. Before, it reset them to web, browser and light, so a chart under it drew light on a dark page (M4). A root nested in another root now also writes the parent's `data-af-theme` and `data-af-os`.
+- A theme's stylesheet leaves `<head>` when the last root drawing that theme unmounts. Before, every distinct theme stayed for the life of the page, so a live colour picker left one sheet per colour (M55). Once mounted, the root holds the sheet itself (`<style data-href="antfabric-ui-<id>" data-af-held>`), counted by theme id. The server render is unchanged.
+- The kit's own sheet is named with the package version (`<style href="antfabric-ui@1.1.0">`), so a host and a plugin on two versions each keep their own (L70).
+- `usePlatform().shortcutOs`: the OS whose shortcut glyphs to draw. It is `os`, except on the web, where it is the visitor's once mounted (`mac` on a Mac or an iPad, so `⌘K`); the server render and the hydration say `browser` (Ctrl) (L73).
+- The focus ring shows when a key is pressed on a control focused by a click, as `:focus-visible` does. A shortcut with ⌘, Ctrl or Alt held does not show it (L68).
+- Hover and press end when a control becomes disabled, so it is not drawn hovered when it is enabled again (L69).
+- IconButton, Menu and MenuButton no longer throw where there is no `matchMedia` (jsdom in Jest or Vitest); they treat the pointer as fine there (L8, in part: Select still needs `matchMedia`, and SegmentedControl and the data components' frame need `ResizeObserver`).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:
