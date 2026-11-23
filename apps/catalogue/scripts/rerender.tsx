@@ -28,7 +28,7 @@ const { components } = await import("@antfabric/ui-docs");
 const { DefaultsProvider, SceneNode, Stage, Thing, kitComponent } = await import("../src/preview/kit");
 const { casesFor, defaultsFor, usedIds } = await import("../src/lib/library");
 const { foldIds, foldUseIds } = await import("./ids");
-const { normalise, roundCoords } = await import("./snapshot-hash");
+const { canonical, normalise, roundCoords } = await import("./snapshot-hash");
 // What Tab reaches, as the kit's focus trap reads it: the modal check below holds the trap to its own rule.
 const { focusables } = await import("../../../packages/react/src/lib/focus");
 const { createHash } = await import("node:crypto");
@@ -446,6 +446,218 @@ for (const doc of components) {
       logged.length = quiet;
     }
   }
+}
+
+/*
+ * The app drives the state: a component never shows the result of a request before the app confirms it. Each case mounts a component with
+ * its events as spies and walks a script of steps; every step is checked against a fresh mount of the props the app has passed by then.
+ *   press      the control (its exact name or text, else the first whose name starts with or holds it, or an index into the pressables).
+ *              `expect: "pending"`: something is busy (aria-busy, or a control went disabled) and, given `result`, the drawing is not the
+ *              result's. `expect: "unchanged"`: the drawing is a fresh mount's of the same props (pure UI state aside, nothing moved).
+ *              `calls`: that event fired.
+ *   answer     the app passes these props: the drawing must be a fresh mount's of them (pending gone, nothing kept from before).
+ *   settle     the spies' promises settle with the props unchanged (`promise: true` makes every spy return one): back to a fresh mount's.
+ * One OS per platform, `antfabric` only. Failures are `pendingTodo` in reports/generic.json, held as focusTodo is.
+ */
+type PendingStep =
+  | { press: string | number; expect?: "pending" | "unchanged"; result?: Record<string, unknown>; calls?: string }
+  | { answer: Record<string, unknown> }
+  | { settle: true };
+interface PendingCase {
+  id: string;
+  platforms: import("@antfabric/ui-core").Platform[];
+  props: Record<string, unknown>;
+  events: string[];
+  promise?: boolean;
+  steps: PendingStep[];
+}
+const PENDING_CASES: PendingCase[] = [
+  // dialog: the CTA spins until the app answers, Cancel stays live, and a failure with the same words comes back through the promise.
+  { id: "dialog", platforms: ["web", "mobile"], props: {}, events: ["onConfirm", "onCancel"], steps: [{ press: "Delete task", expect: "pending" }, { press: "Cancel", calls: "onCancel" }, { answer: { error: "The server refused: try again." } }] },
+  { id: "dialog", platforms: ["web", "mobile"], props: { error: "The server refused: try again." }, events: ["onConfirm"], promise: true, steps: [{ press: "Delete task", expect: "pending" }, { settle: true }] },
+  // session-state: never waiting, or unlocked, before the app says so.
+  { id: "session-state", platforms: ["web", "mobile"], props: { state: "expired" }, events: ["onSignIn"], steps: [{ press: 0, expect: "pending", result: { state: "waiting" } }, { answer: { state: "waiting" } }] },
+  { id: "session-state", platforms: ["web", "mobile"], props: { state: "expired" }, events: ["onSignIn"], promise: true, steps: [{ press: 0, expect: "pending", result: { state: "waiting" } }, { settle: true }] },
+  { id: "session-state", platforms: ["mobile"], props: { state: "locked" }, events: ["onUnlock"], promise: true, steps: [{ press: 0, expect: "pending", result: { state: "locked", unlocked: true } }, { settle: true }] },
+  // update-banner: Retry and Check again spin; the stage is the updater's.
+  { id: "update-banner", platforms: ["desktop"], props: { stage: "failed" }, events: ["onStageChange", "onApply"], steps: [{ press: 0, expect: "pending", result: { stage: "downloading" } }, { answer: { stage: "downloading" } }] },
+  { id: "update-banner", platforms: ["desktop"], props: { stage: "failed" }, events: ["onApply"], promise: true, steps: [{ press: 0, expect: "pending", result: { stage: "downloading" } }, { settle: true }] },
+  { id: "update-banner", platforms: ["mobile"], props: { stage: "latest" }, events: ["onCheck"], promise: true, steps: [{ press: 0, expect: "pending", result: { stage: "checking" } }, { settle: true }] },
+  // permission-prompt: on only when the OS says so.
+  { id: "permission-prompt", platforms: ["web", "mobile"], props: { permission: "default" }, events: ["onAllow"], steps: [{ press: 0, expect: "pending", result: { permission: "granted" } }, { answer: { permission: "denied" } }] },
+  { id: "permission-prompt", platforms: ["web", "mobile"], props: { permission: "default" }, events: ["onAllow"], promise: true, steps: [{ press: 0, expect: "pending", result: { permission: "granted" } }, { settle: true }] },
+  // notification-item: approved only when the server says so.
+  { id: "notification-item", platforms: ["web", "mobile"], props: { approval: "pending" }, events: ["onApprove", "onDecline"], steps: [{ press: "Approve", expect: "pending", result: { approval: "approved" } }, { answer: { approval: "approved" } }] },
+  { id: "notification-item", platforms: ["web", "mobile"], props: { approval: "pending" }, events: ["onApprove", "onDecline"], promise: true, steps: [{ press: "Decline", expect: "pending", result: { approval: "declined" } }, { settle: true }] },
+  // message and attachment-card: a retry that fails again keeps Retry and Delete.
+  { id: "message", platforms: ["web", "mobile"], props: { status: "failed" }, events: ["onStatusChange", "onRetry"], steps: [{ press: "Retry", expect: "pending", result: { status: "sending" } }, { answer: { status: "sending" } }] },
+  { id: "message", platforms: ["web", "mobile"], props: { status: "failed" }, events: ["onRetry"], promise: true, steps: [{ press: "Retry", expect: "pending", result: { status: "sending" } }, { settle: true }] },
+  { id: "attachment-card", platforms: ["web", "mobile"], props: { status: "failed" }, events: ["onRetry"], promise: true, steps: [{ press: "Retry", expect: "pending", result: { status: "uploading" } }, { settle: true }] },
+  // attachment-card's voice note: Play reports itself, so the app can start the audio.
+  { id: "attachment-card", platforms: ["web", "mobile"], props: { kind: "voice" }, events: ["onPlayingChange"], steps: [{ press: 0, calls: "onPlayingChange" }] },
+  // reaction-pill, controlled: busy until the app answers; a rejected reaction stays as it was.
+  { id: "reaction-pill", platforms: ["web", "mobile"], props: { mine: false, count: 2 }, events: ["onMineChange"], steps: [{ press: 0, expect: "pending", result: { mine: true, count: 3 } }, { answer: { mine: true, count: 3 } }] },
+  { id: "reaction-pill", platforms: ["web", "mobile"], props: { mine: false, count: 2 }, events: ["onMineChange"], promise: true, steps: [{ press: 0, expect: "pending", result: { mine: true, count: 3 } }, { settle: true }] },
+  // ...and in a message, whose pills are the server's reactions: a rejected reaction stays as it was.
+  { id: "message", platforms: ["web", "mobile"], props: {}, events: ["onReact"], promise: true, steps: [{ press: "🎉", expect: "pending" }, { settle: true }] },
+  // in-app-banner: one dismissal puts away one notification, not the next.
+  { id: "in-app-banner", platforms: ["web"], props: {}, events: ["onDismiss"], steps: [{ press: "Dismiss", calls: "onDismiss" }, { answer: { title: "Marcus Chen", body: "Can you look at the release notes before 3?" } }] },
+  { id: "in-app-banner", platforms: ["mobile"], props: {}, events: ["onDismiss"], steps: [{ press: 1, calls: "onDismiss" }, { answer: { title: "Marcus Chen", body: "Can you look at the release notes before 3?" } }] },
+  // sidebar: a row never keeps its own current; the section's `selected` decides, back to the items' own when it is "".
+  { id: "sidebar-section", platforms: ["web", "mobile"], props: { selected: "" }, events: ["onSelectedChange"], steps: [{ press: "*1", calls: "onSelectedChange" }, { answer: { selected: "*1" } }, { press: "*2", calls: "onSelectedChange" }, { answer: { selected: "*2" } }, { answer: { selected: "" } }] },
+  { id: "sidebar-item", platforms: ["web", "mobile"], props: { active: false }, events: ["onPress"], steps: [{ press: 0, expect: "unchanged", calls: "onPress" }] },
+  // question-panel: Sending… comes back to Submit when the send settles with nothing changed.
+  { id: "question-panel", platforms: ["web", "mobile"], props: { value: "deny", sending: false }, events: ["onSubmit"], steps: [{ press: "Submit", expect: "pending" }, { answer: { sending: true } }, { answer: { sending: false } }] },
+  { id: "question-panel", platforms: ["web", "mobile"], props: { value: "deny", sending: false }, events: ["onSubmit"], promise: true, steps: [{ press: "Submit", expect: "pending" }, { settle: true }] },
+  // list-item (H7): only a selection row toggles; a link, button or menu row is never current on its own.
+  { id: "list-item", platforms: ["web", "mobile"], props: { role: "link", selected: false }, events: ["onPress"], steps: [{ press: 0, expect: "unchanged", calls: "onPress" }] },
+  { id: "list-item", platforms: ["web", "mobile"], props: { role: "button", selected: false }, events: ["onPress"], steps: [{ press: 0, expect: "unchanged", calls: "onPress" }] },
+  { id: "list-item", platforms: ["web", "mobile"], props: { role: "menuitem", selected: false }, events: ["onPress"], steps: [{ press: 0, expect: "unchanged", calls: "onPress" }] },
+  // thread-summary (M24): opening is not following.
+  { id: "thread-summary", platforms: ["web", "mobile"], props: { following: false }, events: ["onPress"], steps: [{ press: 0, expect: "unchanged", calls: "onPress" }] },
+  // toast (M27): the action reports the dismissal too, so the app unmounts it.
+  { id: "toast", platforms: ["web", "mobile"], props: { actionLabel: "Undo" }, events: ["onAction", "onDismiss"], steps: [{ press: "Undo", calls: "onDismiss" }] },
+];
+{
+  const generic2 = generic as { pendingTodo?: string[] };
+  const pendingTodo = new Set(generic2.pendingTodo ?? []);
+  const pendingFound = new Set<string>();
+  let pendingSteps = 0;
+  const nameOfEl = (el: HTMLElement) => el.getAttribute("aria-label") ?? (el.textContent ?? "").trim();
+  const find = (host: HTMLElement, target: string | number) => {
+    const all = pressablesOf(host);
+    if (typeof target === "number") return all[target];
+    return (
+      all.find((el) => nameOfEl(el) === target || (el.textContent ?? "").trim() === target) ??
+      all.find((el) => nameOfEl(el).startsWith(target)) ??
+      all.find((el) => nameOfEl(el).includes(target))
+    );
+  };
+  const busyIn = (host: HTMLElement) => !!host.querySelector('[aria-busy="true"]');
+  /** What is drawn once focus has left: where focus went (a moved focus, a row's actions shown while focus is inside) is not the app's. */
+  const drawnNow = async (host: HTMLElement) => {
+    await act(async () => (document.activeElement as HTMLElement | null)?.blur?.());
+    return canonical(stateOf(host));
+  };
+  /** With AF_PENDING_DEBUG, the first lines where two drawings part. */
+  const differ = (a: string, b: string) => {
+    if (a === b) return false;
+    if (process.env.AF_PENDING_DEBUG) {
+      const x = a.split("\n"), y = b.split("\n");
+      const i = x.findIndex((l, n) => l !== y[n]);
+      const l = x[i] ?? "", m = y[i] ?? "";
+      let j = 0;
+      while (j < l.length && l[j] === m[j]) j++;
+      keep.error(`    drawn:     …${l.slice(Math.max(0, j - 150), j + 250)}\n    reference: …${m.slice(Math.max(0, j - 150), j + 250)}`);
+    }
+    return true;
+  };
+  for (const c of PENDING_CASES) {
+    if (only.length && !only.includes(c.id)) continue;
+    const doc = components.find((d) => d.id === c.id);
+    if (!doc) {
+      errors++;
+      keep.error(`  ✗ pending probe: no component "${c.id}"`);
+      continue;
+    }
+    for (const platform of c.platforms) {
+      if (!kitComponent(c.id, platform)) continue;
+      drawn.add(c.id);
+      const defaults = defaultsFor(usedIds(doc), platform);
+      const at = `${c.id}/${platform}`;
+      const quiet = logged.length;
+      const draw = (props: Record<string, unknown>) =>
+        createElement(DefaultsProvider, { value: defaults }, createElement(Stage, { platform, ...PROBE_OS[platform], scheme: "light", theme: antfabric, children: createElement(Thing, { id: c.id, platform, props }) }));
+      /**
+       * The reference a step is held to: a mount given the same props in turn (`history`), with nothing pressed. Updated the same way as
+       * the probed mount, so what happy-dom does on an update (it keeps a `background: var(…)` that is set to `none`) is in both.
+       */
+      const fresh = async (...history: Record<string, unknown>[]) => {
+        const host = document.createElement("div");
+        document.body.appendChild(host);
+        const root = createRoot(host);
+        try {
+          for (const props of history) await act(async () => root.render(draw(props)));
+          return await drawnNow(host);
+        } finally {
+          await act(async () => root.unmount());
+          host.remove();
+        }
+      };
+      // A sidebar section's rows: `*1` is the first item, its key in an answer and its name in a press.
+      const item = (v: unknown) => (typeof v === "string" && /^\*\d+$/.test(v) ? ((doc.props.items?.sample ?? doc.props.items?.default) as { key: string; name: string }[] | undefined)?.[Number(v.slice(1)) - 1] : undefined);
+      const resolve = (props: Record<string, unknown>) => Object.fromEntries(Object.entries(props).map(([k, v]) => [k, item(v)?.key ?? v]));
+      const calls: Record<string, number> = {};
+      const settles: (() => void)[] = [];
+      const spies = Object.fromEntries(
+        c.events.map((e) => [
+          e,
+          () => {
+            calls[e] = (calls[e] ?? 0) + 1;
+            return c.promise ? new Promise<void>((done) => settles.push(done)) : undefined;
+          },
+        ]),
+      );
+      let props = { ...c.props };
+      const history = [props];
+      const host = document.createElement("div");
+      document.body.appendChild(host);
+      const root = createRoot(host);
+      const fail = (what: string) => pendingFound.add(`${at}: ${what}`);
+      try {
+        await act(async () => root.render(draw({ ...props, ...spies })));
+        for (const step of c.steps) {
+          pendingSteps++;
+          if ("press" in step) {
+            const el = find(host, item(step.press)?.name ?? step.press);
+            if (!el) {
+              fail(`no control "${step.press}" to press (${pressablesOf(host).map(nameOfEl).join(" | ").slice(0, 200)})`);
+              break;
+            }
+            const locked = () => host.querySelectorAll('[disabled], [aria-disabled="true"]').length;
+            const before = locked();
+            const fired = { ...calls };
+            await activate(el);
+            const now = await drawnNow(host);
+            if (step.calls && (calls[step.calls] ?? 0) === (fired[step.calls] ?? 0)) fail(`pressing "${step.press}" does not call ${step.calls}`);
+            if (step.expect === "pending" && !busyIn(host) && locked() <= before) fail(`pressing "${step.press}" shows no pending state (aria-busy or a disabled control)`);
+            if (step.expect === "pending" && step.result && !differ(now, await fresh(resolve({ ...props, ...step.result })))) fail(`pressing "${step.press}" shows the result before the app answers`);
+            if (step.expect === "unchanged" && differ(now, await fresh(...history))) fail(`pressing "${step.press}" changes what the app passed`);
+          } else if ("answer" in step) {
+            props = { ...props, ...resolve(step.answer) };
+            history.push(props);
+            await act(async () => root.render(draw({ ...props, ...spies })));
+            if (differ(await drawnNow(host), await fresh(...history))) fail(`after the answer ${JSON.stringify(step.answer)} it does not draw what the app passed`);
+          } else {
+            await act(async () => {
+              for (const done of settles.splice(0)) done();
+              await Promise.resolve();
+            });
+            if (differ(await drawnNow(host), await fresh(...history))) fail("after its request settled with the props unchanged it does not return to them");
+          }
+        }
+      } catch (e) {
+        fail(`threw: ${(e as Error).message}`);
+      } finally {
+        await act(async () => root.unmount());
+        host.remove();
+      }
+      logged.length = quiet;
+    }
+  }
+  if (process.env.AF_TODO_WRITE) {
+    generic2.pendingTodo = [...pendingFound].sort();
+  } else {
+    for (const f of pendingFound) if (!pendingTodo.has(f)) {
+      errors++;
+      keep.error(`  ✗ ${f} (not in pendingTodo in reports/generic.json)`);
+    }
+    for (const t of pendingTodo) if (drawn.has(t.split("/")[0]!) && !pendingFound.has(t)) {
+      errors++;
+      keep.error(`  ✗ ${t}: passes now; take it off pendingTodo in reports/generic.json`);
+    }
+  }
+  console.log(`the app drives the state: ${PENDING_CASES.length} scripts, ${pendingSteps} steps, ${pendingFound.size} failing`);
 }
 
 // `styles` on the web: a longhand the recipe also writes as a shorthand (`styles.root.backgroundColor` beside the recipe's `background`) must stay
