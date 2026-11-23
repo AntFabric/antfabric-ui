@@ -160,12 +160,21 @@ export const contrast = (a: RGB, b: RGB): number => {
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
 };
 
-/** An opaque colour as written in a token: `#rgb`, `#rrggbb` or `rgb()`/`rgba()` with numbers (its alpha is ignored); `undefined` for anything else. */
+/** An opaque colour as written in a token: `#rgb`, `#rrggbb`, `rgb()`/`rgba()` or `hsl()`/`hsla()` with numbers (its alpha is ignored); `undefined` for anything else. */
 export function rgbOf(value: string): RGB | undefined {
   const v = value.trim();
   if (/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)) return parse(v, "colour");
-  const m = /^rgba?\(\s*(\d+(?:\.\d+)?)\s*[,\s]\s*(\d+(?:\.\d+)?)\s*[,\s]\s*(\d+(?:\.\d+)?)/i.exec(v);
-  return m ? ([m[1], m[2], m[3]].map(Number) as RGB) : undefined;
+  const n = "([-+]?(?:\\d+(?:\\.\\d*)?|\\.\\d+))";
+  const m = new RegExp(`^(rgba?|hsla?)\\(\\s*${n}(deg|turn|rad|grad)?\\s*[,\\s]\\s*${n}%?\\s*[,\\s]\\s*${n}%?`, "i").exec(v);
+  if (!m) return undefined;
+  const [a, unit, b, c] = [Number(m[2]), m[3]?.toLowerCase(), Number(m[4]), Number(m[5])];
+  if (m[1]!.toLowerCase().startsWith("rgb")) return [a, b, c];
+  // hsl: the hue in degrees (or turns, radians, gradians), saturation and lightness in percent.
+  const h = ((unit === "turn" ? a * 360 : unit === "rad" ? (a * 180) / Math.PI : unit === "grad" ? a * 0.9 : a) % 360 + 360) % 360;
+  const [sat, light] = [Math.min(1, Math.max(0, b / 100)), Math.min(1, Math.max(0, c / 100))];
+  const k = (x: number) => (x + h / 30) % 12;
+  const f = (x: number) => light - sat * Math.min(light, 1 - light) * Math.max(-1, Math.min(k(x) - 3, 9 - k(x), 1));
+  return [f(0), f(8), f(4)].map((x) => Math.round(x * 255)) as RGB;
 }
 
 /**

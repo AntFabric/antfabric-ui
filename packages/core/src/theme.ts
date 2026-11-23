@@ -350,7 +350,8 @@ export function defineTheme(input: ThemeInput): Theme {
     const fill = by.get(`${set}|brand.default`);
     if (!fill || fill.startsWith("extends") || by.get(`${set}|fg.onBrand`)?.startsWith("tokens")) continue;
     const rgb = rgbOf(String(resolveValue(sets.get(set)!["brand.default"]!)));
-    if (rgb) put(fill, set, "fg.onBrand", onBrandFor(rgb));
+    // A fill this cannot read (oklch(), a keyword) takes white, as every brand did before 1.1, not the schema's ink (AntFabric's coral's).
+    put(fill, set, "fg.onBrand", rgb ? onBrandFor(rgb) : "#ffffff");
   }
 
   // Resolved, in the shape `Theme.sets` has: only the sets that hold something.

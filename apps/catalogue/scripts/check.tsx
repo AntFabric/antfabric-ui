@@ -2963,6 +2963,11 @@ function checkThemes() {
     err(at, `a child theme did not keep its parent's leaves under its own: control.hMd ${String(kid["control.hMd"])}, font.sans ${String(kid["font.sans"])}`);
   if (kid["fg.onBrand"] !== "#0e1828") err(at, `a light brand primary in a child theme gives fg.onBrand ${String(kid["fg.onBrand"])}, not ink`);
   if ((flat(resolveTokens("mobile", "light", { os: "ios", theme: grandchild })) as Record<string, unknown>)["fg.onBrand"] !== "#ffffff") err(at, "a dark brand primary over a parent's light one kept the parent's ink fg.onBrand");
+  // A brand.default the theme writes as hsl() is read too, and one nothing can read takes white, never the schema's ink.
+  for (const [fill, want] of [["hsl(243 47% 20%)", "#ffffff"], ["hsl(50 95% 60%)", "#0e1828"], ["hsl(0.5turn 80% 25%)", "#ffffff"], ["oklch(0.3 0.1 260)", "#ffffff"]] as const) {
+    const got = defineTheme({ name: "Fill", extends: null, tokens: { schemes: { light: { brand: { default: fill } } } } }).sets.schemes.light?.["fg.onBrand"];
+    if (got !== want) err(at, `brand.default ${fill} gives fg.onBrand ${String(got)}, not ${want}`);
+  }
   if ((child.recipes as Record<string, unknown>).button === undefined) err(at, "a child theme dropped its parent's recipes");
 
   // Frozen all the way down, without freezing what the caller passed.
