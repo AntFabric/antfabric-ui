@@ -55,7 +55,7 @@ const useStyles = createStyles((t) => ({
  */
 export function Popover({
   content = null,
-  open = false,
+  open,
   onOpenChange,
   side = "bottom",
   align = "start",
@@ -75,7 +75,7 @@ export function Popover({
   const s = useStyles();
   const { t } = useTheme();
   const r = useRecipe(recipes.popover, { variants: { bare }, styles });
-  const [shown, setShown] = useControllable(open, onOpenChange);
+  const [shown = false, setShown] = useControllable(open, onOpenChange);
   const trigger = useRef<View | null>(null);
   const [at, setAt] = useState<LayoutRectangle | null>(null);
   const [screen, setScreen] = useState<{ width: number; height: number } | null>(null);

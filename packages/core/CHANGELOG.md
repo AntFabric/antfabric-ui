@@ -6,6 +6,9 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 1: controlled state
 
+- `useControllable(value, onChange)`: a value left out (`undefined`) keeps the component's own state even when `onChange` is passed, as its comment always said; only the value and the handler together make it controlled.
+- `useControllable` compares an array or plain-object value by its items when deciding whether the caller passed a new one, so an inline `selected={["a"]}` or `sort={{ … }}` without its handler no longer resets the person's change on every parent render.
+
 ### Batch 2: focus, Escape and IME
 
 ### Batch 3: theme sanitiser

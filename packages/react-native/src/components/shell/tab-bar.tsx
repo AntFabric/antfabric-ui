@@ -353,13 +353,13 @@ function useLens(glass: boolean, select: (key: string) => void, current: string,
   };
 }
 
-export function TabBar({ tabs = [], active = "", expanded = true, keyboardUp = false, safeArea = false, action, onActiveChange, onExpandedChange, onAction, styles, strings, style, testID, ...rest }: TabBarProps) {
+export function TabBar({ tabs = [], active, expanded, keyboardUp = false, safeArea = false, action, onActiveChange, onExpandedChange, onAction, styles, strings, style, testID, ...rest }: TabBarProps) {
   const { os, glass } = useTheme();
   const s = useStyles();
   const str = useStrings("tab-bar", strings);
   const r = useRecipe(recipes["tab-bar"], { styles });
-  const [current, setCurrent] = useControllable(active, onActiveChange);
-  const [shown, setExpanded] = useControllable(expanded, onExpandedChange);
+  const [current = "", setCurrent] = useControllable(active, onActiveChange);
+  const [shown = true, setExpanded] = useControllable(expanded, onExpandedChange);
   const squeezed = !shown;
   const reduceMotion = useReducedMotion();
   const lens = useLens(glass, setCurrent, current, reduceMotion);

@@ -44,13 +44,13 @@ const useStyles = createStyles((t) => ({
   meta: { flexShrink: 1 },
 }));
 
-export function ThreadSummary({ replyCount, lastReply = "", participants = [], unreadCount = 0, following = false, onFollowingChange, onPress, strings, styles, style, testID, ...rest }: ThreadSummaryProps) {
+export function ThreadSummary({ replyCount, lastReply = "", participants = [], unreadCount = 0, following, onFollowingChange, onPress, strings, styles, style, testID, ...rest }: ThreadSummaryProps) {
   const locale = useLocale();
   const { t } = useTheme();
   const str = useStrings("thread-summary", strings);
   const s = useStyles();
   const press = usePress();
-  const [follow, setFollow] = useControllable(following, onFollowingChange);
+  const [follow = false, setFollow] = useControllable(following, onFollowingChange);
   const r = useRecipe(recipes["thread-summary"], { state: { pressed: press.pressed, focus: press.focused }, styles });
   const root = partStyle(r, "root", { view: press.pressed ? { opacity: 0.7 } : undefined });
   // An icon's size is its width and height; what else `styles` sets on it goes on the glyph.

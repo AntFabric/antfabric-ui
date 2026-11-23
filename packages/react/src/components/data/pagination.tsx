@@ -41,11 +41,11 @@ const list: CSSProperties = { ...row, listStyle: "none", margin: 0, padding: 0 }
 /** More pages than this and the jump Select is searchable. */
 const SEARCHABLE_AFTER = 12;
 
-export function Pagination({ page, total, pageCount, pageSize = 10, pageSizes, jump = false, compact = false, onPageChange, onPageSizeChange, styles, strings, style, ...rest }: PaginationProps) {
+export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump = false, compact = false, onPageChange, onPageSizeChange, styles, strings, style, ...rest }: PaginationProps) {
   const r = useRecipe(recipes.pagination, { styles });
   const s = useStrings("pagination", strings);
   const [current, setCurrent] = useControllable(page, onPageChange);
-  const [size, setSize] = useControllable(pageSize, onPageSizeChange);
+  const [size = 10, setSize] = useControllable(pageSize, onPageSizeChange);
   const nav = useRef<HTMLElement>(null);
   const count = pageCount ?? pageCountOf(total ?? 0, size);
   const at = clampPage(current ?? 1, count);

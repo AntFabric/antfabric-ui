@@ -74,7 +74,7 @@ export function IconButton({
   variant = "ghost",
   shape = "circle",
   size = "md",
-  active = false,
+  active,
   toggle = false,
   tone = "neutral",
   badge = 0,
@@ -91,7 +91,7 @@ export function IconButton({
 }: IconButtonProps) {
   const s = useStrings("icon-button", strings);
   const ui = useInteraction({ disabled });
-  const [on, setOn] = useControllable(active, onActiveChange);
+  const [on = false, setOn] = useControllable(active, onActiveChange);
   // A finger on a touch laptop gets the phone profile's box (hIcon, or hIconSm for sm); the glyph keeps its size.
   const coarse = useCoarsePointer();
   const r = useRecipe(recipes["icon-button"], {

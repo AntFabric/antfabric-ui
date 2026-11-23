@@ -93,14 +93,14 @@ const useStyles = createStyles((t) => ({
 
 export function NotificationSchedule({
   surface = "menu",
-  paused = false,
+  paused,
   until = "",
   quietHours = "",
   options = [],
   note = "",
   custom = false,
-  customDate = "",
-  customTime = "",
+  customDate,
+  customTime,
   onCustomDateChange,
   onCustomTimeChange,
   onPause,
@@ -115,12 +115,12 @@ export function NotificationSchedule({
   const s = useStyles();
   const str = useStrings("notification-schedule", strings);
   // A choice shows its result at once; the app's next props (from the server) take over when they come.
-  const [isPaused, setPaused] = useControllable(paused, onPausedChange);
+  const [isPaused = false, setPaused] = useControllable(paused, onPausedChange);
   const [end, setEnd] = useControllable(until);
   const [picking, setPicking] = useControllable(custom);
   // What is typed in the picker is what Pause uses, and is reported as it changes.
-  const [date, setDate] = useControllable(customDate, onCustomDateChange);
-  const [time, setTime] = useControllable(customTime, onCustomTimeChange);
+  const [date = "", setDate] = useControllable(customDate, onCustomDateChange);
+  const [time = "", setTime] = useControllable(customTime, onCustomTimeChange);
   const pause = (key: string, at: string) => {
     if (!isPaused) setPaused(true);
     setEnd(at);

@@ -6,6 +6,9 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 1: controlled state
 
+- A control given only its change handler keeps its own state: `<Switch onCheckedChange={save} />` turns on, `<TextField onValueChange={save} />` keeps what is typed, `<Select onOpenChange={log} />` opens, `<Tabs onValueChange={log} />` moves. Before, the prop's default held it there forever. Fixed in every component with a changeable prop (Switch, Checkbox, RadioGroup, Select, TextField, SearchField, Chip, SegmentedControl, IconButton, Tabs, Breadcrumbs, ListItem, Popover, Sheet, Tooltip, HoverCard, CommandPalette, Composer, Message, MessageActions, AttachmentCard, ReactionPill, ThreadSummary, ApprovalItem, QuestionPanel, ThinkingIndicator, UpdateBanner, NotificationSchedule, TrayMenu, Pagination's `pageSize`, TitleBar, WebTopBar, AppMenuBar, NavRail, SidebarSection, WorkspaceSwitcher). Passing the value with its handler is controlled, as before.
+- An array or plain-object value passed without its handler (ContextMenu `picked`, Table `sort` or `selected`) is compared by its items, so re-rendering the parent with an equal inline value no longer undoes the person's change.
+
 ### Batch 2: focus, Escape and IME
 
 ### Batch 3: theme sanitiser

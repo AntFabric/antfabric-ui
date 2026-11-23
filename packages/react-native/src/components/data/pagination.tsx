@@ -47,13 +47,13 @@ const useStyles = createStyles((t) => ({
   choice: { flex: 1 },
 }));
 
-export function Pagination({ page, total, pageCount, pageSize = 10, pageSizes, jump = false, compact = false, onPageChange, onPageSizeChange, styles, strings, style, testID, ...rest }: PaginationProps) {
+export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump = false, compact = false, onPageChange, onPageSizeChange, styles, strings, style, testID, ...rest }: PaginationProps) {
   const s = useStyles();
   const r = useRecipe(recipes.pagination, { styles });
   const str = useStrings("pagination", strings);
   const id = (part: string) => partId(testID, "pagination", part);
   const [current, setCurrent] = useControllable(page, onPageChange);
-  const [size, setSize] = useControllable(pageSize, onPageSizeChange);
+  const [size = 10, setSize] = useControllable(pageSize, onPageSizeChange);
   const count = pageCount ?? pageCountOf(total ?? 0, size);
   const at = clampPage(current ?? 1, count);
   const go = (n: number) => {

@@ -148,12 +148,12 @@ function Option({ option, chosen, disabled, pick, styles, testID }: { option: Ra
 }
 
 /** The phone draws the list for `pills` (they are the desktop's ChoicePills), and `cards` stacked one per row. */
-export function RadioGroup({ options, value = "", label = "", hideLabel = false, appearance = "list", disabled = false, onValueChange, styles, style, testID, ...rest }: RadioGroupProps) {
+export function RadioGroup({ options, value, label = "", hideLabel = false, appearance = "list", disabled = false, onValueChange, styles, style, testID, ...rest }: RadioGroupProps) {
   const s = useStyles();
   const form = useFormField();
   const card = appearance === "cards";
   const r = useRecipe(recipes["radio-group"], { variants: { appearance: card ? "cards" : "list" }, styles });
-  const [current, setCurrent] = useControllable(value, onValueChange);
+  const [current = "", setCurrent] = useControllable(value, onValueChange);
   return (
     <View testID={partId(testID, "radio-group", "root")} accessibilityRole="radiogroup" accessibilityLabel={label || form?.label || undefined} accessibilityHint={form?.hint} accessibilityState={{ disabled }} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
       {label && !hideLabel ? (

@@ -96,7 +96,7 @@ function placePopover(trigger: DOMRect, panel: { width: number; height: number }
  */
 export function Popover({
   content = null,
-  open = false,
+  open,
   onOpenChange,
   side = "bottom",
   align = "start",
@@ -114,7 +114,7 @@ export function Popover({
   ...rest
 }: PopoverProps) {
   const r = useRecipe(recipes.popover, { variants: { bare }, styles });
-  const [shown, setShown] = useControllable(open, onOpenChange);
+  const [shown = false, setShown] = useControllable(open, onOpenChange);
   const id = useId();
   const host = useRef<HTMLDivElement | null>(null);
   const panel = useRef<HTMLDivElement | null>(null);

@@ -38,12 +38,12 @@ const track: CSSProperties = {
 
 const thumb: CSSProperties = { flexShrink: 0, transition: `transform ${t.duration.quick} ${t.ease.out}` };
 
-export function Switch({ checked = false, label: name, description: detail = "", icon = "", hideLabel = false, disabled = false, onCheckedChange, styles, style, ...rest }: SwitchProps) {
+export function Switch({ checked, label: name, description: detail = "", icon = "", hideLabel = false, disabled = false, onCheckedChange, styles, style, ...rest }: SwitchProps) {
   const ui = useInteraction({ disabled });
   const form = useFormField();
   const dir = useDirection();
   const descriptionId = `${useId()}-description`;
-  const [on, setOn] = useControllable(checked, onCheckedChange);
+  const [on = false, setOn] = useControllable(checked, onCheckedChange);
   const r = useRecipe(recipes.switch, { state: { on, hover: ui.hovered, focus: ui.focused, disabled: ui.disabled }, styles });
   return (
     <button

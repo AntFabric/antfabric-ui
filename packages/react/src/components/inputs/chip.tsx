@@ -65,7 +65,7 @@ export function Chip({
   label,
   icon = "",
   variant = "filter",
-  selected = false,
+  selected,
   count = 0,
   removable = false,
   removed = false,
@@ -81,7 +81,7 @@ export function Chip({
   const s = useStrings("chip", strings);
   const ui = useInteraction({ disabled });
   const x = useInteraction({ disabled });
-  const [on, setOn] = useControllable(selected, onSelectedChange);
+  const [on = false, setOn] = useControllable(selected, onSelectedChange);
   const [gone, setGone] = useControllable(removed);
   const rootRef = useRef<HTMLDivElement>(null);
   const drop = () => {

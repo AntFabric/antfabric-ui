@@ -725,13 +725,13 @@ function WebMenu({
 
 export function AppMenuBar({
   menus = [],
-  openMenu = "",
+  openMenu,
   highlight = "",
   workspace = "",
   host = "",
   workspaceIdentity = "ink",
   webItems = [],
-  colorScheme = "system",
+  colorScheme,
   clock = "",
   onSelect,
   onOpenMenuChange,
@@ -746,8 +746,8 @@ export function AppMenuBar({
   const { platform, os } = usePlatform();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const pending = useRef<Focus | null>(null);
-  const [open, setOpen] = useControllable(openMenu, onOpenMenuChange);
-  const [scheme, setScheme] = useControllable(colorScheme, onColorSchemeChange);
+  const [open = "", setOpen] = useControllable(openMenu, onOpenMenuChange);
+  const [scheme = "system", setScheme] = useControllable(colorScheme, onColorSchemeChange);
   // Choosing an entry closes the menu, as the system's own menus do.
   const choose = (item: AppMenuBarItem) => {
     onSelect?.(item);

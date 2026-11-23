@@ -160,17 +160,17 @@ const OptionRow = memo(function OptionRow({ item, id, on, chosen, size, variant,
 
 export function Select({
   items,
-  value = "",
+  value,
   label = "",
   placeholder = "",
   name: fieldName,
   size = "md",
   variant = "field",
-  open = false,
+  open,
   placement = "below",
   activeKey = "",
   searchable = false,
-  query = "",
+  query,
   searchPlaceholder,
   invalid = false,
   disabled = false,
@@ -191,10 +191,10 @@ export function Select({
   const allowFocus = useAutoFocus();
   const phone = usePhoneBrowser() && platform === "web";
   const ui = useInteraction({ disabled });
-  const [current, setCurrent] = useControllable(value, onValueChange);
-  const [isOpen, setOpen] = useControllable(open, onOpenChange);
+  const [current = "", setCurrent] = useControllable(value, onValueChange);
+  const [isOpen = false, setOpen] = useControllable(open, onOpenChange);
   const [active, setActive] = useControllable(activeKey);
-  const [filter, setFilter] = useControllable(query, onQueryChange);
+  const [filter = "", setFilter] = useControllable(query, onQueryChange);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);

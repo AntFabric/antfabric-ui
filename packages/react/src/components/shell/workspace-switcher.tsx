@@ -211,14 +211,14 @@ function AddRow({ label, onPress, styles }: Shared & { label: string; onPress: (
   );
 }
 
-export function WorkspaceSwitcher({ workspaces = [], current = "", showShortcuts = false, addLabel = "", onCurrentChange, onAdd, styles, strings, style, ...rest }: WorkspaceSwitcherProps) {
+export function WorkspaceSwitcher({ workspaces = [], current, showShortcuts = false, addLabel = "", onCurrentChange, onAdd, styles, strings, style, ...rest }: WorkspaceSwitcherProps) {
   const s = useStrings("workspace-switcher", strings);
   const { platform } = usePlatform();
   const r = useRecipe(recipes["workspace-switcher"], { styles });
   const titleId = useId();
   const keys = useRovingKeys<HTMLDivElement>({ items: '[role="menuitem"], [role="menuitemradio"]', orientation: "vertical", typeahead: true });
   // Controlled when the app passes both: it confirms the switch first, then moves `current` itself.
-  const [active, setCurrent] = useControllable(current, onCurrentChange);
+  const [active = "", setCurrent] = useControllable(current, onCurrentChange);
   const isCurrent = (ws: WorkspaceSwitcherWorkspace) => (active ? ws.key === active : !!ws.current);
   const pick = (ws: WorkspaceSwitcherWorkspace) => {
     // A signed-out workspace starts sign-in instead: the app hears of it, and nothing changes here.

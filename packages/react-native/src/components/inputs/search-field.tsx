@@ -41,7 +41,7 @@ const useStyles = createStyles(() => ({
 }));
 
 export function SearchField({
-  value = "",
+  value,
   placeholder = "",
   label = "",
   busy = false,
@@ -61,7 +61,7 @@ export function SearchField({
   const form = useFormField();
   const inputRef = useRef<TextInput>(null);
   const str = useStrings("search-field", strings);
-  const [query, setQuery] = useControllable(value, onValueChange);
+  const [query = "", setQuery] = useControllable(value, onValueChange);
   const [hasFocus, setFocus] = useState(false);
   const isFocused = focused || hasFocus;
   const r = useRecipe(recipes["search-field"], { state: { on: accent && !!query, focus: isFocused, disabled }, styles });

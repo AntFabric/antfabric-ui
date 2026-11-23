@@ -96,8 +96,8 @@ function Tab({ item, id, controls, on, full, styles, strings, onPress }: { item:
   );
 }
 
-export function Tabs({ items, value = "", full = false, rule = true, label, panels = false, onValueChange, styles, strings, style, ref, ...rest }: TabsProps) {
-  const [chosen, setChosen] = useControllable(value, onValueChange);
+export function Tabs({ items, value, full = false, rule = true, label, panels = false, onValueChange, styles, strings, style, ref, ...rest }: TabsProps) {
+  const [chosen = "", setChosen] = useControllable(value, onValueChange);
   const made = useId();
   const base = rest.id ?? made;
   const current = items.some((i) => i.key === chosen) ? chosen : items[0]?.key;

@@ -62,8 +62,8 @@ const Row = memo(function Row({ itemKey, item, selectedName, onSelect }: { itemK
 export function SidebarSection({
   label,
   icon = "",
-  expanded = true,
-  selected = "",
+  expanded,
+  selected,
   unread = 0,
   addLabel = "",
   actionsVisible = true,
@@ -83,9 +83,9 @@ export function SidebarSection({
   const ui = useInteraction();
   const dir = useDirection();
   const r = useRecipe(recipes["sidebar-section"], { variants: { divided }, state: { hover: ui.hovered, focus: ui.focused }, styles });
-  const [isOpen, setExpanded] = useControllable(expanded, onExpandedChange);
+  const [isOpen = true, setExpanded] = useControllable(expanded, onExpandedChange);
   const shut = !isOpen;
-  const [open, setOpen] = useControllable(selected, onSelectedChange);
+  const [open = "", setOpen] = useControllable(selected, onSelectedChange);
   const [hover, setHover] = useState(false);
   const [within, setWithin] = useState(false);
   const revealed = hover || within || ui.hovered || ui.focused;

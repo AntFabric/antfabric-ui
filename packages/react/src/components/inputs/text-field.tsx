@@ -81,7 +81,7 @@ const field: CSSProperties = {
 
 export function TextField({
   label = "",
-  value = "",
+  value,
   placeholder = "",
   type = "text",
   name,
@@ -120,7 +120,7 @@ export function TextField({
   const id = form?.id ?? own;
   const dir = useDirection();
   const ui = useInteraction({ disabled });
-  const [current, setText] = useControllable(value, onValueChange);
+  const [current = "", setText] = useControllable(value, onValueChange);
   const [justCopied, setCopied] = useControllable(copied);
   const copiedSaid = s("copied");
   useEffect(() => {

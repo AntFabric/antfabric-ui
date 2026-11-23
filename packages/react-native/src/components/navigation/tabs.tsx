@@ -89,13 +89,13 @@ function Tab({ item, on, full, styles, strings, testID, onLayout, onPress }: { i
   );
 }
 
-export function Tabs({ items, value = "", full = false, rule = true, label, onValueChange, styles, strings, style, testID, ...rest }: TabsProps) {
+export function Tabs({ items, value, full = false, rule = true, label, onValueChange, styles, strings, style, testID, ...rest }: TabsProps) {
   const s = useStyles();
   const scroll = useRef<ScrollView>(null);
   const spots = useRef<Record<string, { x: number; width: number }>>({});
   const view = useRef(0);
   const r = useRecipe(recipes.tabs, { variants: { rule }, styles });
-  const [chosen, setChosen] = useControllable(value, onValueChange);
+  const [chosen = "", setChosen] = useControllable(value, onValueChange);
   const current = items.some((i) => i.key === chosen) ? chosen : items[0]?.key;
   // A long strip scrolls the chosen tab to the middle when it changes, so it is never left off the edge.
   const first = useRef(true);

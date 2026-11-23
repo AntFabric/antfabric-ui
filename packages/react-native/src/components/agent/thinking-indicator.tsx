@@ -111,11 +111,11 @@ function useBreath(still: boolean) {
   return v;
 }
 
-export function ThinkingIndicator({ steps = [], agentName = "", words = [], since = 0, expanded = true, onExpandedChange, strings, styles, style, testID, ...rest }: ThinkingIndicatorProps) {
+export function ThinkingIndicator({ steps = [], agentName = "", words = [], since = 0, expanded, onExpandedChange, strings, styles, style, testID, ...rest }: ThinkingIndicatorProps) {
   const { t } = useTheme();
   const s = useStyles();
   const str = useStrings("thinking-indicator", strings);
-  const [unfolded, setUnfolded] = useControllable(expanded, onExpandedChange);
+  const [unfolded = true, setUnfolded] = useControllable(expanded, onExpandedChange);
   // Follows Settings live: turning Reduce Motion on stops the lattice at once.
   const still = useReducedMotion();
   const [mood, setMood] = useState(0);

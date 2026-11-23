@@ -88,9 +88,8 @@ export function ContextMenu({
   ...rest
 }: ContextMenuProps) {
   const s = useStrings("context-menu", strings);
-  // The person's own quick reactions, as one string so a new array of the same emoji is not a change.
-  const [own, setOwn] = useControllable(picked.join(" "));
-  const owned = own.split(" ").filter(Boolean);
+  // The person's own quick reactions (a new array of the same emoji is not a change).
+  const [owned, setOwned] = useControllable(picked);
   const r = useRecipe(recipes["context-menu"], { variants: { showTarget }, styles });
   const mine = (emoji: string) => owned.includes(emoji);
   const keyboard = (e: KeyboardEvent) => {
@@ -135,7 +134,7 @@ export function ContextMenu({
                 mine={mine(emoji)}
                 styles={styles}
                 onPress={() => {
-                  setOwn((mine(emoji) ? owned.filter((e) => e !== emoji) : [...owned, emoji]).join(" "));
+                  setOwned(mine(emoji) ? owned.filter((e) => e !== emoji) : [...owned, emoji]);
                   onReact?.(emoji);
                 }}
               >

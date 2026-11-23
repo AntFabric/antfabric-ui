@@ -216,7 +216,7 @@ function RailIcon({ stage, styles, strings, onPress }: { stage: UpdateBannerStag
 const SHOWN: readonly UpdateBannerStage[] = ["available", "downloading", "installing", "ready", "failed"];
 
 export function UpdateBanner({
-  stage = "available",
+  stage,
   version,
   progress = -1,
   error,
@@ -234,7 +234,7 @@ export function UpdateBanner({
   const r = useRecipe(recipes["update-banner"], { styles });
   const dir = useDirection();
   // Installing walks the stage on at once; the updater's own events take it from there.
-  const [current, setStage] = useControllable(stage, onStageChange);
+  const [current = "available", setStage] = useControllable(stage, onStageChange);
   const shown = SHOWN.includes(current);
   const press = () => {
     if (current === "ready") return onRestart?.();

@@ -77,7 +77,7 @@ function useSwipeDown(onDismiss: () => void) {
 }
 
 export function UpdateBanner({
-  stage = "available",
+  stage,
   version,
   error,
   appVersion,
@@ -97,7 +97,7 @@ export function UpdateBanner({
   const str = useStrings("update-banner", strings);
   const r = useRecipe(recipes["update-banner"], { styles });
   // Check for updates moves the card to checking at once; Restart to apply opens the sheet and Later puts it away.
-  const [current, setStage] = useControllable(stage, onStageChange);
+  const [current = "available", setStage] = useControllable(stage, onStageChange);
   const [confirm, setConfirm] = useControllable(confirmProp);
   const swipe = useSwipeDown(() => setConfirm(false));
   const busy = current === "checking" || current === "downloading" || current === "available";

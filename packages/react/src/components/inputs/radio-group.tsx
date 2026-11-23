@@ -166,9 +166,9 @@ function Option({ option, chosen, stop, disabled, pill, card, pick, styles }: Op
   );
 }
 
-export function RadioGroup({ options, value = "", label = "", hideLabel = false, appearance = "list", disabled = false, onValueChange, styles, style, ...rest }: RadioGroupProps) {
+export function RadioGroup({ options, value, label = "", hideLabel = false, appearance = "list", disabled = false, onValueChange, styles, style, ...rest }: RadioGroupProps) {
   const form = useFormField();
-  const [current, setCurrent] = useControllable(value, onValueChange);
+  const [current = "", setCurrent] = useControllable(value, onValueChange);
   const enabled = options.filter((o) => !o.disabled);
   const stopKey = options.some((o) => o.key === current && !o.disabled) ? current : enabled[0]?.key;
   const pill = appearance === "pills";

@@ -153,9 +153,9 @@ export function NavRail({
   title = "",
   home = "",
   workspace = "",
-  active = "",
-  level = "sections",
-  section = "",
+  active,
+  level,
+  section,
   destinations = [],
   search: showSearch = false,
   searchKeys = "Mod+K",
@@ -185,9 +185,9 @@ export function NavRail({
   const { os } = usePlatform();
   const dir = useDirection();
   const open = expanded;
-  const [current, setCurrent] = useControllable(active, onActiveChange);
-  const [depth, setDepth] = useControllable(level, onLevelChange);
-  const [picked, setPicked] = useControllable(section, onSectionChange);
+  const [current = "", setCurrent] = useControllable(active, onActiveChange);
+  const [depth = "sections", setDepth] = useControllable(level, onLevelChange);
+  const [picked = "", setPicked] = useControllable(section, onSectionChange);
   // Which way the rail last moved between its levels, so the list that arrives slides in from that side. Null until it moves.
   const [moved, setMoved] = useState<"in" | "out" | null>(null);
   // The section last open in each destination, so opening it again goes back there.

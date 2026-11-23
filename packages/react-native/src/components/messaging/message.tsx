@@ -127,7 +127,7 @@ export function Message({
   time = "",
   body = "",
   edited = false,
-  status = "sent",
+  status,
   agent = false,
   compact = false,
   unread = false,
@@ -157,7 +157,7 @@ export function Message({
   const { t } = useTheme();
   const s = useStyles();
   const str = useStrings("message", strings);
-  const [state, setState] = useControllable(status, onStatusChange);
+  const [state = "sent", setState] = useControllable(status, onStatusChange);
   const retry = () => {
     setState("sending");
     onRetry?.();

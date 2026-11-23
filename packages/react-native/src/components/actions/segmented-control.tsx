@@ -94,11 +94,11 @@ function Segment({ item, chosen, full, pick, place, styles, strings, testID }: S
   );
 }
 
-export function SegmentedControl({ items, value = "", full = false, scrollable = false, label = "", onValueChange, styles, strings, style, testID, ...rest }: SegmentedControlProps) {
+export function SegmentedControl({ items, value, full = false, scrollable = false, label = "", onValueChange, styles, strings, style, testID, ...rest }: SegmentedControlProps) {
   const { glass } = useTheme();
   const s = useStyles();
   const r = useRecipe(recipes["segmented-control"], { styles });
-  const [current, setCurrent] = useControllable(value, onValueChange);
+  const [current = "", setCurrent] = useControllable(value, onValueChange);
   const at = items.findIndex((i) => i.key === current);
 
   // iOS 26's selection lens: dragging across the strip lifts the chosen card into clear glass that

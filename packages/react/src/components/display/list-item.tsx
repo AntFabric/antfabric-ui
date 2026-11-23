@@ -116,7 +116,7 @@ export function ListItem({
   count = 0,
   shortcut = "",
   chevron = false,
-  selected = false,
+  selected,
   unread = false,
   disabled = false,
   destructive = false,
@@ -134,7 +134,7 @@ export function ListItem({
   const { os } = usePlatform();
   const dir = useDirection();
   const ui = useInteraction({ disabled });
-  const [on, setOn] = useControllable(selected, onSelectedChange);
+  const [on = false, setOn] = useControllable(selected, onSelectedChange);
   const filled = on && (role === "link" || role === "button");
   // `selected` to the recipe is a filled row (a ticked link or button); `on` is the checkbox's own state.
   const r = useRecipe(recipes["list-item"], {

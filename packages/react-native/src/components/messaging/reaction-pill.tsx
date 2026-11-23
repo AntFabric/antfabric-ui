@@ -44,12 +44,13 @@ const useStyles = createStyles((t) => ({
   count: { fontVariant: ["tabular-nums"] },
 }));
 
-export function ReactionPill({ emoji, count = 1, mine = false, variant = "reaction", disabled = false, onMineChange, onPress, onLongPress, strings, styles, style, testID, ...rest }: ReactionPillProps) {
+export function ReactionPill({ emoji, count = 1, mine: mineProp, variant = "reaction", disabled = false, onMineChange, onPress, onLongPress, strings, styles, style, testID, ...rest }: ReactionPillProps) {
   const { t } = useTheme();
   const s = useStyles();
   const str = useStrings("reaction-pill", strings);
   const press = usePress({ disabled });
-  const [on, setOn] = useControllable(mine, onMineChange);
+  const [on = false, setOn] = useControllable(mineProp, onMineChange);
+  const mine = mineProp ?? false;
   // Uncontrolled, a tap moves the count with `mine` (optimistic); controlled, the caller's count is the truth.
   const n = count + (on === mine ? 0 : on ? 1 : -1);
   const add = variant === "add";

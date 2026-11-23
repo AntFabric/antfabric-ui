@@ -78,7 +78,7 @@ export function MessageActions({
   forward = false,
   actions = [],
   more = false,
-  menuOpen = false,
+  menuOpen,
   onReact,
   onAddReaction,
   onReplyInThread,
@@ -92,7 +92,7 @@ export function MessageActions({
   ...rest
 }: MessageActionsProps) {
   const s = useStrings("message-actions", strings);
-  const [open, setOpen] = useControllable(menuOpen, onMenuOpenChange);
+  const [open = false, setOpen] = useControllable(menuOpen, onMenuOpenChange);
   const r = useRecipe(recipes["message-actions"], { styles });
   // Arrows (and Home, End) move between the buttons; left and right follow the tree's direction.
   const keys = useRovingKeys<HTMLDivElement>({ items: "button:not(:disabled)", orientation: "horizontal", roving: true });

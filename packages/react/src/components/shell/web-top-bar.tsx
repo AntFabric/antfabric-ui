@@ -119,8 +119,8 @@ export function WebTopBar({
   compact = false,
   actions = [],
   workspace = "",
-  menuOpen = false,
-  sidebarExpanded = false,
+  menuOpen,
+  sidebarExpanded,
   menu,
   trailing,
   onSidebarExpandedChange,
@@ -139,8 +139,8 @@ export function WebTopBar({
   const s = useStrings("web-top-bar", strings);
   const { os } = usePlatform();
   const r = useRecipe(recipes["web-top-bar"], { styles });
-  const [open, setOpen] = useControllable(menuOpen, onMenuOpenChange);
-  const [sidebar, setSidebar] = useControllable(sidebarExpanded, onSidebarExpandedChange);
+  const [open = false, setOpen] = useControllable(menuOpen, onMenuOpenChange);
+  const [sidebar = false, setSidebar] = useControllable(sidebarExpanded, onSidebarExpandedChange);
   const placeholder = searchPlaceholder || s("searchPlaceholder");
   const menuId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);

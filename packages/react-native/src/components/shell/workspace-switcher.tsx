@@ -129,12 +129,12 @@ function AddRow({ label, onPress, styles, testID }: Shared & { testID?: string; 
 }
 
 /** The sheet the header photo opens on a long-press: every workspace, the current one ticked. */
-export function WorkspaceSwitcher({ workspaces = [], current = "", addLabel = "", onCurrentChange, onAdd, styles, strings, style, testID, ...rest }: WorkspaceSwitcherProps) {
+export function WorkspaceSwitcher({ workspaces = [], current, addLabel = "", onCurrentChange, onAdd, styles, strings, style, testID, ...rest }: WorkspaceSwitcherProps) {
   const s = useStyles();
   const str = useStrings("workspace-switcher", strings);
   const r = useRecipe(recipes["workspace-switcher"], { styles });
   // Controlled when the app passes both: it confirms the switch first, then moves `current` itself.
-  const [active, setCurrent] = useControllable(current, onCurrentChange);
+  const [active = "", setCurrent] = useControllable(current, onCurrentChange);
   const pick = (ws: WorkspaceSwitcherWorkspace) => {
     // A signed-out workspace starts sign-in instead: the app hears of it, and nothing changes here.
     if (ws.signedIn) setCurrent(ws.key);

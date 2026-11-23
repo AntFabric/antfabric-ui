@@ -51,9 +51,9 @@ let errors = 0;
  */
 const { readFileSync } = await import("node:fs");
 const genericFile = new URL("../../../reports/generic.json", import.meta.url);
-const generic = JSON.parse(readFileSync(genericFile, "utf8")) as Record<string, unknown> & { focusTodo?: string[]; keysTodo?: string[] };
-const todo = { focus: new Set(generic.focusTodo ?? []), keys: new Set(generic.keysTodo ?? []) };
-const found = { focus: new Set<string>(), keys: new Set<string>() };
+const generic = JSON.parse(readFileSync(genericFile, "utf8")) as Record<string, unknown> & { focusTodo?: string[]; keysTodo?: string[]; controlTodo?: string[] };
+const todo = { focus: new Set(generic.focusTodo ?? []), keys: new Set(generic.keysTodo ?? []), control: new Set(generic.controlTodo ?? []) };
+const found = { focus: new Set<string>(), keys: new Set<string>(), control: new Set<string>() };
 /** The ids this run drew, so an entry for a component it did not draw is not called stale. */
 const drawn = new Set<string>();
 let steps = 0;
@@ -294,6 +294,158 @@ for (const doc of components) {
 }
 }
 
+/*
+ * Handler only keeps its own state (reports/api/conventions.md, rule 1): for each prop the docs declare `changes: "<p>"`, the component is
+ * mounted with `<p>` left out and only `on<P>Change`, and its controls are pressed one at a time (a text field typed into, a select changed),
+ * each sequence from a fresh mount and breadth first (every control at rest, then every control after a press that drew something new, as a
+ * trigger that opens a list), until a press fires the event. The same presses are then replayed on a mount with neither (which keeps its own
+ * state: the reference), and the two must draw the same state: roles, names, aria-checked/selected/pressed/expanded/current, field values
+ * and the markup. Why not compare with a mount given `<p>: next`: the presses before the one that fired (opening the list) would be missing
+ * from it. A press that fires the event without moving the reference (choosing what is already chosen) does not count, and the search goes
+ * on; a prop no press changes (an overlay the app opens, a stage the app sets) is skipped. One OS per platform, the desktop only for what the
+ * web does not draw (one kit file), `antfabric` only. Failures are `controlTodo` in reports/generic.json, held as focusTodo is.
+ */
+const PRESSABLE = 'button:not(:disabled), [role="button"], [role="tab"], [role="option"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [role="switch"], [role="checkbox"], [role="radio"], [role="link"], a[href], input:not(:disabled), textarea:not(:disabled), select:not(:disabled), [data-af-press], [tabindex="0"]';
+const SIGNED = 'button, a, input, textarea, select, [role], [aria-checked], [aria-selected], [aria-pressed], [aria-expanded], [aria-current]';
+const STATE_ATTRS = ["role", "aria-label", "aria-checked", "aria-selected", "aria-pressed", "aria-expanded", "aria-current"];
+const pressablesOf = (host: HTMLElement) => Array.from(host.querySelectorAll<HTMLElement>(PRESSABLE)).filter((el) => el.getAttribute("aria-disabled") !== "true");
+/**
+ * What the person can see and a screen reader can read: each control's role, name, aria-checked/selected/pressed/expanded/current and field
+ * value, then the whole markup with generated ids folded (the phone's kit says a switch is on by its look, which only the markup carries).
+ */
+function stateOf(host: HTMLElement): string {
+  const rows = Array.from(host.querySelectorAll<HTMLElement>(SIGNED)).map((el) => {
+    const field = el as HTMLInputElement;
+    const value = /^(?:INPUT|TEXTAREA|SELECT)$/.test(el.tagName) ? `=${field.value}${field.type === "checkbox" || field.type === "radio" ? (field.checked ? "+" : "-") : ""}` : "";
+    return `${el.tagName}${STATE_ATTRS.map((a) => `|${el.getAttribute(a) ?? ""}`).join("")}${value}|${(el.textContent ?? "").trim().slice(0, 60)}`;
+  });
+  return `${rows.join("\n")}\n${foldIds(foldUseIds(host.innerHTML))}`;
+}
+/** A value a field does not hold yet, of a kind its type accepts. */
+const typedFor = (el: HTMLInputElement | HTMLTextAreaElement) => {
+  const kind = el instanceof HTMLInputElement ? el.type : "text";
+  const pick = kind === "date" ? "2026-12-01" : kind === "time" ? "09:30" : kind === "number" || kind === "range" ? "3" : "Fabric";
+  return el.value === pick ? `${pick}2` : pick;
+};
+/** Press, type into or change one control, as a person would (React's `onChange` reads the value through the native setter and `input`). */
+async function activate(el: HTMLElement) {
+  await act(async () => {
+    if (el instanceof HTMLSelectElement) {
+      const other = Array.from(el.options).find((o) => o.value !== el.value);
+      if (!other) return;
+      Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")!.set!.call(el, other.value);
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+    } else if ((el instanceof HTMLInputElement && !/^(?:checkbox|radio|button|submit|reset|file)$/.test(el.type)) || el instanceof HTMLTextAreaElement) {
+      const proto = el instanceof HTMLInputElement ? HTMLInputElement.prototype : HTMLTextAreaElement.prototype;
+      Object.getOwnPropertyDescriptor(proto, "value")!.set!.call(el, typedFor(el));
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    } else el.click();
+  });
+}
+// A link pressed in the probe must not navigate the document away.
+document.addEventListener("click", (e) => {
+  if ((e.target as Element | null)?.closest?.("a[href]")) e.preventDefault();
+}, true);
+
+let controlProbed = 0;
+let controlMoved = 0;
+let controlMounts = 0;
+const PROBE_OS: Record<import("@antfabric/ui-core").Platform, OSPick> = { web: { os: "browser" }, desktop: { os: "mac", osVersion: 26 }, mobile: { os: "ios", osVersion: 26 } };
+/** Presses before the one that is tried (a trigger that opens a list, then a row of it), and mounts per prop. */
+const MAX_PREFIX = 2;
+const MAX_MOUNTS = 60;
+for (const doc of components) {
+  if (only.length && !only.includes(doc.id)) continue;
+  for (const platform of PLATFORMS) {
+    if (doc.platforms[platform].status === "not-applicable" || !kitComponent(doc.id, platform)) continue;
+    const applies = (d?: { platforms?: import("@antfabric/ui-core").Platform[] }) => !d?.platforms || d.platforms.includes(platform);
+    const defaults = defaultsFor(usedIds(doc), platform);
+    /**
+     * Mounts the component on its own and presses `presses` in turn (each an index into its pressable controls, read again after every press).
+     * Returns the state at rest and after each press, how many controls the last state has, and whether the last press called `calls`' spy.
+     */
+    const run = async (props: Record<string, unknown>, presses: number[], calls?: unknown[]) => {
+      controlMounts++;
+      const host = document.createElement("div");
+      document.body.appendChild(host);
+      const root = createRoot(host);
+      const states: string[] = [];
+      let lastFired = false;
+      let count = 0;
+      try {
+        await act(async () => root.render(createElement(DefaultsProvider, { value: defaults }, createElement(Stage, { platform, ...PROBE_OS[platform], scheme: "light", theme: antfabric, children: createElement(Thing, { id: doc.id, platform, props }) }))));
+        states.push(stateOf(host));
+        for (const i of presses) {
+          const el = pressablesOf(host)[i];
+          if (!el) break;
+          const before = calls?.length ?? 0;
+          await activate(el);
+          lastFired = (calls?.length ?? 0) > before;
+          states.push(stateOf(host));
+        }
+        count = pressablesOf(host).length;
+      } finally {
+        await act(async () => root.unmount());
+        host.remove();
+      }
+      return { states, count, lastFired, complete: states.length === presses.length + 1 };
+    };
+    for (const [event, d] of Object.entries(doc.props)) {
+      const prop = d.changes;
+      if (!prop || !applies(d) || !applies(doc.props[prop])) continue;
+      // The desktop draws the web's kit file: probed there only for what the web does not draw.
+      const onWeb = (x?: { platforms?: import("@antfabric/ui-core").Platform[] }) => !x?.platforms || x.platforms.includes("web");
+      if (platform === "desktop" && doc.platforms.web.status !== "not-applicable" && kitComponent(doc.id, "web") && onWeb(d) && onWeb(doc.props[prop])) continue;
+      drawn.add(doc.id);
+      controlProbed++;
+      const quiet = logged.length;
+      const calls: unknown[] = [];
+      const handled = { [prop]: undefined, [event]: (next: unknown) => void calls.push(next) };
+      const reference = { [prop]: undefined };
+      try {
+        // Breadth first over press sequences, each from a fresh mount: every control at rest, then every control after each press that drew
+        // something new (a trigger that opened a list), and so on. The first press that fires the event and moves the reference decides.
+        const frontier: number[][] = [[]];
+        const seen = new Set<string>();
+        let mounts = 0;
+        let done = false;
+        for (let f = 0; f < frontier.length && !done && mounts < MAX_MOUNTS; f++) {
+          const prefix = frontier[f]!;
+          const base = await run(handled, prefix, calls);
+          mounts++;
+          if (!base.complete) continue;
+          seen.add(base.states.at(-1)!);
+          for (let i = 0; i < base.count && !done && mounts < MAX_MOUNTS; i++) {
+            const presses = [...prefix, i];
+            const n = presses.length;
+            const h = await run(handled, presses, calls);
+            mounts++;
+            if (!h.complete) continue;
+            if (h.lastFired) {
+              const r = await run(reference, presses);
+              mounts++;
+              // Fired without moving the reference (it chose what was already chosen): keep looking.
+              if (r.complete && r.states[n] !== r.states[n - 1]) {
+                done = true;
+                controlMoved++;
+                if (h.states[n] !== r.states[n]) found.control.add(`${doc.id}/${platform}: ${prop} does not move with only ${event}`);
+                continue;
+              }
+            }
+            if (prefix.length < MAX_PREFIX && !seen.has(h.states[n]!)) {
+              seen.add(h.states[n]!);
+              frontier.push(presses);
+            }
+          }
+        }
+      } catch (e) {
+        logged.push(`control probe: ${(e as Error).message}`);
+      }
+      logged.length = quiet;
+    }
+  }
+}
+
 // `styles` on the web: a longhand the recipe also writes as a shorthand (`styles.root.backgroundColor` beside the recipe's `background`) must stay
 // through every state, and updating the recipe's value must not warn of the two fighting. Button is mounted with it and driven like a pointer would.
 {
@@ -368,10 +520,10 @@ console.warn = keep.warn;
 
 // The focus and keyboard lists: a failure not listed is new; a listed one that passes (for a component this run drew) must come off.
 if (process.env.AF_TODO_WRITE) {
-  writeFileSync(genericFile, JSON.stringify({ ...generic, focusTodo: [...found.focus].sort(), keysTodo: [...found.keys].sort() }, null, 2) + "\n");
-  console.log(`wrote focusTodo (${found.focus.size}) and keysTodo (${found.keys.size}) to reports/generic.json`);
+  writeFileSync(genericFile, JSON.stringify({ ...generic, focusTodo: [...found.focus].sort(), keysTodo: [...found.keys].sort(), controlTodo: [...found.control].sort() }, null, 2) + "\n");
+  console.log(`wrote focusTodo (${found.focus.size}), keysTodo (${found.keys.size}) and controlTodo (${found.control.size}) to reports/generic.json`);
 } else {
-  for (const [list, what] of [["focus", "focusTodo"], ["keys", "keysTodo"]] as const) {
+  for (const [list, what] of [["focus", "focusTodo"], ["keys", "keysTodo"], ["control", "controlTodo"]] as const) {
     for (const f of found[list]) if (!todo[list].has(f)) {
       errors++;
       keep.error(`  ✗ ${f} (not in ${what} in reports/generic.json)`);
@@ -388,6 +540,7 @@ if (process.env.AF_MOUNTED_OUT) {
   writeFileSync(process.env.AF_MOUNTED_OUT, JSON.stringify(out));
 }
 console.log(`re-rendered through ${steps} updates${charts ? `; ${charts} charts mounted twice, one markup each` : ""}`);
+if (controlProbed) console.log(`handler only: ${controlProbed} changeable props probed (${controlMounts} mounts), ${controlMoved} moved by a press, ${found.control.size} held at their default`);
 console.log(errors ? `✗ ${errors} warning(s) on update` : "✓ no warnings on update");
 await GlobalRegistrator.unregister();
 process.exit(errors ? 1 : 0);

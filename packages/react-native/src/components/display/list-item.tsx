@@ -93,7 +93,7 @@ export function ListItem({
   detail = "",
   count = 0,
   chevron = false,
-  selected = false,
+  selected,
   unread = false,
   disabled = false,
   destructive = false,
@@ -112,7 +112,7 @@ export function ListItem({
   const s = useStyles();
   const str = useStrings("list-item", strings);
   const press = usePress({ disabled });
-  const [on, setOn] = useControllable(selected, onSelectedChange);
+  const [on = false, setOn] = useControllable(selected, onSelectedChange);
   // A phone row has no fill and no hover; `selected` to the recipe is a filled row, which only the web draws.
   const r = useRecipe(recipes["list-item"], { variants: { leading, tile, unread, destructive, divider, selected: on && (role === "link" || role === "button") }, state: { on, pressed: press.pressed, focus: press.focused, disabled: press.disabled }, styles });
   const withSubtitle = subtitle ? str("withSubtitle", { title, subtitle }) : title;
