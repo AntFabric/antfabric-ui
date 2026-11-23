@@ -76,7 +76,15 @@ export function usePending(answer: readonly unknown[]): { pending: boolean; run:
     waiting.current = true;
     const id = ++latest.current;
     setPending(true);
-    const out = fn();
+    let out: unknown;
+    try {
+      out = fn();
+    } catch (e) {
+      // A handler that throws made no request: nothing to wait for.
+      waiting.current = false;
+      setPending(false);
+      throw e;
+    }
     if (out && typeof (out as PromiseLike<unknown>).then === "function") {
       const settle = () => {
         if (latest.current === id) setPending(false);
