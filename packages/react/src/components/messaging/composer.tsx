@@ -3,6 +3,7 @@ import { formatShortcut, recipes, useControllable, useDirection, useStrings, typ
 import { useAutoFocus, usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { useInteraction } from "../../lib/interaction";
 import { box, css, enter, input, pressable, row, rtl, text } from "../../lib/style";
@@ -210,7 +211,7 @@ export function Composer({
   };
   const keys = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     // Enter that commits an IME composition never sends.
-    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+    if (isComposing(e)) return;
     if (e.key === "Escape" && editing) {
       e.preventDefault();
       onCancelEdit?.();

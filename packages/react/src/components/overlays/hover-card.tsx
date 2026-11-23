@@ -2,6 +2,8 @@ import { useEffect, useId, useRef, type CSSProperties, type FocusEvent, type Key
 import { MOTION, recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
+import { useLayerStack } from "../../lib/layer";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, pressable, row, rtl, text, truncate } from "../../lib/style";
 import { rootProps, type RootProps } from "../../lib/root-props";
@@ -145,12 +147,18 @@ export function HoverCard({
   const ink: AvatarIdentity = deleted ? "ink" : identity;
   const hasPresence = agent || presence !== "unknown";
   const status = [statusEmoji, statusText].filter(Boolean).join(" ") + (statusUntil ? ` · ${statusUntil}` : "");
-  // Esc closes the card and stops there, so the dialog or panel behind stays open.
-  const keyboard = (e: KeyboardEvent) => {
-    if (e.key !== "Escape") return;
-    e.stopPropagation();
+  // Esc closes an open card and stops there, so the dialog or panel behind stays open: from inside it, and from anywhere while it is the
+  // top layer (one opened by hover). A closed card leaves the key alone.
+  const close = () => {
     hide();
     onClose?.();
+  };
+  useLayerStack(isOpen, () => [host.current], { onEscape: close });
+  const keyboard = (e: KeyboardEvent) => {
+    if (e.key !== "Escape" || !isOpen || e.defaultPrevented || isComposing(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    close();
   };
   const enterPointer = (e: PointerEvent) => {
     // Only where hover exists: a tap on a phone or a tablet never flashes one.

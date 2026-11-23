@@ -4,6 +4,7 @@ import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon, Spinner, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, input, pressable, row, text, truncate } from "../../lib/style";
 import { announce } from "../../lib/announce";
@@ -184,6 +185,8 @@ export function CommandPalette({
   }, [q, count, loading]);
 
   const keyboard = (e: KeyboardEvent) => {
+    // An IME's Enter commits its candidate and its Escape cancels it: neither chooses, clears or closes.
+    if (isComposing(e)) return;
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       if (!all.length) return;
@@ -196,6 +199,7 @@ export function CommandPalette({
       if (current ?? all[0]) choose((current ?? all[0])!);
       else if (q && !loading && ask) onAsk?.(q);
     } else if (e.key === "Escape") {
+      e.preventDefault();
       e.stopPropagation();
       if (q) setQ("");
       else onClose?.();

@@ -5,6 +5,7 @@ import { useAutoFocus } from "../../platform";
 import { useInteraction } from "../../lib/interaction";
 import { announce } from "../../lib/announce";
 import { rootProps, type RootProps } from "../../lib/root-props";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, input, neg, pressable, row, rtl, text } from "../../lib/style";
 import { Button } from "../actions/button";
@@ -322,8 +323,8 @@ export function QuestionPanel({
           onFocus={() => setFocus("field")}
           onBlur={() => setFocus(null)}
           onKeyDown={(e) => {
-            // Enter submits here, and only here: on a row it chooses.
-            if (e.key !== "Enter") return;
+            // Enter submits here, and only here: on a row it chooses. An IME's Enter commits its candidate instead.
+            if (e.key !== "Enter" || isComposing(e)) return;
             e.preventDefault();
             submit();
           }}

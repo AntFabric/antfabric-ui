@@ -29,6 +29,8 @@ const { DefaultsProvider, SceneNode, Stage, Thing, kitComponent } = await import
 const { casesFor, defaultsFor, usedIds } = await import("../src/lib/library");
 const { foldIds, foldUseIds } = await import("./ids");
 const { normalise, roundCoords } = await import("./snapshot-hash");
+// What Tab reaches, as the kit's focus trap reads it: the modal check below holds the trap to its own rule.
+const { focusables } = await import("../../../packages/react/src/lib/focus");
 const { createHash } = await import("node:crypto");
 const { writeFileSync } = await import("node:fs");
 
@@ -112,7 +114,7 @@ async function arrowsIn(host: HTMLElement): Promise<string[]> {
   for (const modal of host.querySelectorAll<HTMLElement>('[aria-modal="true"]')) {
     const role = modal.getAttribute("role") ?? "dialog";
     if (!modal.contains(document.activeElement)) stuck.push(`${role}: focus is not inside when it opens`);
-    const all = Array.from(modal.querySelectorAll<HTMLElement>('button:not(:disabled), [href], input:not(:disabled), textarea:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex="-1"])'));
+    const all = focusables(modal);
     if (all.length >= 2) {
       const last = all[all.length - 1]!;
       await act(async () => last.focus());
@@ -513,6 +515,140 @@ for (const doc of components) {
   }
   await act(async () => root.unmount());
   host.remove();
+}
+
+/*
+ * Keys across layers, on the web (the desktop draws the same kit file), in the setups a single component never shows: an Escape meant for a
+ * Select inside a modal Dialog closes the Select and leaves the Dialog; Tab and Shift+Tab stay inside a modal whose controls are a roving
+ * group (a Sheet holding only a RadioGroup, the CommandPalette from its field); an Enter that commits an IME composition submits nothing.
+ * Tab is pressed as a browser presses it: the keydown first, and when nothing prevented it, focus moves to the next element in the
+ * browser's own order (`tabOrder`, kept apart from the kit's `focusables` so a wrong rule there shows). Failures are `keysTodo` lines.
+ */
+{
+  const Kit = await import("@antfabric/ui-react");
+  const want = (id: string) => !only.length || only.includes(id);
+  /** What a browser's Tab reaches: an enabled control or `tabindex`, at 0 or more, not hidden, not inert. */
+  const tabOrder = () =>
+    Array.from(document.querySelectorAll<HTMLElement>("button, [href], input, select, textarea, [tabindex]")).filter(
+      (el) => el.tabIndex >= 0 && !(el as HTMLButtonElement).disabled && !(el instanceof HTMLInputElement && el.type === "hidden") && !el.closest("[hidden], [inert]"),
+    );
+  const press = async (key: string, init: KeyboardEventInit = {}) => {
+    const ev = new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true, ...init });
+    await act(async () => void (document.activeElement ?? document.body).dispatchEvent(ev));
+    return ev;
+  };
+  const pressTab = async (shift: boolean) => {
+    const at = document.activeElement as HTMLElement | null;
+    if ((await press("Tab", { shiftKey: shift })).defaultPrevented) return;
+    const order = tabOrder();
+    const from = at && at !== document.body ? at : null;
+    const next = shift
+      ? [...order].reverse().find((el) => !from || el !== from && from.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING)
+      : order.find((el) => !from || from.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING);
+    await act(async () => (next ? next.focus() : from?.blur()));
+  };
+  /** Tab, then Shift+Tab, from `start` round the modal and past: focus never leaves it. */
+  const trapLeaks = async (modal: HTMLElement, start: HTMLElement) => {
+    const out: string[] = [];
+    for (const shift of [false, true]) {
+      await act(async () => start.focus());
+      const turns = tabOrder().filter((el) => modal.contains(el)).length + 2;
+      for (let i = 0; i < turns; i++) {
+        await pressTab(shift);
+        if (!modal.contains(document.activeElement)) {
+          out.push(`${shift ? "Shift+Tab" : "Tab"} from ${start.getAttribute("role") ?? start.tagName.toLowerCase()} leaves the modal`);
+          break;
+        }
+      }
+    }
+    return out;
+  };
+  const mountWeb = async (children: ReturnType<typeof createElement>, id?: string) => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    const doc = id ? components.find((d) => d.id === id) : undefined;
+    const stage = createElement(Stage, { platform: "web", os: "browser", scheme: "light", theme: antfabric, children });
+    await act(async () => root.render(doc ? createElement(DefaultsProvider, { value: defaultsFor(usedIds(doc), "web") }, stage) : stage));
+    return {
+      host,
+      done: async () => {
+        await act(async () => root.unmount());
+        host.remove();
+      },
+    };
+  };
+  const quiet = logged.length;
+  try {
+    if (want("select")) {
+      drawn.add("select");
+      const cancels: unknown[] = [];
+      const items = [
+        { key: "platform", label: "Platform" },
+        { key: "mobile", label: "Mobile" },
+      ];
+      const m = await mountWeb(createElement(Kit.Dialog, { modal: true, kind: "form", title: "Move AF-1182", onCancel: () => cancels.push(1), children: createElement(Kit.Select, { label: "Project", items, value: "platform" }) }));
+      const trigger = m.host.querySelector<HTMLElement>('[role="combobox"]');
+      if (!trigger) found.keys.add("select/web: no Select drawn in the modal Dialog probe");
+      else {
+        await act(async () => trigger.click());
+        await act(async () => trigger.focus());
+        await press("Escape");
+        if (trigger.getAttribute("aria-expanded") !== "false") found.keys.add("select/web: Escape on an open Select in a modal Dialog does not close the Select");
+        if (cancels.length) found.keys.add("select/web: Escape on an open Select in a modal Dialog cancels the Dialog");
+        // The same key again, the Select closed: now the Dialog's.
+        else if ((await press("Escape"), cancels.length !== 1)) found.keys.add("select/web: Escape on a closed Select in a modal Dialog does not cancel the Dialog");
+      }
+      await m.done();
+    }
+    if (want("sheet")) {
+      drawn.add("sheet");
+      const options = [
+        { key: "all", label: "All new messages" },
+        { key: "mentions", label: "Mentions and replies" },
+        { key: "none", label: "Nothing" },
+      ];
+      const m = await mountWeb(createElement(Kit.Sheet, { open: true, showClose: false, title: "Notify me about", children: createElement(Kit.RadioGroup, { label: "Notify me about", hideLabel: true, options, value: "mentions" }) }));
+      const modal = m.host.querySelector<HTMLElement>('[aria-modal="true"]');
+      const radio = m.host.querySelector<HTMLElement>('[role="radio"][aria-checked="true"]');
+      if (!modal || !radio) found.keys.add("sheet/web: no modal RadioGroup drawn in the trap probe");
+      else for (const leak of await trapLeaks(modal, radio)) found.keys.add(`sheet/web: holding only a RadioGroup, ${leak}`);
+      await m.done();
+    }
+    if (want("command-palette")) {
+      drawn.add("command-palette");
+      const m = await mountWeb(createElement(Thing, { id: "command-palette", platform: "web" }), "command-palette");
+      const modal = m.host.querySelector<HTMLElement>('[aria-modal="true"]');
+      const field = modal?.querySelector<HTMLElement>("input");
+      if (!modal || !field) found.keys.add("command-palette/web: no field drawn in the trap probe");
+      else for (const leak of await trapLeaks(modal, field)) found.keys.add(`command-palette/web: ${leak}`);
+      await m.done();
+    }
+    // Enter while an IME composes commits the candidate; plain Enter after it submits (the probe's control).
+    const composing: [string, (spy: unknown[]) => ReturnType<typeof createElement>][] = [
+      ["search-field", (spy) => createElement(Kit.SearchField, { placeholder: "Search messages", value: "デプロイ", onSubmit: () => spy.push(1) })],
+      ["question-panel", (spy) => createElement(Kit.QuestionPanel, { title: "What should the release be called?", field: true, typed: "春のリリース", onSubmit: (a: string) => spy.push(a) })],
+    ];
+    for (const [id, draw] of composing) {
+      if (!want(id)) continue;
+      drawn.add(id);
+      const spy: unknown[] = [];
+      const m = await mountWeb(draw(spy));
+      const field = m.host.querySelector<HTMLElement>("input, textarea");
+      if (!field) found.keys.add(`${id}/web: no field drawn in the IME probe`);
+      else {
+        await act(async () => field.focus());
+        await press("Enter", { isComposing: true });
+        if (spy.length) found.keys.add(`${id}/web: Enter during IME composition submits`);
+        else if ((await press("Enter"), !spy.length)) found.keys.add(`${id}/web: Enter does not submit (the IME probe proves nothing)`);
+      }
+      await m.done();
+    }
+  } catch (e) {
+    errors++;
+    keep.error(`  ✗ layered keys probe: ${(e as Error).message}`);
+  }
+  logged.length = quiet;
 }
 
 console.error = keep.error;

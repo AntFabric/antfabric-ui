@@ -5,6 +5,7 @@ import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
 import { Icon, Spinner } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { box, css, enter, glass, input, neg, pressable, row, text, truncate } from "../../lib/style";
@@ -203,7 +204,7 @@ function ReplyRow({ os, sender, placeholder, value, sending, strings, styles, on
         aria-label={s("replyTo", { name: sender })}
         disabled={field.disabled}
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && onSend()}
+        onKeyDown={(e) => e.key === "Enter" && !isComposing(e) && onSend()}
         {...field.handlers}
         data-af-part="replyField"
         style={css(

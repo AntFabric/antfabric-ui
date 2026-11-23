@@ -4,7 +4,7 @@ import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, row, text, truncate } from "../../lib/style";
-import { useOverlayFocus } from "../../lib/focus";
+import { focusables, useOverlayFocus } from "../../lib/focus";
 import { OverlayLayer, useLayerHost, useLayerStack } from "../../lib/layer";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { Button } from "../actions/button";
@@ -148,11 +148,12 @@ function DialogView({
   };
 
   // The focus contract: focus moves in when the dialog mounts (a form to its first field, a confirm to Cancel, so a reflexive Enter never
-  // deletes), Tab stays inside, Esc cancels, and focus goes back to the opener when it unmounts.
+  // deletes), Tab stays inside, Esc cancels, and focus goes back to the opener when it unmounts. In the layer, Esc is the stack's: it comes
+  // after the controls inside (an open Select keeps its own) and reaches the top overlay only.
   const focus = useOverlayFocus<HTMLDivElement>({
     trap: true,
-    onEscape: dismissible ? cancel : undefined,
-    initial: (panel) => (form ? panel.querySelector<HTMLElement>("input, textarea, select") : actions.current?.querySelector<HTMLElement>("button")) ?? panel,
+    onEscape: dismissible && !floating ? cancel : undefined,
+    initial: (panel) => (form ? focusables(panel).find((el) => el.matches("input, textarea, select")) : actions.current?.querySelector<HTMLElement>("button")) ?? panel,
   });
   const panel = focus.ref;
   // Only the top overlay takes Esc and a press on the scrim; a dialog that must be answered takes them and does nothing.

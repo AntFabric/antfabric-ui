@@ -196,7 +196,8 @@ interface PanelProps {
 
 /** The panel: mounted while open, so focus moves in when it opens and back to the trigger when it closes. */
 function PopoverPanel({ id, panelRef, trigger, r, label, bare, modal, floating, positioned, side, align, width, matchTrigger, onClose, children }: PanelProps) {
-  const focus = useOverlayFocus<HTMLDivElement>({ trap: modal, onEscape: onClose });
+  // Floating, Esc is the stack's (after the controls inside, to the top overlay only); drawn in place, the panel's own.
+  const focus = useOverlayFocus<HTMLDivElement>({ trap: modal, onEscape: floating ? undefined : onClose });
   const [place, setPlace] = useState<Place | null>(null);
   const [triggerWidth, setTriggerWidth] = useState(0);
   useLayerStack(floating, () => [panelRef.current, trigger.current], { onEscape: onClose, onOutside: onClose });

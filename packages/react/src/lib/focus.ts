@@ -1,13 +1,22 @@
 import { useEffect, useRef, type KeyboardEvent, type RefObject } from "react";
 import { useAutoFocus } from "../platform";
+import { isComposing } from "./keys";
 
-/** What Tab can reach inside a panel: enabled controls, links, and anything with a non-negative tabIndex. */
+/** The candidates for Tab inside a panel: enabled controls, links, and anything with a `tabindex`. `focusables` keeps the ones Tab reaches. */
 export const FOCUSABLE = 'button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
 
-/** The focusable elements inside `root`, in document order, skipping the ones hidden by `display: none` or `hidden`. */
+/** Tab reaches it: in the tab order (not a roving group's other items at `tabIndex -1`), not a hidden input, not hidden, inert or undrawn. */
+const tabbable = (el: HTMLElement) =>
+  el.tabIndex >= 0 &&
+  !(el instanceof HTMLInputElement && el.type === "hidden") &&
+  !el.closest("[hidden], [inert]") &&
+  el.getAttribute("aria-hidden") !== "true" &&
+  ((el as HTMLElement & { checkVisibility?: () => boolean }).checkVisibility?.() ?? true);
+
+/** The elements inside `root` that Tab reaches, in document order. */
 export function focusables(root: HTMLElement | null | undefined): HTMLElement[] {
   if (!root) return [];
-  return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => !el.closest("[hidden], [inert]") && el.getAttribute("aria-hidden") !== "true");
+  return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(tabbable);
 }
 
 export interface OverlayFocusOptions {
@@ -18,9 +27,12 @@ export interface OverlayFocusOptions {
   initial?: "first" | "panel" | ((panel: HTMLElement) => HTMLElement | null | undefined) | false;
   /** Tab and Shift+Tab cycle inside the panel: a modal. */
   trap?: boolean;
-  /** Escape, with the event stopped so an overlay under this one keeps its own. */
+  /**
+   * Escape, with the event stopped so an overlay under this one keeps its own. Not for an overlay on the layer stack (`useLayerStack`),
+   * which takes Escape from there in the stack's order. An Escape a control inside already used (`defaultPrevented`), or an IME's, is left.
+   */
   onEscape?: () => void;
-  /** Return focus to what had it before the overlay opened, when it closes (default `true`). */
+  /** Return focus to what had it before the overlay opened, when it closes (default `true`); when that is gone, to the nearest place still there. */
   restore?: boolean;
 }
 
@@ -49,23 +61,30 @@ export function useOverlayFocus<T extends HTMLElement = HTMLElement>({ initial =
     const panel = ref.current;
     if (!panel || typeof document === "undefined") return;
     const opener = document.activeElement instanceof HTMLElement && !panel.contains(document.activeElement) ? document.activeElement : null;
+    // Where the opener sat, for when it is gone by the close (a menu row that opened a dialog).
+    const around: HTMLElement[] = [];
+    for (let at = opener?.parentElement ?? null; at; at = at.parentElement) around.push(at);
     const how = pick.current;
     if (allowed && how !== false) {
       const target = how === "panel" ? panel : how === "first" ? focusables(panel)[0] : how(panel);
       (target ?? (how === "first" ? panel : null))?.focus({ preventScroll: true });
     }
     return () => {
-      if (!restore || !opener || !opener.isConnected) return;
+      if (!restore || !opener) return;
       const at = document.activeElement;
       // Only when focus is still ours to give back: inside the closing panel, or dropped to the page when the panel went.
-      if (!at || at === document.body || panel.contains(at)) opener.focus({ preventScroll: true });
+      if (at && at !== document.body && !panel.contains(at)) return;
+      if (opener.isConnected) return opener.focus({ preventScroll: true });
+      // The opener went: the first control of the nearest of its ancestors still there, else that place's AntFabric root.
+      const near = around.find((el) => el.isConnected);
+      if (near) (focusables(near)[0] ?? near.closest<HTMLElement>("[data-af-platform]"))?.focus({ preventScroll: true });
     };
     // Once per opening: the panel is the overlay's lifetime.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape" && escape.current) {
+    if (e.key === "Escape" && escape.current && !e.defaultPrevented && !isComposing(e)) {
       e.stopPropagation();
       e.preventDefault();
       escape.current();
@@ -77,16 +96,13 @@ export function useOverlayFocus<T extends HTMLElement = HTMLElement>({ initial =
       e.preventDefault();
       return;
     }
-    const first = all[0]!;
-    const last = all[all.length - 1]!;
+    // Wrap wherever Tab would leave: from the last (or first) stop, and from focus off the order (the panel itself, a roving group's other
+    // items at tabIndex -1) with no stop after (or before) it. Between stops the browser moves on its own.
     const at = document.activeElement;
-    if (e.shiftKey && (at === first || at === ref.current)) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && at === last) {
-      e.preventDefault();
-      first.focus();
-    }
+    const toward = e.shiftKey ? Node.DOCUMENT_POSITION_PRECEDING : Node.DOCUMENT_POSITION_FOLLOWING;
+    if (at && ref.current.contains(at) && all.some((el) => el !== at && at.compareDocumentPosition(el) & toward)) return;
+    e.preventDefault();
+    (e.shiftKey ? all[all.length - 1]! : all[0]!).focus();
   };
 
   return { ref, onKeyDown };

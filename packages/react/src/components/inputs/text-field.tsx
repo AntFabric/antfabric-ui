@@ -4,6 +4,7 @@ import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { box, css, enter, input, row, rtl, text } from "../../lib/style";
@@ -200,7 +201,7 @@ export function TextField({
           onChange={(e) => setText(e.target.value)}
           onBlur={() => onBlur?.()}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.nativeEvent.isComposing) onSubmit?.();
+            if (e.key === "Enter" && !isComposing(e)) onSubmit?.();
           }}
           style={css(input, { flexGrow: 1, alignSelf: "stretch" }, partStyle(r, "input", disabled && { cursor: "not-allowed" }))}
         />

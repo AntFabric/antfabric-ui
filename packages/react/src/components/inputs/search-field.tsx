@@ -3,6 +3,7 @@ import { recipes, useControllable, useStrings, type KitStrings } from "@antfabri
 import { t } from "../../tokens";
 import { Icon, Spinner } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { css, input, pressable, row, text, truncate } from "../../lib/style";
@@ -115,11 +116,16 @@ export function SearchField({
           disabled={ui.disabled}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => {
+            // An IME's Enter commits its candidate and its Escape cancels it: neither submits nor clears.
+            if (isComposing(e)) return;
             if (e.key === "Enter") onSubmit?.();
-            // Escape clears first, and blurs on the second press.
+            // Escape clears first, and stops there (the overlay around the field stays); the second press blurs and goes on to it.
             if (e.key === "Escape") {
-              if (query) clear();
-              else e.currentTarget.blur();
+              if (query) {
+                e.preventDefault();
+                e.stopPropagation();
+                clear();
+              } else e.currentTarget.blur();
             }
           }}
           data-af-part="input"

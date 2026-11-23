@@ -3,6 +3,7 @@ import { recipes, useControllable, useStrings, type KitStrings } from "@antfabri
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, neg, pressable, row, text } from "../../lib/style";
 import { rootProps, type RootProps } from "../../lib/root-props";
@@ -93,7 +94,8 @@ export function ContextMenu({
   const r = useRecipe(recipes["context-menu"], { variants: { showTarget }, styles });
   const mine = (emoji: string) => owned.includes(emoji);
   const keyboard = (e: KeyboardEvent) => {
-    if (e.key !== "Escape") return;
+    if (e.key !== "Escape" || e.defaultPrevented || isComposing(e)) return;
+    e.preventDefault();
     e.stopPropagation();
     onClose?.();
   };
