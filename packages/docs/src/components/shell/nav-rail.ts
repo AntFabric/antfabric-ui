@@ -29,7 +29,7 @@ const docs: ComponentDocs = {
       type: "string",
       default: "",
       sample: "AntFabric",
-      description: "The wordmark beside the tile while expanded. With no `logo` and no `title`, the lockup is not drawn at the menu level.",
+      description: "The wordmark beside the tile while expanded. With no `logo` and no `title`, the lockup is not drawn at the menu level; with a `title` and no `logo` it is drawn only while expanded (collapsed, there would be nothing in it).",
     },
     home: {
       type: "string",
@@ -407,6 +407,18 @@ const docs: ComponentDocs = {
   ],
   states: ["focus"],
   edgeCases: [
+    {
+      title: "A wordmark with no logo",
+      platforms: ["web", "desktop"],
+      handling: "A product that passes a `title` and no `logo` gets its wordmark while the rail is expanded. Collapsed there is no tile to draw it in, so the lockup is left out rather than drawn as an empty button that Tab would stop on.",
+      example: {
+        name: "Collapsed, title only",
+        props: {
+          logo: "",
+          expanded: false,
+        },
+      },
+    },
     {
       title: "Big counts in a 64px column",
       platforms: ["web", "desktop"],

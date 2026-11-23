@@ -303,7 +303,8 @@ export function NavRail({
       )}
     >
       <div style={css(box, { alignItems: open ? "stretch" : "center", gap: open ? t.space["2xs"] : 14 })}>
-        {inside || logo || title ? (
+        {/* Collapsed, a `title` alone has nothing to draw (the wordmark shows only expanded), so no empty button is drawn for it. */}
+        {inside || logo || (open && title) ? (
           <div style={css(box, { alignItems: "center", gap: open ? t.space["2xs"] : 14 }, open && { flexDirection: "row" })}>
             {inside ? (
               // drill-in: the destination's icon takes the logo's place, and pressing it goes back to the destinations.
