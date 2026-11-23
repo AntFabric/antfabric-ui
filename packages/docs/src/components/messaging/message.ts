@@ -559,6 +559,20 @@ const docs: ComponentDocs = {
   states: ["hover"],
   edgeCases: [
     {
+      title: "The ⋯ menu is open and the pointer moves into it",
+      platforms: ["web", "desktop"],
+      handling: "The bar stays drawn while `menuOpen` holds (the row's own state when the app passes only `onMenuOpenChange`), so the menu the app anchors to ⋯ keeps its anchor after the pointer and focus leave the row for the menu.",
+      example: {
+        name: "Menu open, pointer elsewhere",
+        props: { more: true, menuOpen: true, hovered: false },
+      },
+    },
+    {
+      title: "A long press on one row, then another",
+      platforms: ["web", "desktop"],
+      handling: "On touch the bar opens by long press, on that row only: a press anywhere outside the row puts it away, so bars are never left open on several rows.",
+    },
+    {
       title: "One enormous token",
       platforms: ["web", "desktop", "mobile"],
       handling: "A pasted URL, hash or model dump with no spaces breaks anywhere (overflow-wrap: anywhere, which also counts for min-content), so the row never pushes past the scroller and the timeline never scrolls sideways.",
