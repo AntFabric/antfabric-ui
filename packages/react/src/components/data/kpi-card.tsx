@@ -5,7 +5,7 @@ import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";
-import { box, css, neg, row, text } from "../../lib/style";
+import { box, css, neg, row, text, visuallyHidden } from "../../lib/style";
 import { LoadingLines } from "../../data/loading";
 import { useWidth } from "../../data/frame";
 import { useChartTokens } from "../../data/theme";
@@ -104,7 +104,9 @@ export function KpiCard({ label, value, format = { type: "currency" }, delta, de
               {delta !== undefined ? <span aria-hidden style={{ display: "contents" }}><Delta value={delta} inverse={inverse} format={deltaFormat} variant="badge" /></span> : null}
             </div>
             <div ref={figure} title={short ? fmt(format, value, formatWords, locale) : undefined} style={box}>
-              <MetricValue value={value} format={short ? compactOf(format) : format} size="lg" />
+              {/* Written short, the figure is for the eye: a screen reader hears the whole one. */}
+              {short ? <span style={visuallyHidden}>{fmt(format, value, formatWords, locale)}</span> : null}
+              <MetricValue value={value} format={short ? compactOf(format) : format} size="lg" {...(short ? { "aria-hidden": true } : {})} />
             </div>
             {said || note ? (
               <div data-af-part="foot" style={css(box, r.foot)}>

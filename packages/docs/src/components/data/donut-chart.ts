@@ -41,7 +41,7 @@ const docs: ComponentDocs = {
     loading,
     hidden: {
       type: "array",
-      description: "The segments the list has turned off, by name: [\"Email\"]. Left out, the chart keeps its own, starting with every segment on. Controlled when the app passes it with `onHiddenChange`.",
+      description: "The segments the list has turned off, by name: [\"Email\"]. A name that two rows share is two segments: the second is `Email#2`. Left out, the chart keeps its own, starting with every segment on. Controlled when the app passes it with `onHiddenChange`.",
     },
     onHiddenChange: {
       type: "event",
@@ -51,7 +51,7 @@ const docs: ComponentDocs = {
     },
     selected: {
       type: "string",
-      description: "The segment that is picked, by name: the hole shows it and the others step back until it is picked again. Pointing at a segment or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`.",
+      description: "The segment that is picked, by name (`Email#2` for the second of two rows named Email): the hole shows it and the others step back until it is picked again. Pointing at a segment or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`.",
     },
     onSelectedChange: {
       type: "event",

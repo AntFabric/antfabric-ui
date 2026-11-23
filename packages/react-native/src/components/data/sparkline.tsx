@@ -4,7 +4,7 @@ import { LinearGradient, Stop } from "react-native-svg";
 import { LineChart } from "react-native-gifted-charts";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { type RootProps, partId, rootProps } from "../../lib/root-props";
-import { FLAT_FILL, fmt, valueDomain, type FormatSpec, type Row } from "@antfabric/ui-core/chart";
+import { FLAT_FILL, fmt, valueDomain, type FormatSpec, type FormatWords, type Row } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { giftedAnimated, useChartTokens, useReducedMotion } from "../../data/theme";
@@ -56,6 +56,8 @@ export function Sparkline({ data, y, width = 120, height = 32, area = false, mar
   const t = useChartTokens();
   const r = useRecipe(recipes.sparkline, { styles });
   const str = useStrings("sparkline", strings);
+  // The words a format writes (points, a duration, the dash) are the kit's, so the default label is said in the product's language.
+  const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
   const reduced = useReducedMotion();
   // gifted-charts names its area gradient `Gradient-line-0` in every chart, and an SVG id is the page's: two sparklines of different tones would share the first one's fill. This one's is its own.
@@ -69,7 +71,7 @@ export function Sparkline({ data, y, width = 120, height = 32, area = false, mar
   const span = hi - lo || 1;
   const floor = lo - span * (flush ? AIR_UNDER_FLUSH : AIR);
   const edge = flush ? 0 : t.chart.pointR;
-  const said = label || str("trend", { from: fmt(format, values[0], undefined, locale), to: fmt(format, values[values.length - 1], undefined, locale) });
+  const said = label || str("trend", { from: fmt(format, values[0], formatWords, locale), to: fmt(format, values[values.length - 1], formatWords, locale) });
   // One point has no line to draw: it is a dot.
   const last = values.length - 1;
   const dots = marker || values.length === 1;

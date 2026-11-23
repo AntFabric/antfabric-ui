@@ -115,7 +115,7 @@ export function Breakdown({ data, name, value, title, subtitle = "", format = "i
   const total = totalOf(parts);
   // A finger has no hover: a tap on a part of the bar or on its row picks it, and a tap on it again puts it back.
   const [picked, setPicked] = useControllable(selected, onSelectedChange);
-  const at = picked == null ? -1 : parts.findIndex((p) => p.label === picked);
+  const at = picked == null ? -1 : parts.findIndex((p) => p.key === picked);
   const summary = summarizeSegments({ label: title, segments: parts, format, formatWords, locale }, {
     noData: (v) => str("noData", v),
     allZero: (v) => str("summaryAllZero", v),
@@ -128,7 +128,7 @@ export function Breakdown({ data, name, value, title, subtitle = "", format = "i
   // A part with nothing in it has no width to give the bar: it stays in the list.
   const drawn = parts.map((p, i) => ({ p, i })).filter(({ p }) => p.value > 0);
   const pick = (i: number) => {
-    const next = parts[i]?.label;
+    const next = parts[i]?.key;
     if (next !== undefined) setPicked(picked === next ? null : next);
   };
   return (
@@ -149,7 +149,7 @@ export function Breakdown({ data, name, value, title, subtitle = "", format = "i
               {drawn.length ? (
                 drawn.map(({ p, i }, k) => (
                   <Pressable
-                    key={p.label}
+                    key={p.key}
                     testID={id("segment")}
                     accessible={false}
                     onPress={() => pick(i)}
@@ -175,7 +175,7 @@ export function Breakdown({ data, name, value, title, subtitle = "", format = "i
             </Enter>
             <View testID={id("list")} accessibilityRole="list" accessibilityLabel={str("parts")} style={[s.list, r.list.view]}>
               {parts.map((p, i) => (
-                <Part key={p.label} id={id} part={p} value={fmt(format, p.value, formatWords, locale)} share={fmt(WHOLE, shareOf(p.value, total), formatWords, locale)} shareW={shareW} color={colors[i]!} active={at === i} onPress={() => pick(i)} styles={styles} strings={strings} />
+                <Part key={p.key} id={id} part={p} value={fmt(format, p.value, formatWords, locale)} share={fmt(WHOLE, shareOf(p.value, total), formatWords, locale)} shareW={shareW} color={colors[i]!} active={at === i} onPress={() => pick(i)} styles={styles} strings={strings} />
               ))}
             </View>
           </View>

@@ -129,10 +129,10 @@ export function Breakdown({ data, name, value, title, subtitle = "", format = "i
   // What the bar is lighting: the part under the pointer or the keyboard, else the one that was picked.
   const [picked, setPicked] = useControllable(selected, onSelectedChange);
   const [hot, setHot] = useState<number | null>(null);
-  const pickedAt = picked == null ? -1 : parts.findIndex((p) => p.label === picked);
+  const pickedAt = picked == null ? -1 : parts.findIndex((p) => p.key === picked);
   const at = hot ?? (pickedAt >= 0 ? pickedAt : null);
   const pick = (i: number) => {
-    const next = parts[i]?.label;
+    const next = parts[i]?.key;
     if (next !== undefined) setPicked(picked === next ? null : next);
   };
   const summary = summarizeSegments({ label: title, segments: parts, format, formatWords, locale }, {
@@ -164,7 +164,7 @@ export function Breakdown({ data, name, value, title, subtitle = "", format = "i
               {drawn.length ? (
                 drawn.map(({ p, i }, k) => (
                   <span
-                    key={p.label}
+                    key={p.key}
                     data-af-part="segment"
                     onPointerEnter={() => setHot(i)}
                     onPointerLeave={() => setHot((h) => (h === i ? null : h))}
@@ -179,7 +179,7 @@ export function Breakdown({ data, name, value, title, subtitle = "", format = "i
             </div>
             <ul data-af-part="list" aria-label={str("parts")} style={css({ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${t.chart.partMinW}, 1fr))`, columnGap: t.space.lg, listStyle: "none", margin: 0, padding: 0 }, r.list)}>
               {parts.map((p, i) => (
-                <Part key={p.label} part={p} value={fmt(format, p.value, formatWords, locale)} share={fmt(WHOLE, shareOf(p.value, total), formatWords, locale)} color={colors[i]!} active={at === i} picked={pickedAt === i} onPick={() => pick(i)} onHot={(isHot) => setHot((h) => (isHot ? i : h === i ? null : h))} styles={styles} strings={strings} />
+                <Part key={p.key} part={p} value={fmt(format, p.value, formatWords, locale)} share={fmt(WHOLE, shareOf(p.value, total), formatWords, locale)} color={colors[i]!} active={at === i} picked={pickedAt === i} onPick={() => pick(i)} onHot={(isHot) => setHot((h) => (isHot ? i : h === i ? null : h))} styles={styles} strings={strings} />
               ))}
             </ul>
           </div>

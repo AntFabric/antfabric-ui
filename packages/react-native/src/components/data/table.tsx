@@ -215,32 +215,37 @@ export function Table({ columns, rows, rowKey = "key", sort, onSortChange, selec
     return cellText(c, v, formatWords, locale, currency);
   };
 
-  const bar = (
+  // The bar holds the select-all box and the sort: with neither (no column sorts, rows that are not picked), there is no bar.
+  const bar = !selectable && sortable.length === 0 ? null : (
     <View testID={id("bar")} style={[s.bar, r.bar.view]}>
       {selectable ? <Checkbox label={str("selectAll")} hideLabel checked={all} indeterminate={some} onCheckedChange={() => setTicked(togglePage(ids, picked))} /> : null}
-      <View testID={id("barSort")} style={[s.barSort, r.barSort.view]}>
-        <Select
-          label=""
-          title={str("sortBy")}
-          placeholder={str("sortBy")}
-          value={order$?.column ?? ""}
-          items={[{ key: "", label: str("asListed") }, ...sortable.map((c) => ({ key: c.key, label: c.label }))]}
-          onValueChange={(key) => {
-            const c = columns.find((x) => x.key === key);
-            change(c ? { column: c.key, direction: firstDirection(c) } : null);
-          }}
-        />
-      </View>
-      {order$ ? (
-        <IconButton
-          icon={order$.direction === "asc" ? "arrow-up" : "arrow-down"}
-          label={order$.direction === "asc" ? str("sortedAscending") : str("sortedDescending")}
-          variant="outline"
-          shape="square"
-          size="sm"
-          onPress={() => change({ ...order$, direction: order$.direction === "asc" ? "desc" : "asc" })}
-        />
-      ) : null}
+      {sortable.length === 0 ? null : (
+        <>
+          <View testID={id("barSort")} style={[s.barSort, r.barSort.view]}>
+            <Select
+              label=""
+              title={str("sortBy")}
+              placeholder={str("sortBy")}
+              value={order$?.column ?? ""}
+              items={[{ key: "", label: str("asListed") }, ...sortable.map((c) => ({ key: c.key, label: c.label }))]}
+              onValueChange={(key) => {
+                const c = columns.find((x) => x.key === key);
+                change(c ? { column: c.key, direction: firstDirection(c) } : null);
+              }}
+            />
+          </View>
+          {order$ ? (
+            <IconButton
+              icon={order$.direction === "asc" ? "arrow-up" : "arrow-down"}
+              label={order$.direction === "asc" ? str("sortedAscending") : str("sortedDescending")}
+              variant="outline"
+              shape="square"
+              size="sm"
+              onPress={() => change({ ...order$, direction: order$.direction === "asc" ? "desc" : "asc" })}
+            />
+          ) : null}
+        </>
+      )}
     </View>
   );
 

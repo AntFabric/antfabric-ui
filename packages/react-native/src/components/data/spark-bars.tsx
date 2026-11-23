@@ -2,7 +2,7 @@ import { View, type ViewStyle } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { type RootProps, partId, rootProps } from "../../lib/root-props";
-import { EARLIER_BARS, barLayout, fmt, valueDomain, withAlpha, type FormatSpec, type Row } from "@antfabric/ui-core/chart";
+import { EARLIER_BARS, barLayout, fmt, valueDomain, withAlpha, type FormatSpec, type FormatWords, type Row } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { giftedAnimated, useChartTokens, useReducedMotion } from "../../data/theme";
@@ -45,6 +45,8 @@ export function SparkBars({ data, y, width = 96, height = 36, animate = false, t
   const t = useChartTokens();
   const r = useRecipe(recipes["spark-bars"], { styles });
   const str = useStrings("spark-bars", strings);
+  // The words a format writes (points, a duration, the dash) are the kit's, so the default label is said in the product's language.
+  const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
   const reduced = useReducedMotion();
   const values = data.map((row) => row[y]).filter((v): v is number => typeof v === "number" && Number.isFinite(v));
@@ -57,7 +59,7 @@ export function SparkBars({ data, y, width = 96, height = 36, animate = false, t
   const layout = barLayout(width, values.length, t.chart.barGap);
   const { gap } = layout;
   const barWidth = Math.min(layout.barWidth, t.kpi.sparkBarMaxW);
-  const said = label || str("summary", { count: values.length, latest: fmt(format, values[last], undefined, locale) });
+  const said = label || str("summary", { count: values.length, latest: fmt(format, values[last], formatWords, locale) });
   return (
     <View testID={partId(testID, "spark-bars", "root")} accessible accessibilityRole="image" accessibilityLabel={said} {...rootProps(rest)} style={frame}>
       <BarChart

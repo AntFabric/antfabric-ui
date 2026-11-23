@@ -139,11 +139,11 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
   const all = segmentsOf(data, name, value, str("other"));
   const palette = seriesColors(tk);
   const colors = all.map((x, i) => (x.folded ? tk.chart.other : palette[i % palette.length]!));
-  const series = useSeries(all.map((x) => x.label), colors, { hidden, onHiddenChange });
-  const shown = all.filter((x) => series.visible.includes(x.label));
+  const series = useSeries(all.map((x) => x.key), colors, { hidden, onHiddenChange });
+  const shown = all.filter((x) => series.visible.includes(x.key));
   const total = totalOf(shown);
   const [picked, setPicked] = useControllable(selected, onSelectedChange);
-  const focus = shown.find((x) => x.label === picked) ?? null;
+  const focus = shown.find((x) => x.key === picked) ?? null;
   const summary = summarizeSegments({ label: title, segments: shown, format, formatWords, locale }, {
     noData: (v) => str("noData", v),
     allZero: (v) => str("summaryAllZero", v),
@@ -186,7 +186,7 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
                 // Every value is 0: the whole is nothing, so the ring is its track.
                 data={
                   total > 0
-                    ? shown.map((x) => ({ value: x.value, color: focus === null || focus.label === x.label ? series.colorOf(x.label) : withAlpha(series.colorOf(x.label), DIMMED) }))
+                    ? shown.map((x) => ({ value: x.value, color: focus === null || focus.key === x.key ? series.colorOf(x.key) : withAlpha(series.colorOf(x.key), DIMMED) }))
                     : [{ value: 1, color: tk.chart.track }]
                 }
               />
@@ -197,7 +197,7 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
                 onStartShouldSetResponder={() => total > 0}
                 onResponderRelease={(e) => {
                   const hit = segmentAt(e.nativeEvent.locationX, e.nativeEvent.locationY, diameter, inner, outer, shown.map((x) => x.value));
-                  const next = shown[hit]?.label;
+                  const next = shown[hit]?.key;
                   if (next !== undefined) setPicked(picked === next ? null : next);
                 }}
               />
@@ -210,8 +210,8 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
             </Enter>
             <View testID="donut-chart.list" accessibilityRole="list" accessibilityLabel={str("segments")} style={[s.list, r.list.view]}>
               {all.map((x) => {
-                const on = series.visible.includes(x.label);
-                return <Item key={x.label} label={x.label} value={fmt(format, x.value, formatWords, locale)} share={on ? fmt("percent", shareOf(x.value, total), formatWords, locale) : str("unavailable")} color={series.colorOf(x.label)} shareW={shareW} on={on} active={focus?.label === x.label} onPick={() => setPicked(picked === x.label ? null : x.label)} onToggle={() => series.toggle(x.label)} styles={styles} strings={strings} />;
+                const on = series.visible.includes(x.key);
+                return <Item key={x.key} label={x.label} value={fmt(format, x.value, formatWords, locale)} share={on ? fmt("percent", shareOf(x.value, total), formatWords, locale) : str("unavailable")} color={series.colorOf(x.key)} shareW={shareW} on={on} active={focus?.key === x.key} onPick={() => setPicked(picked === x.key ? null : x.key)} onToggle={() => series.toggle(x.key)} styles={styles} strings={strings} />;
               })}
             </View>
           </View>

@@ -141,7 +141,7 @@ export function GoalRings({ data, name, value, goal, title, subtitle = "", forma
   const bands = ringBands(size, tk.chart.ringW, tk.chart.ringGap, goals.length);
   // The goal that is picked: a finger has no hover, so a tap on a ring or on its row picks it, and a tap on it again puts it back.
   const [picked, setPicked] = useControllable(selected, onSelectedChange);
-  const at = picked == null ? -1 : goals.findIndex((g) => g.label === picked);
+  const at = picked == null ? -1 : goals.findIndex((g) => g.key === picked);
   const lit = at >= 0 ? (goals[at] ?? null) : null;
   const summary = summarizeGoals({ label: title, goals, format, formatWords, locale }, {
     noGoals: (v) => str("summaryNoGoals", v),
@@ -153,7 +153,7 @@ export function GoalRings({ data, name, value, goal, title, subtitle = "", forma
   const centerLabel$ = partStyle(r, "centerLabel", { text: chartFont(tk) });
   const dimmed = (k: number) => at >= 0 && at !== k;
   const pick = (k: number) => {
-    const next = goals[k]?.label;
+    const next = goals[k]?.key;
     if (next !== undefined) setPicked(picked === next ? null : next);
   };
   return (
@@ -173,7 +173,7 @@ export function GoalRings({ data, name, value, goal, title, subtitle = "", forma
             <Enter motion="pop" testID="goal-rings.ring" accessible accessibilityRole="image" accessibilityLabel={summary} style={[s.ring, r.ring.view]}>
               {/* gifted-charts' pie starts at 12 o'clock and runs clockwise. One donut per ring, the biggest first, each in a view as wide as its outer edge and centred, so a smaller ring sits in the hole of the one before. */}
               {goals.map((g, k) => (
-                <View key={g.label} pointerEvents="none" style={[s.band, { left: size / 2 - bands[k]!.outer, top: size / 2 - bands[k]!.outer, opacity: dimmed(k) ? DIMMED : 1 }]}>
+                <View key={g.key} pointerEvents="none" style={[s.band, { left: size / 2 - bands[k]!.outer, top: size / 2 - bands[k]!.outer, opacity: dimmed(k) ? DIMMED : 1 }]}>
                   <PieChart
                     donut
                     radius={bands[k]!.outer}
@@ -200,12 +200,12 @@ export function GoalRings({ data, name, value, goal, title, subtitle = "", forma
               />
               <View testID="goal-rings.center" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" pointerEvents="none" style={[s.center, r.center.view]}>
                 <Text testID="goal-rings.centerLabel" numberOfLines={1} style={[centerLabel$.view, centerLabel$.text]}>{lit ? str("thisGoal") : (centerLabel ?? str("centerLabel"))}</Text>
-                <MetricValue value={lit ? lit.ratio : overallOf(goals)} format={WHOLE} size="md" />
+                <MetricValue value={lit ? lit.share : overallOf(goals)} format={WHOLE} size="md" />
               </View>
             </Enter>
             <View testID="goal-rings.list" accessibilityRole="list" accessibilityLabel={str("goals")} style={[s.list, r.list.view]}>
               {goals.map((g, k) => (
-                <GoalItem key={g.label} goal={g} color={palette[k % palette.length]!} format={format} dim={dimmed(k)} picked={at === k} onPress={() => pick(k)} styles={styles} strings={strings} />
+                <GoalItem key={g.key} goal={g} color={palette[k % palette.length]!} format={format} dim={dimmed(k)} picked={at === k} onPress={() => pick(k)} styles={styles} strings={strings} />
               ))}
             </View>
           </View>

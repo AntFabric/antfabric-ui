@@ -12,11 +12,23 @@ import type { Row } from "./types";
 export const MOST_SEGMENTS = 8;
 
 export interface Segment {
+  /** What names the segment in `hidden` and `selected` (and a React key): its label, or `label#2`, `label#3`… for the second and third of the same name, so two rows with one name are two segments, not one. */
+  key: string;
   label: string;
   /** A share of the whole is never negative: a value under zero, or one that is not a number, counts as 0. */
   value: number;
   /** For "Other": how many rows it holds. */
   folded?: number;
+}
+
+/** A key for each of `labels`: the label itself the first time, `label#2` the second, and so on, so labels that repeat still name one item each. */
+export function keysOf(labels: readonly string[]): string[] {
+  const seen = new Map<string, number>();
+  return labels.map((l) => {
+    const n = (seen.get(l) ?? 0) + 1;
+    seen.set(l, n);
+    return n === 1 ? l : `${l}#${n}`;
+  });
 }
 
 /**
@@ -25,13 +37,14 @@ export interface Segment {
  */
 export function segmentsOf(data: Row[], label: string, value: string, other: string, most: number = MOST_SEGMENTS): Segment[] {
   const all = data.map((r) => ({ label: String(r[label] ?? "–"), value: Number.isFinite(+(r[value] as number)) ? Math.max(0, +(r[value] as number)) : 0 }));
-  if (all.length <= most) return all;
   const rest = all.slice(most);
-  return [...all.slice(0, most), { label: other, value: rest.reduce((s, r) => s + r.value, 0), folded: rest.length }];
+  const kept: Omit<Segment, "key">[] = all.length <= most ? all : [...all.slice(0, most), { label: other, value: rest.reduce((s, r) => s + r.value, 0), folded: rest.length }];
+  const keys = keysOf(kept.map((x) => x.label));
+  return kept.map((x, i) => ({ key: keys[i]!, ...x }));
 }
 
 /** The sum of some segments' values. */
-export const totalOf = (segments: readonly Segment[]): number => segments.reduce((s, x) => s + x.value, 0);
+export const totalOf = (segments: readonly Omit<Segment, "key">[]): number => segments.reduce((s, x) => s + x.value, 0);
 
 /** A segment's share of the whole, or NaN while the whole is nothing (which `fmt` prints as an en dash). */
 export const shareOf = (value: number, total: number): number => (total > 0 ? value / total : NaN);
@@ -56,7 +69,7 @@ export interface SegmentWords {
 }
 
 /** Every segment's share of the donut's sentence, in the chart's words: its name, value and share for each, then the total. A whole of nothing says so. */
-export function summarizeSegments({ label, segments, format, formatWords, locale }: { label: string; segments: readonly Segment[]; format?: FormatSpec; formatWords: FormatWords; locale?: string }, words: SegmentWords): string {
+export function summarizeSegments({ label, segments, format, formatWords, locale }: { label: string; segments: readonly Omit<Segment, "key">[]; format?: FormatSpec; formatWords: FormatWords; locale?: string }, words: SegmentWords): string {
   if (!segments.length) return words.noData({ title: label });
   const total = totalOf(segments);
   if (total <= 0) return words.allZero({ title: label, zero: fmt(format, 0, formatWords, locale) });

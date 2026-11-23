@@ -920,7 +920,8 @@ function checkChart() {
   const channels = [["#support", 212], ["#billing", 148], ["#platform-eng", 101], ["#onboarding", 86], ["Email", 62], ["#design-crit", 48], ["#sales-ops", 38], ["#security", 27], ["Slack Connect", 22], ["Chat widget", 16], ["Phone", 9]].map(([channel, tickets]) => ({ channel, tickets }));
   const segs = segmentsOf(channels, "channel", "tickets", "Other");
   same("segmentsOf, eleven rows are eight and Other", segs.length, 9);
-  same("segmentsOf, Other is the ninth row on", segs[8], { label: "Other", value: 47, folded: 3 });
+  same("segmentsOf, Other is the ninth row on", segs[8], { key: "Other", label: "Other", value: 47, folded: 3 });
+  same("segmentsOf, a name that repeats is two segments (L66)", segmentsOf([{ a: "Email", v: 1 }, { a: "Chat", v: 2 }, { a: "Email", v: 3 }], "a", "v", "Other").map((s) => s.key), ["Email", "Chat", "Email#2"]);
   same("segmentsOf, the first eight are as given", segs.slice(0, 8).map((s) => s.label), channels.slice(0, 8).map((r) => r.channel));
   same("segmentsOf, the total is the rows' total", totalOf(segs), 769);
   same("segmentsOf, eight rows are not folded", segmentsOf(channels.slice(0, 8), "channel", "tickets", "Other").some((s) => s.folded), false);
