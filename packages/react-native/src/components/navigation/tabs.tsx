@@ -21,7 +21,7 @@ export interface TabsItem {
 
 export interface TabsProps extends RootProps<ScrollView> {
   items: TabsItem[];
-  /** The chosen tab's key. Empty chooses the first. */
+  /** The chosen tab's key. Empty, or a key no tab has, chooses none: no bar under any tab. */
   value?: string;
   /** The tabs share the width between them. */
   full?: boolean;
@@ -62,7 +62,7 @@ function Tab({ item, on, full, styles, strings, testID, onLayout, onPress }: { i
   }, [on, bar, t.duration.base]);
   // A phone has no hover; a press inks the label while it is down, and the chosen tab stays strong.
   const r = useRecipe(recipes.tabs, { state: { on, pressed: press.pressed && !on, focus: press.focused }, styles });
-  const tab = partStyle(r, "tab", { view: full && { flexGrow: 1 }, text: { lineHeight: (r.tab.text.fontSize as number) * 1.2 } });
+  const tab = partStyle(r, "tab", { view: [full && { flexGrow: 1 }, item.disabled && { opacity: t.opacity.disabled }], text: { lineHeight: (r.tab.text.fontSize as number) * 1.2 } });
   const count = partStyle(r, "count", { text: [{ lineHeight: r.count.text.fontSize }, s.countText] });
   return (
     <Pressable
@@ -74,7 +74,7 @@ function Tab({ item, on, full, styles, strings, testID, onLayout, onPress }: { i
       onLayout={(e) => onLayout?.(e.nativeEvent.layout.x, e.nativeEvent.layout.width)}
       onPress={() => onPress()}
       {...press.handlers}
-      style={[s.tab, tab.view, item.disabled && { opacity: t.opacity.disabled }]}
+      style={[s.tab, tab.view]}
     >
       <Text numberOfLines={1} style={tab.text}>
         {item.label}
@@ -96,7 +96,8 @@ export function Tabs({ items, value, full = false, rule = true, label, onValueCh
   const view = useRef(0);
   const r = useRecipe(recipes.tabs, { variants: { rule }, styles });
   const [chosen = "", setChosen] = useControllable(value, onValueChange);
-  const current = items.some((i) => i.key === chosen) ? chosen : items[0]?.key;
+  // A value that matches no tab chooses none (a strip whose panel is closed): nothing is chosen for the app, a disabled tab least of all.
+  const current = items.some((i) => i.key === chosen) ? chosen : undefined;
   // A long strip scrolls the chosen tab to the middle when it changes, so it is never left off the edge.
   const first = useRef(true);
   useEffect(() => {

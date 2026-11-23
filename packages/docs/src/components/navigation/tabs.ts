@@ -276,11 +276,28 @@ const docs: ComponentDocs = {
     {
       title: "Nothing chosen",
       platforms: ["web", "desktop", "mobile"],
-      handling: "A value that matches no tab draws no bar at all. The channel shelf depends on it: with the details or thread panel open, no shelf tab is showing, and a bar under Files would be the strip telling a lie. When a tab is chosen again the bar is placed there, not slid in from where it last was. Tab then lands on the first tab.",
+      handling: "A value that matches no tab (empty, or a key no tab has) chooses none and draws no bar at all; the kit never falls back to the first tab. The channel shelf depends on it: with the details or thread panel open, no shelf tab is showing, and a bar under Files would be the strip telling a lie. When a tab is chosen again the bar is placed there, not slid in from where it last was. Tab then lands on the first enabled tab, the strip's one tab stop while none is chosen.",
       example: {
         name: "Thread panel open",
         props: {
           value: "",
+        },
+        width: 480,
+      },
+    },
+    {
+      title: "Nothing chosen and the first tab disabled",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "A disabled tab is never chosen for the app: with no value matching, no tab is chosen, and on web and desktop Tab lands on the first enabled tab (Pinned here), from which the arrows move on, skipping the disabled one.",
+      example: {
+        name: "First tab disabled",
+        props: {
+          value: "thread",
+          items: [
+            { key: "messages", label: "Messages", disabled: true },
+            { key: "pinned", label: "Pinned", badge: 3 },
+            { key: "files", label: "Files", badge: 12 },
+          ],
         },
         width: 480,
       },
