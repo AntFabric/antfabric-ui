@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, type ViewStyle } from "react-native";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { fmt, withoutSign, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles, useTheme } from "../../theme";
-import { Icon } from "../../lib/icon";
+import { Icon, type IconName } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { partId, rootProps, type RootProps } from "../../lib/root-props";
 import { LoadingLines } from "../../data/loading";
@@ -20,8 +20,8 @@ export type StatTileTrendKind = "line" | "bars";
 export interface StatTileProps extends RootProps<View> {
   /** What is counted: "Open tickets", "Orders shipped". One line; a long one is cut. */
   label: string;
-  /** A lucide icon name, in a soft chip before the label. Empty draws no chip. */
-  icon?: string;
+  /** A lucide icon name or component, in a soft chip before the label. Empty draws no chip. */
+  icon?: IconName;
   /** A word at the end of the top row: the period the number covers ("24h"), or "Now". */
   aside?: string;
   value: number;

@@ -3,7 +3,7 @@ import { Platform, Pressable, Text, TextInput, View, type TextStyle, type ViewSt
 import { recipes, useControllable, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { GlassSurface } from "../../lib/glass";
-import { Icon, Spinner } from "../../lib/icon";
+import { Icon, Spinner, type IconName } from "../../lib/icon";
 import { Enter } from "../../lib/motion";
 import { usePress } from "../../lib/press";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -113,7 +113,7 @@ const useStyles = createStyles((t) => ({
   sliver: { borderTopWidth: 0, ...blur },
 }));
 
-function MenuRow({ label, icon, last, styles, onPress }: { label: string; icon?: string; last: boolean; styles?: PartStyles<"os-notification">; onPress: () => void }) {
+function MenuRow({ label, icon, last, styles, onPress }: { label: string; icon?: IconName; last: boolean; styles?: PartStyles<"os-notification">; onPress: () => void }) {
   const s = useStyles();
   const press = usePress();
   const r = useRecipe(recipes["os-notification"], { state: { pressed: press.pressed, focus: press.focused }, styles });

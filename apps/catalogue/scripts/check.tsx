@@ -72,7 +72,9 @@
  *            packages' import rules (`pnpm check code` runs just them): `recharts` only under packages/react/src/data/ and
  *            packages/react/src/components/data/, `react-native-gifted-charts` and `gifted-charts-core` only under the same two folders of
  *            packages/react-native/src/, `@tanstack/table-core`
- *            only under packages/core/src/table/, nothing third-party under packages/core/src/chart/, and a file under
+ *            only under packages/core/src/table/, nothing third-party under packages/core/src/chart/, `lucide-react` and
+ *            `lucide-react-native` only in their kit's src/lib/icons.ts, whose registry holds exactly the icon names the kit's source
+ *            spells (`icons-ast.ts`), and a file under
  *            packages/{react,react-native}/src/templates/ imports only its kit's public entries (and core's). The app frame ships from
  *            each kit's `./shell` (`src/shell/index.ts`): no kit file outside src/shell/ imports that entry, or a file it re-exports (a
  *            category's every file when it re-exports the category's index), so the root and `./data` never reach it; the same of `./chat`
@@ -157,6 +159,7 @@ import * as ReactRecipe from "../../../packages/react/src/lib/recipe";
 import * as NativeRecipe from "../../../packages/react-native/src/lib/recipe";
 import { placeholdersOf, readStrings, type FileStrings } from "./strings-ast";
 import { readControllable } from "./controllable-ast";
+import { readIconNames, readIconRegistry } from "./icons-ast";
 import { platformOnly, type PlatformOnly, type StringTemplate } from "../../../packages/core/src/strings";
 import { PART_MARKS, canonical, normalise, unknownVars, type DrawnIn } from "./snapshot-hash";
 import { citedPaths, componentsJson, llmsTxt } from "./agent-surface";
@@ -1604,6 +1607,9 @@ const ONLY_UNDER: { pkg: RegExp; under: string | string[]; why: string }[] = [
   { pkg: /^recharts(?:\/|$)/, under: ["packages/react/src/data/", "packages/react/src/components/data/"], why: "charts reach the React kit only through its data subpath" },
   { pkg: /^(?:react-native-gifted-charts|gifted-charts-core)(?:\/|$)/, under: ["packages/react-native/src/data/", "packages/react-native/src/components/data/"], why: "charts reach the phone kit only through its data subpath" },
   { pkg: /^@tanstack\/table-core(?:\/|$)/, under: "packages/core/src/table/", why: "the table engine is core's table subpath" },
+  // Named imports of the icons the kit draws, in one file, so a bundler keeps those and drops the rest of lucide (`checkIconRegistry`).
+  { pkg: /^lucide-react(?:\/|$)/, under: "packages/react/src/lib/icons.ts", why: "the kit's icons are its registry's, imported one by one" },
+  { pkg: /^lucide-react-native(?:\/|$)/, under: "packages/react-native/src/lib/icons.ts", why: "the kit's icons are its registry's, imported one by one" },
 ];
 
 /** Every module a file names: `from "x"`, `import "x"`, `import("x")`, `require("x")`, with comments blanked first. */
@@ -1685,6 +1691,52 @@ function checkImports() {
   }
 }
 const an = (level: string) => `${/^[aeiou]/.test(level) ? "an" : "a"} ${level}`;
+
+/* ---------- icons ---------- */
+
+/** Source written here for the icon-name reader: each way a name reaches an icon, and a string that is not one. */
+const ICON_PROBE = `const MAP = { danger: "circle-alert", info: "info" };
+const LIST = [["bold", "bold-icon", label], "rule"] as const;
+function Row({ tone, glyph = "pin" }) {
+  const meta = (named: string) => <Icon name={named} />;
+  return (
+    <div title="not-an-icon">
+      {meta("pencil")}
+      <Icon name={glyph} />
+      <Icon name={tone === "danger" ? "triangle-alert" : MAP[tone]} />
+      {LIST.map((t) => (t === "rule" ? null : <IconButton icon={t[1]} label={t[0]} />))}
+      <Button iconLeading={\`chevron-\${tone}\`} />
+    </div>
+  );
+}`;
+const ICON_PROBE_NAMES = ["circle-alert", "info", "bold-icon", "pin", "pencil", "triangle-alert", "dynamic:`chevron-${tone}`"];
+
+/**
+ * A kit ships only the lucide icons it draws (`src/lib/icons.ts`), so every name its source spells for an icon (`readIconNames`: `<Icon name>`,
+ * an icon prop, a default, a ternary, a map, a list read in a `.map`, a local helper's argument) must be registered there, and everything
+ * registered must be drawn. A name an app passes is the app's to register; a name built at run time cannot be held to the registry, so it fails.
+ */
+function checkIconRegistry() {
+  const probe = readIconNames("probe.tsx", ICON_PROBE).map((u) => (u.dynamic ? `dynamic:${u.name}` : u.name));
+  if (probe.length !== ICON_PROBE_NAMES.length || ICON_PROBE_NAMES.some((n) => !probe.includes(n))) err("scripts/icons-ast.ts", `readIconNames read [${probe.join(", ")}] from the probe, not [${ICON_PROBE_NAMES.join(", ")}]`);
+  const root = repoRoot();
+  for (const kit of ["react", "react-native"] as const) {
+    const at = `packages/${kit}/src/lib/icons.ts`;
+    const registry = readIconRegistry(readFileSync(join(root, at), "utf8"));
+    const drawn = new Set<string>();
+    for (const file of sourcesUnder(join(root, "packages", kit, "src"))) {
+      const rel = file.slice(root.length + 1);
+      if (rel === at) continue;
+      for (const u of readIconNames(file, readFileSync(file, "utf8"))) {
+        const where = `${rel}:${u.line}`;
+        if (u.dynamic) err(where, `builds an icon name (${u.name}): spell each name out, so it can be held to the registry in ${at}`);
+        else if (!registry.has(pascal(u.name))) err(where, `draws the icon "${u.name}", which ${at} does not register: import ${pascal(u.name)} there and add it to the registry, or an app gets an empty box`);
+        else drawn.add(pascal(u.name));
+      }
+    }
+    for (const n of registry) if (!drawn.has(n)) err(at, `registers ${n}, which no file of the kit draws: take it out (the registry holds the kit's own icons; an app registers the rest)`);
+  }
+}
 
 /* ---------- strings ---------- */
 
@@ -3005,7 +3057,10 @@ if (!only.length || only.includes("themes") || only.includes("brand")) {
   checkBrand();
   checkThemes();
 }
-if (!only.length || only.includes("code")) checkImports();
+if (!only.length || only.includes("code")) {
+  checkImports();
+  checkIconRegistry();
+}
 if (!only.length || only.includes("code") || only.includes("conventions")) checkConventions();
 if (!only.length || only.includes("code") || only.includes("generic")) {
   checkStyles();

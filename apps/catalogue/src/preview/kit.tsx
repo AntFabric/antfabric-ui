@@ -17,6 +17,8 @@ import * as NC from "@antfabric/ui-react-native/chat";
 import { cssVarName, pascal, useControllable, type InteractionState, type NativeTokens, type OS, type Platform, type Scheme, type Theme } from "@antfabric/ui-core";
 import type { Scene, SceneStyle } from "@antfabric/ui-docs";
 import { ANTFABRIC_STRINGS, TITLE_BAR_SAMPLE, WEB_TOP_BAR_SAMPLE } from "@antfabric/ui-docs/samples";
+// Every lucide icon, for the samples' names: a kit registers only its own.
+import "./icons";
 
 type AnyComponent = (props: Record<string, unknown>) => ReactNode;
 

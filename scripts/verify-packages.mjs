@@ -20,7 +20,9 @@
  *   (g) proves AntFabric's copy is opt-in: core's published `exports` carry `./antfabric` with its types; the subpath resolves in Node and
  *       type-checks (`antfabricStrings` as `strings` with `antfabric` as the theme, `antfabric` being `themes.antfabric`); everything the
  *       roots of core, react and react-native export, bundled, holds none of its files and none of its words (a sentence only AntFabric's
- *       copy has), and a consumer of `./antfabric` does bundle them, so the proof is not an empty one.
+ *       copy has), and a consumer of `./antfabric` does bundle them, so the proof is not an empty one,
+ *   (h) proves an app pays for the kit's icons, not lucide's: `import { Button }` from `@antfabric/ui-react`, bundled minified with
+ *       lucide-react inside (only react external), holds at most `ICON_CEILING` lucide icons and stays under `BUTTON_CEILING` bytes.
  *
  *   pnpm verify:packages
  *
@@ -447,6 +449,18 @@ for (const name of NAMES) {
 const plainApp = await bundledText("plain-app", 'import { AntFabricRoot, Button } from "@antfabric/ui-react";\nimport { ThemeProvider } from "@antfabric/ui-react-native";\nimport { themes } from "@antfabric/ui-core";\nexport { AntFabricRoot, Button, ThemeProvider, themes };\n');
 for (const w of COPY_WORDS) if (plainApp.text.includes(w)) fail(`a consumer of the roots holds "${w}"`);
 console.log("  bundle: AntFabric's copy ships from core/antfabric only: its bundle holds " + COPY_WORDS.map((w) => `"${w}"`).join(" and ") + "; the roots of core, react and react-native, bundled, hold neither");
+
+// (h) A consumer pays for the icons the kit draws, not for lucide. `import { Button }`, bundled for production with lucide-react inside
+// (only react is external), holds the kit's registry of lucide icons and no more, and stays under a ceiling. Before the registry, the
+// kit looked icons up in `import * as lucide`, and the same consumer held every one of lucide's 1859 icons in 1,205 KB (284 KB gzip).
+const BUTTON_CEILING = 500 * 1024; // measured 398 KB minified (94 KB gzip) with 88 icons; about 1.25×
+const ICON_CEILING = 120; // the React kit registers 88
+const button = await build({ absWorkingDir: app, stdin: { contents: 'export { Button } from "@antfabric/ui-react";\n', resolveDir: app, loader: "js" }, bundle: true, write: false, metafile: true, minify: true, format: "esm", platform: "browser", conditions: ["import"], external: ["react", "react-dom", "react/jsx-runtime"], define: { "process.env.NODE_ENV": '"production"' }, logLevel: "silent" });
+const buttonBytes = button.outputFiles[0].contents.length;
+const buttonIcons = Object.entries(Object.values(button.metafile.outputs)[0].inputs).filter(([f, v]) => /lucide-react\/dist\/esm\/icons\//.test(f) && v.bytesInOutput > 0).length;
+if (buttonIcons > ICON_CEILING) fail(`a consumer of Button bundles ${buttonIcons} lucide icons (ceiling ${ICON_CEILING}): something imports lucide as a whole again`);
+if (buttonBytes > BUTTON_CEILING) fail(`a consumer of Button bundles ${(buttonBytes / 1024).toFixed(0)} KB minified, over the ${BUTTON_CEILING / 1024} KB ceiling`);
+console.log(`  bundle: Button alone, minified with lucide-react inside, is ${(buttonBytes / 1024).toFixed(0)} KB (ceiling ${BUTTON_CEILING / 1024} KB) with ${buttonIcons} lucide icons (ceiling ${ICON_CEILING})`);
 
 rmSync(scratch, { recursive: true, force: true });
 console.log("verify:packages: ok");

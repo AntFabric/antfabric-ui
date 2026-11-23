@@ -289,7 +289,10 @@ Six things to know:
 - **A container takes children.** `<Card>…</Card>`, `<Dialog>…</Dialog>`, `<BottomSheet>…</BottomSheet>`.
   A component has no AntFabric sample as a default: pass the icon, the avatar, the actions you want.
 - **Events carry documented arguments, not DOM events.** `onPress()`, `onValueChange(value)`.
-- **Icons are lucide names in kebab case**: `iconLeading="plus"`. The kit draws them at its size.
+- **Icons are lucide names in kebab case**: `iconLeading="plus"`. The kit draws them at its size. The kit registers only the icons it
+  draws itself, so a name it does not use draws an empty box (and warns once in development) until you register it, once, at start-up:
+  `registerIcons({ GitBranch, Rocket })` with the components from `lucide-react` (or `lucide-react-native`), or pass the component itself:
+  `iconLeading={GitBranch}`. Either way your bundle holds the icons you name, not all of lucide.
 
 ## 9. Versions
 
