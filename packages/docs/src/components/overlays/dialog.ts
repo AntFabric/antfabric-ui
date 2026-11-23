@@ -92,7 +92,7 @@ const docs: ComponentDocs = {
     dismissible: {
       type: "boolean",
       default: true,
-      description: "Esc, a press on the scrim, the phone's handle and Android's back cancel it. Off for a step that must be answered with one of its buttons.",
+      description: "Esc, a press on the scrim, the phone's handle, Android's back and the screen reader's escape gesture cancel it. Off for a step that must be answered with one of its buttons.",
     },
     onConfirm: {
       type: "event",
@@ -193,7 +193,7 @@ const docs: ComponentDocs = {
       "Web: focus moves in when the dialog mounts, whenever that is (a timer, a deep link, a push), unless the tree is under `autoFocus={false}`; a confirm focuses Cancel, not the CTA, so a reflexive Enter never deletes, and a form focuses its first field. Tab and Shift+Tab wrap inside the panel, Esc cancels (and stops there, so a layer under keeps its own), and when the dialog unmounts focus returns to the control that had it, if that is still on the page.",
       "With `modal` the kit makes the rest of the root inert and hidden from assistive tech and locks the page's scroll while the dialog is open. Without it, the host that mounts the dialog owns those.",
       "The glyph tile is decorative and hidden from assistive tech.",
-      "Phone: the sheet is a modal view; Android's back button cancels, VoiceOver's and TalkBack's escape gesture cancels, and screen-reader focus moves to the title on open. A form dialog lifts its sheet above the keyboard.",
+      "Phone: the sheet is a modal view; Android's back button cancels, VoiceOver's and TalkBack's escape gesture cancels (both only while `dismissible`), screen-reader focus moves to the title on open, and an error that arrives is announced. A form dialog lifts its sheet above the keyboard.",
     ],
   },
   examples: [

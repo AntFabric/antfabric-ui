@@ -3,7 +3,7 @@ import { AccessibilityInfo, KeyboardAvoidingView, Modal, Platform, Pressable, Te
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon, type IconName } from "../../lib/icon";
-import { useBackHandler } from "../../lib/a11y";
+import { announce, useBackHandler } from "../../lib/a11y";
 import { Enter } from "../../lib/motion";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { partId, rootProps, type RootProps } from "../../lib/root-props";
@@ -117,6 +117,10 @@ export function Dialog({
     const node = Platform.OS === "web" || !heading.current ? null : findNodeHandle(heading.current);
     if (node) AccessibilityInfo.setAccessibilityFocus(node);
   }, []);
+  // An error that arrives is said: iOS has no live regions, so the alert role alone reads nothing.
+  useEffect(() => {
+    if (error) announce(error);
+  }, [error]);
   // A form's fields are lifted above the keyboard; a confirm has none.
   const Lift = kind === "form" ? KeyboardAvoidingView : View;
   const drawn = (
@@ -130,7 +134,7 @@ export function Dialog({
         aria-modal
         accessibilityViewIsModal
         accessibilityLabel={title}
-        onAccessibilityEscape={() => cancel()}
+        onAccessibilityEscape={() => dismissible && cancel()}
         style={[s.sheet, r.sheet.view]}
       >
         <Pressable testID={partId(testID, "dialog", "handle")} accessibilityRole="button" accessibilityLabel={str("dismiss")} hitSlop={12} disabled={busy} onPress={() => dismissible && cancel()} style={[s.handle, r.handle.view]} />

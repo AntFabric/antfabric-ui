@@ -206,7 +206,7 @@ const docs: ComponentDocs = {
     notes: [
       "Quick reactions are toggle buttons with aria-pressed, named \"React with 👍\" / \"Remove your 👍\".",
       "Long-press is not discoverable with VoiceOver or TalkBack, so the message row exposes the same actions as accessibility actions (rotor / actions menu); \"Message actions\" opens this sheet.",
-      "Phone: the sheet is a modal view; Android's back button closes it, screen-reader focus starts at the title (else the handle), the handle's touch area is the 44pt target, the emoji panel's search field is lifted above the keyboard on iOS, and each emoji in the panel is a pressable button that reacts. The panel's emoji lists are the kit's own fixed sets and the search field filters nothing yet.",
+      "Phone: the sheet is a modal view; Android's back button closes it, screen-reader focus starts at the title (else the handle), the handle's touch area is the 44pt target, the emoji panel's search field is lifted above the keyboard on iOS, and each emoji in the panel is a pressable button that reacts. The panel's emoji lists are the kit's own fixed sets; the search field narrows them to the emoji whose English Unicode name holds what is typed, and drops a heading with none left.",
       "On web and desktop the menu rows are a Menu: focus moves to the first enabled row when the menu mounts, ↑ ↓ Home End and type-ahead move between rows, Esc closes, and focus returns to what had it (the message it was opened on) when the menu unmounts.",
     ],
   },

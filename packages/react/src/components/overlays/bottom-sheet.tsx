@@ -29,8 +29,10 @@ export interface BottomSheetProps extends RootProps<HTMLDivElement> {
   dragging?: boolean;
   /** Dismissed: the panel slides back down and the scrim clears. The close button sets it. */
   closed?: boolean;
-  /** The person asked to close: ×, the handle, Esc. */
+  /** The person asked to close: ×, the handle, a press on the scrim, Esc. */
   onClose?: () => void;
+  /** ×, the handle, a press on the scrim and Esc close it. Off for a sheet that must be answered from inside: there is no ×, and none of them do anything. */
+  dismissible?: boolean;
   /** The sheet has finished leaving. */
   onDismiss?: () => void;
   /** Per-part styles over the theme: `{ panel: {…}, handle: {…}, title: {…} }`. */
@@ -54,6 +56,7 @@ export function BottomSheet({
   keyboard = false,
   dragging = false,
   closed = false,
+  dismissible = true,
   onPrimary,
   onClose,
   onDismiss,
@@ -67,6 +70,7 @@ export function BottomSheet({
   const handleUi = useInteraction();
   const r = useRecipe(recipes["bottom-sheet"], { variants: { dragging, closed: gone, largeTitle }, state: { focus: handleUi.focused }, styles });
   const close = () => {
+    if (!dismissible) return;
     setGone(true);
     onClose?.();
   };
@@ -79,19 +83,10 @@ export function BottomSheet({
     <div
       data-af-part="root"
       {...rootProps(rest)}
-      style={css(
-        box,
-        {
-          alignSelf: "flex-start",
-          width: 375, /* structural: stage: a 375pt phone frame for the sheet demo */
-          maxWidth: "100%",
-          paddingTop: 96, /* structural: stage: room above the sheet in the demo frame */
-          justifyContent: "flex-end",
-          overflow: "hidden",
-        },
-        partStyle(r, "root", tall && { height: 740, paddingTop: 119 }), /* structural: stage: the tall demo frame and its top room */
-        style,
-      )}
+      // A press on the scrim above the panel closes it; the keyboard has Esc and the handle.
+      onClick={(e) => e.target === e.currentTarget && close()}
+      // It fills what it is given (the viewport, the host's layer): the panel sits at the foot and the scrim above it is the backdrop.
+      style={css(box, partStyle(r, "root", { flexGrow: 1, alignSelf: "stretch", justifyContent: "flex-end", overflow: "hidden" }), style)}
     >
       <div
         ref={focus.ref}
@@ -127,6 +122,9 @@ export function BottomSheet({
           data-af-part="handle"
           data-af-press
           aria-label={s("dismiss")}
+          // Not dismissible, the handle is only a picture of one.
+          disabled={!dismissible}
+          aria-hidden={!dismissible || undefined}
           onClick={() => close()}
           onFocus={handleUi.handlers.onFocus}
           onBlur={handleUi.handlers.onBlur}
@@ -139,7 +137,7 @@ export function BottomSheet({
             <h2 data-af-part="title" style={css(text, { flexShrink: 1 }, partStyle(r, "title", largeTitle && truncate(1)))}>
               {title}
             </h2>
-            {showClose && <IconButton icon="x" label={s("close")} onPress={() => close()} />}
+            {showClose && dismissible && <IconButton icon="x" label={s("close")} onPress={() => close()} />}
           </div>
         )}
         <div data-af-scroll style={css(box, { flexShrink: 1, gap: t.space["2xs"], overflowY: "auto" }, tall && { flexGrow: 1, flexBasis: 0 })}>

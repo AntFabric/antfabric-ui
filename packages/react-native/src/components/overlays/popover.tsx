@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Modal, Pressable, View, type LayoutRectangle, type ViewStyle } from "react-native";
 import { recipes, useControllable } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
@@ -83,10 +83,13 @@ export function Popover({
   const floating = children !== undefined && children !== null && children !== false;
   const gap = t.space.xs;
 
-  const toggle = () => {
-    if (!shown) trigger.current?.measureInWindow((x, y, w, h) => setAt({ x, y, width: w, height: h }));
-    setShown(!shown);
-  };
+  // The trigger is measured each time the panel shows, however it was opened (its own press or the `open` prop): until then the panel is
+  // drawn unseen, so it is never left invisible over a backdrop that takes the next tap.
+  useEffect(() => {
+    if (floating && shown) trigger.current?.measureInWindow((x, y, w, h) => setAt({ x, y, width: w, height: h }));
+  }, [floating, shown]);
+
+  const toggle = () => setShown(!shown);
 
   const panel = (place?: ViewStyle) => (
     <Enter

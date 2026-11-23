@@ -1,5 +1,12 @@
 {
   "commit": "43ac8eac41b98cc26e79b1b428baa50782b686f9",
   "theme": "antfabric",
-  "accepted": {}
+  "accepted": {
+    "bottom-sheet": "B11: the 375 demo frame moves to the catalogue (M20, owner decision)",
+    "sheet": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); the phone's Sheet is a BottomSheet",
+    "empty-state": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
+    "fab": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
+    "icon-button": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
+    "inline-banner": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet"
+  }
 }

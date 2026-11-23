@@ -90,9 +90,27 @@ function Reaction({ label, mine, expanded, testID, styles, onPress, children }: 
   );
 }
 
-/** The emoji the panel lists under its two headings. The cells are pressable: one reacts. */
-const FREQUENT = ["👍", "❤️", "😂", "🎉", "👀", "✅", "🙏", "🔥"];
-const SMILEYS = ["😀", "😃", "😄", "😁", "😆", "🥹", "😅", "🤣"];
+/** The emoji the panel lists under its two headings, each with its Unicode name, which the search field matches. The cells are pressable: one reacts. */
+const FREQUENT: [emoji: string, name: string][] = [
+  ["👍", "thumbs up"],
+  ["❤️", "red heart"],
+  ["😂", "face with tears of joy"],
+  ["🎉", "party popper"],
+  ["👀", "eyes"],
+  ["✅", "check mark button"],
+  ["🙏", "folded hands"],
+  ["🔥", "fire"],
+];
+const SMILEYS: [emoji: string, name: string][] = [
+  ["😀", "grinning face"],
+  ["😃", "grinning face with big eyes"],
+  ["😄", "grinning face with smiling eyes"],
+  ["😁", "beaming face with smiling eyes"],
+  ["😆", "grinning squinting face"],
+  ["🥹", "face holding back tears"],
+  ["😅", "grinning face with sweat"],
+  ["🤣", "rolling on the floor laughing"],
+];
 
 export function ContextMenu({ quickReactions = [], picked = [], items = [], label, title = "", picking = false, onReact, onSelect, onClose, styles, strings, style, testID, ...rest }: ContextMenuProps) {
   const { t } = useTheme();
@@ -113,6 +131,11 @@ export function ContextMenu({ quickReactions = [], picked = [], items = [], labe
     setOwned(mine(emoji) ? owned.filter((e) => e !== emoji) : [...owned, emoji]);
     onReact?.(emoji);
   };
+  // What the search field has typed narrows each list to the emoji whose name holds it; a heading with none left is not drawn.
+  const query = search.trim().toLowerCase();
+  const matching = (list: [string, string][]) => list.filter(([emoji, name]) => !query || name.includes(query) || emoji === query).map(([emoji]) => emoji);
+  const frequent = matching(FREQUENT);
+  const smileys = matching(SMILEYS);
   // A cell of the panel: pressing it reacts, and a screen reader reads it as a button named by the emoji.
   const cells = (list: string[]) =>
     list.map((emoji, i) => (
@@ -170,10 +193,10 @@ export function ContextMenu({ quickReactions = [], picked = [], items = [], labe
                 <Icon testID={partId(testID, "context-menu", "searchIcon")} name="search" size={searchIcon.size} color={r.searchIcon.text.color} style={searchIcon.rest} />
                 <TextInput testID={partId(testID, "context-menu", "input")} value={search} onChangeText={setSearch} placeholder={str("searchEmoji")} accessibilityLabel={str("searchEmoji")} placeholderTextColor={placeholderTextColor} style={[s.input, r.input.view, inputText]} />
               </View>
-              <Text testID={partId(testID, "context-menu", "heading")} style={[r.heading.view, r.heading.text]}>{str("frequent")}</Text>
-              <Text testID={partId(testID, "context-menu", "grid")} style={[s.grid, r.grid.view, r.grid.text]}>{cells(FREQUENT)}</Text>
-              <Text testID={partId(testID, "context-menu", "heading")} style={[r.heading.view, r.heading.text]}>{str("smileys")}</Text>
-              <Text testID={partId(testID, "context-menu", "grid")} style={[s.grid, r.grid.view, r.grid.text]}>{cells(SMILEYS)}</Text>
+              {frequent.length ? <Text testID={partId(testID, "context-menu", "heading")} style={[r.heading.view, r.heading.text]}>{str("frequent")}</Text> : null}
+              {frequent.length ? <Text testID={partId(testID, "context-menu", "grid")} style={[s.grid, r.grid.view, r.grid.text]}>{cells(frequent)}</Text> : null}
+              {smileys.length ? <Text testID={partId(testID, "context-menu", "heading")} style={[r.heading.view, r.heading.text]}>{str("smileys")}</Text> : null}
+              {smileys.length ? <Text testID={partId(testID, "context-menu", "grid")} style={[s.grid, r.grid.view, r.grid.text]}>{cells(smileys)}</Text> : null}
             </Enter>
           ) : (
             <Menu items={items} label={label ?? str("actions")} bare onSelect={(item) => onSelect?.(item)} onClose={() => onClose?.()} style={s.rows} />

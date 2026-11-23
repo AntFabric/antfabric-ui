@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { recipes, useControllable, useStrings, type ActionItem, type KitStrings, type NavItem } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
+import { hitSlopTo } from "../../lib/a11y";
 import { GlassSurface } from "../../lib/glass";
 import { Icon } from "../../lib/icon";
 import { Enter, useReducedMotion } from "../../lib/motion";
@@ -29,7 +30,7 @@ export interface TabBarProps extends RootProps {
   tabs?: NavItem[];
   /** The key of the open tab. A key no tab has (a pushed screen is on top) draws no capsule: the tabs share the width evenly. */
   active?: string;
-  /** The tabs are shown. Left (false) is the bar squeezed by scrolling down: a 42pt circle with the current tab's icon. */
+  /** The tabs are shown. Left (false) is the bar squeezed by scrolling down: a 42pt circle with the current tab's icon (a chevron when no tab is open). */
   expanded?: boolean;
   /** The bar is not drawn while the keyboard is up. */
   keyboardUp?: boolean;
@@ -168,7 +169,9 @@ function Tab({ tab, on, under, labelled, testID, onPress, onPressIn, onPressOut,
   );
 }
 
-function Squeezed({ tab, testID, onPress, styles, strings }: { tab: NavItem; testID?: string; onPress: () => void; styles?: PartStyles<"tab-bar">; strings?: Partial<KitStrings["tab-bar"]> }) {
+/** The squeezed bar's disc: the open tab's icon, or with no tab open (a pushed screen is on top), a chevron that brings the tabs back all the same. */
+function Squeezed({ tab, testID, onPress, styles, strings }: { tab?: NavItem; testID?: string; onPress: () => void; styles?: PartStyles<"tab-bar">; strings?: Partial<KitStrings["tab-bar"]> }) {
+  const { t } = useTheme();
   const s = useStyles();
   const str = useStrings("tab-bar", strings);
   const press = usePress();
@@ -178,14 +181,16 @@ function Squeezed({ tab, testID, onPress, styles, strings }: { tab: NavItem; tes
     <Pressable
       testID={partId(testID, "tab-bar", "squeezed")}
       accessibilityRole="button"
-      accessibilityLabel={str("showTabs", { label: tab.label })}
+      accessibilityLabel={tab ? str("showTabs", { label: tab.label }) : str("show")}
+      // The disc is drawn under the 44pt touch size: its touch area grows to it.
+      hitSlop={hitSlopTo(t.control.hit, t.tabBar.itemSqueezed, t.tabBar.itemSqueezed)}
       onPress={() => onPress()}
       {...press.handlers}
       style={squeezed.view}
     >
       <GlassSurface testID={partId(testID, "tab-bar", "squeezedSurface")} style={[s.squeezedSurface, r.squeezedSurface.view]} glassStyle={[s.bare, styles?.squeezedSurface]}>
         <View testID={partId(testID, "tab-bar", "disc")} style={[s.disc, r.disc.view]}>
-          <Icon testID={partId(testID, "tab-bar", "discIcon")} name={tab.icon} {...glyphOf(r.discIcon)} />
+          <Icon testID={partId(testID, "tab-bar", "discIcon")} name={tab?.icon ?? "chevron-up"} {...glyphOf(r.discIcon)} />
         </View>
       </GlassSurface>
     </Pressable>
@@ -418,7 +423,7 @@ export function TabBar({ tabs = [], active, expanded, keyboardUp = false, safeAr
               </GlassSurface>
             </View>
           )}
-          {squeezed && open ? (
+          {squeezed ? (
             <Squeezed
               tab={open}
               testID={testID}

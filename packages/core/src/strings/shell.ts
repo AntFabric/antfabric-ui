@@ -161,6 +161,8 @@ export const shell = {
     new: "new",
     /** The squeezed disc's accessible name: it brings the tabs back, naming the open one. */
     showTabs: "Show tabs. {label} is open",
+    /** The squeezed disc's accessible name when no tab is open (a pushed screen is on top). */
+    show: "Show tabs",
   },
 } as const satisfies StringGroups;
 

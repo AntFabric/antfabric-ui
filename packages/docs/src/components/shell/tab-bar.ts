@@ -24,7 +24,7 @@ const docs: ComponentDocs = {
     expanded: {
       type: "boolean",
       default: true,
-      description: "The tabs are shown. Left (false) is the bar squeezed by scrolling down: a 42pt circle with the current tab's icon. Scrolling up or a tap opens it again.",
+      description: "The tabs are shown. Left (false) is the bar squeezed by scrolling down: a 42pt circle (a 44pt touch area) with the current tab's icon, or a chevron when no tab is open. Scrolling up or a tap opens it again.",
     },
     keyboardUp: {
       type: "boolean",

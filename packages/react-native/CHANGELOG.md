@@ -39,6 +39,16 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 11: React Native overlays
 
+- Android back closes the innermost overlay first: `useBackHandler` adds its listener once each time an overlay opens, not on every render, so a Select open inside a BottomSheet closes before the sheet (H16).
+- Sheet with `dismissible={false}` can no longer be closed by the handle, a drag, back or the escape gesture, which left an empty scrim. BottomSheet takes `dismissible` (default `true`); off, there is no ×, the handle is only a picture and none of the ways out do anything (H17).
+- Popover opened by its `open` prop is placed beside its trigger. The trigger was measured only on its own press, so the panel stayed invisible under a backdrop that took the next tap (H18).
+- BarChart, ComboChart and MetricTabs: tapping a bar, then passing fewer rows, no longer throws. A tapped bar's tooltip and dimming now close on a second tap of the same bar or a tap beside the bars (H19, M48).
+- BottomSheet fills what it is given (the screen, a Modal): the 375pt frame and the room above the panel were the catalogue's demo stage, and now are the catalogue's. A tall sheet reaches the top of its box, so give it the room above (the header row) yourself. A press on the scrim above the panel closes it, as the docs said (M20).
+- Dialog: the escape gesture respects `dismissible`, and an error that arrives is announced on iOS (M21).
+- ContextMenu: the emoji panel's search field narrows the emoji shown, by their English names (M22).
+- TabBar: squeezed with an `active` that no tab has (a pushed screen), the disc is still drawn, with a chevron, and brings the tabs back; its touch area is 44pt (M33, L48). New string `tab-bar.show` ("Show tabs").
+- SidebarItem: a hold is a press unless `onLongPress` is given (M39).
+
 ### Batch 12: per-component fixes
 
 ## 1.0.0
