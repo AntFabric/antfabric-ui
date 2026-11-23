@@ -4,6 +4,7 @@ import { useAutoFocus } from "../../platform";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { box, css, enter, input, neg, pressable, row, rtl, text, truncate } from "../../lib/style";
@@ -145,7 +146,9 @@ export function InAppBanner({
         <div
           onKeyDown={(e) => {
             // Escape in the reply field closes the reply and keeps the draft; anywhere else in the card it puts the banner away.
-            if (e.key === "Escape" && !(e.target instanceof HTMLInputElement)) dismiss("close");
+            if (e.key !== "Escape" || e.target instanceof HTMLInputElement || e.defaultPrevented || isComposing(e)) return;
+            e.preventDefault();
+            dismiss("close");
           }}
           data-af-part="card"
           style={css(card, enter(dir === "rtl" ? "slide-right" : "slide-left"), r.card)}
@@ -221,9 +224,12 @@ export function InAppBanner({
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => {
+                  // An IME's Enter commits its candidate and its Escape cancels it: neither sends nor closes the reply.
+                  if (isComposing(e)) return;
                   if (e.key === "Enter") send();
                   else if (e.key === "Escape") {
                     // The reply is closed and the draft kept; the banner stays.
+                    e.preventDefault();
                     e.stopPropagation();
                     setOpen(false);
                   }

@@ -127,7 +127,8 @@ interface PanelProps {
 function SheetPanel({ side, width, title, subtitle, footer, showClose, label, closeLabel, dismissible, floating, r, rootRest, style, onClose, children }: PanelProps) {
   const id = useId();
   const close = () => dismissible && onClose();
-  const focus = useOverlayFocus<HTMLDivElement>({ trap: true, onEscape: dismissible ? onClose : undefined, initial: "first" });
+  // In the layer, Esc is the stack's (after the controls inside, to the top overlay only); drawn in place, the panel's own.
+  const focus = useOverlayFocus<HTMLDivElement>({ trap: true, onEscape: dismissible && !floating ? onClose : undefined, initial: "first" });
   useLayerStack(floating, () => [focus.ref.current], { onEscape: close, onOutside: close });
   const end = side === "end";
   return (

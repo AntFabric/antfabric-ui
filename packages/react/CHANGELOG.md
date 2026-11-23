@@ -11,6 +11,14 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 2: focus, Escape and IME
 
+- Escape goes to the innermost thing that uses it. An open Select, Menu, ContextMenu, Tooltip or HoverCard inside a Dialog, Sheet or Popover closes itself and leaves the overlay open; the next Escape closes the overlay. Before, the overlay took every Escape first, so Esc on an open Select in a form dialog cancelled the dialog (S4, H4). The rule for your own controls: a handler that uses Escape calls `e.preventDefault()`. The overlay stack then reads only an Escape nothing inside used, in the bubble phase on the document, and gives it to the top overlay.
+- Clearing a SearchField with Escape, or Select's filter, stops there. The overlay around it stays open (M7).
+- Tab stays inside a modal whose controls include a roving group (a RadioGroup, Tabs, a Menu's rows, the CommandPalette's results). The trap now counts only what Tab reaches: not `tabIndex={-1}` items, hidden inputs, or anything hidden or inert. It also wraps when focus sits outside the order (S3, H3). A form Dialog no longer puts its first focus on a Select's hidden `name` input.
+- Enter or Escape that commits or cancels an IME composition (Japanese, Chinese, Korean) no longer submits, sends, chooses, clears or closes. This covers SearchField, TextField, Select, CommandPalette, QuestionPanel, InAppBanner, OsNotification, Composer and every overlay's Escape (S5, H5).
+- Tooltip and HoverCard: Escape hides a bubble or card that hover opened, wherever focus is (WCAG 1.4.13; M16). A closed HoverCard no longer swallows Escape, so the dialog behind it closes (M15).
+- Select: Enter on the filter's clear button clears the filter and chooses nothing (M8). Opening, closing or typing a filter puts the cursor back on the chosen row. When the filter leaves that row out, the cursor moves to the first row left, so Enter never takes a hidden or stale row (M9).
+- A modal opened over another modal (a confirm over a Sheet) makes the one under it inert until it closes (L20). When the control that opened an overlay is gone by the time it closes (a menu row), focus goes to the nearest control still on the page instead of the page body (S6).
+
 ### Batch 3: theme sanitiser
 
 ### Batch 4: packaging and icons

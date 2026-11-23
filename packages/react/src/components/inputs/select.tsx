@@ -4,6 +4,7 @@ import { useAutoFocus, usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { box, css, enter, pressable, row, text, truncate } from "../../lib/style";
@@ -208,18 +209,25 @@ export function Select({
   });
 
   const chosen = items.find((i) => i.key === current);
-  const cursor = active || current;
   const enabled = items.filter((i) => !i.disabled);
+  // The row Enter takes: the one the arrows or the pointer reached, else the chosen one. A filter that left neither in the list falls to
+  // its first enabled row, so Enter never takes a row that is not there.
+  const reached = active || current;
+  const cursor = filter && !enabled.some((i) => i.key === reached) ? (enabled[0]?.key ?? "") : reached;
   const name = label || placeholder;
   // Inside a FormField, with no label of its own, the field's label names the select.
   const labelled = label ? { "aria-label": name } : form ? { "aria-labelledby": form.labelId } : { "aria-label": name };
   const optionId = (i: number) => `${id}-option-${i}`;
 
+  // Opening or closing puts the cursor back on the chosen row: one hovered or arrowed to last time is not where Enter lands.
+  const show = (next: boolean) => {
+    setActive("");
+    setOpen(next);
+  };
   const choose = (item: SelectItem) => {
     if (item.disabled) return;
     setCurrent(item.key);
-    setOpen(false);
-    setActive("");
+    show(false);
     // The row that was clicked or entered is about to unmount: focus goes back to the trigger, not to the page.
     triggerRef.current?.focus({ preventScroll: true });
   };
@@ -236,11 +244,14 @@ export function Select({
     const tall = panelRef.current?.offsetHeight ?? 0;
     if (at && at.top >= 0 && at.bottom <= innerHeight) setFlip(placement === "below" && at.bottom + tall > innerHeight && at.top - tall >= 0);
     const away = (e: PointerEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+      if (!rootRef.current?.contains(e.target as Node)) {
+        setActive("");
+        setOpen(false);
+      }
     };
     document.addEventListener("pointerdown", away);
     return () => document.removeEventListener("pointerdown", away);
-  }, [isOpen, placement, setOpen]);
+  }, [isOpen, placement, setOpen, setActive]);
   // A searchable select is typed into: focus moves to the filter when the panel opens (never under a host that draws overlays as pictures),
   // and the filter is the combobox, so it names the list it drives and the row the cursor is on.
   useEffect(() => {
@@ -268,10 +279,12 @@ export function Select({
 
   /** The listbox's keys, from the trigger and (when searchable) from the filter, which keeps its own Space, Home, End and caret. */
   const keys = (e: KeyboardEvent<HTMLElement>, fromFilter = false) => {
+    // An IME's Enter commits its candidate and its Escape cancels it; Enter on the filter's clear button presses the button.
+    if (isComposing(e) || (fromFilter && e.key === "Enter" && (e.target as HTMLElement).tagName !== "INPUT")) return;
     if (!isOpen) {
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
-        setOpen(true);
+        show(true);
       }
       return;
     }
@@ -290,19 +303,19 @@ export function Select({
       const item = items.find((i) => i.key === cursor);
       if (item) choose(item);
       else {
-        setOpen(false);
+        show(false);
         triggerRef.current?.focus({ preventScroll: true });
       }
     } else if (e.key === "Escape") {
-      // Typed text is cleared first (the filter does that); a second Escape closes. Captured, so it does not also close the pane behind.
+      // Typed text is cleared first (the filter does that); a second Escape closes. Prevented and stopped, so the overlay behind stays.
       if (fromFilter && filter) return;
       e.preventDefault();
       e.stopPropagation();
-      setOpen(false);
+      show(false);
       triggerRef.current?.focus({ preventScroll: true });
     } else if (e.key === "Tab") {
       // From the trigger, Tab closes. From the filter it moves on, and focus leaving the select closes it.
-      if (!fromFilter) setOpen(false);
+      if (!fromFilter) show(false);
     } else if (!fromFilter && e.key.length === 1 && !searchable) {
       // Type-ahead: the next enabled row whose label starts with the letter.
       const k = e.key.toLowerCase();
@@ -355,7 +368,7 @@ export function Select({
       onBlur={(e) => {
         // Focus moved to something outside the select (Tab from the filter): the panel closes. A blur to nowhere (the window) keeps it.
         const to = e.relatedTarget as Node | null;
-        if (isOpen && to && !rootRef.current?.contains(to)) setOpen(false);
+        if (isOpen && to && !rootRef.current?.contains(to)) show(false);
       }}
       {...rootProps(rest)}
       style={css(box, { width: "100%" }, r.root, style)}
@@ -382,7 +395,7 @@ export function Select({
           aria-required={form?.required || undefined}
           title={title || undefined}
           disabled={ui.disabled}
-          onClick={() => setOpen(!isOpen)}
+          onClick={() => show(!isOpen)}
           onKeyDown={(e) => keys(e)}
           {...ui.handlers}
           data-af-part="trigger"
@@ -417,7 +430,16 @@ export function Select({
           >
             {searchable && (
               <div data-af-part="search" onKeyDown={(e) => keys(e, true)} style={partStyle(r, "search", { paddingBottom: t.space["2xs"] })}>
-                <SearchField placeholder={searchPlaceholder ?? s("searchPlaceholder")} value={filter} focused onValueChange={(next) => setFilter(next)} />
+                <SearchField
+                  placeholder={searchPlaceholder ?? s("searchPlaceholder")}
+                  value={filter}
+                  focused
+                  onValueChange={(next) => {
+                    // A new filter is a new list: the cursor goes back to the chosen row, or the first one left.
+                    setFilter(next);
+                    setActive("");
+                  }}
+                />
               </div>
             )}
             <div id={`${id}-list`} role="listbox" aria-label={name} style={box}>

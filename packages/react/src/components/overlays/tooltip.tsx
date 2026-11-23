@@ -2,6 +2,8 @@ import { useEffect, useId, useRef, useState, type CSSProperties, type FocusEvent
 import { MOTION, recipes, useControllable } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
+import { useLayerStack } from "../../lib/layer";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import type { IconName } from "../../lib/icon";
 import { box, css, enter, row, text } from "../../lib/style";
@@ -104,8 +106,12 @@ export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = t
     };
   }, [id, label, shortcut, os, children, showTrigger, triggerIcon]);
 
+  // Esc hides a shown bubble (WCAG 1.4.13) and stops there: from its control, and from anywhere while it is the top layer, so one opened by
+  // hover goes too. A hidden one leaves the key alone.
+  useLayerStack(shown, () => [host.current], { onEscape: hide });
   const keyboard = (e: KeyboardEvent) => {
-    if (e.key !== "Escape" || !shown) return;
+    if (e.key !== "Escape" || !shown || e.defaultPrevented || isComposing(e)) return;
+    e.preventDefault();
     e.stopPropagation();
     hide();
   };

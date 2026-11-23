@@ -264,6 +264,10 @@ export const switchRecipe = defineRecipe({
   - An overlay keeps `useOverlayFocus` from `lib/focus.ts`: focus in when it opens (unless the tree says `autoFocus={false}`), Tab trapped
     when modal, Escape, focus back to the opener when it closes. A focused control that is replaced by something else hands focus on
     (`useFocusHandoff`).
+  - Escape goes to the innermost handler that uses it: a handler that consumes Escape (or Enter) calls `e.preventDefault()`, and returns
+    first when `isComposing(e)` (`lib/keys.ts`), since an IME's keys are its own. An overlay drawn in the layer (`useLayerStack`) takes
+    Escape from the stack, which reads only what nothing inside prevented and gives it to the top overlay; it passes no `onEscape` to
+    `useOverlayFocus` while it floats.
   - A status that appears is announced: `announce()` from `lib/announce.ts` on the web (never a live region mounted with its text) and
     from `lib/a11y.ts` on the phone (iOS has no live regions).
 - **Composition:** import sibling components from their files (`../actions/button`), never from the
