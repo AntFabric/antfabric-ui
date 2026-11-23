@@ -93,6 +93,11 @@ const docs: ComponentDocs = {
       handling: "Your own participant id is filtered out, so typing on the phone never shows \"Priya is typing…\" to Priya on the desktop.",
     },
     {
+      title: "Nobody typing",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "With `names` empty nothing is drawn, and on the phone the dots' loop does not run: it starts when someone starts typing and stops when the last one stops.",
+    },
+    {
       title: "Someone stops without sending",
       platforms: ["web", "desktop", "mobile"],
       handling: "A \"stopped\" removes them at once; a lost \"stopped\" (closed laptop, dead socket) still lapses after 8 s, because the list is always read through the TTL, never straight off the last event.",
