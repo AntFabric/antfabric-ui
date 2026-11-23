@@ -160,6 +160,8 @@ export function WebTopBar({
       setNarrow(w > 0 && w < NARROW);
     };
     watch();
+    // A test DOM (jsdom) has no ResizeObserver: the bar is measured once.
+    if (typeof ResizeObserver === "undefined") return;
     const ro = new ResizeObserver(watch);
     ro.observe(el);
     return () => ro.disconnect();
