@@ -166,7 +166,8 @@ export function MetricTabs({ data, x, metrics, title, subtitle = "", format = "i
           ))}
         </div>
       ) : null}
-      <div role="tabpanel" id={panelId} aria-labelledby={chosen ? tabId(at) : undefined} aria-label={chosen ? undefined : title} style={css(box)}>
+      {/* Named by its tab while the tabs are drawn; while loading or empty there is no tab to point at, so the title names it. */}
+      <div role="tabpanel" id={panelId} aria-labelledby={chosen && !loading && !nothing ? tabId(at) : undefined} aria-label={chosen && !loading && !nothing ? undefined : title} style={css(box)}>
         <ChartFrame height={height} label={loading ? str("loading", { title }) : summary} loading={loading} empty={nothing} emptyTitle={empty ?? str("empty")} emptyLine={emptyLine ?? str("emptyLine")} loadingLabel={str("loadingChart")}>
           {(width) => <RechartsBars tk={tk} theme={theme} ui={ui} plot={partStyle(r, "plot", { color: s.colorOf(s.visible[0]!), transition: `color ${tk.duration.slow} ${tk.ease.out}` })} hint={str("arrowKeys", { title })} data={rows} rows={rows} keys={keys} fields={[METRIC_KEY]} s={s} labels={labels} format={shown} formatWords={formatWords} scale={scale} easeColor width={width} height={height} />}
         </ChartFrame>
