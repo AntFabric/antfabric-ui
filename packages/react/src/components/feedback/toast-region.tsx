@@ -1,4 +1,4 @@
-import { Children, useRef, type CSSProperties, type ReactNode } from "react";
+import { Children, isValidElement, useRef, type CSSProperties, type ReactNode } from "react";
 import { recipes, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { OverlayLayer, useLayerHost } from "../../lib/layer";
@@ -16,7 +16,7 @@ export interface ToastRegionProps extends RootProps<HTMLDivElement> {
   align?: ToastRegionAlign;
   /** The most toasts shown at once; the newest are kept. */
   max?: number;
-  /** The toasts, oldest first (each a Toast, which keeps its own timer, pause and dismissal). */
+  /** The toasts, oldest first, each with its own React `key` (each a Toast, which keeps its own timer, pause and dismissal). */
   children?: ReactNode;
   /** Per-part styles over the theme: `{ root: {…} }`. */
   styles?: PartStyles<"toast-region">;
@@ -62,7 +62,9 @@ export function ToastRegion({ side = "bottom", align = "center", max = 3, childr
       )}
     >
       {shown.map((toast, i) => (
-        <div key={i} style={{ pointerEvents: "auto", maxWidth: "100%" }}>
+        // Keyed by the toast's own key (Children.toArray keeps it), so a toast leaving or arriving never remounts the ones after it: their
+        // timers, announcements and focus stay. A toast with no key falls back to its place.
+        <div key={isValidElement(toast) && toast.key !== null ? toast.key : i} style={{ pointerEvents: "auto", maxWidth: "100%" }}>
           {toast}
         </div>
       ))}
