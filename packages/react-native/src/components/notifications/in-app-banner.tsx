@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, PanResponder, Platform, Pressable, Text, View, type ViewStyle } from "react-native";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
@@ -95,6 +95,14 @@ export function InAppBanner({
   // An icon's size is its width and height; what else `styles` sets on it goes on the glyph.
   const { width: tileIconSize, height: _tileIconHeight, ...tileIconRest } = r.tileIcon.view;
   const [gone, setGone] = useControllable(dismissed);
+  // Dismissing puts this notification away, not the banner: a new one (another title, context, body or time) shows again, back at
+  // `dismissed`. Body is part of it because two messages from one sender in one minute share a title and a time.
+  const notification = [title, context, body, time].join("\n");
+  const [shown, setShown] = useState(notification);
+  if (shown !== notification) {
+    setShown(notification);
+    setGone(dismissed);
+  }
   const dismiss = (reason: InAppBannerDismissReason) => {
     setGone(true);
     onDismiss?.(reason);

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { recipes, useControllable, useDirection, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { useAutoFocus } from "../../platform";
 import { t } from "../../tokens";
@@ -114,6 +114,14 @@ export function InAppBanner({
   const r = useRecipe(recipes["in-app-banner"], { state: { focus: ui.focused }, styles });
   const rField = useRecipe(recipes["in-app-banner"], { state: { focus: typing.focused }, styles });
   const [gone, setGone] = useControllable(dismissed);
+  // Dismissing puts this notification away, not the banner: a new one (another title, context, body or time) shows again, back at
+  // `dismissed`. Body is part of it because two messages from one sender in one minute share a title and a time.
+  const notification = [title, context, body, time].join("\n");
+  const [shown, setShown] = useState(notification);
+  if (shown !== notification) {
+    setShown(notification);
+    setGone(dismissed);
+  }
   const [open, setOpen] = useControllable(replying);
   const [draft, setDraft] = useControllable(replyText);
   const dismiss = (reason: InAppBannerDismissReason) => {
