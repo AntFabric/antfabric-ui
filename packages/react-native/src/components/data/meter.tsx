@@ -24,7 +24,7 @@ export interface MeterProps extends RootProps {
   thresholds?: MeterThresholds;
   /** Just a short track with the value beside it, for a row of a list that already names what it is. The label stays the track's accessible name. */
   compact?: boolean;
-  /** An icon beside the value in the caution and critical states, so the state is not the fill's colour alone. The spoken value always says it. */
+  /** An icon beside the value in the caution and critical states, so the state is not the fill's colour alone. On by default. The spoken value always says it. */
   showState?: boolean;
   /** Per-part styles over the theme: `{ root: {…}, head: {…}, label: {…}, value: {…}, track: {…}, fill: {…} }`. */
   styles?: PartStyles<"meter">;
@@ -44,7 +44,7 @@ const useStyles = createStyles((t) => ({
   mark: { marginRight: t.space["2xs"] },
 }));
 
-export function Meter({ value, max = 1, label, kind = "usage", format = "percent", thresholds, compact = false, showState = false, styles, strings, testID, style, ...rest }: MeterProps) {
+export function Meter({ value, max = 1, label, kind = "usage", format = "percent", thresholds, compact = false, showState = true, styles, strings, testID, style, ...rest }: MeterProps) {
   const s = useStyles();
   const { t } = useTheme();
   const r = useRecipe(recipes.meter, { variants: { kind }, styles });

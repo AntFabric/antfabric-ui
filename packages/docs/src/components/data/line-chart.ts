@@ -33,7 +33,7 @@ const docs: ComponentDocs = {
     },
     ...commonProps({ title: "Tickets opened and resolved", subtitle: "All channels, May to October 2026", labels: { opened: "Opened", resolved: "Resolved" }, height: 240, xFormat: MONTH }),
     area: { type: "boolean", default: false, description: "A flat fill under the first series: its colour at one opacity, never a gradient. Only the first is filled: two fills over each other mix into a colour neither series has." },
-    marks: { type: "boolean", default: false, description: "Each series gets its own dash pattern and marker shape besides its colour, in the plot and in the legend's key, so two series are never told apart by hue alone. Markers are left off past 40 points. Off by default: the plot keeps its plain lines." },
+    marks: { type: "boolean", description: "Each series gets its own dash pattern and marker shape besides its colour, in the plot and in the legend's key, so two series are never told apart by hue alone (WCAG 1.4.1). Markers are left off past 40 points. Left out, it is on for two or more series and off for one; `false` keeps plain lines where the product labels the series another way." },
     target: { type: "number", description: "A reference line at this value: a goal, a limit. The value axis takes it in, so a target outside the data still shows." },
     targetLabel: { type: "string", default: "", description: "What the target line says, at its right end: \"Q4 target $180K\". Empty draws a line with no words." },
   },
@@ -89,7 +89,7 @@ const docs: ComponentDocs = {
     notes: [
       "The figure is named by the sentence core's `summarize` writes from the rows: dates read as a trend (rose, fell, held, and where it peaked), categories as highest and lowest. It is heard, not printed: in the light theme most series colours sit under 3:1 against the card, so the tooltip and \"View as table\" give the numbers without colour.",
       "\"View as table\" is the other way in: the same rows in Table, with real headers. It is a Button, so it is reached by keyboard and named by what it will do.",
-      "With `marks`, a series is told apart by its dash and marker as well as its colour (the first is solid with a round marker, the next dashed with a square, and so on), and the legend's key draws the same. Without it, the tooltip and the table are the relief for series that are close in hue.",
+      "With `marks` (on by default for two or more series), a series is told apart by its dash and marker as well as its colour (the first is solid with a round marker, the next dashed with a square, and so on), and the legend's key draws the same. With `marks={false}`, the tooltip and the table are the relief for series that are close in hue.",
       "The legend says what it toggles: each entry is a button that is pressed while the series is on (\"Resolved, pressed\"), and an entry that is off is struck through and faint, not only dimmer. The last series showing cannot be turned off, so a chart is never blank because of a press.",
       "On the web the plot is a stop for the arrow keys (recharts' accessibility layer): the tooltip moves point to point, and the plot draws a focus edge from the tokens while the keyboard is in it. The phone's plot is one image; the sentence and the table carry it.",
       "The tooltip is drawn with `role=\"tooltip\"` on the web and is never the only place a value is: the table has every one.",
