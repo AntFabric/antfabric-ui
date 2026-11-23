@@ -133,7 +133,10 @@ export function Popover({
 
   const close = () => setShown(false);
   const press = (e: MouseEvent) => {
-    if (panel.current?.contains(e.target as Node)) return;
+    // Only a press on the trigger toggles. A click in the panel, or in a layer portalled from it (an inner Dialog or Popover, which React
+    // bubbles here through the component tree, not the DOM), is not one.
+    const target = e.target as Node;
+    if (!host.current?.contains(target) || panel.current?.contains(target)) return;
     setShown(!shown);
   };
 
