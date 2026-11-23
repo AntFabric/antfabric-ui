@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, type CSSProperties, type ReactNode } from "react";
+import { createContext, useContext, useInsertionEffect, useMemo, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { hasGlass, kitCss, StringsProvider, themeCss, themes, tokensCss, type Direction, type OS, type Scheme, type StringsOverrides, type Theme } from "@antfabric/ui-core";
 import { t } from "./tokens";
 
@@ -17,20 +17,40 @@ export interface PlatformInfo {
   scheme: Scheme;
   /** The theme object this tree is drawn in: `neutral` unless a root or provider is given another. */
   theme: Theme;
+  /**
+   * The OS whose shortcut glyphs to draw, for `formatShortcut(keys, shortcutOs)`: `os`, except on the web (`browser`), where it is the
+   * visitor's once mounted (`mac` on a Mac or an iPad, so `⌘K`); a server render and the hydration after it say `browser` (Ctrl).
+   */
+  shortcutOs: OS;
 }
 
 // With no root or provider above, the kit draws `neutral`. AntFabric's own look is the `antfabric` preset, passed as a theme.
-const PlatformContext = createContext<PlatformInfo>({ platform: "web", os: "browser", glass: false, scheme: "light", theme: themes.neutral });
+const TOP: PlatformInfo = { platform: "web", os: "browser", glass: false, scheme: "light", theme: themes.neutral, shortcutOs: "browser" };
+const PlatformContext = createContext<PlatformInfo>(TOP);
+
+// The visitor's machine, read once mounted (`useSyncExternalStore` gives the server's answer during hydration, so the markup matches).
+const never = () => () => {};
+function visitorOs(): OS {
+  if (typeof navigator === "undefined") return "browser";
+  const nav = navigator as Navigator & { userAgentData?: { platform?: string } };
+  return /mac|iphone|ipad|ipod/i.test(nav.userAgentData?.platform || nav.platform || "") ? "mac" : "browser";
+}
+const serverOs = (): OS => "browser";
 
 export function usePlatform(): PlatformInfo {
   return useContext(PlatformContext);
 }
 
+/**
+ * Where the tree is drawn. Each of `platform`, `os`, `osVersion`, `scheme` and `theme` left out is the parent provider's (a provider nested
+ * to scope `strings` keeps the page's platform, OS and scheme); at the top they are web, browser, light and `neutral`. An `os` left out
+ * under a parent of another platform is that platform's own (`browser` on the web, `mac` on the desktop).
+ */
 export interface AntFabricProviderProps {
   platform?: "web" | "desktop";
   os?: OS;
   osVersion?: number;
-  /** Light or dark (default light). `AntFabricRoot` passes its own; set it here only for a host that sets `data-af-theme` itself. */
+  /** Light or dark (default: the parent provider's, else light). `AntFabricRoot` passes its own; set it here only for a host that sets `data-af-theme` itself. */
   scheme?: Scheme;
   /**
    * The theme the tree is drawn in. Left out, a provider inside another takes its parent's; at the top it is `neutral`. A host
@@ -96,21 +116,27 @@ function warnOnce(message: string): void {
  * root's attributes with `rootAttrs({ platform, os, scheme, theme })` and puts `themeCss(theme)` in its stylesheet; without a theme here it draws
  * `neutral`, whose sheet that host has not written (in development this warns once).
  */
-export function AntFabricProvider({ platform = "web", os, osVersion, scheme = "light", theme, strings, locale, dir, autoFocus, children }: AntFabricProviderProps) {
+export function AntFabricProvider({ platform: givenPlatform, os: givenOs, osVersion: givenVersion, scheme: givenScheme, theme, strings, locale, dir, autoFocus, children }: AntFabricProviderProps) {
   assertTheme(theme, "AntFabricProvider");
-  const inherited = useContext(PlatformContext).theme;
+  const parent = useContext(PlatformContext);
   const chosen = useContext(ChosenContext);
   if (theme === undefined && !chosen)
     warnOnce(
-      `AntFabricProvider has no theme and no AntFabricRoot above it, so it draws "${inherited.name}" while the page's stylesheet and root attributes are not that theme's. Pass the same theme here that you give rootAttrs() and themeCss() (CONSUMING.md, "Without AntFabricRoot").`,
+      `AntFabricProvider has no theme and no AntFabricRoot above it, so it draws "${parent.theme.name}" while the page's stylesheet and root attributes are not that theme's. Pass the same theme here that you give rootAttrs() and themeCss() (CONSUMING.md, "Without AntFabricRoot").`,
     );
-  const drawn = theme ?? inherited;
+  const drawn = theme ?? parent.theme;
+  const platform = givenPlatform ?? parent.platform;
+  const os = givenOs ?? (platform === parent.platform ? parent.os : platform === "web" ? "browser" : "mac");
+  const osVersion = givenVersion ?? (os === parent.os ? parent.osVersion : undefined);
+  const scheme = givenScheme ?? parent.scheme;
+  const visitor = useSyncExternalStore(never, visitorOs, serverOs);
+  const shortcutOs = os === "browser" ? visitor : os;
   // Keyed by the theme's id (its content), so one built inline on every render does not re-render the tree.
   // eslint-disable-next-line react-hooks/exhaustive-deps -- `drawn.id` is `drawn`'s content
-  const value = useMemo<PlatformInfo>(() => {
-    const o = os ?? (platform === "web" ? "browser" : "mac");
-    return { platform, os: o, osVersion, glass: platform === "desktop" && hasGlass(o, osVersion), scheme, theme: drawn };
-  }, [platform, os, osVersion, scheme, drawn.id]);
+  const value = useMemo<PlatformInfo>(
+    () => ({ platform, os, osVersion, glass: platform === "desktop" && hasGlass(os, osVersion), scheme, theme: drawn, shortcutOs }),
+    [platform, os, osVersion, scheme, drawn.id, shortcutOs],
+  );
   const focusIn = useContext(AutoFocusContext);
   return (
     <ChosenContext.Provider value={chosen || theme !== undefined}>
@@ -141,26 +167,36 @@ export interface AntFabricRootProps extends AntFabricProviderProps {
  * `data-af-theme` for the scheme, `data-af-os`, and `data-af-theme-id` for any theme but the empty one), and the kit's stylesheet
  * with the theme's. A tenant's brand is part of a theme (`defineTheme({ name, extends, brand })`), passed as `theme`.
  */
-export function AntFabricRoot({ platform = "web", os, osVersion, scheme = "light", theme, strings, locale, dir, autoFocus, style, css = true, children }: AntFabricRootProps) {
+export function AntFabricRoot({ platform: givenPlatform, os: givenOs, osVersion, scheme: givenScheme, theme, strings, locale, dir, autoFocus, style, css = true, children }: AntFabricRootProps) {
   assertTheme(theme, "AntFabricRoot");
-  const inherited = useContext(PlatformContext).theme;
+  const parent = useContext(PlatformContext);
   const chosen = useContext(ChosenContext);
   if (css === false && theme === undefined && !chosen)
     warnOnce(
-      `AntFabricRoot css={false} has no theme, so it draws "${inherited.name}" while the page's stylesheet is not that theme's. Pass the theme and add themeCss(theme) to the stylesheet (CONSUMING.md, "Without AntFabricRoot").`,
+      `AntFabricRoot css={false} has no theme, so it draws "${parent.theme.name}" while the page's stylesheet is not that theme's. Pass the theme and add themeCss(theme) to the stylesheet (CONSUMING.md, "Without AntFabricRoot").`,
     );
-  const drawn = theme ?? inherited;
+  const drawn = theme ?? parent.theme;
+  // A root inside another root or a provider keeps what it is not given, as a provider does; at the top it writes no `data-af-os` unless given one.
+  const platform = givenPlatform ?? parent.platform;
+  const scheme = givenScheme ?? parent.scheme;
+  const os = givenOs ?? (parent !== TOP && platform === parent.platform ? parent.os : undefined);
+  const themeSheetHere = drawn.id !== "" && css !== false;
+  // On the server (and while hydrating) the theme's sheet is a `<style href precedence>` React hoists, which it never takes out of the page;
+  // once mounted the root holds the sheet itself, counted by theme id, and the last root drawing a theme takes its sheet out.
+  const mounted = useSyncExternalStore(never, onClient, onServer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- `drawn.id` is `drawn`'s content
+  useInsertionEffect(() => (mounted && themeSheetHere ? holdThemeSheet(drawn) : undefined), [mounted, themeSheetHere, drawn.id]);
   return (
     <div {...rootAttrs({ platform, os, scheme, theme: drawn })} dir={dir} style={{ fontFamily: t.font.sans, color: t.fg.body, ...ROOT_TEXT, ...style }}>
       {/* One slot for both sheets: a sibling more would shift the ids `useId` gives everything inside (the tree's shape is part of them). */}
       {(css === true || (css === "theme" && drawn.id !== "")) && (
         <>
           {css === true && (
-            <style href="antfabric-ui" precedence="low">
+            <style href={KIT_HREF} precedence="low">
               {KIT_CSS}
             </style>
           )}
-          {drawn.id !== "" && (
+          {themeSheetHere && !mounted && (
             <style href={`antfabric-ui-${drawn.id}`} precedence="low">
               {themeSheet(drawn)}
             </style>
@@ -175,6 +211,47 @@ export function AntFabricRoot({ platform = "web", os, osVersion, scheme = "light
 }
 
 const KIT_CSS = tokensCss() + kitCss;
+
+// The package's version, written in by the build (`scripts/build-packages.mjs`); the workspace's source has none. React keeps one sheet
+// per `href`, so a host and a plugin on two versions of the kit each ship their own.
+declare const __ANTFABRIC_UI_VERSION__: string | undefined;
+const KIT_HREF = typeof __ANTFABRIC_UI_VERSION__ === "string" ? `antfabric-ui@${__ANTFABRIC_UI_VERSION__}` : "antfabric-ui";
+
+const onClient = () => true;
+const onServer = () => false;
+
+/** The theme sheets mounted roots hold, by theme id: how many roots draw it, and the element when the kit put it in (not React or a server). */
+const held = new Map<string, { roots: number; el: HTMLStyleElement | null }>();
+
+/** Puts the theme's sheet in the page unless a server render already did, and returns its release: the last root to let go takes it out. */
+function holdThemeSheet(theme: Theme): (() => void) | undefined {
+  if (typeof document === "undefined" || !document.head) return undefined;
+  const id = theme.id;
+  let entry = held.get(id);
+  if (!entry) {
+    const href = `antfabric-ui-${id}`;
+    // The server's (or a hydration's) sheet, alone or merged with the kit's: React's to keep, so it stays and nothing is added. One another
+    // copy of the kit holds (`data-af-held`) may go when that copy lets go of it, so it does not count.
+    const there = [...document.querySelectorAll("style[data-href]:not([data-af-held])")].some((s) => (s.getAttribute("data-href") ?? "").split(" ").includes(href));
+    let el: HTMLStyleElement | null = null;
+    if (!there) {
+      el = document.createElement("style");
+      el.setAttribute("data-href", href);
+      el.setAttribute("data-af-held", "");
+      el.textContent = themeSheet(theme);
+      document.head.appendChild(el);
+    }
+    entry = { roots: 0, el };
+    held.set(id, entry);
+  }
+  const mine = entry;
+  mine.roots++;
+  return () => {
+    if (--mine.roots > 0) return;
+    held.delete(id);
+    mine.el?.remove();
+  };
+}
 
 /**
  * How the root's text is drawn (web and desktop; the phone kit draws its own text). Grayscale antialiasing on macOS, as AntFabric's
