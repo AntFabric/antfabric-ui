@@ -1,4 +1,4 @@
-import { createContext, createElement, useCallback, useContext, useId, useMemo, useState, type ReactNode } from "react";
+import { createContext, createElement, useCallback, useContext, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import type { InteractionState } from "./types";
 
 /**
@@ -50,6 +50,41 @@ export function useControllable<T>(value: T, onChange?: (next: T) => void): [T, 
     [controlled, onChange],
   );
   return [controlled ? value : inner, set];
+}
+
+/**
+ * A request a press makes, shown as pending until the app answers. A component never shows the result of a request before the app
+ * confirms it: `run(handler)` sets `pending` and calls the handler, and pending clears when the app answers, that is when the handler's
+ * promise settles (either way) or when any value in `answer` changes (compared as `same()` compares, so a re-render with equal props is
+ * not an answer). A failed request that leaves the props as they were clears through its promise, or when a prop moves. A press while
+ * pending does nothing, and with no handler there is nothing to wait for, so nothing is pending.
+ */
+export function usePending(answer: readonly unknown[]): { pending: boolean; run: (fn?: () => unknown) => void } {
+  const [pending, setPending] = useState(false);
+  const [seen, setSeen] = useState(answer);
+  if (!same(seen, answer)) {
+    setSeen(answer);
+    if (pending) setPending(false);
+  }
+  // Two presses before a re-render read the same `pending`: the ref holds the wait between them.
+  const waiting = useRef(false);
+  waiting.current = pending;
+  // Only the latest request's promise clears pending: an older one settling late does not end a newer wait.
+  const latest = useRef(0);
+  const run = useCallback((fn?: () => unknown) => {
+    if (waiting.current || !fn) return;
+    waiting.current = true;
+    const id = ++latest.current;
+    setPending(true);
+    const out = fn();
+    if (out && typeof (out as PromiseLike<unknown>).then === "function") {
+      const settle = () => {
+        if (latest.current === id) setPending(false);
+      };
+      (out as PromiseLike<unknown>).then(settle, settle);
+    }
+  }, []);
+  return { pending, run };
 }
 
 /* ---------- forced states, for the catalogue's snapshots ---------- */

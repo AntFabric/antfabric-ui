@@ -222,6 +222,12 @@ export const switchRecipe = defineRecipe({
   catalogue's previews stay pressable. Never default that prop in the destructuring (the event alone would then hold it at
   the default); default the result: `const [on = false, setOn] = useControllable(checked, onCheckedChange)`
   (`pnpm check conventions`, rule `controllable-default`).
+- **A request is not a result.** A press that asks the app for something (send, retry, approve, sign in, turn on) never shows the
+  outcome itself: it runs the handler through `usePending(answer)` (`const { pending, run } = usePending([status, error])`, then
+  `run(onRetry)`), shows `pending` on the pressed control (a spinner, aria-busy, no second press), and draws the outcome only from the props
+  the app passes. Pending ends when a value in `answer` changes or the promise the handler returns settles, so a failure that leaves the
+  props as they were comes back by itself; Cancel, Close and Escape stay live meanwhile. The event's type is `() => void | Promise<unknown>`.
+  Only pure UI state (expanded, revealed, hovered, a selection row's tick) may move on its own.
 - **Built-in text:** a component has no fixed words of its own (aria labels, "Not now", "Required", a counter): it reads them from the
   dictionary in `packages/core/src/strings/<category>.ts`, keyed by its docs id, and a product overrides them per tree (`strings` on
   `AntFabricRoot` / `AntFabricProvider` / `ThemeProvider`, with `locale`) or per instance (the component's `strings` prop).
