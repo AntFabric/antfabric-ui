@@ -159,18 +159,19 @@ function CloseButton({ os, label, icon = "x", styles, onPress }: { os: Desk; lab
   );
 }
 
-function ActionButton({ os, label, styles, onPress }: { os: Desk; label: string; styles?: PartStyles<"os-notification">; onPress: () => void }) {
-  const ui = useInteraction();
-  const r = useRecipe(recipes["os-notification"], { state: { hover: ui.hovered, focus: ui.focused }, styles });
+function ActionButton({ os, label, disabled = false, styles, onPress }: { os: Desk; label: string; disabled?: boolean; styles?: PartStyles<"os-notification">; onPress: () => void }) {
+  const ui = useInteraction({ disabled });
+  const r = useRecipe(recipes["os-notification"], { state: { hover: ui.hovered, focus: ui.focused, disabled: ui.disabled }, styles });
   return (
     <button
       type="button"
       data-af-part="action"
       data-af-press
       aria-label={label}
+      disabled={ui.disabled}
       onClick={() => onPress()}
       {...ui.handlers}
-      style={css(pressable, center, { flex: 1 }, os === "browser" && { borderRadius: 0 }, r.action)}
+      style={css(pressable, center, { flex: 1 }, os === "browser" && { borderRadius: 0 }, partStyle(r, "action", ui.disabled && { cursor: "default" }))}
     >
       <span style={css(text, truncate(1))}>{label}</span>
     </button>
@@ -302,7 +303,8 @@ export function OsNotification({
   // Reply swaps the buttons for the field: focus, fallen to the page, follows into it.
   const replyField = useFocusHandoff<HTMLInputElement>(typing);
 
-  const press = (a: OsNotificationAction) => (a.reply ? setReplying("typing") : onAction?.(a));
+  // The browser has no inline reply: there a reply action reports itself, and the app opens the conversation.
+  const press = (a: OsNotificationAction) => (a.reply && os !== "browser" ? setReplying("typing") : onAction?.(a));
   const send = () => {
     if (replyAction && draft && replying !== "sending") onAction?.(replyAction, draft);
   };
@@ -337,7 +339,7 @@ export function OsNotification({
     shown.length > 0 && (
       <div data-af-part="actions" style={css(row, { alignItems: "stretch" }, ACTIONS[os], partStyle(r, "actions", motion && enter("fade")))}>
         {shown.map((a) => (
-          <ActionButton key={a.key} os={os} label={a.label} styles={styles} onPress={() => press(a)} />
+          <ActionButton key={a.key} os={os} label={a.label} disabled={a.disabled} styles={styles} onPress={() => press(a)} />
         ))}
       </div>
     );

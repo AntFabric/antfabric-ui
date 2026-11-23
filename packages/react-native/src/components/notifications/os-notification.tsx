@@ -130,12 +130,12 @@ function MenuRow({ label, icon, last, styles, testID, onPress }: { label: string
   );
 }
 
-function ActionButton({ label, styles, testID, onPress }: { label: string; styles?: PartStyles<"os-notification">; testID?: string; onPress: () => void }) {
+function ActionButton({ label, disabled = false, styles, testID, onPress }: { label: string; disabled?: boolean; styles?: PartStyles<"os-notification">; testID?: string; onPress: () => void }) {
   const s = useStyles();
-  const press = usePress();
-  const r = useRecipe(recipes["os-notification"], { state: { focus: press.focused }, styles });
+  const press = usePress({ disabled });
+  const r = useRecipe(recipes["os-notification"], { state: { focus: press.focused, disabled: press.disabled }, styles });
   return (
-    <Pressable testID={partId(testID, "os-notification", "action")} accessibilityRole="button" accessibilityLabel={label} onPress={() => onPress()} {...press.handlers} style={[s.action, r.action.view]}>
+    <Pressable testID={partId(testID, "os-notification", "action")} accessibilityRole="button" accessibilityLabel={label} accessibilityState={press.disabled ? { disabled: true } : undefined} disabled={press.disabled} onPress={() => onPress()} {...press.handlers} style={[s.action, r.action.view]}>
       <Text testID={partId(testID, "os-notification", "actionText")} numberOfLines={1} style={[face("android", "600"), r.actionText.view, r.actionText.text]}>
         {label}
       </Text>
@@ -345,7 +345,7 @@ export function OsNotification({
             {(replying === "none" || replying === "failed") && actions.length > 0 ? (
               <View style={s.actions}>
                 {actions.map((a) => (
-                  <ActionButton key={a.key} label={a.label} styles={styles} testID={testID} onPress={() => press(a)} />
+                  <ActionButton key={a.key} label={a.label} disabled={a.disabled} styles={styles} testID={testID} onPress={() => press(a)} />
                 ))}
               </View>
             ) : null}
