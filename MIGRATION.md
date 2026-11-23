@@ -1,4 +1,122 @@
-# Migrating to AntFabric UI 1.0
+# Migrating to AntFabric UI
+
+## 1.0 → 1.1
+
+1.1.0 fixes the 1.0 component review (`reports/audit/2026-11-23-component-review.md`). It removes no prop, so an app on 1.0 compiles on 1.1 apart from the `ref` types ("Pass-through props") and an item's `icon`, which may now be a component ("Icons"). But several components change behaviour, and a few need something from your app. The full list is under "Changed (behaviour)" in each package's `CHANGELOG.md`; this section is what to do about it.
+
+### Checklist
+
+1. **Install 1.1.** Set `@antfabric/ui-core`, `react` and `react-native` (whichever you use) to the same `1.1.x`.
+2. **Register the icons your app names** that the kit does not draw (`registerIcons`), or pass the component. See "Icons".
+3. **Return a promise, or pass the answer.** For Dialog, SessionState, UpdateBanner, PermissionPrompt, NotificationItem, Message, AttachmentCard, ReactionPill and QuestionPanel, the app drives the state. See "The app drives the state".
+4. **Fix the `ref` types and look at `aria-label`s.** `ref`, `id` and `aria-*` now reach the control, not its wrapper. See "Pass-through props".
+5. **Chip:** drop the chip from your list in `onRemove`; it no longer hides itself.
+6. **In-app banner strings:** if you override `in-app-banner` `open` or `openIn`, move the text to `titleIn`, `withBody`, `leadBody` and `toOpen`.
+7. **AntFabric's primary buttons draw dark ink on coral** (`fg.onBrand` is picked by contrast). A theme that wants white sets `fg.onBrand` itself; update screenshot tests.
+8. **Read "Other changes that need action"** below: ProgressBar with no `value`, Tabs with an unknown `value`, `marks` and `showState` defaults, SidebarSection buttons, ToastRegion keys, deprecated events, and Escape in your own controls.
+9. **Run your typecheck, tests and one pass over each screen** in light and dark, with a keyboard and a screen reader on the dialogs and the forms.
+
+### Other changes that need action
+
+- **Chip.** Only a `filter` chip toggles `selected`. The ✕ and Backspace / Delete report `onRemove` and nothing else: the chip stays until your app drops it from its list (or sets `removed`), and then focus goes to the next chip. Before, the chip hid itself.
+- **`in-app-banner` strings.** `open` and `openIn` are gone; the banner's name is built from `titleIn`, `withBody`, `leadBody` and `toOpen` (with the common `withDetail`). A product that overrode `open` or `openIn` moves its text to these.
+- **`fg.onBrand` by contrast.** White where white reaches 4.5:1 on `brand.default`, otherwise ink. AntFabric's coral takes ink, so primary buttons, brand badges and ticked checkboxes draw dark ink. A tenant theme gets the same rule from its `brand`; set `fg.onBrand` in the theme's `tokens` to choose. The OS imitations (macOS menu highlight, red badge, Windows close button, tray menu hover) read the new `os.onFill` and stay white.
+- **Chart and data colours** in the light scheme are darker (3:1 on the card): `chart.series2`, `series4`, `series6`, `series7`, `chart.previous`, `chart.other`, `data.positive`, `data.warning`. A test that matches a hex value, or a product that copied them, updates.
+- **ProgressBar with no `value` is indeterminate.** It no longer draws and announces 40%. Pass `value` for a determinate bar.
+- **Tabs with a `value` no tab has (or none) choose no tab** and draw no bar; they used to select the first tab. Pass the key of the tab you want chosen.
+- **Defaults that turn on:** `LineChart` `marks` is on for two or more series (pass `marks={false}` for plain lines); `Meter` `showState` is `true` (pass `showState={false}`); on the phone `BarChart` and `RadarChart` take `marks` the same way, and `GaugeChart` takes `showState`.
+- **`GaugeChart` with the default `percent` format** prints a share of `max` (58 of 100 is 58%). Before, 58 printed as 5,800%.
+- **Deprecated, kept through 1.x:** ThreadSummary `onFollowingChange` (never called; `following` is the app's) and Composer `onAttachmentDownload` (a staged file has no download).
+- **Events that report a request.** `onStageChange` (UpdateBanner) and `onStatusChange` (Message, AttachmentCard) keep their names but no longer declare `changes`: the app passes `stage` and `status`. Toast's action also fires `onDismiss`. AttachmentCard's voice note reports through the new `onPlayingChange`.
+- **ListItem and SidebarItem never mark themselves current.** Pass `selected` / `active` (a SidebarSection's `selected` wins).
+- **ToastRegion:** give each Toast a `key` (the notification's id); toasts are held by key, not by place.
+- **SidebarSection:** + is drawn only with `onAdd` and ⋯ only with `onMenu`; on the phone the header's long press needs `onMenu` and the rows' `onItemLongPress`. `onItemMenu(key)` (web and desktop) is the rows' ⋮ and context menu.
+- **ContextMenu:** the + of the quick reactions calls the new `onMoreReactions`; open your emoji picker there.
+- **Escape.** An open Select, Menu, ContextMenu, Tooltip or HoverCard inside a Dialog, Sheet or Popover closes itself first, and the next Escape closes the overlay. A handler of your own that uses Escape calls `e.preventDefault()`, or the overlay takes it too.
+- **Status text is not a live region.** Statuses are announced, and the markup loses `role="status"`, `role="alert"` and `aria-live` on them (Composer, Message, InAppBanner, Badge `live`, CommandPalette, Dialog's error, ConnectionBanner, Pagination, NotificationSchedule, QuestionPanel). A test that does `getByRole("status")` or `"alert"` on these fails; assert the announcement instead.
+- **Bigger targets.** 24px pointer targets on web and desktop (Checkbox without a label, Chip ✕, IconButton `sm`, NotificationItem row actions, DonutChart swatch); a layout that counted on 20px moves by a few pixels. On the phone `fontScale.control` is 2, so control labels grow with Dynamic Type up to 200%.
+- **Stricter themes.** `defineTheme` throws on a value holding a control character, `@`, `!` or a resource-loading function (`url(`, `image-set(` and the like), on a brand `soft`, `softHover`, `onSoft` or `tint` that is not a colour, and, for the phone, on a size in `rem`, `em`, `%` (other than `50%`) or `calc()`.
+- **Dates and numbers.** A date-only string (`"2026-03-01"`) is that calendar day in every zone; text that is not a date prints `unavailable` and text that is not a number prints the dash instead of `NaN`; `currency` honours `digits`. A Table row without its `rowKey` field is named by its index.
+- **BottomSheet** fills the box it is given and no longer carries the catalogue's 375px stage; give it the room above (the header row) yourself. `dismissible={false}` turns off the ×, the handle, the scrim, Esc and Android's back.
+- **Nested roots keep the parent's platform, OS and scheme** when they are not given them. A root that relied on resetting to web, browser and light passes them.
+- **Next.js and strict CSP.** Every file the kits publish starts with `"use client"`; core does not, so a layout builds its theme in a `"use client"` file (CONSUMING.md, section 3). A strict CSP needs `style-src 'unsafe-inline'`.
+
+### Icons
+
+1.0 looked every icon name up in all of lucide, so an app's bundle held every lucide icon (a consumer of `Button` alone was 1,205 KB minified). From 1.1 each kit registers only the icons it draws itself, and `Icon` and every icon prop (`icon`, `iconLeading`, `triggerIcon`, an item's `icon`) also take the icon component. Names the kit draws keep working unchanged.
+
+- **A lucide name the kit does not draw** (a channel's `git-branch`, an agent's `rocket`) now draws an empty box, and warns once in development. Register the names your app passes, once, before the first render:
+
+  ```ts
+  import { GitBranch, Rocket } from "lucide-react"; // lucide-react-native on the phone
+  import { registerIcons } from "@antfabric/ui-react"; // @antfabric/ui-react-native on the phone
+  registerIcons({ GitBranch, Rocket }); // keys are export names or kebab-case names
+  ```
+
+  Or pass the component where you used the name: `<Button iconLeading={GitBranch} />`, `{ key: "deploy", label: "Deploy", icon: Rocket }`. An item that must stay serialisable (built from config) keeps its name and the app registers it.
+- **Types.** `IconName` is `string | IconComponent` in both kits (and core's items). Code that reads an item's `icon` as a string narrows it first (`typeof item.icon === "string"`).
+- **Check:** in development the console has no `no icon "…"` warning, and `grep -rn "data-af-missing-icon"` over your rendered HTML (or `missing-icon:` testIDs on the phone) finds nothing.
+
+### The app drives the state
+
+A component no longer shows the result of a request before the app confirms it. A press that asks for something shows a pending state on
+the pressed control and reports the request; the outcome is drawn only from the props you pass. Pending ends when you pass a new value of
+the props below, or when the promise your handler returns settles. So either return a promise, or answer with the props.
+
+| Component | The press | Pass, as the answer | Before |
+|---|---|---|---|
+| Dialog | the CTA spins (`onConfirm`) | close it, or a new `error` or `loading` | the CTA set `loading` itself; Cancel, ✕, Esc and the scrim went dead |
+| SessionState | Sign in (`onSignIn`), Unlock on the phone (`onUnlock`) | `state="waiting"`, `unlocked`, `error`, `offline` | the card turned to waiting, or unlocked, itself |
+| UpdateBanner | Install and Retry (`onStageChange("downloading")`, `onApply`); Check again (`onStageChange("checking")`, `onCheck`) | `stage`, `error`, `progress` | the banner moved `stage` itself |
+| PermissionPrompt | Turn on (`onAllow`) | `permission` (the OS's answer) | it showed on, and said so, at once |
+| NotificationItem | Approve, Decline (`onApprove`, `onDecline`) | `approval` | it showed Approved or Declined at once |
+| Message | Retry (`onStatusChange("sending")`, `onRetry`); a reaction pill (`onReact`) | `status`; `reactions` | it went back to sending itself; the pill flipped itself |
+| AttachmentCard | Retry (`onStatusChange("uploading")`, `onRetry`) | `status`, `error`, `progress` | it went back to uploading itself |
+| ReactionPill (with `mine` and `onMineChange`) | the pill (`onMineChange`) | `mine`, `count` | — (controlled already drew the app's; the pill is now busy meanwhile) |
+| QuestionPanel | Submit (`onSubmit`) | `sending`, `offline` | it stayed Sending… until `sending` was pulsed |
+
+- **Return a promise** from the handler when the request can fail without changing a prop (a retry that fails with the same error, an
+  approval the server refuses, an OS prompt the person dismisses): `onRetry={() => resend(message)}` where `resend` returns its promise.
+  Settling, either way, ends the pending state, and the props you pass then are what is drawn.
+- **Or answer with the props.** A handler that returns nothing and never changes a prop leaves the control pending: Cancel, ✕ and Escape
+  stay live meanwhile, but the CTA does not come back.
+- **Pass the outcome props.** Where a component used to move a prop itself, it no longer does: `UpdateBanner stage`, `Message status`,
+  `AttachmentCard status`, `SessionState state` and `unlocked`, `PermissionPrompt permission`, `NotificationItem approval`. `onStageChange` and
+  `onStatusChange` keep their names and report what was asked for; their docs no longer declare `changes`.
+- **Also in this batch:** a SidebarItem never makes itself current (pass `active`, or the section's `selected`); a ListItem that is a link,
+  button or menu row never toggles `selected` (only `option` and `checkbox` rows do); ThreadSummary's press no longer flips `following`, and
+  `onFollowingChange` is deprecated and never called; Toast's action also fires `onDismiss`; InAppBanner shows a new notification after a
+  dismissal; AttachmentCard's voice note reports Play and Pause through the new `onPlayingChange`.
+- **Check:** press each of these with your handler stubbed to return a rejected promise: the control spins, then comes back as it was, and
+  no outcome (Approved, Unlocked, Notifications are on, Downloading) is drawn or announced.
+
+### Pass-through props
+
+`id`, `aria-*` and `ref` (the phone: `nativeID`, `accessibilityLabel`, `accessibilityHint` and `ref`) now go to the element that carries the
+component's role. `className`, `data-*`, `testID` and `style` stay on the root.
+
+| Component | `ref` and `id` were | Now |
+|---|---|---|
+| TextField, TextArea | the wrapper `<div>` (`View`) | the `<input>` / `<textarea>` (`TextInput`) |
+| SearchField | the wrapper | the `<input>` (`TextInput`); the launcher `<button>` with `launcher` |
+| Select | the wrapper | the trigger: `<button role="combobox">`, the native `<select>` in a phone browser, the `Pressable` on the phone |
+| Chip | the wrapper | the chip's button |
+| SegmentedControl | the wrapper (the `ScrollView` when `scrollable` on the phone) | the tab list |
+| Dialog, Sheet, BottomSheet, CommandPalette, ContextMenu (phone) | the scrim or backdrop | the `role="dialog"` panel |
+| Tabs (phone) | discarded | the `ScrollView` |
+| PeriodCompare, MetricTabs, Breakdown (phone) | dropped | the chart's root inside its card |
+
+- **Type change.** `TextFieldProps` takes `RootProps<HTMLInputElement>`, `TextAreaProps` `RootProps<HTMLTextAreaElement>`, `SearchFieldProps`
+  `RootProps<HTMLInputElement | HTMLButtonElement>`, `SelectProps` `RootProps<HTMLButtonElement | HTMLSelectElement>`, `ChipProps`
+  `RootProps<HTMLButtonElement>`; on the phone TextField, TextArea and SearchField take `RootProps<TextInput>`. A `useRef<HTMLDivElement>()` you
+  passed to one of them is now a type error: change its type to the control's.
+- **A ref that measured or scrolled the wrapper** now gets the control. Wrap the component in an element of your own and measure that.
+- **Your own `aria-label` now wins** over the kit's name on every component (ListItem, Message, Skeleton, SessionState, the sparklines and
+  others named in the changelog). An `aria-label` you passed and the kit ignored is now what a screen reader says: check its wording.
+- **Check:** `<label htmlFor="email">Email</label><TextField id="email" />` focuses the field when the label is clicked, and
+  `ref.current.focus()` on a TextField puts the caret in it.
+
+## 0.1 → 1.0
 
 For an app that uses 0.1 (the 0.1 packages) and moves to 1.0. It is one break, made once: every rename and removal below lands in `1.0.0`, and nothing is left behind as a deprecated alias. Follow "The short path"; use "Every break, by area" when the typechecker points at something. An agent can follow it as written.
 
@@ -258,81 +376,6 @@ The cross-cutting renames, one row per rule, with what each touched. [`reports/a
 | 3. Open or closed is `expanded` | `collapsed`, `open` | `expanded` / `onExpandedChange`, positive, default as drawn before: Breadcrumbs, SidebarSection, QuestionPanel, TabBar, UpdateBanner, ThinkingIndicator. Overlays keep `open`. | Codemod (the value is inverted); manual for a handler that reads its argument |
 | 4. Chart fields | `label`, `field`, `trendField`, `selection` | `name`, `y`, `trendY`, `selected`; axis charts read `x` and `y` | Codemod |
 | 5. One name per concept | `cap`, `time`, `kind`, `authorIdentity`, `text`, `reactions` | `max`, `clock`, glyph/icon/avatar, `identity`, `body`, `quickReactions` + `picked`; `IconActionItem` for icon-only bars; `Person`, `Attachment`, `Reaction`; `avatarSrc` with `identity` on things that show someone; every button a component draws fires an event; string variable `{name}` | Mixed, as the tables above say |
-
-## 1.0 → 1.1: icons
-
-1.0 looked every icon name up in all of lucide, so an app's bundle held every lucide icon (a consumer of `Button` alone was 1,205 KB minified). From 1.1 each kit registers only the icons it draws itself, and `Icon` and every icon prop (`icon`, `iconLeading`, `triggerIcon`, an item's `icon`) also take the icon component. Names the kit draws keep working unchanged.
-
-- **A lucide name the kit does not draw** (a channel's `git-branch`, an agent's `rocket`) now draws an empty box, and warns once in development. Register the names your app passes, once, before the first render:
-
-  ```ts
-  import { GitBranch, Rocket } from "lucide-react"; // lucide-react-native on the phone
-  import { registerIcons } from "@antfabric/ui-react"; // @antfabric/ui-react-native on the phone
-  registerIcons({ GitBranch, Rocket }); // keys are export names or kebab-case names
-  ```
-
-  Or pass the component where you used the name: `<Button iconLeading={GitBranch} />`, `{ key: "deploy", label: "Deploy", icon: Rocket }`. An item that must stay serialisable (built from config) keeps its name and the app registers it.
-- **Types.** `IconName` is `string | IconComponent` in both kits (and core's items). Code that reads an item's `icon` as a string narrows it first (`typeof item.icon === "string"`).
-- **Check:** in development the console has no `no icon "…"` warning, and `grep -rn "data-af-missing-icon"` over your rendered HTML (or `missing-icon:` testIDs on the phone) finds nothing.
-
-## 1.0 → 1.1: the app drives the state
-
-A component no longer shows the result of a request before the app confirms it. A press that asks for something shows a pending state on
-the pressed control and reports the request; the outcome is drawn only from the props you pass. Pending ends when you pass a new value of
-the props below, or when the promise your handler returns settles. So either return a promise, or answer with the props.
-
-| Component | The press | Pass, as the answer | Before |
-|---|---|---|---|
-| Dialog | the CTA spins (`onConfirm`) | close it, or a new `error` or `loading` | the CTA set `loading` itself; Cancel, ✕, Esc and the scrim went dead |
-| SessionState | Sign in (`onSignIn`), Unlock on the phone (`onUnlock`) | `state="waiting"`, `unlocked`, `error`, `offline` | the card turned to waiting, or unlocked, itself |
-| UpdateBanner | Install and Retry (`onStageChange("downloading")`, `onApply`); Check again (`onStageChange("checking")`, `onCheck`) | `stage`, `error`, `progress` | the banner moved `stage` itself |
-| PermissionPrompt | Turn on (`onAllow`) | `permission` (the OS's answer) | it showed on, and said so, at once |
-| NotificationItem | Approve, Decline (`onApprove`, `onDecline`) | `approval` | it showed Approved or Declined at once |
-| Message | Retry (`onStatusChange("sending")`, `onRetry`); a reaction pill (`onReact`) | `status`; `reactions` | it went back to sending itself; the pill flipped itself |
-| AttachmentCard | Retry (`onStatusChange("uploading")`, `onRetry`) | `status`, `error`, `progress` | it went back to uploading itself |
-| ReactionPill (with `mine` and `onMineChange`) | the pill (`onMineChange`) | `mine`, `count` | — (controlled already drew the app's; the pill is now busy meanwhile) |
-| QuestionPanel | Submit (`onSubmit`) | `sending`, `offline` | it stayed Sending… until `sending` was pulsed |
-
-- **Return a promise** from the handler when the request can fail without changing a prop (a retry that fails with the same error, an
-  approval the server refuses, an OS prompt the person dismisses): `onRetry={() => resend(message)}` where `resend` returns its promise.
-  Settling, either way, ends the pending state, and the props you pass then are what is drawn.
-- **Or answer with the props.** A handler that returns nothing and never changes a prop leaves the control pending: Cancel, ✕ and Escape
-  stay live meanwhile, but the CTA does not come back.
-- **Pass the outcome props.** Where a component used to move a prop itself, it no longer does: `UpdateBanner stage`, `Message status`,
-  `AttachmentCard status`, `SessionState state` and `unlocked`, `PermissionPrompt permission`, `NotificationItem approval`. `onStageChange` and
-  `onStatusChange` keep their names and report what was asked for; their docs no longer declare `changes`.
-- **Also in this batch:** a SidebarItem never makes itself current (pass `active`, or the section's `selected`); a ListItem that is a link,
-  button or menu row never toggles `selected` (only `option` and `checkbox` rows do); ThreadSummary's press no longer flips `following`, and
-  `onFollowingChange` is deprecated and never called; Toast's action also fires `onDismiss`; InAppBanner shows a new notification after a
-  dismissal; AttachmentCard's voice note reports Play and Pause through the new `onPlayingChange`.
-- **Check:** press each of these with your handler stubbed to return a rejected promise: the control spins, then comes back as it was, and
-  no outcome (Approved, Unlocked, Notifications are on, Downloading) is drawn or announced.
-
-## 1.0 → 1.1: pass-through props
-
-`id`, `aria-*` and `ref` (the phone: `nativeID`, `accessibilityLabel`, `accessibilityHint` and `ref`) now go to the element that carries the
-component's role. `className`, `data-*`, `testID` and `style` stay on the root.
-
-| Component | `ref` and `id` were | Now |
-|---|---|---|
-| TextField, TextArea | the wrapper `<div>` (`View`) | the `<input>` / `<textarea>` (`TextInput`) |
-| SearchField | the wrapper | the `<input>` (`TextInput`); the launcher `<button>` with `launcher` |
-| Select | the wrapper | the trigger: `<button role="combobox">`, the native `<select>` in a phone browser, the `Pressable` on the phone |
-| Chip | the wrapper | the chip's button |
-| SegmentedControl | the wrapper (the `ScrollView` when `scrollable` on the phone) | the tab list |
-| Dialog, Sheet, BottomSheet, CommandPalette, ContextMenu (phone) | the scrim or backdrop | the `role="dialog"` panel |
-| Tabs (phone) | discarded | the `ScrollView` |
-| PeriodCompare, MetricTabs, Breakdown (phone) | dropped | the chart's root inside its card |
-
-- **Type change.** `TextFieldProps` takes `RootProps<HTMLInputElement>`, `TextAreaProps` `RootProps<HTMLTextAreaElement>`, `SearchFieldProps`
-  `RootProps<HTMLInputElement | HTMLButtonElement>`, `SelectProps` `RootProps<HTMLButtonElement | HTMLSelectElement>`, `ChipProps`
-  `RootProps<HTMLButtonElement>`; on the phone TextField, TextArea and SearchField take `RootProps<TextInput>`. A `useRef<HTMLDivElement>()` you
-  passed to one of them is now a type error: change its type to the control's.
-- **A ref that measured or scrolled the wrapper** now gets the control. Wrap the component in an element of your own and measure that.
-- **Your own `aria-label` now wins** over the kit's name on every component (ListItem, Message, Skeleton, SessionState, the sparklines and
-  others named in the changelog). An `aria-label` you passed and the kit ignored is now what a screen reader says: check its wording.
-- **Check:** `<label htmlFor="email">Email</label><TextField id="email" />` focuses the field when the label is clicked, and
-  `ref.current.focus()` on a TextField puts the caret in it.
 
 ## Checks you can run
 
