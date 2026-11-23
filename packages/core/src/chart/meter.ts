@@ -19,10 +19,13 @@ export function meterTone(kind: MeterKind, share: number, thresholds: MeterThres
   return share <= thresholds.danger ? "danger" : share <= thresholds.warning ? "warning" : "ok";
 }
 
-const isPercent = (format: FormatSpec) => format === "percent" || (typeof format === "object" && format.type === "percent");
+const isPercent = (format: FormatSpec | undefined) => format === "percent" || (typeof format === "object" && format.type === "percent");
 
 /** What a meter's value reads as, before it has words: the share (`42%`), the value of the capacity (`9.4` of `10 GB`), or nothing to show. */
 export type MeterReading = { kind: "unavailable" } | { kind: "share"; value: string } | { kind: "of"; value: string; max: string };
+
+/** A value of `max` as a meter or a gauge prints it: its share of `max` in a percent format (58 of 100 is 58%), the value itself in any other. */
+export const meterShown = (value: number, max: number, format: FormatSpec | undefined): number => (isPercent(format) ? value / max : value);
 
 /**
  * `42%` for a percent format, `9.4` and `10 GB` for any other (the kit says "of": `{value} of {max}`); `unavailable` while the value or the capacity is not a
@@ -30,5 +33,5 @@ export type MeterReading = { kind: "unavailable" } | { kind: "share"; value: str
  */
 export function meterReading(value: number, max: number, words: FormatWords, format: FormatSpec = "percent", locale = "en-US"): MeterReading {
   if (!Number.isFinite(value) || !Number.isFinite(max) || max <= 0) return { kind: "unavailable" };
-  return isPercent(format) ? { kind: "share", value: fmt(format, value / max, words, locale) } : { kind: "of", value: fmt(format, value, words, locale), max: fmt(format, max, words, locale) };
+  return isPercent(format) ? { kind: "share", value: fmt(format, meterShown(value, max, format), words, locale) } : { kind: "of", value: fmt(format, value, words, locale), max: fmt(format, max, words, locale) };
 }

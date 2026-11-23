@@ -161,7 +161,7 @@ import { PART_MARKS, canonical, normalise, unknownVars, type DrawnIn } from "./s
 import { citedPaths, componentsJson, llmsTxt } from "./agent-surface";
 import { tokensJson, EXTENSION, REFERENCE } from "@antfabric/ui-core/dtcg";
 import { tokenLeaves, tokenPaths } from "./token-leaves";
-import { barLayout, barScale, bySign, chartTable, clampScore, easeFn, cellText as coreCellText, fitLabel, fmt as coreFmt, gaugeState, labelWidth, lineScale, goalsOf, lttb, meterReading as coreMeterReading, meterTone, moved as coreMoved, nearestAxis, niceScale, onHalfRing, prepare as corePrepare, segmentAt, segmentsOf, shareOf, sparseLabels, summarize as coreSummarize, summarizeCompare as coreSummarizeCompare, summarizeGauge as coreSummarizeGauge, summarizeGoals as coreSummarizeGoals, summarizeSegments as coreSummarizeSegments, tipRows as coreTipRows, totalOf, valueDomain, valueParts as coreValueParts, withAlpha, withoutSign, type CompareWords, type FormatSpec, type FormatWords, type GaugeWords, type GoalWords, type SegmentWords, type SummaryWords } from "@antfabric/ui-core/chart";
+import { barLayout, barScale, bySign, chartTable, clampScore, easeFn, cellText as coreCellText, fitLabel, fmt as coreFmt, gaugeState, labelWidth, lineScale, goalsOf, lttb, meterReading as coreMeterReading, meterShown, meterTone, moved as coreMoved, nearestAxis, niceScale, onHalfRing, pickState, prepare as corePrepare, rowIds, segmentAt, segmentsOf, shareOf, sortRows, sparseLabels, summarize as coreSummarize, summarizeCompare as coreSummarizeCompare, summarizeGauge as coreSummarizeGauge, summarizeGoals as coreSummarizeGoals, summarizeSegments as coreSummarizeSegments, tipRows as coreTipRows, toggleRow, totalOf, valueDomain, valueParts as coreValueParts, whenOf, withAlpha, withoutSign, type CompareWords, type FormatSpec, type FormatWords, type GaugeWords, type GoalWords, type SegmentWords, type SummaryWords } from "@antfabric/ui-core/chart";
 import { contrast, lightnessChroma, separation } from "../src/lib/palette";
 import { rowCount } from "../src/lib/token-ref";
 
@@ -570,6 +570,28 @@ function checkChart() {
     ["missing", ["integer", null], "–"],
     ["undefined", ["integer", undefined], "–"],
     ["NaN", ["compact", NaN], "–"],
+    // The review's inputs (reports/audit/2026-11-23-component-review.md, batch 5).
+    ["date, an ISO date-only string (H8)", ["date", "2026-05-01"], "May 1, 2026"],
+    ["month, an ISO date-only string (H8)", ["month", "2026-05-01"], "May"],
+    ["day, an ISO date-only string (H8)", ["day", "2026-03-01"], "Mar 1"],
+    ["date, a full ISO date-time is its instant", [{ type: "date", timeZone: "UTC" }, "2026-03-15T12:00:00Z"], "Mar 15, 2026"],
+    ["date, text that is not a date (H8)", ["date", "soon"], "–"],
+    ["date, an invalid Date", ["date", new Date(Number.NaN)], "–"],
+    ["date, a timestamp past what a Date holds", ["date", Infinity], "–"],
+    ["no spec, an invalid Date", [undefined, new Date(Number.NaN)], "–"],
+    ["currency keeps whole units by default (M44)", ["currency", 19.99], "$20"],
+    ["currency, digits 2 prints cents (M44)", [{ type: "currency", digits: 2 }, 19.99], "$19.99"],
+    ["currency, digits leave compact alone (M44)", [{ type: "currency", compact: true, digits: 2 }, 12400], "$12.4K"],
+    ["points, a loss that rounds to nothing (L64)", ["points", -0.0001], "0.0 pts"],
+    ["points, a gain that rounds to nothing (L64)", ["points", 0.0001], "0.0 pts"],
+    ["points, numeric text", ["points", "0.032"], "+3.2 pts"],
+    ["duration, negative (L64)", ["duration", -150], "-2m 30s"],
+    ["duration, negative under a second is zero (L64)", ["duration", -0.4], "0m 00s"],
+    ["integer, text that is not a number (L64)", ["integer", "abc"], "–"],
+    ["percent, text that is not a number (L64)", ["percent", "abc"], "–"],
+    ["duration, text that is not a number (L64)", ["duration", "abc"], "–"],
+    ["integer, empty text", ["integer", ""], "–"],
+    ["integer, numeric text", ["integer", "1234.6"], "1,235"],
   ];
   for (const [what, args, want] of fmts) same(`fmt ${what}`, fmt(...args), want);
   // The words a format writes are the caller's: another language's set changes the dash, the points and the duration, and nothing else.
@@ -579,6 +601,28 @@ function checkChart() {
   same("fmt, a duration in other words", coreFmt("duration", 125, other), "2 min 05 s");
   same("fmt, other words leave numbers and dates alone", [coreFmt("integer", 1234.6, other), coreFmt({ type: "month", timeZone: "UTC" }, new Date(utc), other)], ["1,235", "Mar"]);
   same("cellText, a blank is the words' dash", [coreCellText({ key: "n", label: "N" }, null, other), coreCellText({ key: "n", label: "N", cell: "number", format: "duration" }, 61, other)], ["n/d", "1 min 01 s"]);
+  // A date-only string is a calendar day: its own day in every zone (and so on the server and the client alike), while a full date-time is an
+  // instant and the zone decides its day (H9). The zones are passed in, so the result does not hang on the zone this check runs in.
+  for (const timeZone of ["UTC", "America/Los_Angeles", "Asia/Tokyo", "Pacific/Kiritimati", "Pacific/Pago_Pago"]) {
+    same(`fmt, a date-only string is its own day in ${timeZone} (H9)`, [fmt({ type: "date", timeZone }, "2026-03-01"), fmt({ type: "day", timeZone }, "2026-12-31"), fmt({ type: "month", timeZone }, "2026-01-01")], ["Mar 1, 2026", "Dec 31", "Jan"]);
+    same(`cellText, a date-only string is its own day in ${timeZone} (H9)`, coreCellText({ key: "d", label: "D", cell: "date", format: { type: "date", timeZone } }, "2026-03-01", EN_WORDS), "Mar 1, 2026");
+  }
+  same("cellText, a date-only string in the viewer's own zone (H9)", coreCellText({ key: "d", label: "D", cell: "date" }, "2026-03-01", EN_WORDS), "Mar 1, 2026");
+  same("fmt, a date-time keeps its zone", [fmt({ type: "date", timeZone: "America/Los_Angeles" }, "2026-03-01T03:00:00Z"), fmt({ type: "date", timeZone: "Asia/Tokyo" }, "2026-03-01T03:00:00Z")], ["Feb 28, 2026", "Mar 1, 2026"]);
+  same("cellText, a date function is handed the timestamp", coreCellText({ key: "d", label: "D", cell: "date", format: (v: number) => String(v) }, "2026-03-01", EN_WORDS), String(Date.UTC(2026, 2, 1)));
+  same("cellText, text that is not a date (H8)", coreCellText({ key: "d", label: "D", cell: "date" }, "soon", EN_WORDS), "–");
+  same("whenOf", [whenOf("2026-03-01"), whenOf("soon"), whenOf(new Date(Number.NaN)), whenOf(utc)], [Date.UTC(2026, 2, 1), undefined, undefined, utc]);
+  // Sorting by a date: what is not a date goes last whichever way, in the order it came (L65).
+  const dated = [{ i: 0, d: "2026-03-01" }, { i: 1, d: "not a date" }, { i: 2, d: new Date(Number.NaN) }, { i: 3, d: "2026-01-01" }, { i: 4, d: new Date(Date.UTC(2026, 1, 1)) }];
+  const dateColumn = [{ key: "d", label: "D", cell: "date" as const }];
+  same("sortRows, invalid dates last, ascending (L65)", sortRows(dated, dateColumn, { column: "d", direction: "asc" }).map((r) => r.i), [3, 4, 0, 1, 2]);
+  same("sortRows, invalid dates last, descending (L65)", sortRows(dated, dateColumn, { column: "d", direction: "desc" }).map((r) => r.i), [0, 4, 3, 1, 2]);
+  // A row's id: its rowKey field, or its index in the rows as they came, so one box ticks one row (M51).
+  const keyless = [{ a: "x" }, { a: "y" }, { a: "z" }];
+  same("rowIds, rows without the field are their index (M51)", rowIds(keyless, keyless, "key"), ["0", "1", "2"]);
+  same("rowIds, the index is the row's own, sorted or paged (M51)", rowIds([keyless[2]!, keyless[0]!], keyless, "key"), ["2", "0"]);
+  same("rowIds, the field when it is there", rowIds([{ key: "acc-1" }, { key: 7 }], [{ key: "acc-1" }, { key: 7 }], "key"), ["acc-1", "7"]);
+  same("rowIds, ticking one keyless row ticks one (M51)", pickState(rowIds(keyless, keyless, "key"), toggleRow(rowIds(keyless, keyless, "key")[1]!, [])), { all: false, some: true });
   same("withoutSign on a name", withoutSign("percent"), { type: "percent", sign: false });
   same("withoutSign keeps options", withoutSign({ type: "percent", digits: 0, sign: true }), { type: "percent", digits: 0, sign: false });
   same("withoutSign leaves a function", typeof withoutSign((v: number) => String(v)), "function");
@@ -612,12 +656,32 @@ function checkChart() {
     ["a single negative value stays below zero", [[-0.5, -0.5]], [-1.5, -1, -0.5, 0]],
     ["padding stops at zero", [[3, 100], { pad: 0.1 }], [0, 50, 100, 150]],
     ["padding stops at zero, below", [[-100, -3], { pad: 0.1 }], [-150, -100, -50, 0]],
+    // The review's inputs (M41): a small range at a large magnitude steps no finer than 12 significant digits tell apart.
+    ["near 1e16, a range of 10 (M41)", [[1e16, 1e16 + 10]], [1e16, 1e16 + 1e6]],
+    ["near 1e12, a range of 3 (M41)", [[1e12, 1e12 + 3]], [1e12, 1e12 + 100]],
+    ["a side that is NaN takes the other's (M41)", [[Number.NaN, 1]], [0, 0.5, 1, 1.5, 2]],
+    ["a side that is Infinity takes the other's (M41)", [[0, Infinity]], [0, 0.25, 0.5, 0.75, 1]],
+    ["neither side a number (M41)", [[Number.NaN, Number.NaN]], [0, 0.25, 0.5, 0.75, 1]],
+    ["a reversed domain", [[97, 0]], [0, 25, 50, 75, 100]],
+    ["count 0 is 4 (M41)", [[0, 97], { count: 0 }], [0, 25, 50, 75, 100]],
+    ["a negative count is 4 (M41)", [[0, 97], { count: -2 }], [0, 25, 50, 75, 100]],
+    ["a count that is NaN is 4 (M41)", [[0, 97], { count: Number.NaN }], [0, 25, 50, 75, 100]],
   ];
   for (const [what, args, want] of ticks) {
     const got = niceScale(...args);
     same(`niceScale ${what}`, got.ticks, want);
     same(`niceScale ${what}: min, max and step agree`, [got.min, got.max, +(got.ticks[1]! - got.ticks[0]!).toPrecision(12)], [want[0], want[want.length - 1], got.step]);
   }
+  // Whatever the domain, the ticks are finite, distinct, rising, cover what is a number of it, and are a short list, made quickly (M41).
+  const hard: [number, number][] = [[1e16, 1e16 + 1], [1e16, 1e16 + 10], [-1e16 - 10, -1e16], [9.99999999999e15, 9.99999999999e15 + 3e4], [1e12, 1e12 + 3], [1e-12, 1e-12 + 1e-20], [Number.NaN, 1], [0, Infinity], [-Infinity, Infinity], [3, 3]];
+  for (const domain of hard)
+    for (const count of [4, 1, 0, 1e9]) {
+      const began = performance.now();
+      const { ticks: tk } = niceScale(domain, { count });
+      const took = performance.now() - began;
+      const finite = domain.filter(Number.isFinite);
+      same(`niceScale [${domain}] count ${count}: finite, distinct, rising, covering, short and quick`, [tk.every(Number.isFinite), tk.every((v, k) => k === 0 || v > tk[k - 1]!), tk.length >= 2 && tk.length <= 1002, finite.every((v) => v >= tk[0]! && v <= tk[tk.length - 1]!), took < 50], [true, true, true, true, true]);
+    }
 
   // The sentence a screen reader hears. Core works out what there is to say; the words are the chart's, so these tests give it the English the dictionary has, read as a kit reads it.
   const wordsOf = <W,>(id: Parameters<typeof stringsFor>[0], keys: Record<string, string>): W => {
@@ -639,12 +703,23 @@ function checkChart() {
   same("summarize, two series", summarize({ label: "Chart", keys: ["A", "B"], fields: ["x", "y"], labels: { y: "Why" }, format: "integer", data: [{ x: 1, y: 5 }, { x: 4, y: 2 }] }, seriesWords), "Chart: x: highest B (4), lowest A (1); Why: highest A (5), lowest B (2).");
   same("summarize, no rows", summarize({ ...mrr, data: [] }, seriesWords), "Revenue: no data.");
   same("summarize, no values", summarize({ ...mrr, data: [{ v: null }] }, seriesWords), "Revenue: MRR: no values.");
+  // The review's inputs (M47): from 0 the direction is the sign; NaN and text that is not a number are gaps; numeric text is its number.
+  same("summarize, 0 to a loss fell (M47)", summarize({ ...mrr, ordered: true, data: [{ v: 0 }, { v: -2 }, { v: -5 }] }, seriesWords), "Revenue, Jan to Mar: MRR fell from $0 to -$5, highest in Jan.");
+  same("summarize, 0 to a gain rose (M47)", summarize({ ...mrr, ordered: true, data: [{ v: 0 }, { v: 2 }, { v: 5 }] }, seriesWords), "Revenue, Jan to Mar: MRR rose from $0 to $5, highest in Mar.");
+  same("summarize, NaN is a gap (M47)", summarize({ ...mrr, ordered: true, data: [{ v: 100 }, { v: Number.NaN }, { v: 120 }] }, seriesWords), "Revenue, Jan to Mar: MRR rose from $100 to $120.");
+  same("summarize, numeric text is its number (M47)", summarize({ ...mrr, ordered: true, data: [{ v: "100" }, { v: "140" }, { v: "120" }] }, seriesWords), "Revenue, Jan to Mar: MRR rose from $100 to $120, highest in Feb.");
+  same("summarize, text that is not a number is a gap (M47)", summarize({ label: "Tickets", keys: ["Mon", "Tue", "Wed"], fields: ["n"], labels: { n: "Open" }, format: "integer", data: [{ n: "n/a" }, { n: 12 }, { n: "3" }] }, seriesWords), "Tickets: Open: highest Tue (12), lowest Wed (3).");
+  same("summarize, only NaN has no values (M47)", summarize({ ...mrr, data: [{ v: Number.NaN }] }, seriesWords), "Revenue: MRR: no values.");
 
   // A chart's rows as a table, a tooltip's rows, and rows as the libraries take them.
   const t = chartTable({ data: [{ month: "Jan", mrr: 1, cost: 2 }], x: "month", y: ["mrr", "cost"], labels: { mrr: "MRR" }, format: "integer" });
   same("chartTable columns", t.columns.map((c) => [c.key, c.label, c.cell, c.priority, c.align ?? null]), [["month", "Month", "text", 1, null], ["mrr", "MRR", "number", 2, "end"], ["cost", "cost", "number", 3, "end"]]);
   same("chartTable rows", t.rows, [{ month: "Jan", mrr: 1, cost: 2, key: "row-0" }]);
   same("chartTable, one field", chartTable({ data: [], x: "day", y: "n", xLabel: "Date" }).columns.map((c) => c.label), ["Date", "n"]);
+  same("chartTable names its rows by the Table's default", t.rowKey, "key");
+  const keyed = chartTable({ data: [{ key: "Jan", n: 1 }, { key: "Jan", n: 2 }], x: "key", y: "n" });
+  same("chartTable keeps a data field named key (L61)", [keyed.rowKey, keyed.rows], ["_key", [{ key: "Jan", n: 1, _key: "row-0" }, { key: "Jan", n: 2, _key: "row-1" }]]);
+  same("chartTable, and one named _key too (L61)", chartTable({ data: [{ key: 1, _key: 2 }], x: "key", y: "_key" }).rowKey, "__key");
   const colorOf = (f: string) => ({ a: "#a", b: "#b" })[f as "a" | "b"];
   same("tipRows", tipRows({ __x: "Jan", a: 1200, b: -300 }, { fields: ["a", "b"], labels: { a: "Alpha" }, colorOf, format: "compact" }), { title: "Jan", rows: [{ key: "a", label: "Alpha", value: "1.2K", color: "#a" }, { key: "b", label: "b", value: "-300", color: "#b" }], total: null });
   same("tipRows, stacked total", tipRows({ __x: "Jan", a: 1200, b: 300 }, { fields: ["a", "b"], labels: {}, colorOf, format: "compact", stacked: true }).total, "1.5K");
@@ -787,6 +862,20 @@ function checkChart() {
   same("summarizeGauge", summarizeGauge({ label: "Resolved by Fabric", value: 0.583, max: 1, target: 0.6, caption: "of resolved tickets", format: "percent" }, gaugeWords), "Resolved by Fabric: 58.3% of resolved tickets, target 60%.");
   same("summarizeGauge, over", summarizeGauge({ label: "G", value: 1.12, max: 1, format: "percent" }, gaugeWords), "G: 112%, over the 100% it is measured against.");
   same("summarizeGauge, no value", summarizeGauge({ label: "G", value: Number.NaN, max: 1 }, gaugeWords), "G: no value.");
+  // A percent format prints a share of max, as Meter does (M43).
+  same("meterShown", [meterShown(58, 100, "percent"), meterShown(58, 100, { type: "percent", digits: 0 }), meterShown(42, 50, "integer"), meterShown(42, 50, undefined)], [0.58, 0.58, 42, 42]);
+  same("summarizeGauge, a percent of a max of 100 (M43)", summarizeGauge({ label: "G", value: 58, max: 100, target: 70, format: "percent" }, gaugeWords), "G: 58%, target 70%.");
+  same("summarizeGauge, over a max of 100 (M43)", summarizeGauge({ label: "G", value: 112, max: 100, format: "percent" }, gaugeWords), "G: 112%, over the 100% it is measured against.");
+  same("summarizeGauge, another format prints the value", summarizeGauge({ label: "Seats", value: 42, max: 50, format: "integer" }, gaugeWords), "Seats: 42.");
+  same("summarizeGauge, no format prints the value", summarizeGauge({ label: "G", value: 58, max: 100 }, gaugeWords), "G: 58.");
+  // The gauge and a score meter drawn by both kits: the gauge says 58% of 100 (M43); a meter with no value has no state icon (L60).
+  for (const [platform, os] of [["web", "browser"], ["mobile", "ios"]] as const) {
+    const drawn = (id: string, props: Record<string, unknown>) => renderToString(createElement(Stage, { platform, os, scheme: "light", theme: antfabric, children: createElement(Thing, { id, platform, props }) }));
+    const gauge = drawn("gauge-chart", { value: 58, max: 100, target: 70, title: "Resolved", format: "percent" });
+    same(`gauge-chart on ${platform} prints the share of max (M43)`, [gauge.includes("5,800"), gauge.includes("10,000"), gauge.includes("58"), gauge.includes("100%")], [false, false, true, true]);
+    const icons = (value: number) => (drawn("meter", { value, kind: "score", showState: true, label: "Goal" }).match(/<svg/g) ?? []).length;
+    same(`meter on ${platform}: a low score has its icon, no value has none (L60)`, [icons(0.1) > icons(Number.NaN), icons(Number.NaN), icons(0.9)], [true, 0, 0]);
+  }
   const week = [{ day: "Mon", a: 3, b: 2 }, { day: "Tue", a: 5, b: 4 }];
   const weeks: { label: string; keys: string[]; fields: [string, string]; labels: Record<string, string>; format: "integer" } = { label: "Tickets", keys: ["Mon", "Tue"], fields: ["a", "b"], labels: { a: "This week", b: "Last week" }, format: "integer" };
   same("summarizeCompare", summarizeCompare({ ...weeks, data: week }, compareWords), "Tickets: This week 8 against Last week 6, up 33.3%. This week: highest Tue (5), lowest Mon (3); Last week: highest Tue (4), lowest Mon (2).");

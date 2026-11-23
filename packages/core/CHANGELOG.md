@@ -14,6 +14,13 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 5: data core
 
+- `fmt`: the `date`, `month` and `day` formats take an ISO string as well as a Date or a timestamp, and print `unavailable` for anything that is not a date instead of throwing `Invalid time value`. A date-only string (`"2026-03-01"`) is a calendar day: it prints as that day in every zone, so a Table cell no longer shows Feb 28 west of UTC and the server and the browser agree; a full date-time is still the instant it names, in `timeZone` or the viewer's zone. `whenOf` now lives in `format.ts` (still exported from `@antfabric/ui-core/chart`) and returns `undefined` for an invalid Date, so a Table sorts it last.
+- `fmt`: `currency` honours `digits` (`{ type: "currency", digits: 2 }` prints `$19.99`); the default stays whole units. `points` takes its sign from the rounded number (no `-0.0 pts`), a negative `duration` is signed once (`-2m 30s`), and text a number format cannot read (`"abc"`, `""`) prints `unavailable` instead of `NaN`.
+- `niceScale`: a small range at a large magnitude (near 1e12 to 1e16) no longer loops forever or repeats ticks: the step is never finer than the 12 significant digits a tick is rounded to. A side that is `NaN` or infinite takes the other's value, a reversed domain is turned round, and a `count` that is not above zero is 4 (at most 1,000).
+- `summarize`: numeric text (`"120"`) counts as its number, `NaN` and other text are gaps, and a series from 0 says the direction it went (0 to -5 "fell", not "rose").
+- `summarizeGauge` with a percent format prints each value as its share of `max` (58 of 100 is 58%), through the new `meterShown(value, max, format)` that `meterReading` also uses.
+- `chartTable` keeps a data field named `key`: it returns `rowKey`, the field the rows are named by (`key`, or `_key` when the data has a `key`), to pass to the Table. New `rowIds(shown, rows, rowKey)`: a row without the field is named by its index in `rows`.
+
 ### Batch 6: the app drives the state
 
 ### Batch 7: announcements

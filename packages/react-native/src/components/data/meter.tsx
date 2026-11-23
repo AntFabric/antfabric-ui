@@ -62,7 +62,8 @@ export function Meter({ value, max = 1, label, kind = "usage", format = "percent
   const track = partStyle(r, "track", { view: compact && { width: t.kpi.meterCompactW, flexShrink: 0 } });
   const bar = partStyle(r, "fill", { view: [{ width: `${Math.min(1, Math.max(0, share)) * 100}%` }, fill !== null && { backgroundColor: fill }] });
   const said = tone === "warning" ? str("stateWarning", { value: shown }) : tone === "danger" ? str("stateDanger", { value: shown }) : shown;
-  const mark = showState && tone !== "ok" ? <Icon name={tone === "danger" ? "circle-alert" : "triangle-alert"} size={t.icon.sizeMd} color={fill ?? t.fg.body} style={s.mark} /> : null;
+  // No value has no state to mark (an empty score would read as critical).
+  const mark = showState && known && tone !== "ok" ? <Icon name={tone === "danger" ? "circle-alert" : "triangle-alert"} size={t.icon.sizeMd} color={fill ?? t.fg.body} style={s.mark} /> : null;
   const readout = <Text testID={partId(testID, "meter", "value")} maxFontSizeMultiplier={fontScale.chrome} style={[value$.view, value$.text]}>{shown}</Text>;
   const valueText = mark ? <View style={s.valueRow}>{mark}{readout}</View> : readout;
   return (

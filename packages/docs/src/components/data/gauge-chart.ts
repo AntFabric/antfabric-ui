@@ -38,7 +38,7 @@ const docs: ComponentDocs = {
       type: "object",
       description: "The shares of `max` where the fill turns to the caution colour and then the loss colour: { warning: 0.5, danger: 0.4 }. Default Meter's for the kind: usage 0.75 and 0.9, a score 0.6 and 0.4.",
     },
-    format: { ...format, default: "percent", description: "A format name, its options or a function: what core's `fmt` takes. The value, the target, the two ends, the summary and \"View as table\" all print through it, so they agree." },
+    format: { ...format, default: "percent", description: "A format name, its options or a function: what core's `fmt` takes. The value, the target, the two ends, the summary and \"View as table\" all print through it, so they agree. A percent format prints each as its share of `max`, as Meter does: 58 of 100 is 58%." },
     size: { type: "number", description: "The half ring's width, in px (points on the phone); its height is half. Default 280 on the web and desktop, 220 on the phone: `chart.gaugeW`." },
     empty: { ...empty, default: "No value yet", description: "The title of the empty state when the value is not a number." },
     emptyLine: { ...emptyLine, default: "It shows once there is a number to measure.", description: "One sentence under it: what to do about it." },

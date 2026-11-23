@@ -14,6 +14,11 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 5: data core
 
+- Charts, Table and KPIs: the core format fixes (`@antfabric/ui-core`'s Batch 5) reach every value they print. A chart whose `x` is an ISO date string no longer crashes, a `date` cell holding `"2026-03-01"` shows Mar 1 in every zone, `{ type: "currency", digits: 2 }` prints cents, and a cell whose text is not a number shows the dash instead of `NaN`.
+- GaugeChart: with the default `percent` format, the value, the target, the two ends, the summary and "View as table" print as a share of `max`, as Meter does: `value={58} max={100}` is 58%, not 5,800%. A gauge with `max` 1 (the docs' examples) draws as before.
+- Table: a row without its `rowKey` field is named by its index in `rows`, so ticking one such card ticks that row only (they all had the id `"undefined"`). "View as table" passes `chartTable`'s `rowKey`, so a chart's data field named `key` is shown as it is.
+- Meter: a `score` meter with no value no longer shows the critical icon with `showState`.
+
 ### Batch 6: the app drives the state
 
 ### Batch 7: announcements

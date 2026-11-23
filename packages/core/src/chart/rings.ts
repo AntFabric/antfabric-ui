@@ -5,7 +5,7 @@
  */
 
 import { fmt, type FormatSpec, type FormatWords } from "./format";
-import { meterTone, type MeterKind, type MeterThresholds } from "./meter";
+import { meterShown, meterTone, type MeterKind, type MeterThresholds } from "./meter";
 import type { Row } from "./types";
 
 /** The most segments a donut gives a colour of the palette to: the palette has eight, and a ninth would wrap onto the first. Rows after the eighth fold into one more, which the kit names. */
@@ -139,10 +139,11 @@ export interface GaugeWords {
   summary(v: { label: string; value: string; caption: string; over: string; target: string }): string;
 }
 
-/** A gauge's sentence, in the chart's words: the value in its format, what it is of, whether it is past the capacity, and the target. */
+/** A gauge's sentence, in the chart's words: the value in its format (a percent format prints its share of `max`), what it is of, whether it is past the capacity, and the target. */
 export function summarizeGauge({ label, value, max, target, caption, format, formatWords, locale }: { label: string; value: number; max: number; target?: number; caption?: string; format?: FormatSpec; formatWords: FormatWords; locale?: string }, words: GaugeWords): string {
   if (!(Number.isFinite(value) && Number.isFinite(max) && max > 0)) return words.noValue({ title: label });
-  const f = (v: number) => fmt(format, v, formatWords, locale);
+  // Meter's reading: a percent format says the share of `max` (58 of 100 is 58%), any other the value.
+  const f = (v: number) => fmt(format, meterShown(v, max, format), formatWords, locale);
   return words.summary({
     label,
     value: f(value),
