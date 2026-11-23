@@ -95,6 +95,15 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 12: per-component fixes
 
+- Display, notifications and shell:
+  - Avatar is named "{name}, AI agent" when it wears the agent sparkle; SidebarItem's row name adds its face's agent or presence (M36).
+  - SidebarSection: + is drawn only with `onAdd`; the header takes a long press only with `onMenu`, and the rows only with `onItemLongPress` (L37).
+  - TabBar: the floating action draws its `badge` on its corner and reads it with its name, and `disabled` dims it and takes no press (L38). OsNotification's actions honour `disabled`.
+  - AvatarStack: +N is everyone the faces do not show (2 faces of 10 read +8, was +7) (L40).
+  - NotificationSchedule: the Custom picker's Pause is disabled until both fields hold something (L41).
+  - WorkspaceSwitcher: a row's activity dot is read in its name, "new messages" (L44).
+  - InAppBanner: the open button's name says the title and conversation, the time, the lead and body and the queue, then "Open"; with no body it is no longer "Title: . Open" (L47).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:

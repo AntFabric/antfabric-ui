@@ -58,6 +58,9 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 12: per-component fixes
 
+- Strings: `avatar.labelAgent`; `sidebar-item` `agent` and the presence words; `nav-rail` `profileWithPresence` and the presence words; `workspace-switcher.newMessages` is read by both kits now. `in-app-banner` `open` and `openIn` give way to `titleIn`, `withBody`, `leadBody` and `toOpen` (with the common `withDetail`): a product that overrode `open` or `openIn` moves its text to these.
+- Recipes: `tab-bar` `action` and `os-notification` `action` gain a `disabled` state (`opacity.disabled`).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:

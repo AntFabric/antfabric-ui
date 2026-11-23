@@ -1139,6 +1139,7 @@
           "Inside a menu Up, Down, Home, End and typing a letter move between entries, Left and Right go to the neighbouring menu, and Escape closes the menu and returns focus to the entry that opened it. The Windows ☰ panel and GNOME popover use the same keys; Right opens an entry's flyout, Left or Escape closes it.",
           "The web ⋯ menu is a picture of an open menu (the app owns opening it), so it has no Escape of its own. Its entries take Up, Down, Home, End and typing; the Theme row is a radiogroup that is one stop in that order: Left, Right, Up and Down inside it move between Light, Dark and System and check the option they reach, and Tab leaves it.",
           "Disabled items stay in the menu and are announced as dimmed — a command that vanishes is harder to find again than one that is greyed.",
+          "An entry with `checked` (true or false) is a toggle: a menuitemcheckbox with aria-checked, so its tick is read as checked or not checked, not only seen. Up, Down, Home, End and typing reach it like any entry.",
           "Every entry draws a focus ring. A long menu scrolls inside the window (80% of its height) instead of running off it."
         ]
       },
@@ -1301,6 +1302,11 @@
           "title": "Zoom at its limits",
           "platforms": ["desktop"],
           "handling": "At 200% Zoom In is greyed, at 50% Zoom Out is greyed, and Actual Size is greyed at 100%. Today the items stay enabled and the step pins at the end stop, which reads as a broken shortcut; the spec greys them so the menu says why nothing happened."
+        },
+        {
+          "title": "A toggle entry",
+          "platforms": ["desktop"],
+          "handling": "View › Show Sidebar and Show Status Bar are toggles: an entry with `checked` draws its tick when true and keeps the tick's room when false, so the labels line up, and a screen reader hears it as checked or not checked (menuitemcheckbox). Choosing it reports the entry; the app flips `checked` in its next `menus`."
         },
         {
           "title": "Clicked and pressed: still once",
@@ -2534,7 +2540,7 @@
         "presence": { "type": "enum", "default": "none", "options": ["none", "active", "away", "dnd", "offline"] },
         "agent": {
           "type": "boolean",
-          "description": "Marks an AI agent: a sparkle badge, so a person never mistakes an agent's message for a colleague's.",
+          "description": "Marks an AI agent: a sparkle badge, so a person never mistakes an agent's message for a colleague's. Its accessible name says it too: 'Fabric, AI agent'.",
           "default": false
         },
         "decorative": {
@@ -2623,7 +2629,8 @@
         "notes": [
           "Initials are hidden from screen readers — the name is the label.",
           "`decorative` removes the role and the name and hides the face from assistive tech (aria-hidden on web; hidden from VoiceOver and TalkBack on the phone): use it beside a visible name.",
-          "Presence is announced in words, never by colour alone; dnd and away also differ in shape on the presence picker."
+          "Presence is announced in words, never by colour alone; dnd and away also differ in shape on the presence picker.",
+          "The agent sparkle is announced too: an agent's avatar is named '{name}, AI agent' (the `labelAgent` string), so a screen reader never takes an agent for a colleague. The sparkle takes the presence dot's place, so its presence is not read."
         ]
       },
       "examples": [
@@ -2839,6 +2846,11 @@
         }
       ],
       "edgeCases": [
+        {
+          "title": "A preview shorter than max",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "When the server sends fewer faces than `max` (two of a ten-person channel), the stack draws the two and +8: +N counts everyone the faces do not show, `total` minus the faces drawn."
+        },
         {
           "title": "Photos side by side",
           "platforms": ["web", "desktop", "mobile"],
@@ -5464,7 +5476,7 @@
         {
           "title": "Buttons inside a clickable card",
           "platforms": ["web", "desktop", "mobile"],
-          "handling": "The nested control wins: on web and desktop it sits above the stretched press target (position: relative) and stops propagation; on mobile the inner Pressable claims the responder, so the card does not open. Never put a card's only primary action inside it AND on the card itself."
+          "handling": "The nested control wins: on web and desktop the stretched press target is drawn under the card's content, so a nested button, a plain link or a field takes its own press, and a press inside one never opens the card; on mobile the inner Pressable claims the responder, so the card does not open. Text in an interactive card can be selected: a press that ends a selection does not open it. Never put a card's only primary action inside it AND on the card itself."
         },
         {
           "title": "Keyboard and screen reader",
@@ -5495,10 +5507,10 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A <div> with a stretched <button> under the content as its one press target (nested controls sit above it); hover from useInteraction fills it, keyboard focus rings the whole card; inline styles over `t`",
+          "base": "A <div> with a stretched <button> under the content as its one press target (the content, nested controls and text, sits above it); hover from useInteraction fills it, keyboard focus rings the whole card; inline styles over `t`",
           "import": "import { Card } from \"@antfabric/ui-react\"",
           "notes": [
-            "An interactive card is a stretched link: one <a href> (with `href`) or <button> covers the card, and nested controls sit above it with position: relative. A <button> wrapping the whole card would make every nested button invalid HTML.",
+            "An interactive card is a stretched link: one <a href> (with `href`) or <button> fills the card, drawn under its content (z-index -1 inside the card, which isolates its own stacking context), so whatever the product nests, a plain <a>, a <button>, a field, stays its own control and the card's text can be selected. A press on the card's padding is the target's; a press on its text opens the card too (through the link with `href`, so ⌘-click still opens a tab), unless it ended a text selection. A <button> wrapping the whole card would make every nested button invalid HTML.",
             "A card that navigates (`href`) is an <a>, so middle-click and ⌘-click open it in a new tab.",
             "With no `label`, the target is named by the card's first heading (aria-labelledby) or, with none, by the card's text; give a `label` when that is not what the card is for."
           ],
@@ -13009,7 +13021,7 @@
         },
         "replying": {
           "type": "boolean",
-          "description": "The inline reply is open. Web and desktop only — on a phone a tap opens the conversation with the composer focused.",
+          "description": "The inline reply is open. Web and desktop only — on a phone a tap opens the conversation with the composer focused. A new notification (another title, context, body or time) starts again from `replying` and `replyText`, as it does from `dismissed`.",
           "default": false,
           "platforms": ["web", "desktop"]
         },
@@ -13200,6 +13212,7 @@
         "role": "status",
         "notes": [
           "A banner that arrives is announced politely as \"Priya Raman. #platform-eng. …\" (through the page's announcer on the web, the screen reader's announcement call on the phone) — never assertive, and it never takes focus. A failed inline reply is announced at once.",
+          "The open button's name says everything the card shows: 'Priya Raman in #platform-eng, 2m: Mentioned you · can you look at the deck?, +2 more waiting. Open'. With no body it is the title, the time and 'Open', never an empty ': .'.",
           "The kit has no auto-dismiss timer: the app owns it and must stop it while the banner has focus or the pointer is on it, and give a screen-reader user longer (WCAG 2.2.1).",
           "Reply moves focus into the field, and Escape in the field closes the reply and keeps the draft without dismissing the banner (Escape elsewhere on the card dismisses it); focus goes back to Reply when the reply closes. These are the web's: the phone has no reply field."
         ]
@@ -13278,6 +13291,16 @@
           "title": "Several arrive at once",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "One banner at a time, each on screen at least 1.5 s before the next replaces it, with \"+2 more waiting\" so nothing is silently skipped. Three or more from one conversation inside 10 s collapse into one: \"3 new messages\" in #platform-eng. A reconnect backlog never replays as banners — it goes to the rail."
+        },
+        {
+          "title": "No preview text",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "An event with nothing to preview (a call, a file with no caption) draws its title and time only, and its open button is named 'Design crit starts in 5 min, now. Open' rather than with an empty body."
+        },
+        {
+          "title": "The next one arrives while you reply",
+          "platforms": ["web", "desktop"],
+          "handling": "The reply and its draft belong to the notification they answer. When the banner moves on to another (a new title, context, body or time), it starts from `replying` and `replyText` again, so a half-typed reply to Marcus never ends up in the box under Aisha's message. The app keeps the draft if it wants to offer it back."
         },
         {
           "title": "You are typing",
@@ -18417,7 +18440,7 @@
         },
         "title": {
           "type": "string",
-          "description": "The wordmark beside the tile while expanded. With no `logo` and no `title`, the lockup is not drawn at the menu level.",
+          "description": "The wordmark beside the tile while expanded. With no `logo` and no `title`, the lockup is not drawn at the menu level; with a `title` and no `logo` it is drawn only while expanded (collapsed, there would be nothing in it).",
           "default": "",
           "sample": "AntFabric"
         },
@@ -18800,6 +18823,7 @@
           "Drill-in: the list is a <nav> named for where it is ('Mode', or 'Channels sections'). The top tile is a button named 'Channels. Back to the main menu', so the destination is announced where the logo was.",
           "Drill-in: opening a destination or going back replaces the pressed row, so focus moves to the row that is now current instead of falling to the page. Escape in a destination's sections goes back.",
           "The workspace chip and the profile button are menu buttons (aria-haspopup=\"menu\"); their aria-expanded follows `workspaceMenuOpen` and `profileMenuOpen`, which the app sets while its menu is open.",
+          "The profile button says the face's presence in words: 'Priya Raman, active, profile and sign out' (`profileWithPresence`); with `presence: \"none\"` it is 'Priya Raman, profile and sign out'.",
           "The destination list scrolls when it does not fit, so the utilities and the profile stay in view. Every row, the utilities and the profile draw a focus ring."
         ]
       },
@@ -18881,6 +18905,11 @@
         }
       ],
       "edgeCases": [
+        {
+          "title": "A wordmark with no logo",
+          "platforms": ["web", "desktop"],
+          "handling": "A product that passes a `title` and no `logo` gets its wordmark while the rail is expanded. Collapsed there is no tile to draw it in, so the lockup is left out rather than drawn as an empty button that Tab would stop on."
+        },
         {
           "title": "Big counts in a 64px column",
           "platforms": ["web", "desktop"],
@@ -19905,6 +19934,11 @@
           "handling": "The Pause button is disabled until the time is later than now (\"Pick a time later than now.\"), and the latest allowed is 7 days ahead; anything longer is turning notifications off, which is the Show Notifications switch."
         },
         {
+          "title": "A field left empty",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "Pause in the Custom… picker is disabled until both the date and the time hold something, so it never pauses 'until , '. (A picker option with its own `until` pauses until that, whatever the fields hold.)"
+        },
+        {
           "title": "Our pause and the OS's Focus",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "Independent, and both apply: macOS/iOS Focus, Windows Do not disturb and Android DND hold what we send; our pause means we do not send. The pill only ever describes ours — we cannot read the OS's Focus state reliably, so we never claim it."
@@ -20044,7 +20078,7 @@
         "lead": { "type": "string", "description": "Words before the body: \"Replied in a thread\".", "default": "" },
         "actions": {
           "type": "array",
-          "description": "The banner's buttons, at most two: `{ key, label, icon?, reply?, rest? }`. The one with `reply` opens the inline reply and its text comes back with the press (Windows always shows that field). `rest` marks the ones the OS shows before the banner is expanded: Windows always, the browser once expanded; macOS and GNOME show them all when expanded, and iOS lists them in the long-press menu with their `icon`.",
+          "description": "The banner's buttons, at most two: `{ key, label, icon?, reply?, rest?, disabled? }`. `disabled` dims a button and it takes no press; `badge` is not drawn (an OS banner's buttons carry no count). The one with `reply` opens the inline reply and its text comes back with the press (Windows always shows that field); in the browser, which has no inline reply, it reports the press with no text and the app opens the conversation. `rest` marks the ones the OS shows before the banner is expanded: Windows always, the browser once expanded; macOS and GNOME show them all when expanded, and iOS lists them in the long-press menu with their `icon`.",
           "default": [],
           "sample": [
             { "key": "reply", "label": "Reply", "icon": "reply", "reply": true },
@@ -20358,7 +20392,7 @@
             }
           },
           "action": {
-            "states": { "focus": { "shadow": "$shadow.focus" } },
+            "states": { "focus": { "shadow": "$shadow.focus" }, "disabled": { "opacity": "$opacity.disabled" } },
             "platforms": {
               "mac": {
                 "base": {
@@ -20766,6 +20800,11 @@
         }
       ],
       "edgeCases": [
+        {
+          "title": "Reply in a browser",
+          "platforms": ["web"],
+          "handling": "A browser notification has no inline reply. A reply action marked `rest` is still drawn once the banner is expanded, and pressing it reports `onAction(action)` with no text, so the app opens the conversation with the reply box focused, instead of a button that does nothing."
+        },
         {
           "title": "Previews hidden (our setting or the lock screen)",
           "platforms": ["web", "desktop", "mobile"],
@@ -26522,7 +26561,7 @@
         "external": { "type": "boolean", "description": "Shared with another organisation.", "default": false },
         "actionsVisible": {
           "type": "boolean",
-          "description": "The row's ⋮ (Move to…, Mute, Leave), always shown when set. With `onMenu` alone it is there but transparent until the pointer is over the row or keyboard focus is in it; the room for it is reserved, so showing it never reflows the row.",
+          "description": "The row's ⋮ (Move to…, Mute, Leave), always shown when set. With `onMenu` alone it is there but transparent until the pointer is over the row or keyboard focus is in it, and takes no press while transparent (a tap on a touch screen lands on the row); the room for it is reserved, so showing it never reflows the row.",
           "default": false,
           "platforms": ["web", "desktop"]
         },
@@ -26643,6 +26682,7 @@
         "notes": [
           "A button on every platform (there is no href prop): the row reports `onPress` and the app navigates. Middle-click and open-in-new-tab are the app's to add.",
           "The whole row is one accessible name: '#design-crit, 3 mentions, muted, draft'. The glyph and the badge's own number are hidden so nothing is read twice.",
+          "A row with `avatar` says its face in words, after the name: 'Fabric, AI agent' for the sparkle, 'Lena Fischer, away' for the presence dot. Neither is colour or shape alone.",
           "The open conversation has aria-current=\"page\" (selected on the phone); selection is never carried by colour alone. Pressing the open row leaves it open.",
           "Web and desktop: with `onMenu` the row's ⋮ appears while the row has pointer hover or keyboard focus and stays in the tab order; the context menu and Shift+F10 or the Menu key on the row also call `onMenu`.",
           "Phone: `onLongPress` is also an accessibility action, 'Options for #design-crit', so a screen reader, Voice Control or Switch Control user can run it.",
@@ -26812,7 +26852,7 @@
         {
           "title": "Hover-only ⋮ on touch",
           "platforms": ["web", "desktop", "mobile"],
-          "handling": "On a phone the ⋮ does not exist: long-press opens the action sheet and swipe reveals Mark as read and Mute. On a touch laptop (pointer: coarse) the ⋮ is always visible on the open row and the row grows to 40px."
+          "handling": "On a phone the ⋮ does not exist: long-press opens the action sheet and swipe reveals Mark as read and Mute. On a touch screen with the web or desktop kit, a hidden ⋮ takes no press (pointer-events: none until it shows), so a tap at the row's end opens the row rather than an invisible menu; pass `actionsVisible` to keep the ⋮ there for touch. On a touch laptop (pointer: coarse) the ⋮ is always visible on the open row and the row grows to 40px."
         },
         {
           "title": "Text at 130% on a phone",
@@ -26926,7 +26966,7 @@
         },
         "actionsVisible": {
           "type": "boolean",
-          "description": "Draws + and ⋯. On web and desktop the kit reveals them on header hover or focus-within (opacity, so revealing never reflows); on a phone they are always there.",
+          "description": "Draws + (when there is an `onAdd`) and ⋯ (when there is an `onMenu`; the phone has no ⋯, a long press on the header instead). On web and desktop the kit reveals them on header hover or focus-within (opacity, so revealing never reflows); on a phone + is always there. A button with nothing to fire is never drawn.",
           "default": true
         },
         "divided": {
@@ -26958,14 +26998,23 @@
         },
         "onExpandedChange": { "type": "event", "args": "expanded: boolean", "changes": "expanded" },
         "onSelectedChange": { "type": "event", "args": "selected: string", "changes": "selected" },
+        "onItemMenu": {
+          "type": "event",
+          "description": "A row's options were asked for: its ⋮ (drawn on each row while this is given, shown on hover or focus), the context menu on it, or Shift+F10 or the Menu key. Its key; the app opens the row's menu (Mark as read, Mute, Star, Move to…, Leave) from it. The phone's is `onItemLongPress`.",
+          "platforms": ["web", "desktop"],
+          "args": "key: string"
+        },
         "onItemLongPress": {
           "type": "event",
-          "description": "A row was long-pressed: its key. The app opens the row's action sheet (Mark as read, Mute, Star, Move to…, Leave) from it.",
+          "description": "A row was long-pressed: its key. The app opens the row's action sheet (Mark as read, Mute, Star, Move to…, Leave) from it. Left out, a hold is a press and the rows offer no options action. The web's is `onItemMenu`.",
           "platforms": ["mobile"],
           "args": "key: string"
         },
-        "onAdd": { "type": "event" },
-        "onMenu": { "type": "event" }
+        "onAdd": { "type": "event", "description": "+ was pressed. Left out, no + is drawn." },
+        "onMenu": {
+          "type": "event",
+          "description": "The section's options were asked for: ⋯ on web and desktop, a long press on the header (and its accessibility action) on the phone. Left out, no ⋯ is drawn and the header takes no long press."
+        }
       },
       "parts": ["root", "header", "toggle", "chevron", "starIcon", "label", "list", "emptyText"],
       "recipe": {
@@ -27057,7 +27106,8 @@
           "The header toggle carries aria-expanded; collapsed with unread, its name is 'Channels, 12 unread'.",
           "The badge's own number is hidden; the toggle's name already says it.",
           "Phone: `onMenu` (the long press on the header) is also an accessibility action, 'Channels options', and `onItemLongPress` is one on each row.",
-          "The + and ⋯ buttons are revealed while the header has hover or focus-within, by opacity, so they stay in the tab order. The list is a role=list of the rows."
+          "The + and ⋯ buttons are revealed while the header has hover or focus-within, by opacity, so they stay in the tab order. Each is drawn only with its handler (`onAdd`, `onMenu`). The list is a role=list of the rows.",
+          "Web and desktop: with `onItemMenu` each row has the SidebarItem ⋮, its context menu and Shift+F10 or the Menu key, all reporting the row's key, as `onItemLongPress` does on the phone."
         ]
       },
       "states": ["hover", "focus"],
@@ -27222,6 +27272,11 @@
           "title": "A long section name",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "The label truncates; the chevron, the total and the actions never shrink. The full name is the tooltip and the group's accessible name."
+        },
+        {
+          "title": "A row's own menu",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "Each row offers its options the platform's way, reporting the same thing, the row's key: on web and desktop `onItemMenu` (its ⋮ on hover or focus, a right-click, Shift+F10 or the Menu key), on the phone `onItemLongPress` (a long press, and an accessibility action). The app opens one menu from either. Without the handler no row offers options."
         },
         {
           "title": "Reordering",
@@ -28867,7 +28922,7 @@
         },
         "action": {
           "type": "object",
-          "description": "ActionItem: { key, label, icon?, badge?, disabled? }. The floating round button beside the bar; its `label` is its accessible name. Leave it out for none.",
+          "description": "ActionItem: { key, label, icon?, badge?, disabled? }. The floating round button beside the bar; its `label` is its accessible name, with the `badge` count after it ('Fabric, 2 new'). `badge` draws a count on its corner; `disabled` dims it and takes no press. Leave it out for none.",
           "sample": { "key": "fabric", "icon": "sparkles", "label": "Fabric" }
         },
         "onActiveChange": { "type": "event", "args": "active: string", "changes": "active" },
@@ -28960,7 +29015,7 @@
               "bg": "$brand.tint",
               "shadow": "$shadow.float"
             },
-            "states": { "focus": { "shadow": "$shadow.focus" } }
+            "states": { "focus": { "shadow": "$shadow.focus" }, "disabled": { "opacity": "$opacity.disabled" } }
           },
           "actionIcon": { "base": { "fg": "$brand.default" } },
           "safeArea": {
@@ -28993,6 +29048,7 @@
           "gutter.pane",
           "homeIndicator.h",
           "icon.sizeLg",
+          "opacity.disabled",
           "osHeader.androidHomeBarH",
           "osHeader.androidHomeBarW",
           "osHeader.androidNavH",
@@ -29032,6 +29088,11 @@
         { "name": "Android gesture handle", "props": {}, "os": "android" }
       ],
       "edgeCases": [
+        {
+          "title": "The floating action, busy or waiting",
+          "platforms": ["mobile"],
+          "handling": "The action is an ActionItem like any other: a `badge` draws its count on the button's corner and is read with its name ('Fabric, 2 new'); `disabled` dims it, takes no press and is announced as dimmed, for a moment the app cannot start what it opens."
+        },
         {
           "title": "Badge counts",
           "platforms": ["mobile"],
@@ -32737,7 +32798,7 @@
         },
         "searchPlaceholder": {
           "type": "string",
-          "description": "The field's text. Empty uses the `searchPlaceholder` string (\"Search\"); a product says what it searches.",
+          "description": "The field's text, and its accessible name, so what the field shows is what it is called. Empty uses the `searchPlaceholder` string (\"Search\") on the field and the `searchLabel` string as its name; a product says what it searches.",
           "default": ""
         },
         "searchKeys": {
@@ -33069,7 +33130,12 @@
         {
           "title": "Keyboard and screen reader",
           "platforms": ["desktop"],
-          "handling": "Tab order: ☰ (Windows/Linux), Back, Forward, History, Search, Help. Window controls are skipped, as the native ones are. F6 moves between the title bar and the regions below it, so nobody has to tab through the rail to reach search."
+          "handling": "Tab order: ☰ (Windows/Linux), Back, Forward, History, Search, Help. Window controls are skipped, as the native ones are: Windows and GNOME never put the caption buttons in the tab order, and Alt+Space opens the system window menu (Minimise, Maximise, Close) from anywhere in the window, so a keyboard user reaches them there. F6 moves between the title bar and the regions below it, so nobody has to tab through the rail to reach search."
+        },
+        {
+          "title": "A product's own placeholder",
+          "platforms": ["desktop"],
+          "handling": "`searchPlaceholder` is both the words on the field and its accessible name, so a speech user who says what they see reaches it (WCAG 2.5.3). Without it the field shows the `searchPlaceholder` string and is named by the `searchLabel` string."
         },
         {
           "title": "Hidden in the tray, then reopened",
@@ -35071,7 +35137,7 @@
         },
         "searchPlaceholder": {
           "type": "string",
-          "description": "The field's text. Empty uses the `searchPlaceholder` string (\"Search\"); a product says what it searches.",
+          "description": "The field's text, and its accessible name (and the compact magnifier's), so what the field shows is what it is called. Empty uses the `searchPlaceholder` string (\"Search\") on the field and the `searchLabel` string as its name; a product says what it searches.",
           "default": ""
         },
         "searchKeys": {
@@ -35231,7 +35297,17 @@
         {
           "title": "Narrow window (under 768px)",
           "platforms": ["web"],
-          "handling": "Search collapses to its magnifier and 'Open in desktop app' to its icon, each keeping its full name as tooltip and accessible label. Back, Forward and History never collapse. At 320 CSS px (400% zoom on a laptop, WCAG 1.4.10) the bar still fits without horizontal scroll."
+          "handling": "Search collapses to its magnifier and 'Open in desktop app' to its icon, each keeping its full name as tooltip and accessible label, and Recent history leaves the bar. Back and Forward never collapse; `compact` does the same at any width. At 320 CSS px (400% zoom on a laptop, WCAG 1.4.10) the bar still fits without horizontal scroll."
+        },
+        {
+          "title": "A product's own placeholder",
+          "platforms": ["web"],
+          "handling": "`searchPlaceholder` is both the words on the field and its accessible name, and the compact magnifier's, so a speech user who says what they see reaches it (WCAG 2.5.3). Without it the field shows the `searchPlaceholder` string and is named by the `searchLabel` string."
+        },
+        {
+          "title": "Right-to-left",
+          "platforms": ["web"],
+          "handling": "In Arabic or Hebrew the bar mirrors: the sidebar button and history sit at the right, the ⋯ menu at the left, and the search field's text starts at its right edge. Back points right and Forward points left."
         },
         {
           "title": "Several AntFabric tabs open",
@@ -35619,8 +35695,8 @@
           "Each tile's name says everything a sighted person reads off it: 'Northwind Health, 3 mentions, Command 2'.",
           "The current tile has aria-current; the black ring and the left bar are never the only signal.",
           "Signed-out tiles stay focusable and say 'signed out' — choosing one starts sign-in.",
-          "Web: a role=menu named by its 'Workspaces' heading (which sits outside the menu) holding menuitemradio links, the current one checked, and the add row. The menu is one tab stop (the current row); Up, Down, Home, End and typing a letter move between rows. Truncated names and hosts are in each row's tooltip.",
-          "Phone: a sheet (accessibilityViewIsModal) of buttons with the current one selected."
+          "Web: a role=menu named by its 'Workspaces' heading (which sits outside the menu) holding menuitemradio links, the current one checked, and the add row. The menu is one tab stop (the current row, else the first, else the add row when there are no workspaces); Up, Down, Home, End and typing a letter move between rows, and Enter or Space chooses one (Space never scrolls the page). Truncated names and hosts are in each row's tooltip.",
+          "Phone: a sheet (accessibilityViewIsModal) of buttons with the current one selected. A row's name says what its badge or dot shows: 'Lumen Studio, 3 mentions', 'Northwind Health, new messages'."
         ]
       },
       "states": ["hover", "focus"],
@@ -35631,6 +35707,11 @@
         { "name": "Phone sheet", "props": {}, "platforms": ["mobile"] }
       ],
       "edgeCases": [
+        {
+          "title": "No workspaces yet",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "With nothing signed in, only the add tile (desktop), the add row (web) or the add row (phone) is drawn. On the web the add row is then the menu's tab stop, so Tab still enters the menu."
+        },
         {
           "title": "Only one workspace signed in at a time (today)",
           "platforms": ["desktop"],

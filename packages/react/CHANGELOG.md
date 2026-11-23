@@ -99,6 +99,20 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 12: per-component fixes
 
+- Display, notifications and shell:
+  - Card: an interactive card's stretched press target is drawn under its content (z-index -1 in an isolated card), so a plain link, button or field the product nests takes its own press and the card's text can be selected. A press on the text still opens the card (through the link with `href`, so ⌘-click opens a tab), unless it ended a selection (M34).
+  - AppMenuBar: an entry with `checked` true or false is a `menuitemcheckbox` with `aria-checked` (M35). AppMenuBar and TrayMenu no longer throw on a key holding `"` or `\` (L46).
+  - Avatar is named "{name}, AI agent" when it wears the agent sparkle; SidebarItem's row name adds its face's agent or presence; NavRail's profile button adds its presence (M36).
+  - SidebarSection: new `onItemMenu(key)` (web and desktop) gives each row SidebarItem's ⋮, context menu and Shift+F10, as `onItemLongPress` does on the phone (M38). + is drawn only with `onAdd` and ⋯ only with `onMenu` (L37): pass them to keep the buttons.
+  - SidebarItem: a hidden ⋮ takes no press, so a tap on a touch screen lands on the row (L52).
+  - WebTopBar: `compact` removes Recent history at any width, as documented (M32). TitleBar and WebTopBar name the search field by `searchPlaceholder` when one is given (L54), mirror their physical insets in a right-to-left tree and point Back and Forward the other way there (L49). TitleBar's caption buttons stay out of the tab order, as the native ones are; the docs say why (L42).
+  - OsNotification: an action's `disabled` dims it and takes no press (L38); in the browser picture a reply action reports `onAction` with no text instead of opening a reply the browser does not draw (L50).
+  - AvatarStack: +N is everyone the faces do not show (2 faces of 10 read +8, was +7) (L40).
+  - NotificationSchedule: the Custom picker's Pause is disabled until both fields hold something (L41).
+  - WorkspaceSwitcher: with no workspaces the web menu's add row is its tab stop, and Space on a row chooses it instead of scrolling (L43).
+  - NavRail: collapsed with a `title` and no `logo`, no empty lockup button is drawn (L45).
+  - InAppBanner: the open button's name says the title and conversation, the time, the lead and body and the queue, then "Open"; with no body it is no longer "Title: . Open" (L47). `replying` and `replyText` start again from their props when the notification changes, as `dismissed` does.
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:
