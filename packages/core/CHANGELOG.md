@@ -19,6 +19,7 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 - The types resolve under `moduleResolution: node16` and `nodenext`: the `.d.ts` files' relative imports name their `.js` (H11).
 - Each `.js` file ships with its source map (L72).
+- An item's `icon` (`MenuItem`, `NavItem`, `ActionItem`, `IconActionItem`) is an `IconName`: a lucide name or the icon component (new `IconComponent` and `IconName` types), so an app can pass a glyph it has not registered with a kit (H13).
 - Core carries no `"use client"`. Under the `react-server` condition `./dtcg` and `./antfabric` load; the root and `./chart` do not yet (they call `createContext` and import `useState` when they load), so a Next.js layout builds its theme in a `"use client"` file (CONSUMING.md section 3).
 
 ### Batch 5: data core

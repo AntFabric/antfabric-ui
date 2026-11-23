@@ -259,6 +259,22 @@ The cross-cutting renames, one row per rule, with what each touched. [`reports/a
 | 4. Chart fields | `label`, `field`, `trendField`, `selection` | `name`, `y`, `trendY`, `selected`; axis charts read `x` and `y` | Codemod |
 | 5. One name per concept | `cap`, `time`, `kind`, `authorIdentity`, `text`, `reactions` | `max`, `clock`, glyph/icon/avatar, `identity`, `body`, `quickReactions` + `picked`; `IconActionItem` for icon-only bars; `Person`, `Attachment`, `Reaction`; `avatarSrc` with `identity` on things that show someone; every button a component draws fires an event; string variable `{name}` | Mixed, as the tables above say |
 
+## 1.0 → 1.1: icons
+
+1.0 looked every icon name up in all of lucide, so an app's bundle held every lucide icon (a consumer of `Button` alone was 1,205 KB minified). From 1.1 each kit registers only the icons it draws itself, and `Icon` and every icon prop (`icon`, `iconLeading`, `triggerIcon`, an item's `icon`) also take the icon component. Names the kit draws keep working unchanged.
+
+- **A lucide name the kit does not draw** (a channel's `git-branch`, an agent's `rocket`) now draws an empty box, and warns once in development. Register the names your app passes, once, before the first render:
+
+  ```ts
+  import { GitBranch, Rocket } from "lucide-react"; // lucide-react-native on the phone
+  import { registerIcons } from "@antfabric/ui-react"; // @antfabric/ui-react-native on the phone
+  registerIcons({ GitBranch, Rocket }); // keys are export names or kebab-case names
+  ```
+
+  Or pass the component where you used the name: `<Button iconLeading={GitBranch} />`, `{ key: "deploy", label: "Deploy", icon: Rocket }`. An item that must stay serialisable (built from config) keeps its name and the app registers it.
+- **Types.** `IconName` is `string | IconComponent` in both kits (and core's items). Code that reads an item's `icon` as a string narrows it first (`typeof item.icon === "string"`).
+- **Check:** in development the console has no `no icon "…"` warning, and `grep -rn "data-af-missing-icon"` over your rendered HTML (or `missing-icon:` testIDs on the phone) finds nothing.
+
 ## Checks you can run
 
 One per step. Each says what you should see.

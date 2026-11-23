@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { fmt, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
-import { Icon } from "../../lib/icon";
+import { Icon, type IconName } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { box, css, row, text, truncate } from "../../lib/style";
@@ -20,8 +20,8 @@ export type StatTileTrendKind = "line" | "bars";
 export interface StatTileProps extends RootProps<HTMLDivElement> {
   /** What is counted: "Open tickets", "Orders shipped". One line; a long one is cut. */
   label: string;
-  /** A lucide icon name, in a soft chip before the label. Empty draws no chip. */
-  icon?: string;
+  /** A lucide icon name or component, in a soft chip before the label. Empty draws no chip. */
+  icon?: IconName;
   /** A word at the end of the top row: the period the number covers ("24h"), or "Now". */
   aside?: string;
   value: number;

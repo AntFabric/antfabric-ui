@@ -19,6 +19,7 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 - Every published file starts with `"use client"`, as the web kit's do; Metro ignores it (H12).
 - Each `.js` file ships with its source map (L72).
 - CONSUMING.md: charts from `./data` draw their text in Geist on every theme, so an app on `themes.antfabric` that draws them loads the `Geist-*` files beside Figtree (M56); `testID`, `nativeID`, `accessibilityLabel`, `accessibilityHint` and `ref` pass through to a component's root (L71).
+- Icons no longer pull in all of lucide-react-native (H13). The kit registers only the 74 icons it draws, imported one by one. A name the kit does not draw draws an empty box and warns once in development: register it with the new `registerIcons({ GitBranch })`, or pass the component, which `Icon` and every icon prop now take (`IconName` is `string | IconComponent`; `IconComponent` is exported). MIGRATION.md, "1.0 → 1.1: icons".
 
 ### Batch 5: data core
 

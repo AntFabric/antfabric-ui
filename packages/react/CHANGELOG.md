@@ -27,6 +27,7 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 - Every published file starts with `"use client"`, so a React Server Component (the Next.js App Router) can import the kit from any entry (H12).
 - Each `.js` file ships with its source map (L72).
 - CONSUMING.md: `id`, `className`, `ref`, `data-*` and `aria-*` do pass through to a component's root (L71); a strict CSP needs `style-src 'unsafe-inline'`, since the kit draws with inline styles and the root takes no `nonce`.
+- Icons no longer pull in all of lucide (H13). The kit registers only the 88 lucide icons it draws, imported one by one, so `import { Button }` bundles to 398 KB minified (94 KB gzip) instead of 1,205 KB (284 KB gzip). A name the kit does not draw draws an empty box and warns once in development: register it with the new `registerIcons({ GitBranch })`, or pass the component, which `Icon` and every icon prop now take (`IconName` is `string | IconComponent`; `IconComponent` is exported). MIGRATION.md, "1.0 → 1.1: icons".
 
 ### Batch 5: data core
 

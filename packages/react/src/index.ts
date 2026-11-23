@@ -1,6 +1,7 @@
 export * from "./platform";
 export { t } from "./tokens";
-export { Icon, Spinner, type IconName } from "./lib/icon";
+export { Icon, Spinner, type IconComponent, type IconName } from "./lib/icon";
+export { registerIcons } from "./lib/icons";
 export { useInteraction } from "./lib/interaction";
 export type { PartStyles, RecipeId } from "./lib/recipe";
 export { ForceState, useControllable, useDirection, useForcedState, useLocale, useStrings, type Direction } from "@antfabric/ui-core";

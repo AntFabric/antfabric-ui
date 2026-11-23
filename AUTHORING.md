@@ -272,7 +272,13 @@ export const switchRecipe = defineRecipe({
     from `lib/a11y.ts` on the phone (iOS has no live regions).
 - **Composition:** import sibling components from their files (`../actions/button`), never from the
   kit's index.
-- **Icons** are lucide names in kebab case, drawn with the kit's `<Icon name>`.
+- **Icons** are lucide names in kebab case, drawn with the kit's `<Icon name>`; every icon prop is an `IconName`,
+  which also takes the icon component. A name is drawn from the kit's registry, `src/lib/icons.ts`, which imports
+  exactly the lucide icons the kit draws, one by one, so an app's bundle holds those and not all of lucide. A name
+  you add to kit code goes in the registry in the same change (`pnpm check code` fails both ways: a drawn name not
+  registered, a registered name not drawn), spelled out where it is drawn (`tone === "danger" ? "circle-alert" :
+  "info"`, never `` `chevron-${dir}` ``). No other kit file imports lucide. Items carry no functions, except a
+  component icon: an item's `icon` may be one, for an app that has not registered the name.
 - **Shortcuts** are written once (`Mod+Enter`) and drawn with `formatShortcut(keys, os)` from
   `@antfabric/ui-core`.
 - **Entrances** (menus and dialogs pop, sheets slide up, banners drop, toasts rise) play on mount,

@@ -1,19 +1,12 @@
-import * as lucide from "lucide-react";
 import type { ComponentType, CSSProperties } from "react";
-import { pascal } from "@antfabric/ui-core";
+import type { IconName } from "@antfabric/ui-core";
 import { t } from "../tokens";
+import { iconFor } from "./icons";
 
-/** A lucide icon name in kebab case: `"trash-2"`, `"chevron-right"`. */
-export type IconName = string;
+/** A lucide icon name in kebab case (`"trash-2"`, `"chevron-right"`), or the icon component itself (`Trash2` from `lucide-react`). */
+export type { IconComponent, IconName } from "@antfabric/ui-core";
 
-/**
- * Looked up among the package's exports, not its `icons` map: lucide v1 renamed some icons
- * (`trash-2` is now `trash`) and keeps the old names only as alias exports.
- */
-const glyph = (name: string) => {
-  const g = (lucide as unknown as Record<string, unknown>)[pascal(name)];
-  return g && typeof g === "object" && "$$typeof" in g ? (g as ComponentType<{ "aria-hidden"?: boolean; "data-af-part"?: string; style?: CSSProperties }>) : null;
-};
+type Glyph = ComponentType<{ "aria-hidden"?: boolean; "data-af-part"?: string; style?: CSSProperties }>;
 
 export interface IconProps {
   name: IconName;
@@ -28,13 +21,14 @@ export interface IconProps {
 }
 
 /**
- * A lucide icon by name, sized and stroked by the platform's tokens. Names are strings so the props
- * API is the same as the phone kit's, where the same name picks the lucide-react-native icon.
+ * A lucide icon by name or as a component, sized and stroked by the platform's tokens. A name is drawn from the kit's registry (the icons
+ * the kit draws itself, and whatever the app adds with `registerIcons`), so the props API is the same as the phone kit's, where the same
+ * name picks the lucide-react-native icon. A name nobody registered draws an empty box of the icon's size.
  */
 export function Icon({ name, size = t.icon.size, color, strokeWidth = t.icon.stroke, part, style }: IconProps) {
-  const Glyph = glyph(name);
+  const Glyph = (typeof name === "string" ? iconFor(name) : name) as Glyph | null;
   const box: CSSProperties = { width: size, height: size, flexShrink: 0, display: "block", color, strokeWidth, ...style };
-  if (!Glyph) return <span aria-hidden data-af-missing-icon={name} data-af-part={part} style={{ ...box, display: "inline-block" }} />;
+  if (!Glyph) return <span aria-hidden data-af-missing-icon={name as string} data-af-part={part} style={{ ...box, display: "inline-block" }} />;
   return <Glyph aria-hidden data-af-part={part} style={box} />;
 }
 
