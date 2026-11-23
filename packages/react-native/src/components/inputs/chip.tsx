@@ -10,6 +10,7 @@ import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 
 export type ChipVariant = "filter" | "suggestion" | "object";
 
+/** `nativeID`, the accessibility label and hint, and `ref` name the chip's button; `testID` and `style` stay on the root. */
 export interface ChipProps extends RootProps {
   label: string;
   icon?: IconName;
@@ -86,7 +87,7 @@ export function Chip({
   const { width: iconSize, height: _ih, ...iconRest } = r.icon.view;
   const { width: removeSize, height: _rh, ...removeRest } = rx.removeIcon.view;
   return (
-    <View testID={partId(testID, "chip", "root")} {...rootProps(rest)} style={[s.root, root.view, drawn ? { height: undefined, minHeight: drawn } : null, style]}>
+    <View testID={partId(testID, "chip", "root")} style={[s.root, root.view, drawn ? { height: undefined, minHeight: drawn } : null, style]}>
       <Pressable
         testID={partId(testID, "chip", "main")}
         accessibilityRole={variant === "filter" ? "togglebutton" : "button"}
@@ -98,6 +99,7 @@ export function Chip({
           setOn(!on);
           onPress?.();
         }}
+        {...rootProps(rest)}
         {...press.handlers}
         style={[s.main, r.main.view]}
       >

@@ -8,6 +8,7 @@ import { BottomSheet } from "./bottom-sheet";
 
 export type SheetSide = "start" | "end";
 
+/** `nativeID`, the accessibility label and hint, and `ref` name the dialog; `testID` and `style` stay on the root. */
 export interface SheetProps extends RootProps {
   /** The sheet is showing. ✕, the handle, a drag down and Android's back close it (unless `dismissible` is off). */
   open?: boolean;
@@ -49,8 +50,9 @@ export function Sheet({ open, onOpenChange, side: _side = "end", width: _width =
   const [shown = false, setShown] = useControllable(open, onOpenChange);
   if (!shown) return null;
   return (
-    <View testID={partId(testID, "sheet", "root")} accessibilityLabel={title ? undefined : label || str("label")} {...rootProps(rest)} style={[r.root.view, style]}>
-      <BottomSheet title={title} showClose={showClose} dismissible={dismissible} onClose={() => setShown(false)}>
+    <View testID={partId(testID, "sheet", "root")} style={[r.root.view, style]}>
+      {/* With no title, the dialog is named by `label`: the BottomSheet puts its pass-through on the dialog. */}
+      <BottomSheet title={title} showClose={showClose} dismissible={dismissible} onClose={() => setShown(false)} accessibilityLabel={title ? undefined : label || str("label")} {...rootProps(rest)}>
         <View style={s.body}>
           {subtitle ? <Text testID={partId(testID, "sheet", "subtitle")} style={[r.subtitle.view, r.subtitle.text]}>{subtitle}</Text> : null}
           {children}

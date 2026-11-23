@@ -99,7 +99,7 @@ export function PeriodCompare({ data, x, current, previous, title, subtitle = ""
   ] as const;
   const lines = [{ width: `${tk.kpi.loadS}px`, height: `${tk.kpi.loadLineH}px` }, { width: `${tk.kpi.loadM}px`, height: `${tk.kpi.loadValueH}px` }, { width: `${tk.kpi.loadS}px`, height: `${tk.kpi.loadLineH}px` }];
   return (
-    <ChartCard id="period-compare" r={r} viewAsTable={str("viewAsTable")} viewAsChart={str("viewAsChart")} title={title} subtitle={subtitle} table={!loading && data.length ? { data, x, y: [current, previous], format, xFormat, labels } : null} style={style} {...({ testID, ...rootProps(rest) } as object)}>
+    <ChartCard id="period-compare" r={r} viewAsTable={str("viewAsTable")} viewAsChart={str("viewAsChart")} title={title} subtitle={subtitle} table={!loading && data.length ? { data, x, y: [current, previous], format, xFormat, labels } : null} style={style} testID={testID} root={rootProps(rest)}>
       <View testID={id("compare")} style={r.compare.view}>
         {loading ? (
           <View testID={id("side")} style={[s.side, r.side.view]}>

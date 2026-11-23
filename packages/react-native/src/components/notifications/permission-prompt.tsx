@@ -139,10 +139,10 @@ export function PermissionPrompt({ permission = "default", presentation = "card"
   return (
     <Enter
       motion={sheet ? "slide-up" : "pop"}
-      {...rootProps(rest)}
       testID={sheet ? undefined : partId(testID, "permission-prompt", "card")}
       role="region"
       accessibilityLabel={str("notifications")}
+      {...rootProps(rest)}
       style={[sheet ? (glass ? s.sheetGlass : s.sheetBox) : r.card.view, style]}
     >
       {/* Only the sheet takes glass; the card stays opaque so the explanation reads cleanly wherever it sits. */}

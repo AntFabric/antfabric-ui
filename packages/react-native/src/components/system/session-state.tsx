@@ -115,7 +115,7 @@ export function SessionState({
     if (note) announce(note);
   }, [note]);
   return (
-    <Enter {...rootProps(rest)} testID={partId(testID, "session-state", "root")} motion="pop" role="region" accessibilityLabel={title} style={[s.root, r.root.view, style]}>
+    <Enter testID={partId(testID, "session-state", "root")} motion="pop" role="region" accessibilityLabel={title} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
       <View testID={partId(testID, "session-state", "tile")} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden style={[s.tile, r.tile.view]}>
         <Icon name={icon} size={40} color={r.tile.text.color} />
       </View>

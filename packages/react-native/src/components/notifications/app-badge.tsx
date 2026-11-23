@@ -54,7 +54,7 @@ export function AppBadge({ appName, mark, count: n = 0, dot = false, mutedAll = 
   const appIcon = partStyle(r, "appIcon", { view: { width: side, height: side, borderRadius: ios ? 14 : side / 2 } });
   const label = partStyle(r, "label", { text: { fontSize: ios ? 12 : 13 } });
   return (
-    <View {...rootProps(rest)} testID={partId(testID, "app-badge", "root")} accessible accessibilityRole="image" accessibilityLabel={mutedAll ? str("paused", { what }) : what} style={[s.root, r.root.view, style]}>
+    <View testID={partId(testID, "app-badge", "root")} accessible accessibilityRole="image" accessibilityLabel={mutedAll ? str("paused", { what }) : what} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
       <View testID={partId(testID, "app-badge", "container")} style={[s.home, r.container.view]}>
         <View style={s.iconWrap}>
           <View testID={partId(testID, "app-badge", "appIcon")} style={[s.appIcon, appIcon.view]}>

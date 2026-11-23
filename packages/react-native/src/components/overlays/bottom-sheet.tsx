@@ -10,6 +10,7 @@ import { partId, rootProps, type RootProps } from "../../lib/root-props";
 import { Button } from "../actions/button";
 import { IconButton } from "../actions/icon-button";
 
+/** `nativeID`, the accessibility label and hint, and `ref` name the dialog; `testID` and `style` stay on the root. */
 export interface BottomSheetProps extends RootProps {
   /** Empty draws no title row: the handle and the content only. */
   title?: string;
@@ -149,7 +150,7 @@ export function BottomSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <View testID={partId(testID, "bottom-sheet", "root")} {...rootProps(rest)} style={[s.scrim, r.root.view, style]}>
+    <View testID={partId(testID, "bottom-sheet", "root")} style={[s.scrim, r.root.view, style]}>
       {/* A press on the scrim above the panel closes it. A screen reader has the handle, the × and the escape gesture instead. */}
       {gone ? null : <Pressable testID={partId(testID, "bottom-sheet", "backdrop")} accessible={false} style={s.backdrop} onPress={() => close()} />}
       <Enter
@@ -158,6 +159,7 @@ export function BottomSheet({
         aria-modal
         accessibilityViewIsModal
         accessibilityLabel={title || undefined}
+        {...rootProps(rest)}
         accessibilityElementsHidden={gone}
         onAccessibilityEscape={() => close()}
         style={tall ? { flex: 1 } : null}

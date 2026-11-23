@@ -16,6 +16,7 @@ export interface SegmentedControlItem {
   count?: number;
 }
 
+/** `nativeID`, the accessibility label and hint, and `ref` name the tab list; `testID` and `style` stay on the root. */
 export interface SegmentedControlProps extends RootProps {
   items: SegmentedControlItem[];
   /** The chosen item's key. A value that matches no item is allowed and draws no card — for a strip whose panel can be closed. */
@@ -144,7 +145,7 @@ export function SegmentedControl({ items, value, full = false, scrollable = fals
   );
 
   const strip = (
-    <View testID={partId(testID, "segmented-control", "track")} accessibilityRole="tablist" accessibilityLabel={label || undefined} {...(lensOn ? responder.panHandlers : null)} style={[s.track, partStyle(r, "track", { view: full && { flexGrow: 1 } }).view]}>
+    <View testID={partId(testID, "segmented-control", "track")} accessibilityRole="tablist" accessibilityLabel={label || undefined} {...rootProps(rest)} {...(lensOn ? responder.panHandlers : null)} style={[s.track, partStyle(r, "track", { view: full && { flexGrow: 1 } }).view]}>
       {items.map((item, i) => (
         <Segment
           key={item.key}
@@ -170,12 +171,12 @@ export function SegmentedControl({ items, value, full = false, scrollable = fals
 
   if (scrollable) {
     return (
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} {...rootProps(rest)} style={[{ alignSelf: "stretch" }, style]} contentContainerStyle={full ? { flexGrow: 1 } : undefined}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={[{ alignSelf: "stretch" }, style]} contentContainerStyle={full ? { flexGrow: 1 } : undefined}>
         {strip}
       </ScrollView>
     );
   }
-  return <View {...rootProps(rest)} style={[s.root, full && { alignSelf: "stretch" }, style]}>
+  return <View style={[s.root, full && { alignSelf: "stretch" }, style]}>
       {strip}
     </View>;
 }

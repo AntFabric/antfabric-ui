@@ -64,8 +64,10 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
   const range = { from, to, total: total ?? 0 };
   const summary = total === undefined ? str("pageOf", { page: at, count }) : compact ? str("rangeOf", range) : str("showing", range);
   const sizes = pageSizes && pageSizes.length > 0 ? (pageSizes.includes(size) ? pageSizes : [size, ...pageSizes].sort((a, b) => a - b)) : null;
+  // With the choices above it, the pager sits in a wrapper, which is then the root the pass-through names.
+  const alone = !sizes && !(jump && count > 1);
   const pager = (
-    <View testID={id("root")} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
+    <View testID={id("root")} {...(alone ? rootProps(rest) : null)} style={[s.root, r.root.view, style]}>
       <Text testID={id("summary")} accessibilityLiveRegion="polite" style={[r.summary.view, s.summary, r.summary.text]}>{summary}</Text>
       <View testID={id("pages")} style={[s.pages, r.pages.view]}>
         <IconButton icon="chevron-left" label={str("previous")} variant="outline" shape="square" size="sm" disabled={at <= 1} onPress={() => go(at - 1)} />
@@ -85,9 +87,9 @@ export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump =
       </View>
     </View>
   );
-  if (!sizes && !(jump && count > 1)) return pager;
+  if (alone) return pager;
   return (
-    <View style={s.outer}>
+    <View {...rootProps(rest)} style={s.outer}>
       <View style={s.choices}>
         {sizes ? (
           <View style={s.choice}>

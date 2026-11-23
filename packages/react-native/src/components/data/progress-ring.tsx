@@ -65,11 +65,11 @@ export function ProgressRing({ value, max = 1, size, thickness = 0, tone = "defa
   return (
     <View
       testID={partId(testID, "progress-ring", "root")}
-      {...rootProps(rest)}
       accessible
       accessibilityRole="progressbar"
       accessibilityLabel={label || spoken}
       accessibilityValue={known ? { min: 0, max, now: Math.min(max, Math.max(0, value)), text: spoken } : { text: spoken }}
+      {...rootProps(rest)}
       style={[s.root, root.view, style]}
     >
       {/* gifted-charts' pie starts at 12 o'clock and runs clockwise: the value's slice first, the rest in the track's colour. */}

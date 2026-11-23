@@ -75,7 +75,7 @@ export function Sparkline({ data, y, width = 120, height = 32, area = false, mar
   const dots = marker || values.length === 1;
   const points = values.map((value, i) => ({ value, hideDataPoint: !(dots && i === last), dataPointRadius: t.chart.pointR - 1, dataPointColor: color }));
   return (
-    <View testID={partId(testID, "sparkline", "root")} {...rootProps(rest)} accessible accessibilityRole="image" accessibilityLabel={said} style={frame}>
+    <View testID={partId(testID, "sparkline", "root")} accessible accessibilityRole="image" accessibilityLabel={said} {...rootProps(rest)} style={frame}>
       <LineChart
         data={points}
         width={width}
