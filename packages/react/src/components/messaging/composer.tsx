@@ -166,7 +166,7 @@ export function Composer({
   ...rest
 }: ComposerProps) {
   const s = useStrings("composer", strings);
-  const { os } = usePlatform();
+  const { shortcutOs } = usePlatform();
   const [draft = "", setDraft] = useControllable(value, onValueChange);
   const [also = false, setAlso] = useControllable(alsoSend, onAlsoSendChange);
   const [inside, setInside] = useState(false);
@@ -265,7 +265,7 @@ export function Composer({
             {s("editing")}
           </span>
           <span data-af-part="editHint" style={css(text, r.editHint)}>
-            {s.parts("editHint", { save: formatShortcut(sendKey === "mod-enter" ? "Mod+Enter" : "Enter", os) })}
+            {s.parts("editHint", { save: formatShortcut(sendKey === "mod-enter" ? "Mod+Enter" : "Enter", shortcutOs) })}
           </span>
         </div>
       )}
@@ -397,12 +397,12 @@ export function Composer({
           <span style={spacer} />
           {keyHint && sendKey === "enter" && (
             <span data-af-part="hint" style={css(hint, r.hint)}>
-              {s.parts("newLine", { keys: formatShortcut("Shift+Enter", os) })}
+              {s.parts("newLine", { keys: formatShortcut("Shift+Enter", shortcutOs) })}
             </span>
           )}
           {keyHint && sendKey === "mod-enter" && (
             <span data-af-part="hint" style={css(hint, r.hint)}>
-              {s.parts("modSend", { send: formatShortcut("Mod+Enter", os), newline: formatShortcut("Enter", os) })}
+              {s.parts("modSend", { send: formatShortcut("Mod+Enter", shortcutOs), newline: formatShortcut("Enter", shortcutOs) })}
             </span>
           )}
         </div>

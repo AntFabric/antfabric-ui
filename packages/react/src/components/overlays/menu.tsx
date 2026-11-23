@@ -110,7 +110,7 @@ function useFlip(toggled: string) {
 const spoken = (item: MenuItem) => `${item.label ?? ""}${item.count != null ? `, ${item.count}` : ""}${item.sublabel ? `, ${item.sublabel}` : ""}`;
 
 function MenuRow({ item, checked, coarse, tabbable, styles, onPress }: { item: MenuRowItem; checked: boolean; coarse: boolean; tabbable: boolean; styles?: PartStyles<"menu">; onPress: () => void }) {
-  const { platform, os } = usePlatform();
+  const { platform, shortcutOs } = usePlatform();
   const dir = useDirection();
   const ui = useInteraction({ disabled: item.disabled });
   const toggle = typeof item.checked === "boolean";
@@ -127,7 +127,7 @@ function MenuRow({ item, checked, coarse, tabbable, styles, onPress }: { item: M
       data-af-part={part}
       data-af-press
       role={toggle ? (item.radio ? "menuitemradio" : "menuitemcheckbox") : "menuitem"}
-      aria-keyshortcuts={keys ? ariaShortcut(keys, os) : undefined}
+      aria-keyshortcuts={keys ? ariaShortcut(keys, shortcutOs) : undefined}
       aria-checked={toggle ? checked : undefined}
       // Disabled rows stay reachable by the arrows so a screen reader can say why.
       aria-disabled={item.disabled || undefined}

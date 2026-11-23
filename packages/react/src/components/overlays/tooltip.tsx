@@ -66,7 +66,7 @@ const bubble: CSSProperties = {
  */
 export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = true, triggerIcon = "bell-off", children, open, onOpenChange, styles, style, ref, ...rest }: TooltipProps) {
   const r = useRecipe(recipes.tooltip, { styles });
-  const { os } = usePlatform();
+  const { shortcutOs } = usePlatform();
   const id = useId();
   const [shown = false, setShown] = useControllable(open, onOpenChange);
   const host = useRef<HTMLDivElement | null>(null);
@@ -93,7 +93,7 @@ export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = t
     const had = el.getAttribute("aria-describedby");
     const hadKeys = el.getAttribute("aria-keyshortcuts");
     el.setAttribute("aria-describedby", [had, id].filter(Boolean).join(" "));
-    if (shortcut) el.setAttribute("aria-keyshortcuts", ariaShortcut(shortcut, os));
+    if (shortcut) el.setAttribute("aria-keyshortcuts", ariaShortcut(shortcut, shortcutOs));
     const name = (el.getAttribute("aria-label") ?? el.textContent ?? "").trim().toLowerCase();
     setSame(name === label.trim().toLowerCase());
     return () => {
@@ -104,7 +104,7 @@ export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = t
         else el.removeAttribute("aria-keyshortcuts");
       }
     };
-  }, [id, label, shortcut, os, children, showTrigger, triggerIcon]);
+  }, [id, label, shortcut, shortcutOs, children, showTrigger, triggerIcon]);
 
   // Esc hides a shown bubble (WCAG 1.4.13) and stops there: from its control, and from anywhere while it is the top layer, so one opened by
   // hover goes too. A hidden one leaves the key alone.
