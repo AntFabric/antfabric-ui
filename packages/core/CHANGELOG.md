@@ -42,6 +42,8 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 11: React Native overlays
 
+- Strings: `tab-bar.show` ("Show tabs"), the squeezed TabBar disc's name when no tab is open (M33).
+
 ### Batch 12: per-component fixes
 
 ## 1.0.0

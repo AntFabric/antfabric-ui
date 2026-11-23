@@ -137,10 +137,11 @@ export function SidebarItem({
           setOn(true);
           onPress?.();
         }}
-        onLongPress={() => onLongPress?.()}
+        // Only with a handler: attached, a hold is taken by the long press and never becomes the press.
+        onLongPress={onLongPress ? () => onLongPress() : undefined}
         // A long press has no touch-free route of its own: it is an action a screen reader, Voice Control or Switch Control can run.
         accessibilityActions={onLongPress ? [{ name: "longpress", label: str("options", { name }) }] : undefined}
-        onAccessibilityAction={(e) => e.nativeEvent.actionName === "longpress" && onLongPress?.()}
+        onAccessibilityAction={onLongPress ? (e) => e.nativeEvent.actionName === "longpress" && onLongPress() : undefined}
         {...press.handlers}
         style={[s.row, row.view]}
       >

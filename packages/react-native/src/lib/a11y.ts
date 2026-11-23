@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AccessibilityInfo, BackHandler, Platform, type Insets } from "react-native";
 
 /**
@@ -25,14 +25,21 @@ export function hitSlopTo(target: number, height: number, width = target): Inset
   return v || h ? { top: v, bottom: v, left: h, right: h } : undefined;
 }
 
-/** Android's back button closes this overlay while it is open (`onBack` returns nothing; the press is taken). Nothing on iOS or the web. */
+/**
+ * Android's back button closes this overlay while it is open (`onBack` returns nothing; the press is taken). Nothing on iOS or the web.
+ * Android calls the newest listener first, so the listener is added once each time the overlay opens, not on every render: a Select opened
+ * inside a sheet stays on top and closes first. `onBack` is read when back is pressed, so a new function each render is fine.
+ */
 export function useBackHandler(onBack: (() => void) | undefined, active = true): void {
+  const latest = useRef(onBack);
+  latest.current = onBack;
+  const on = active && !!onBack;
   useEffect(() => {
-    if (!active || !onBack || Platform.OS !== "android") return;
+    if (!on || Platform.OS !== "android") return;
     const sub = BackHandler.addEventListener("hardwareBackPress", () => {
-      onBack();
+      latest.current?.();
       return true;
     });
     return () => sub.remove();
-  }, [active, onBack]);
+  }, [on]);
 }

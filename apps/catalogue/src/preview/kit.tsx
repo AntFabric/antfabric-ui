@@ -123,12 +123,26 @@ function RailWindow({ platform, rail }: { platform: Platform; rail: Record<strin
 /** Components the catalogue draws inside the part of the app that drives them, on web and desktop. */
 const HOSTS: Record<string, (p: { platform: Platform; rail: Record<string, unknown> }) => ReactNode> = { "nav-rail": RailWindow };
 
+/**
+ * Components that fill what they are given (a phone's screen) are drawn in a phone-sized frame, laid on their root as `styles.root`: 375 wide,
+ * with room above the sheet (a tall sheet stops under the screen's header row, y 119 on an 852pt iPhone).
+ */
+const PHONE_FRAME = { alignSelf: "flex-start", flexGrow: 0, width: 375, maxWidth: "100%" } as const;
+const FRAMES: Record<string, (props: Record<string, unknown>, platform: Platform) => Record<string, unknown> | null> = {
+  "bottom-sheet": (p) => ({ ...PHONE_FRAME, ...(p.tall ? { height: 740, paddingTop: 119 } : { paddingTop: 96 }) }),
+  // The phone's Sheet is a BottomSheet, which fills the Sheet.
+  sheet: (_, platform) => (platform === "mobile" ? PHONE_FRAME : null),
+};
+
 /** One component with its documented defaults under the given props, or a note while the kit does not have it yet. */
 export function Thing({ id, platform, props = {} }: { id: string; platform: Platform; props?: Record<string, unknown> }) {
   const defaults = useContext(Defaults)[id];
   const C = kitComponent(id, platform);
   if (!C) return <Missing id={id} platform={platform} />;
   const resolved = resolveProps({ ...defaults, ...props }, platform);
+  const frame = FRAMES[id]?.(resolved, platform);
+  // Under the root's own `styles`, so a product's (the styles probe's) still wins.
+  if (frame) resolved.styles = { ...(resolved.styles as object | undefined), root: { ...frame, ...(resolved.styles as { root?: object } | undefined)?.root } };
   const Host = platform === "mobile" ? undefined : HOSTS[id];
   return (
     <Boundary id={id} platform={platform}>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { AccessibilityInfo, Animated, Dimensions, Easing, KeyboardAvoidingView, PanResponder, Platform, Pressable, ScrollView, Text, View, findNodeHandle, type ViewStyle } from "react-native";
+import { AccessibilityInfo, Animated, Dimensions, Easing, KeyboardAvoidingView, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View, findNodeHandle, type ViewStyle } from "react-native";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { hitSlopTo, useBackHandler } from "../../lib/a11y";
@@ -30,8 +30,10 @@ export interface BottomSheetProps extends RootProps {
   dragging?: boolean;
   /** Dismissed: the panel slides back down and the scrim clears. The close button, the handle and a drag past the threshold set it. */
   closed?: boolean;
-  /** The person asked to close: ×, the handle, a drag down, the escape gesture. */
+  /** The person asked to close: ×, the handle, the backdrop, a drag down, back, the escape gesture. */
   onClose?: () => void;
+  /** ×, the handle, the backdrop, a drag down, back and the escape gesture close it. Off for a sheet that must be answered from inside: there is no ×, and none of them do anything. */
+  dismissible?: boolean;
   /** The sheet has finished leaving. A screen that opens another sheet next waits for this. */
   onDismiss?: () => void;
   /** Per-part styles over the theme: `{ panel: {…}, handle: {…}, title: {…} }`. */
@@ -48,8 +50,9 @@ const DRAG_PREVIEW = 72;
 
 /** The layout no token decides; what the tokens decide is the recipe's. */
 const useStyles = createStyles((t) => ({
-  scrim: { alignSelf: "flex-start", width: 375, maxWidth: "100%", paddingTop: 96, justifyContent: "flex-end", overflow: "hidden" }, /* structural: stage: a 375pt phone frame and room above the sheet */
-  tall: { height: 740, paddingTop: 119 }, /* structural: stage: the tall demo frame and its top room */
+  // It fills what it is given (the screen, a Modal): the panel sits at the foot and the scrim above it is the backdrop.
+  scrim: { flexGrow: 1, alignSelf: "stretch", justifyContent: "flex-end", overflow: "hidden" },
+  backdrop: { ...StyleSheet.absoluteFillObject },
   panel: { paddingTop: t.space.md, paddingBottom: t.space.xl },
   glass: { marginHorizontal: t.space.sm, marginBottom: t.space.sm, borderRadius: t.sheet.glassRadius },
   handle: { alignSelf: "center", marginBottom: t.space.lg },
@@ -71,6 +74,7 @@ export function BottomSheet({
   keyboard = false,
   dragging = false,
   closed = false,
+  dismissible = true,
   onPrimary,
   onClose,
   onDismiss,
@@ -105,6 +109,7 @@ export function BottomSheet({
   }, [gone, dragging]);
 
   const close = () => {
+    if (!dismissible) return;
     setGone(true);
     onClose?.();
   };
@@ -112,9 +117,11 @@ export function BottomSheet({
   // A drag on the handle and the title row moves the panel; letting go far or fast enough dismisses.
   const closeRef = useRef(close);
   closeRef.current = close;
+  const dismissibleRef = useRef(dismissible);
+  dismissibleRef.current = dismissible;
   const pan = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, g) => g.dy > 4 && Math.abs(g.dy) > Math.abs(g.dx),
+      onMoveShouldSetPanResponder: (_, g) => dismissibleRef.current && g.dy > 4 && Math.abs(g.dy) > Math.abs(g.dx),
       onPanResponderGrant: () => setHeld(true),
       onPanResponderMove: (_, g) => drop.setValue(Math.max(0, g.dy)),
       onPanResponderRelease: (_, g) => {
@@ -131,7 +138,7 @@ export function BottomSheet({
 
   const r = useRecipe(recipes["bottom-sheet"], { variants: { dragging: dragging || held, closed: gone, largeTitle }, styles });
   // Android's back button closes the sheet while it is open; a screen reader starts at the title (else the handle) when it opens.
-  useBackHandler(close, !gone);
+  useBackHandler(dismissible ? close : undefined, !gone);
   const heading = useRef<Text>(null);
   const grabber = useRef<View>(null);
   useEffect(() => {
@@ -142,7 +149,9 @@ export function BottomSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <View testID={partId(testID, "bottom-sheet", "root")} {...rootProps(rest)} style={[s.scrim, partStyle(r, "root", { view: tall && s.tall }).view, style]}>
+    <View testID={partId(testID, "bottom-sheet", "root")} {...rootProps(rest)} style={[s.scrim, r.root.view, style]}>
+      {/* A press on the scrim above the panel closes it. A screen reader has the handle, the × and the escape gesture instead. */}
+      {gone ? null : <Pressable testID={partId(testID, "bottom-sheet", "backdrop")} accessible={false} style={s.backdrop} onPress={() => close()} />}
       <Enter
         motion={closed || dragging ? null : "slide-up"}
         role="dialog"
@@ -166,6 +175,9 @@ export function BottomSheet({
                 testID={partId(testID, "bottom-sheet", "handle")}
                 accessibilityRole="button"
                 accessibilityLabel={str("dismiss")}
+                // Not dismissible, the handle is only a picture of one: nothing to press, nothing to read.
+                accessible={dismissible}
+                disabled={!dismissible}
                 hitSlop={hitSlopTo(t.control.hit, t.sheet.grabberH, t.sheet.grabberW)}
                 onPress={() => close()}
                 style={[s.handle, r.handle.view]}
@@ -175,7 +187,7 @@ export function BottomSheet({
                   <Text ref={heading} testID={partId(testID, "bottom-sheet", "title")} accessibilityRole="header" numberOfLines={largeTitle ? 1 : undefined} style={[s.title, r.title.view, r.title.text]}>
                     {title}
                   </Text>
-                  {showClose ? <IconButton icon="x" label={str("close")} onPress={() => close()} /> : null}
+                  {showClose && dismissible ? <IconButton icon="x" label={str("close")} onPress={() => close()} /> : null}
                 </View>
               ) : null}
             </View>

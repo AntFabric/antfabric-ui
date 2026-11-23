@@ -50,7 +50,7 @@ export function Sheet({ open, onOpenChange, side: _side = "end", width: _width =
   if (!shown) return null;
   return (
     <View testID={partId(testID, "sheet", "root")} accessibilityLabel={title ? undefined : label || str("label")} {...rootProps(rest)} style={[r.root.view, style]}>
-      <BottomSheet title={title} showClose={showClose && dismissible} onClose={() => dismissible && setShown(false)}>
+      <BottomSheet title={title} showClose={showClose} dismissible={dismissible} onClose={() => setShown(false)}>
         <View style={s.body}>
           {subtitle ? <Text testID={partId(testID, "sheet", "subtitle")} style={[r.subtitle.view, r.subtitle.text]}>{subtitle}</Text> : null}
           {children}

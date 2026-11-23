@@ -54,7 +54,8 @@ export interface GiftedBarsProps {
  */
 export function GiftedBars({ tk, theme, rows, s, fields, labels, format, formatWords, stacked = false, totalLabel, signed = false, width, height, scale, tipFields, barsOff = false, line, target, targetLabel }: GiftedBarsProps) {
   const locale = useLocale();
-  const [active, setActive] = useState<number | null>(null);
+  // The bar (or stack) last pressed, as gifted-charts numbers it.
+  const [hit, setHit] = useState<number | null>(null);
   const axis = giftedAxis({ tk, theme, scale, format, formatWords, locale });
   const plotW = plotWidth(tk, width, axis);
   const per = stacked ? 1 : fields.length;
@@ -74,16 +75,25 @@ export function GiftedBars({ tk, theme, rows, s, fields, labels, format, formatW
       : { label: row.__x, labelWidth: span + gap * LABEL_SHARE, labelTextStyle: theme.text("regular", { textAlign: "center", marginLeft: -gap * LABEL_SHIFT }) };
   const signColors = signed ? { positive: tk.data.positive, negative: tk.data.negative } : undefined;
   const tipOf = (i: number) => tipRows(rows[i]!, { fields: tipFields ?? fields, labels, colorOf: s.colorOf, format, formatWords, locale, stacked, signColors });
-  // The category last pressed keeps its colour and the rest step back, as the web's hovered one does.
-  const press = (rowOf: (index: number) => number) => ({
-    onPress: (_item: unknown, index: number) => setActive(rowOf(index)),
+  const rowOf = (index: number) => (stacked ? index : Math.floor(index / fields.length));
+  // New data with fewer rows (or series) than the press was made on: nothing is pressed any more.
+  const pressed = hit !== null && rowOf(hit) < rows.length ? hit : null;
+  if (pressed !== hit) setHit(null);
+  const active = pressed === null ? null : rowOf(pressed);
+  // The category last pressed keeps its colour and the rest step back, as the web's hovered one does. Pressing the same bar again, or the
+  // plot beside the bars, lets go.
+  const press = () => ({
+    onPress: (_item: unknown, index: number) => setHit(index === pressed ? null : index),
+    onBackgroundPress: () => setHit(null),
     highlightEnabled: true,
     lowlightOpacity: DIMMED,
     // The bars of the pressed category: a group's (an array), or a stack (a number: gifted-charts compares a stack's with `===`). `-1` is none, which leaves every bar as it is.
     highlightedBarIndex: stacked ? (active ?? -1) : active === null ? [-1] : fields.map((_, j) => active * fields.length + j),
   });
-  const tooltip = (rowOf: (index: number) => number) => ({
-    ...press(rowOf),
+  const tooltip = () => ({
+    ...press(),
+    // gifted-charts' own card follows this rather than its own state, so a second press or a press beside the bars takes it away.
+    focusedBarIndex: pressed ?? -1,
     renderTooltip: (_item: unknown, index: number) => (
       <View style={{ marginBottom: tk.space.xs, marginLeft: -(theme.tooltip.width / 2 - barW / 2) }}>
         <ChartTooltip totalLabel={totalLabel} tip={tipOf(rowOf(index))} />
@@ -117,7 +127,7 @@ export function GiftedBars({ tk, theme, rows, s, fields, labels, format, formatW
     const left = Math.min(Math.max(0, centre - theme.tooltip.width / 2), Math.max(0, width - theme.tooltip.width));
     return (
       <View>
-        <GiftedBarChart {...common} stackData={stackData} stackBorderTopLeftRadius={theme.bar.radius} stackBorderTopRightRadius={theme.bar.radius} {...press((i) => i)} />
+        <GiftedBarChart {...common} stackData={stackData} stackBorderTopLeftRadius={theme.bar.radius} stackBorderTopRightRadius={theme.bar.radius} {...press()} />
         {active !== null ? (
           <View pointerEvents="none" style={[overlay, { left, width: theme.tooltip.width }]}>
             <ChartTooltip totalLabel={totalLabel} tip={tipOf(active)} />
@@ -162,7 +172,7 @@ export function GiftedBars({ tk, theme, rows, s, fields, labels, format, formatW
       showReferenceLine1={target !== undefined}
       referenceLine1Position={target ?? 0}
       referenceLine1Config={{ ...theme.reference, labelText: targetLabel, labelTextStyle: theme.text("semibold", { color: tk.fg.muted, position: "absolute", left: tk.space.xs, top: -tk.space.lg }) }}
-      {...tooltip((i) => Math.floor(i / fields.length))}
+      {...tooltip()}
     />
   );
 }

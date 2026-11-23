@@ -39,6 +39,8 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 11: React Native overlays
 
+- BottomSheet fills what it is given: the 375px frame and the room above the panel were the catalogue's demo stage, and now are the catalogue's. A tall sheet reaches the top of its box. A press on the scrim above the panel closes it, and the new `dismissible` (default `true`) turns off the ×, the handle, the scrim and Esc together (M20, H17).
+
 ### Batch 12: per-component fixes
 
 ## 1.0.0

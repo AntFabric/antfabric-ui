@@ -130,7 +130,12 @@ const docs: ComponentDocs = {
     },
     onClose: {
       type: "event",
-      description: "The person asked to close: ×, backdrop, drag, back, the escape gesture.",
+      description: "The person asked to close: ×, the handle, a press on the backdrop, a drag down, Android's back, the escape gesture (Esc on the web).",
+    },
+    dismissible: {
+      type: "boolean",
+      default: true,
+      description: "×, the handle, the backdrop, a drag down, back and the escape gesture close it. Off for a sheet that must be answered from inside: the × is not drawn, the handle is only a picture, and none of the others do anything.",
     },
     onDismiss: {
       type: "event",
@@ -140,12 +145,13 @@ const docs: ComponentDocs = {
   platforms: {
     web: {
       status: "partial",
-      base: "A <div role=\"dialog\"> aria-modal on a scrim, inline styles over `t`; slides up with enter(\"slide-up\"), then a drag or a close moves it with a transform transition. The handle is a Dismiss <button>; ×, the handle and Esc set `closed` (useControllable) and call onClose; onDismiss fires when the slide down ends",
+      base: "A <div role=\"dialog\"> aria-modal on a scrim that fills what it is given, inline styles over `t`; slides up with enter(\"slide-up\"), then a drag or a close moves it with a transform transition. The handle is a Dismiss <button>; ×, the handle, a press on the scrim and Esc set `closed` (useControllable) and call onClose, unless `dismissible` is off; onDismiss fires when the slide down ends",
       import: "import { BottomSheet } from \"@antfabric/ui-react\"",
       notes: [
         "Decision: a bottom sheet exists on the web only in a phone-width browser. At 640px and wider the same caller content opens as what it is on desktop: a Dialog for pickers and forms, a Menu for action lists, a HoverCard or side panel for details.",
         "The kit does not lift the sheet over the on-screen keyboard or read the safe-area inset: the host that mounts it owns both (visualViewport, env(safe-area-inset-bottom)).",
-        "Drag-to-dismiss and the browser's pull-to-refresh are the host's: the kit's sheet follows `dragging` and `closed` and calls onClose from the handle, the × and Esc.",
+        "Drag-to-dismiss and the browser's pull-to-refresh are the host's: the kit's sheet follows `dragging` and `closed` and calls onClose from the handle, the ×, a press on the scrim and Esc.",
+        "The sheet fills the box it is given (the host's layer over the page): its scrim covers that box and the panel sits at its foot. The catalogue draws it in a 375px phone frame.",
       ],
       keyboard: [
         {
@@ -170,12 +176,12 @@ const docs: ComponentDocs = {
     },
     mobile: {
       status: "ready",
-      base: "<Enter motion=\"slide-up\"> (role dialog, accessibilityViewIsModal) around an Animated.View that the handle and title row drag through PanResponder (past 120pt or a fling dismisses), on GlassSurface (Liquid Glass on iOS 26+); ScrollView body; `closed` through useControllable, onDismiss when the slide down ends",
+      base: "A scrim View that fills what it is given, with a Pressable backdrop, under <Enter motion=\"slide-up\"> (role dialog, accessibilityViewIsModal) around an Animated.View that the handle and title row drag through PanResponder (past 120pt or a fling dismisses), on GlassSurface (Liquid Glass on iOS 26+); ScrollView body; `closed` through useControllable, onDismiss when the slide down ends",
       import: "import { BottomSheet } from \"@antfabric/ui-react-native\"",
       notes: [
         "The surface panel with 20pt top corners, the 36 × 5 handle 12pt from the top, then one 16pt rhythm: handle → title row → first child. The title row is the title on the left and the × in a 40pt box whose box (not glyph) sits on the 12pt gutter.",
         "Title is 20pt semibold on a 24pt line; largeTitle is 28pt on the 40pt box line, one line.",
-        "At rest the panel stops under the screen's header row (status bar + 12 + 40 + 8 — y 119 on an 852pt iPhone) so the dimmed title behind is never cut through. With the keyboard up the cap is the space above the keys instead.",
+        "The sheet fills what it is given (the screen, a Modal): the scrim covers it and the panel sits at its foot. A tall sheet fills it to the top, so the host gives it the room above, to stop under the screen's header row (status bar + 12 + 40 + 8 — y 119 on an 852pt iPhone) so the dimmed title behind is never cut through. The catalogue draws it in a 375pt phone frame with that room. With the keyboard up the cap is the space above the keys instead.",
         "Keyboard: on iOS the sheet is inside a KeyboardAvoidingView and lifts above the keys; on Android the window's own adjustResize is relied on (an edge-to-edge Modal window that is not resized needs the host to measure the IME).",
         "Closing always puts the keyboard away too.",
         "Today's Sheet is a plain Modal with animationType slide and no drag. The kit's sheet adds drag-to-dismiss: a PanResponder on the handle and title row.",
@@ -197,7 +203,7 @@ const docs: ComponentDocs = {
         },
         {
           gesture: "Tap the backdrop",
-          action: "Closes",
+          action: "Closes (unless `dismissible` is off)",
         },
         {
           gesture: "Android back",
