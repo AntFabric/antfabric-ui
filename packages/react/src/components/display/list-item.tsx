@@ -54,7 +54,7 @@ export interface ListItemProps extends RootProps<HTMLElement> {
   role?: ListItemRole;
   /** The row navigates: with role `link` it is an `<a href>`, so middle-click and ⌘-click open a new tab. A plain click calls `onPress` and stays on the page when there is one. */
   href?: string;
-  /** Called with `selected` as the press leaves it: a press toggles it. */
+  /** Called with `selected` as the press leaves it: a press toggles it on a selection row (role option or checkbox) only. */
   onSelectedChange?: (selected: boolean) => void;
   /** The row was pressed. Opening what the row stands for is the caller's. */
   onPress?: () => void;
@@ -172,7 +172,8 @@ export function ListItem({
         // ⌘-, ctrl- and middle-click on a link are the browser's; a plain click is the product's when it gave `onPress`.
         if (anchor && (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || !onPress)) return;
         if (anchor) e.preventDefault();
-        setOn(!on);
+        // Only a selection row (an option, a checkbox) toggles; a link, button or menu row's `selected` is the app's.
+        if (role === "option" || role === "checkbox") setOn(!on);
         onPress?.();
       }}
       {...ui.handlers}
