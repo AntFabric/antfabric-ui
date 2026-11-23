@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { type RootProps, rootProps } from "../../lib/root-props";
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart as RechartsRadarChart, Tooltip } from "recharts";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
-import { FLAT_FILL, clampScore, prepare, summarize, tipRows, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
+import { FLAT_FILL, markPath, seriesMark, clampScore, prepare, summarize, tipRows, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { useInteraction } from "../../lib/interaction";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css } from "../../lib/style";
@@ -33,6 +33,8 @@ export interface RadarChartProps extends RootProps<HTMLDivElement> {
   format?: FormatSpec;
   /** A field's name for people, for the legend and the tooltip: `{ q4: "Q4 2026" }`. */
   labels?: Record<string, string>;
+  /** Each series gets its own dash and marker shape besides its colour, in the plot and in the legend, so two series are never told apart by hue alone. Left out, on for two or more series. */
+  marks?: boolean;
   /** The plot's height. */
   height?: number;
   /** The title of the empty state when there are no rows. */
@@ -61,7 +63,7 @@ const OUTER = "72%";
 /** Rings across the grid, as recharts counts ticks: the centre and four rings. */
 const RINGS = 5;
 
-export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 100, format = "integer", labels = {}, height = 280, empty, emptyLine, loading = false, hidden, onHiddenChange, styles, strings, headingLevel, style, ...rest }: RadarChartProps) {
+export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 100, format = "integer", labels = {}, marks: marksProp, height = 280, empty, emptyLine, loading = false, hidden, onHiddenChange, styles, strings, headingLevel, style, ...rest }: RadarChartProps) {
   const str = useStrings("radar-chart", strings);
   const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
@@ -71,6 +73,7 @@ export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 1
   const ui = useInteraction();
   const r = useRecipe(recipes["radar-chart"], { state: { focus: ui.focused }, styles });
   const fields = [y].flat().slice(0, MOST);
+  const marks = marksProp ?? fields.length > 1;
   const s = useSeries(fields, theme.series, { hidden, onHiddenChange });
   const { rows, keys } = prepare(data, x, formatWords, undefined, locale);
   // A score is held to the scale for drawing, so no polygon leaves the outer ring; the tooltip reads the row as it was.
@@ -92,7 +95,7 @@ export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 1
     <ChartCard
       headingLevel={headingLevel}
       root={rootProps(rest)}
-      legend={!loading && data.length > 0 ? <Legend series={s} labels={labels} label={str("legend")} /> : null}
+      legend={!loading && data.length > 0 ? <Legend series={s} labels={labels} label={str("legend")} marks={marks} /> : null}
       r={r} viewAsTable={str("viewAsTable")} viewAsChart={str("viewAsChart")}
       title={title}
       subtitle={subtitle}
@@ -114,20 +117,29 @@ export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 1
                   return row ? <ChartTooltip tip={tipRows(rows[row.__i as number]!, { fields: s.visible, labels, colorOf: s.colorOf, format, formatWords, locale })} /> : null;
                 }}
               />
-              {s.visible.map((f) => (
-                <Radar
-                  key={f}
-                  dataKey={f}
-                  name={labels[f] ?? f}
-                  stroke={s.colorOf(f)}
-                  strokeWidth={theme.line.strokeWidth}
-                  fill={s.colorOf(f)}
-                  fillOpacity={FLAT_FILL}
-                  dot={{ r: theme.line.dotRadius - 1, fill: s.colorOf(f), strokeWidth: 0 }}
-                  activeDot={{ r: theme.line.dotRadius + 1, fill: s.colorOf(f), stroke: theme.card, strokeWidth: tk.chart.activeRing }}
-                  {...theme.motion.draw}
-                />
-              ))}
+              {s.visible.map((f) => {
+                // Another channel than hue: the outline's dash and a marker at each axis, the line chart's (`seriesMark`).
+                const mark = marks ? seriesMark(s.fields.indexOf(f)) : null;
+                const dash = mark && mark.dash.length ? mark.dash.map((n) => n * theme.line.strokeWidth).join(" ") : undefined;
+                const dot = mark
+                  ? ({ cx, cy, index }: { cx?: number; cy?: number; index?: number }) => <path key={index} d={markPath(mark.shape, cx ?? 0, cy ?? 0, theme.line.dotRadius * 2)} fill={mark.shape === "cross" ? "none" : s.colorOf(f)} stroke={s.colorOf(f)} strokeWidth={tk.border.wThick} strokeDasharray="none" />
+                  : { r: theme.line.dotRadius - 1, fill: s.colorOf(f), strokeWidth: 0 };
+                return (
+                  <Radar
+                    key={f}
+                    dataKey={f}
+                    name={labels[f] ?? f}
+                    stroke={s.colorOf(f)}
+                    strokeWidth={theme.line.strokeWidth}
+                    strokeDasharray={dash}
+                    fill={s.colorOf(f)}
+                    fillOpacity={FLAT_FILL}
+                    dot={dot}
+                    activeDot={{ r: theme.line.dotRadius + 1, fill: s.colorOf(f), stroke: theme.card, strokeWidth: tk.chart.activeRing, strokeDasharray: "none" }}
+                    {...theme.motion.draw}
+                  />
+                );
+              })}
             </RechartsRadarChart>
           </div>
         )}

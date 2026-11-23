@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { useLocale } from "@antfabric/ui-core";
 import { View, type ViewStyle } from "react-native";
 import { BarChart as GiftedBarChart } from "react-native-gifted-charts";
-import { DIMMED, labelWidth, sparseLabels, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Scale, type Series } from "@antfabric/ui-core/chart";
+import { DIMMED, labelWidth, seriesMark, sparseLabels, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Scale, type Series } from "@antfabric/ui-core/chart";
 import { giftedAxis, labelScale, plotHeight, plotWidth } from "./axis";
+import { Texture } from "./texture";
 import { ChartTooltip } from "./tooltip";
 import { giftedTheme, type ChartTokens } from "./theme";
 
@@ -45,6 +46,8 @@ export interface GiftedBarsProps {
   line?: { field: string | null; color: string };
   target?: number;
   targetLabel?: string;
+  /** Each series past the first is textured over its colour (`seriesMark(i).texture`), as the legend's swatch is (`Legend marks="texture"`). */
+  marks?: boolean;
 }
 
 /**
@@ -52,8 +55,14 @@ export interface GiftedBarsProps {
  * category's label on the first), stacked ones its `stackData`; a combo chart's line is `showLine` with `lineData` and `lineConfig`, a target is
  * `referenceLine1`. It works out the plot's width and each bar's from the measured width, because gifted-charts takes numbers, not a layout.
  */
-export function GiftedBars({ tk, theme, rows, s, fields, labels, format, formatWords, stacked = false, totalLabel, signed = false, width, height, scale, tipFields, barsOff = false, line, target, targetLabel }: GiftedBarsProps) {
+export function GiftedBars({ tk, theme, rows, s, fields, labels, format, formatWords, stacked = false, totalLabel, signed = false, width, height, scale, tipFields, barsOff = false, line, target, targetLabel, marks = false }: GiftedBarsProps) {
   const locale = useLocale();
+  // A series' texture, laid over each of its bars: gifted-charts draws a bar as a view of one colour, so the texture is an svg inside it, with an id of its own.
+  const uid = useId().replace(/\W/g, "");
+  const textured = (f: string, at: string) => {
+    const texture = marks && !signed && !barsOff ? seriesMark(s.fields.indexOf(f)).texture : "none";
+    return texture === "none" ? null : () => <Texture id={`af-chart-${uid}t${at}`} texture={texture} ink={theme.card} />;
+  };
   // The bar (or stack) last pressed, as gifted-charts numbers it.
   const [hit, setHit] = useState<number | null>(null);
   const axis = giftedAxis({ tk, theme, scale, format, formatWords, locale });
@@ -119,7 +128,10 @@ export function GiftedBars({ tk, theme, rows, s, fields, labels, format, formatW
     const stackData = rows.map((row, i) => ({
       ...labelOf(row, i),
       spacing: gap,
-      stacks: fields.map((f, j) => ({ value: +(row[f] as number) || 0, color: s.colorOf(f), marginBottom: j ? tk.chart.stackGap : 0 })),
+      stacks: fields.map((f, j) => {
+        const inner = textured(f, `${i}x${j}`);
+        return { value: +(row[f] as number) || 0, color: s.colorOf(f), marginBottom: j ? tk.chart.stackGap : 0, ...(inner ? { innerBarComponent: inner } : {}) };
+      }),
     }));
     // gifted-charts compares a stack's selection with `===` against an array, so its own tooltip never opens on a stack: the card is drawn here, above the pressed stack.
     // A stack's own spacing is applied before it as well as the chart's initial spacing, so the first stack stands a whole gap in from the axis, not half of one.
@@ -137,12 +149,16 @@ export function GiftedBars({ tk, theme, rows, s, fields, labels, format, formatW
     );
   }
   const data = rows.flatMap((row, i) =>
-    fields.map((f, j) => ({
-      value: +(row[f] as number) || 0,
-      frontColor: barsOff ? "transparent" : signed ? ((row[f] as number) < 0 ? tk.data.negative : tk.data.positive) : s.colorOf(f),
-      spacing: j === fields.length - 1 ? gap : inner,
-      ...(j === 0 ? labelOf(row, i) : {}),
-    })),
+    fields.map((f, j) => {
+      const texture = textured(f, `${i}x${j}`);
+      return {
+        value: +(row[f] as number) || 0,
+        frontColor: barsOff ? "transparent" : signed ? ((row[f] as number) < 0 ? tk.data.negative : tk.data.positive) : s.colorOf(f),
+        spacing: j === fields.length - 1 ? gap : inner,
+        ...(texture ? { texture } : {}),
+        ...(j === 0 ? labelOf(row, i) : {}),
+      };
+    }),
   );
   const radius = signed ? tk.chart.signedRadius : theme.bar.radius;
   // gifted-charts puts a line's first point half a bar in from `initialSpacing` and steps by a bar's width plus `spacing`, so these land each point on its category's centre.
@@ -168,6 +184,8 @@ export function GiftedBars({ tk, theme, rows, s, fields, labels, format, formatW
       data={data}
       barBorderTopLeftRadius={radius}
       barBorderTopRightRadius={radius}
+      // gifted-charts reads a grouped bar's inner component from the chart, not from the bar (it hands the bar in), so each bar's texture rides on its data item.
+      {...(marks && fields.length > 1 ? { barInnerComponent: (item?: object) => (item as { texture?: () => ReactNode } | undefined)?.texture?.() ?? null } : {})}
       {...(signed ? { barBorderBottomLeftRadius: radius, barBorderBottomRightRadius: radius } : {})}
       showReferenceLine1={target !== undefined}
       referenceLine1Position={target ?? 0}

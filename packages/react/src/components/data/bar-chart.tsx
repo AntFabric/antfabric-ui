@@ -33,6 +33,8 @@ export interface BarChartProps extends RootProps<HTMLDivElement> {
   stacked?: boolean;
   /** Bars run left to right, categories down the side: for long labels and ranked lists. A single series gets its value at each bar's end. */
   horizontal?: boolean;
+  /** Each series past the first is filled with a texture (lines one way, the other, both, dots) over its colour, in the plot and in the legend, so two series are never told apart by hue alone. Left out, on for two or more series. */
+  marks?: boolean;
   /** The plot's height. */
   height?: number;
   /** The title of the empty state when there are no rows. */
@@ -54,7 +56,7 @@ export interface BarChartProps extends RootProps<HTMLDivElement> {
   style?: CSSProperties;
 }
 
-export function BarChart({ data, x, y, title, subtitle = "", headline, format = "integer", xFormat, labels = {}, stacked = false, horizontal = false, height = 240, empty, emptyLine, loading = false, hidden, onHiddenChange, styles, strings, headingLevel, style, ...rest }: BarChartProps) {
+export function BarChart({ data, x, y, title, subtitle = "", headline, format = "integer", xFormat, labels = {}, stacked = false, horizontal = false, marks: marksProp, height = 240, empty, emptyLine, loading = false, hidden, onHiddenChange, styles, strings, headingLevel, style, ...rest }: BarChartProps) {
   const str = useStrings("bar-chart", strings);
   const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
@@ -64,6 +66,7 @@ export function BarChart({ data, x, y, title, subtitle = "", headline, format = 
   const ui = useInteraction();
   const r = useRecipe(recipes["bar-chart"], { state: { focus: ui.focused }, styles });
   const fields = [y].flat();
+  const marks = marksProp ?? fields.length > 1;
   const s = useSeries(fields, theme.series, { hidden, onHiddenChange });
   const { rows, keys, ordered } = prepare(data, x, formatWords, xFormat, locale);
   const scale = barScale(data, s.visible, { stacked });
@@ -84,7 +87,7 @@ export function BarChart({ data, x, y, title, subtitle = "", headline, format = 
     <ChartCard
       headingLevel={headingLevel}
       root={rootProps(rest)}
-      legend={!loading && data.length > 0 ? <Legend series={s} labels={labels} label={str("legend")} /> : null}
+      legend={!loading && data.length > 0 ? <Legend series={s} labels={labels} label={str("legend")} marks={marks && "texture"} /> : null}
       r={r} viewAsTable={str("viewAsTable")} viewAsChart={str("viewAsChart")}
       title={title}
       subtitle={subtitle}
@@ -93,7 +96,7 @@ export function BarChart({ data, x, y, title, subtitle = "", headline, format = 
       style={style}
     >
       <ChartFrame height={height} label={loading ? str("loading", { title }) : summary} loading={loading} empty={data.length === 0} emptyTitle={empty ?? str("empty")} emptyLine={emptyLine ?? str("emptyLine")} loadingLabel={str("loadingChart")}>
-        {(width) => <RechartsBars tk={tk} theme={theme} ui={ui} plot={r.plot} hint={str("arrowKeys", { title })} data={data} rows={rows} keys={keys} fields={fields} s={s} labels={labels} format={format} formatWords={formatWords} scale={scale} stacked={stacked} totalLabel={str("total")} horizontal={horizontal} width={width} height={height} />}
+        {(width) => <RechartsBars tk={tk} theme={theme} ui={ui} plot={r.plot} hint={str("arrowKeys", { title })} data={data} rows={rows} keys={keys} fields={fields} s={s} labels={labels} format={format} formatWords={formatWords} scale={scale} stacked={stacked} totalLabel={str("total")} horizontal={horizontal} marks={marks} width={width} height={height} />}
       </ChartFrame>
     </ChartCard>
   );

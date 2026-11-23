@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { type RootProps, rootProps } from "../../lib/root-props";
 import { View, type ViewStyle } from "react-native";
+import Svg, { Path } from "react-native-svg";
 import { RadarChart as GiftedRadarChart } from "react-native-gifted-charts";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
-import { FLAT_FILL, clampScore, nearestAxis, prepare, summarize, tipRows, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
+import { FLAT_FILL, clampScore, markPath, nearestAxis, radarPoint, seriesMark, prepare, summarize, tipRows, useSeries, type FormatSpec, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { ChartCard, type ChartHeadline } from "../../data/chart-card";
@@ -31,6 +32,8 @@ export interface RadarChartProps extends RootProps {
   format?: FormatSpec;
   /** A field's name for people, for the legend and the tooltip: `{ q4: "Q4 2026" }`. */
   labels?: Record<string, string>;
+  /** Each series gets its own dash and marker shape besides its colour, in the plot and in the legend, so two series are never told apart by hue alone. Left out, on for two or more series. */
+  marks?: boolean;
   /** The plot's height, in points. */
   height?: number;
   /** The title of the empty state when there are no rows. */
@@ -62,9 +65,10 @@ const LABEL_OFFSET = 0.1;
 const useStyles = createStyles(() => ({
   plot: { alignItems: "center", justifyContent: "center" },
   overlay: { position: "absolute" },
+  markers: { position: "absolute", top: 0, left: 0 },
 }));
 
-export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 100, format = "integer", labels = {}, height = 280, empty, emptyLine, loading = false, hidden, onHiddenChange, styles, strings, headingLevel: _headingLevel, testID, style, ...rest }: RadarChartProps) {
+export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 100, format = "integer", labels = {}, marks: marksProp, height = 280, empty, emptyLine, loading = false, hidden, onHiddenChange, styles, strings, headingLevel: _headingLevel, testID, style, ...rest }: RadarChartProps) {
   const str = useStrings("radar-chart", strings);
   const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
@@ -74,6 +78,7 @@ export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 1
   const theme = giftedTheme(tk, reduced);
   const r = useRecipe(recipes["radar-chart"], { styles });
   const fields = [y].flat().slice(0, MOST);
+  const marks = marksProp ?? fields.length > 1;
   const series = useSeries(fields, theme.series, { hidden, onHiddenChange });
   const { rows, keys } = prepare(data, x, formatWords, undefined, locale);
   const summary = summarize({ label: title, data, keys, fields: series.visible, labels, format, formatWords, locale, ordered: false }, {
@@ -89,6 +94,12 @@ export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 1
     separator: () => str("summarySeparator"),
     summary: (v) => str("summary", v),
   });
+  // Another channel than hue: each polygon's outline is dashed (`seriesMark`) and its points carry a marker, as the line chart's.
+  const dashOf = (f: string) => {
+    const dash = marks ? seriesMark(series.fields.indexOf(f)).dash : [];
+    return dash.length ? dash.map((n) => n * theme.line.thickness) : undefined;
+  };
+  const markSize = theme.line.dataPointsRadius * 2;
   // The axis a finger is on, and where: gifted-charts' radar has no pointer of its own, so the kit finds the axis from the touch.
   const [touch, setTouch] = useState<{ axis: number; x: number; y: number } | null>(null);
   const animated = giftedAnimated(true, reduced);
@@ -99,7 +110,7 @@ export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 1
   };
   return (
     <ChartCard
-      legend={!loading && data.length > 0 ? <Legend series={series} labels={labels} label={str("legend")} /> : null}
+      legend={!loading && data.length > 0 ? <Legend series={series} labels={labels} label={str("legend")} marks={marks} /> : null}
       id="radar-chart"
       testID={testID}
       root={rootProps(rest)}
@@ -148,7 +159,7 @@ export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 1
                   animationDuration={theme.motion.animationDuration}
                   polygonConfigArray={[
                     ...series.visible.map((f) => ({ stroke: "transparent", strokeWidth: 0, fill: series.colorOf(f), opacity: FLAT_FILL, showGradient: false, isAnimated: animated })),
-                    ...series.visible.map((f) => ({ stroke: series.colorOf(f), strokeWidth: theme.line.thickness, fill: "transparent", opacity: 1, showGradient: false, isAnimated: animated })),
+                    ...series.visible.map((f) => ({ stroke: series.colorOf(f), strokeWidth: theme.line.thickness, strokeDashArray: dashOf(f), fill: "transparent", opacity: 1, showGradient: false, isAnimated: animated })),
                   ]}
                   gridConfig={{ stroke: tk.chart.grid, strokeWidth: tk.border.wHairline, fill: tk.surface.card, opacity: 1, showGradient: false }}
                   asterLinesConfig={{ stroke: tk.chart.grid, strokeWidth: tk.border.wHairline }}
@@ -156,6 +167,18 @@ export function RadarChart({ data, x, y, title, subtitle = "", headline, max = 1
                   labelConfigArray={keys.map((_, i) => (touch?.axis === i ? label("semibold", tk.fg.strong) : label("regular", tk.fg.body)))}
                   labelsPositionOffset={max * LABEL_OFFSET}
                 />
+                {/* gifted-charts' radar draws no markers: the kit draws each series' (`seriesMark`) at its points, where the library puts them (`radarPoint`). */}
+                {marks ? (
+                  <Svg width={size} height={size} style={s.markers} pointerEvents="none">
+                    {series.visible.map((f, k) => {
+                      const shape = seriesMark(series.fields.indexOf(f)).shape;
+                      return sets[k]!.map((v, i) => {
+                        const p = radarPoint(i, rows.length, v, max, size);
+                        return <Path key={`${f}-${i}`} d={markPath(shape, p.x, p.y, markSize)} fill={shape === "cross" ? "none" : series.colorOf(f)} stroke={series.colorOf(f)} strokeWidth={tk.border.wThick} />;
+                      });
+                    })}
+                  </Svg>
+                ) : null}
               </View>
               {touch ? (
                 <View pointerEvents="none" style={[s.overlay, { left, top, width: theme.tooltip.width }]}>

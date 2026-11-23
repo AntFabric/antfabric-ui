@@ -1,8 +1,10 @@
+import { useId } from "react";
 import { Pressable, Text, View, type ViewStyle } from "react-native";
 import Svg, { Line, Path } from "react-native-svg";
 import { markPath, seriesMark, type Series } from "@antfabric/ui-core/chart";
 import { createStyles } from "../theme";
 import { usePress } from "../lib/press";
+import { Texture } from "./texture";
 import { chartFont, useChartTokens } from "./theme";
 
 export interface LegendProps {
@@ -11,8 +13,8 @@ export interface LegendProps {
   labels?: Record<string, string>;
   /** The name a screen reader gives the group of toggles ("Series"). The chart passes its own string. */
   label: string;
-  /** The key draws each series' dash and marker beside its colour (`seriesMark`), the same ones the plot draws when it is told to. */
-  marks?: boolean;
+  /** The key draws each series' dash and marker beside its colour (`seriesMark`), the same ones the plot draws when it is told to; `"texture"` draws its swatch in its texture, as a bar chart fills its bars. */
+  marks?: boolean | "texture";
   style?: ViewStyle;
 }
 
@@ -23,10 +25,12 @@ const useStyles = createStyles((t) => ({
   root: { flexDirection: "row", flexWrap: "wrap", gap: t.space["3xs"] },
   item: { flexDirection: "row", alignItems: "center", gap: t.space.xs, minHeight: t.control.hit, paddingHorizontal: t.space.sm, borderRadius: t.radius.pill },
   swatch: { width: t.space.smMd, height: t.space.smMd, borderRadius: t.radius.tag },
+  clip: { overflow: "hidden" },
 }));
 
-function Item({ label, on, color, onPress, index }: { label: string; on: boolean; color: string; onPress: () => void; index?: number }) {
+function Item({ label, on, color, onPress, index, texture = false }: { label: string; on: boolean; color: string; onPress: () => void; index?: number; texture?: boolean }) {
   const mark = index === undefined ? null : seriesMark(index);
+  const pattern = `af-chart-${useId().replace(/\W/g, "")}`;
   const s = useStyles();
   const t = useChartTokens();
   // The phone has no hover; a focused item (keyboard, switch access) draws the ring.
@@ -40,13 +44,14 @@ function Item({ label, on, color, onPress, index }: { label: string; on: boolean
       {...press.handlers}
       style={[s.item, { backgroundColor: press.pressed ? t.hover.surface : "transparent", boxShadow: press.focused ? t.shadow.focus : undefined }]}
     >
-      {mark ? (
+      {mark && !texture ? (
         <Svg width={t.space.smMd * 2} height={t.space.smMd} viewBox={`0 0 ${KEY.w} ${KEY.h}`} style={{ opacity: on ? 1 : t.opacity.muted }}>
           <Line x1={0} x2={KEY.w} y1={KEY.h / 2} y2={KEY.h / 2} stroke={color} strokeWidth={KEY.stroke} strokeDasharray={mark.dash.length ? mark.dash.map((n) => n * KEY.stroke).join(" ") : undefined} />
           <Path d={markPath(mark.shape, KEY.w / 2, KEY.h / 2, KEY.h * 0.6)} fill={mark.shape === "cross" ? "none" : color} stroke={color} strokeWidth={KEY.stroke / 2} />
         </Svg>
       ) : (
-        <View style={[s.swatch, { backgroundColor: color, opacity: on ? 1 : t.opacity.muted }]} />
+        // A bar chart's key: the swatch in the series' texture over its colour, as its bars are filled (the first series is plain).
+        <View style={[s.swatch, { backgroundColor: color, opacity: on ? 1 : t.opacity.muted }, mark && mark.texture !== "none" && s.clip]}>{mark && mark.texture !== "none" ? <Texture id={pattern} texture={mark.texture} ink={t.surface.card} /> : null}</View>
       )}
       <Text style={[chartFont(t), { color: on ? t.fg.muted : t.fg.faint, fontSize: t.text.caption, lineHeight: t.text.captionLine, textDecorationLine: on ? "none" : "line-through" }]}>{label}</Text>
     </Pressable>
@@ -63,7 +68,7 @@ export function Legend({ series, labels = {}, label, marks = false, style }: Leg
   return (
     <View accessibilityRole="toolbar" accessibilityLabel={label} style={[s.root, style]}>
       {series.fields.map((f) => (
-        <Item key={f} label={labels[f] ?? f} on={!series.hidden.has(f)} color={series.colorOf(f)} onPress={() => series.toggle(f)} index={marks ? series.fields.indexOf(f) : undefined} />
+        <Item key={f} label={labels[f] ?? f} on={!series.hidden.has(f)} color={series.colorOf(f)} onPress={() => series.toggle(f)} index={marks ? series.fields.indexOf(f) : undefined} texture={marks === "texture"} />
       ))}
     </View>
   );

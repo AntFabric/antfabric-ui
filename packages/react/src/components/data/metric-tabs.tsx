@@ -116,9 +116,10 @@ export function MetricTabs({ data, x, metrics, title, subtitle = "", format = "i
   const [picked, setPicked] = useControllable(value, onValueChange);
   const tabs = metrics.slice(0, MOST);
   // React's id, so two tab sets never share one (a title of non-Latin words would have been all dashes); the server and the client give the same.
-  const uid = `metric-tabs-${useId()}`;
-  const panelId = `${uid}-panel`;
-  const tabId = (i: number) => `${uid}-tab-${i}`;
+  // In the chart family (`af-chart-…`, word characters only), as the charts' own generated ids are.
+  const uid = `af-chart-${useId().replace(/\W/g, "")}`;
+  const panelId = `${uid}panel`;
+  const tabId = (i: number) => `${uid}tab${i}`;
   // The arrows move by the reading direction and the tab chosen is the one focused (automatic activation); Home and End go to the ends.
   const keys$ = useRovingKeys<HTMLDivElement>({ items: '[role="tab"]', orientation: "horizontal", onMove: (_, i) => tabs[i] && setPicked(tabs[i].field) });
   const palette = seriesColors(tk);

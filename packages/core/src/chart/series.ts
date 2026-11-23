@@ -73,18 +73,52 @@ export function barLayout(width: number, count: number, gap: number): { gap: num
 /** A marker's shape, drawn at the points of a series and in the legend's key. */
 export type MarkShape = "circle" | "square" | "triangle" | "diamond" | "cross";
 
+/** A bar's texture over its fill: none, lines rising at 45°, lines falling at 135°, both, or dots. Diagonals only: a level or upright line would read as a rule or a bar's edge. */
+export type MarkTexture = "none" | "rising" | "falling" | "cross" | "dots";
+
 /**
  * What tells one series from another besides its hue (WCAG 1.4.1): its dash pattern (a line's dash and gap lengths, as multiples of the
  * line's width; none is solid) and the shape of its marker. The first series stays a plain solid line with a round marker; the order is
  * the palette's, so a series is the same in the plot and in the legend.
  */
-export const SERIES_MARKS: readonly { dash: readonly number[]; shape: MarkShape }[] = [
-  { dash: [], shape: "circle" },
-  { dash: [4, 2], shape: "square" },
-  { dash: [1, 2], shape: "triangle" },
-  { dash: [6, 2, 1, 2], shape: "diamond" },
-  { dash: [2, 2], shape: "cross" },
+export const SERIES_MARKS: readonly { dash: readonly number[]; shape: MarkShape; texture: MarkTexture }[] = [
+  { dash: [], shape: "circle", texture: "none" },
+  { dash: [4, 2], shape: "square", texture: "rising" },
+  { dash: [1, 2], shape: "triangle", texture: "falling" },
+  { dash: [6, 2, 1, 2], shape: "diamond", texture: "cross" },
+  { dash: [2, 2], shape: "cross", texture: "dots" },
 ];
+
+/**
+ * A texture's tile (px on the web, points on the phone): one repeat of the pattern, a line's width, a dot's radius, and how strongly it is inked.
+ * It is drawn in the card's colour over the series' fill, a lighter step of the fill in a light theme and a darker one in a dark theme, so it is
+ * tone on tone and every slot is as loud as the next: the hue still leads, the texture is the second channel.
+ */
+export const TEXTURE = { tile: 6, stroke: 1.5, dot: 1.25, opacity: 0.55 } as const;
+
+/**
+ * One tile of a texture as an SVG path, `size` square, drawn so tiles meet with no seam: lines are stroked (`fill="none"`), dots are filled. Empty for `none`.
+ * Both kits draw it in a `<pattern>` (`patternUnits="userSpaceOnUse"`, `size` wide and high) over a bar's fill and in the legend's swatch.
+ */
+export function texturePath(texture: MarkTexture, size: number = TEXTURE.tile): string {
+  const s = size;
+  const h = s / 2;
+  const rising = `M0 ${s}L${s} 0M${-h} ${h}L${h} ${-h}M${h} ${s + h}L${s + h} ${h}`;
+  const falling = `M0 0L${s} ${s}M${-h} ${h}L${h} ${s + h}M${h} ${-h}L${s + h} ${h}`;
+  const r = TEXTURE.dot;
+  switch (texture) {
+    case "rising":
+      return rising;
+    case "falling":
+      return falling;
+    case "cross":
+      return rising + falling;
+    case "dots":
+      return `M${h - r} ${h}a${r} ${r} 0 1 0 ${r * 2} 0a${r} ${r} 0 1 0 ${-r * 2} 0Z`;
+    default:
+      return "";
+  }
+}
 
 /** The marks of the series at `index`, cycling past the table's end. */
 export const seriesMark = (index: number) => SERIES_MARKS[index % SERIES_MARKS.length]!;

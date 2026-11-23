@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useLocale } from "@antfabric/ui-core";
 import { Bar, BarChart as RBarChart, Cell, LabelList, ReferenceLine, Tooltip } from "recharts";
-import { DIMMED, bySign, fitLabel, fmt, labelWidth, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Row, type Scale, type Series } from "@antfabric/ui-core/chart";
+import { DIMMED, bySign, fitLabel, fmt, labelWidth, seriesMark, tipRows, type FormatSpec, type FormatWords, type PreparedRow, type Row, type Scale, type Series } from "@antfabric/ui-core/chart";
 import type { Interaction } from "../lib/interaction";
 import { box, css } from "../lib/style";
 import { cartesianAxes } from "./axes";
 import { rechartsTheme, type ChartTokens } from "./theme";
+import { TexturePattern } from "./texture";
 import { ChartTooltip, hoveredRow, type TipContentArgs } from "./tooltip";
 
 export interface RechartsBarsProps {
@@ -39,6 +40,8 @@ export interface RechartsBarsProps {
    * `color` and its transition on the `plot` style it passes in.
    */
   easeColor?: boolean;
+  /** Each series past the first is filled with its texture (`seriesMark(i).texture`) over its colour: WCAG 1.4.1, for people who cannot tell the hues apart. The legend draws the same (`Legend marks="texture"`). */
+  marks?: boolean;
   width: number;
   height: number;
 }
@@ -53,7 +56,7 @@ const indexOf = (state: { activeTooltipIndex?: number | string | null }): number
  * back, value labels at the ends of a single horizontal series, a colour by sign for a single series with a loss. A bar's fill eases to a new colour, and
  * the same bars tween to new heights when the rows change under the same data key.
  */
-export function RechartsBars({ tk, theme, ui, plot, hint, data, rows, keys, fields, s, labels, format, formatWords, scale, stacked = false, totalLabel, horizontal = false, easeColor = false, width, height }: RechartsBarsProps) {
+export function RechartsBars({ tk, theme, ui, plot, hint, data, rows, keys, fields, s, labels, format, formatWords, scale, stacked = false, totalLabel, horizontal = false, easeColor = false, marks = false, width, height }: RechartsBarsProps) {
   const locale = useLocale();
   const [active, setActive] = useState<number | null>(null);
   // A single series with a loss colours each bar by its sign, so a bar below zero reads as a loss.
@@ -71,7 +74,11 @@ export function RechartsBars({ tk, theme, ui, plot, hint, data, rows, keys, fiel
   };
   // Long category labels are cut to the room the axis gives them; the tooltip has the full one.
   const catWidth = Math.min(labelWidth(keys, tk.chart.labelSize) + tk.space["2xs"], width * 0.4);
-  const fillOf = (f: string) => (easeColor ? "currentColor" : s.colorOf(f));
+  // A texture is a pattern of the series' colour and the card's: its own id, from this chart's, so two charts never share one.
+  const uid = useId().replace(/\W/g, "");
+  const textureOf = (f: string) => (marks ? seriesMark(s.fields.indexOf(f)).texture : "none");
+  const patternOf = (f: string) => `af-chart-${uid}t${s.fields.indexOf(f)}`;
+  const fillOf = (f: string) => (easeColor ? "currentColor" : textureOf(f) !== "none" ? `url(#${patternOf(f)})` : s.colorOf(f));
   const shown = horizontal ? rows.map((row) => ({ ...row, __x: fitLabel(row.__x, catWidth - tk.space.md, tk.chart.labelSize), __full: row.__x })) : rows;
   return (
     <div data-af-part="plot" data-af-plot onFocus={ui.handlers.onFocus} onBlur={ui.handlers.onBlur} style={css(box, plot)}>
@@ -88,6 +95,11 @@ export function RechartsBars({ tk, theme, ui, plot, hint, data, rows, keys, fiel
         onMouseMove={(state) => setActive(indexOf(state))}
         onMouseLeave={() => setActive(null)}
       >
+        {marks ? (
+          <defs>
+            {s.visible.map((f) => (textureOf(f) === "none" ? null : <TexturePattern key={f} id={patternOf(f)} texture={textureOf(f)} ink={theme.card} fill={s.colorOf(f)} />))}
+          </defs>
+        ) : null}
         {cartesianAxes({ tk, theme, scale, format, formatWords, locale, horizontal, catWidth, hideValues: endLabels })}
         {scale.min < 0 ? <ReferenceLine {...(horizontal ? { x: 0 } : { y: 0 })} stroke={tk.chart.axis} /> : null}
         <Tooltip

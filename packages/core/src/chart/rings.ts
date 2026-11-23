@@ -192,6 +192,18 @@ export const clampScore = (value: unknown, max: number): number => {
 };
 
 /**
+ * Where a value sits on a radar drawn as the phone's library draws one (gifted-charts' RadarChart): `size` square, the outer ring at `reach` of
+ * the half-size, axis `index` of `count` at `startAngle` degrees (counter-clockwise from three o'clock) stepping clockwise. The kit draws a series'
+ * markers here, over the library's polygons.
+ */
+export function radarPoint(index: number, count: number, value: number, max: number, size: number, { startAngle = 90, clockwise = true, reach = 0.8 }: { startAngle?: number; clockwise?: boolean; reach?: number } = {}): { x: number; y: number } {
+  const c = size / 2;
+  const a = ((startAngle + index * (360 / Math.max(1, count)) * (clockwise ? -1 : 1)) * Math.PI) / 180;
+  const d = max > 0 ? c * reach * (value / max) : 0;
+  return { x: c + d * Math.cos(a), y: c - d * Math.sin(a) };
+}
+
+/**
  * Which of `count` axes a point is nearest to, on a radar drawn with the first axis at `startAngle` (degrees, counter-clockwise from three o'clock,
  * as gifted-charts takes it) and the rest running `clockwise` or not. `x`, `y` are measured from the chart's top left, `size` is its width and height.
  * The phone's radar has no pointer of its own, so the kit finds the axis under a finger with this.
