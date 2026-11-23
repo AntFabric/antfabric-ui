@@ -1983,7 +1983,7 @@
         },
         "onOpen": {
           "type": "event",
-          "description": "Desktop/web: preview (lightbox or file viewer). Mobile: MediaViewer for images, video and previewable files; Share (iOS) or Save to device (Android) for the rest."
+          "description": "Desktop/web: preview (lightbox or file viewer). Mobile: MediaViewer for images, video and previewable files; Share (iOS) or Save to device (Android) for the rest. A ready staged chip's body and a link card's press call it too (the web still follows the link; the phone opens only an http, https or mailto link itself)."
         },
         "onDownload": { "type": "event", "platforms": ["web", "desktop"] },
         "onStatusChange": {
@@ -2037,6 +2037,7 @@
         "bar",
         "duration",
         "chip",
+        "chipOpen",
         "chipThumb"
       ],
       "recipe": {
@@ -2071,6 +2072,7 @@
           "bar",
           "duration",
           "chip",
+          "chipOpen",
           "chipThumb"
         ],
         "styles": {
@@ -2228,6 +2230,10 @@
               "borderColor": "$border.subtle",
               "bg": "$surface.card"
             }
+          },
+          "chipOpen": {
+            "base": { "gap": "$space.sm", "radius": "$radius.tag" },
+            "states": { "focus": { "shadow": "$shadow.focus" } }
           },
           "chipThumb": { "base": { "borderWidth": "$border.wHairline", "borderColor": "$border.subtle" } }
         },
@@ -2414,6 +2420,16 @@
           "title": "Image will not load",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "A thumbnail that 404s or fails to decode falls back to the file card with the image badge, so the file can still be downloaded. A deleted or no-longer-shared file shows \"This file is no longer available\" with no actions."
+        },
+        {
+          "title": "A staged file is pressed",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "Once a staged chip is ready, its thumbnail or badge and name are one button that calls onOpen, so the sender can check the file before sending. While it uploads, is paused or failed, the body is not a button: Cancel and Retry are the chip's controls."
+        },
+        {
+          "title": "A link that is not a web or mail link",
+          "platforms": ["mobile"],
+          "handling": "A press on a link card calls onOpen; the card opens the link itself only for http, https and mailto, so a message carrying another scheme (an app deep link, tel:, a file path) opens nothing unless the app does it from onOpen."
         },
         {
           "title": "Link preview from an untrusted page",
@@ -7675,7 +7691,7 @@
         },
         "onAttachmentDownload": {
           "type": "event",
-          "description": "A staged attachment's download was pressed.",
+          "description": "Never called, and deprecated: a staged file is the sender's own, so its chip has no download (a ready chip's body calls onAttachmentOpen). Kept so 1.x code compiles; removed in 2.0.",
           "platforms": ["web", "desktop"],
           "args": "attachment: Attachment"
         },
@@ -8048,6 +8064,16 @@
           "title": "Double press on Send",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "The box is cleared and Send disabled in the same tick as the press, before the request; the message carries a client id so a network retry cannot post it twice."
+        },
+        {
+          "title": "Send pressed while a file is still uploading",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "Send stays reachable (aria-disabled on the web, not disabled), drawn quiet: a press, or Enter, sends nothing and says \"Waiting for the upload to finish\", the same words as the line under the box. Once the upload is done Send lights up."
+        },
+        {
+          "title": "Editing with Mod+Enter to send",
+          "platforms": ["web", "desktop"],
+          "handling": "The edit banner names the key that saves: ⌘↩ (Ctrl+Enter on Windows and Linux) with sendKey mod-enter, Enter otherwise, since plain Enter is a new line there."
         },
         {
           "title": "Offline, then back",
@@ -10461,6 +10487,12 @@
           "default": false,
           "platforms": ["web", "desktop"]
         },
+        "headingLevel": {
+          "type": "number",
+          "description": "The title's heading level, 1 to 6, so it keeps the page's heading order: an empty pane under the page's h1 is an h2, an empty section inside an h2 an h3. The phone has one kind of header.",
+          "default": 2,
+          "platforms": ["web", "desktop"]
+        },
         "onAction": { "type": "event" }
       },
       "parts": [
@@ -10755,6 +10787,11 @@
           "handling": "The quoted query is cut at 40 characters on a word boundary with an ellipsis; the full query stays in the search field. The line wraps (text-wrap: pretty) rather than truncating the sentence."
         },
         {
+          "title": "Inside a section that has its own heading",
+          "platforms": ["web", "desktop"],
+          "handling": "Pass `headingLevel` one below the section's heading (3 under an h2), so the outline a screen reader walks stays in order; the title looks the same at every level."
+        },
+        {
           "title": "Narrow rail",
           "platforms": ["web", "desktop"],
           "handling": "compact cuts the padding to 28 × 18 and the measure to 214px so the drawing stays above the fold in a 248px column; the drawing itself never shrinks below 160 × 116."
@@ -10783,11 +10820,11 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A centred flex column with enter(\"fade\"): the 160 × 116 drawing as absolutely placed boxes over `t`, or a glyph in a disc; an <h2> title; the kit's Button (secondary, lg)",
+          "base": "A centred flex column with enter(\"fade\"): the 160 × 116 drawing as absolutely placed boxes over `t`, or a glyph in a disc; an <h2> title (`headingLevel` picks h1 to h6); the kit's Button (secondary, lg)",
           "import": "import { EmptyState } from \"@antfabric/ui-react\"",
           "notes": [
             "Search empties are announced through the search field's own live region (\"No matches\"), not by this component.",
-            "The title is an h2 inside the pane's landmark, so a screen-reader user can jump to it."
+            "The title is a heading inside the pane's landmark (h2 unless `headingLevel` says otherwise), so a screen-reader user can jump to it."
           ]
         },
         "desktop": {
@@ -16552,6 +16589,16 @@
       ],
       "edgeCases": [
         {
+          "title": "The ⋯ menu is open and the pointer moves into it",
+          "platforms": ["web", "desktop"],
+          "handling": "The bar stays drawn while `menuOpen` holds (the row's own state when the app passes only `onMenuOpenChange`), so the menu the app anchors to ⋯ keeps its anchor after the pointer and focus leave the row for the menu."
+        },
+        {
+          "title": "A long press on one row, then another",
+          "platforms": ["web", "desktop"],
+          "handling": "On touch the bar opens by long press, on that row only: a press anywhere outside the row puts it away, so bars are never left open on several rows."
+        },
+        {
           "title": "One enormous token",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "A pasted URL, hash or model dump with no spaces breaks anywhere (overflow-wrap: anywhere, which also counts for min-content), so the row never pushes past the scroller and the timeline never scrolls sideways."
@@ -16789,6 +16836,7 @@
         "label": "Message actions",
         "notes": [
           "Every control is a real button with a name (\"React with 👍\", \"Reply in thread\").",
+          "⋯ is a menu button, not a toggle: a screen reader hears that it opens a menu and whether the menu is open (aria-haspopup=\"menu\", aria-expanded), never \"pressed\".",
           "Arrow keys, Home and End move between the buttons; left and right follow the tree's direction, so in right-to-left they turn round. Every button is still its own Tab stop: a single roving stop needs IconButton to take a tabIndex, which it does not yet.",
           "Inside a Message, the bar shows on hover, on focus in the row, and after a long press or Shift+F10 / the Menu key; Escape closes it back to the row."
         ]
@@ -16843,7 +16891,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A role=\"toolbar\" box with inline styles over `t`: quick reactions are <button>s with hover and press from useInteraction, the rest the kit's IconButton (square); ⋯ is a toggle IconButton that holds `menuOpen`. ← / → move focus along the bar. Tooltips are each button's title.",
+          "base": "A role=\"toolbar\" box with inline styles over `t`: quick reactions are <button>s with hover and press from useInteraction, the rest the kit's IconButton (square); ⋯ is a menu button (aria-haspopup=\"menu\", aria-expanded) that holds `menuOpen` and draws pressed while the menu is open. ← / → move focus along the bar. Tooltips are each button's title.",
           "import": "import { MessageActions } from \"@antfabric/ui-react/chat\"",
           "notes": [
             "Shown on row hover and on :focus-within, positioned absolute at top 2 / right 14 of the row so it costs the message no height and no reflow.",
@@ -22267,8 +22315,8 @@
       "props": {
         "value": {
           "type": "number",
-          "description": "0–100, clamped. The desktop kit calls it pct; the mobile kit takes 0–1 and the adapter multiplies by 100, so one prop means one thing everywhere.",
-          "default": 40
+          "description": "0–100, clamped. Left out (or NaN), the bar is indeterminate: no percent is drawn or announced until there is one. The desktop kit calls it pct; the mobile kit takes 0–1 and the adapter multiplies by 100, so one prop means one thing everywhere.",
+          "sample": 40
         },
         "indeterminate": {
           "type": "boolean",
@@ -22414,7 +22462,7 @@
         {
           "title": "Value out of range or missing",
           "platforms": ["web", "desktop", "mobile"],
-          "handling": "Clamped to 0–100, so 130 draws full and −5 draws empty. A NaN or unknown total becomes indeterminate rather than a bar stuck at zero."
+          "handling": "Clamped to 0–100, so 130 draws full and −5 draws empty. A NaN, an unknown total or no value at all (an upload that has not reported yet) is indeterminate rather than a bar stuck at zero or a made-up percent."
         },
         {
           "title": "Fast enough not to show",
@@ -24483,6 +24531,11 @@
         }
       ],
       "edgeCases": [
+        {
+          "title": "Nobody to name yet",
+          "platforms": ["web", "desktop"],
+          "handling": "With `reactors` empty (the names still loading, or a product that does not send them), hover and focus open no card: an empty card would say nothing. The pill's name is the emoji and the count."
+        },
         {
           "title": "Hundreds of reactors",
           "platforms": ["web", "desktop"],
@@ -27552,6 +27605,11 @@
           "handling": "Hears \"Loading conversations\" once, from the group; the shapes are hidden. A list of forty rows is still one announcement."
         },
         {
+          "title": "Laid out but not yet visible",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "While `visible` is false (its first 300 ms) the placeholder is hidden from screen readers too, not only from sight: nothing is announced and there is no \"Loading\" group to find until it fades in."
+        },
+        {
           "title": "Text scaled to 130%",
           "platforms": ["mobile"],
           "handling": "Each bar sits in a line box of fontSize × 1.4 at the current scale, so the skeleton row is as tall as the real row it stands in for and nothing jumps when the text arrives."
@@ -28561,6 +28619,11 @@
           "title": "Scrolling while a row is open",
           "platforms": ["mobile"],
           "handling": "A vertical scroll that starts on a row scrolls the list, never half-opens the row (the pan activates on horizontal movement only); the open row stays open until another opens or it is tapped closed."
+        },
+        {
+          "title": "A drag that starts on an open row",
+          "platforms": ["mobile"],
+          "handling": "The drag starts from where the row rests, open, at once (the animated value's own reading arrives a frame later on the native driver), so the row follows the finger from the tray's edge instead of jumping to closed first."
         },
         {
           "title": "Reduced motion",
@@ -32450,6 +32513,11 @@
       ],
       "edgeCases": [
         {
+          "title": "Only thinking, no steps yet, on the web",
+          "platforms": ["web", "desktop"],
+          "handling": "The lattice, the word and the clock are drawing only; the row also holds the sentence it announces (\"Fabric is thinking\") as plain hidden text, so a reader moving through the page finds what the agent is doing, not an empty row."
+        },
+        {
           "title": "A long turn",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "The clock reads seconds to a tenth under a minute, then minutes and seconds (1m 05s). Past five steps (three on the phone) the oldest are counted as \"+N earlier\"."
@@ -33399,6 +33467,16 @@
       ],
       "edgeCases": [
         {
+          "title": "The message changes while it is shown",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "A toast whose `message` changes in place (\"Uploading 2 files…\" becomes \"2 files uploaded\") is announced again, and on the web and desktop its `duration` starts again, so the new words get their full time."
+        },
+        {
+          "title": "A theme's ink in another colour form",
+          "platforms": ["mobile"],
+          "handling": "The Undo and Dismiss chips are the pill's ink at a low alpha; the ink may be #rgb, #rrggbb (with or without alpha), rgb() or hsl(), and a colour name leaves the chips unfilled rather than drawing a wrong colour."
+        },
+        {
           "title": "Several toasts at once",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "Never a stack. Web and desktop show the newest and drop the older — except that a success never replaces an error still in its first 2 s; it waits behind it. Mobile queues oldest-first, 4 s each. Identical messages raised within the window collapse into one (\"Link copied\" three times shows once)."
@@ -33551,7 +33629,10 @@
           "description": "The most toasts shown at once; the newest are kept, the older ones wait out of sight.",
           "default": 3
         },
-        "children": { "type": "node", "description": "The toasts, oldest first." }
+        "children": {
+          "type": "node",
+          "description": "The toasts, oldest first, each with its own React `key` (the notification's id), so one leaving never remounts the others."
+        }
       },
       "parts": ["root"],
       "recipe": {
@@ -33581,6 +33662,11 @@
           "title": "More toasts than max",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "Only the newest `max` are drawn; when one is dismissed, the next older one comes back into view."
+        },
+        {
+          "title": "A toast leaves while others stay",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "Each toast is held by its own `key`, not its place: when the oldest is dismissed, the ones after it keep their nodes, so their timers run on, they are not announced again, and focus on a later Undo stays where it is."
         },
         {
           "title": "A toast over an open dialog",
@@ -34534,6 +34620,11 @@
           "title": "You are typing on another device",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "Your own participant id is filtered out, so typing on the phone never shows \"Priya is typing…\" to Priya on the desktop."
+        },
+        {
+          "title": "Nobody typing",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "With `names` empty nothing is drawn, and on the phone the dots' loop does not run: it starts when someone starts typing and stops when the last one stops."
         },
         {
           "title": "Someone stops without sending",

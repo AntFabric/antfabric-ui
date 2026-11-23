@@ -173,6 +173,9 @@ export function SwipeRow({ open, unread = false, dense = false, title, body = ""
         },
         onPanResponderGrant: () => {
           setMoving(true);
+          // Where the row rests (open or closed) at once: on the native driver the stopped value comes back a frame later, and a move
+          // read before it would start from a stale place and jump. The callback then refines it for a row caught mid-snap.
+          state.current.start = at.current ? -state.current.width : 0;
           x.stopAnimation((v) => (state.current.start = v));
         },
         onPanResponderMove: (_, g) => {

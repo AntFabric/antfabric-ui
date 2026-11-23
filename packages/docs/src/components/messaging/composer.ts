@@ -196,7 +196,7 @@ const docs: ComponentDocs = {
       type: "event",
       platforms: ["web", "desktop"],
       args: "attachment: Attachment",
-      description: "A staged attachment's download was pressed.",
+      description: "Never called, and deprecated: a staged file is the sender's own, so its chip has no download (a ready chip's body calls onAttachmentOpen). Kept so 1.x code compiles; removed in 2.0.",
     },
     onAttachmentCancel: {
       type: "event",
@@ -476,6 +476,24 @@ const docs: ComponentDocs = {
       title: "Double press on Send",
       platforms: ["web", "desktop", "mobile"],
       handling: "The box is cleared and Send disabled in the same tick as the press, before the request; the message carries a client id so a network retry cannot post it twice.",
+    },
+    {
+      title: "Send pressed while a file is still uploading",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "Send stays reachable (aria-disabled on the web, not disabled), drawn quiet: a press, or Enter, sends nothing and says \"Waiting for the upload to finish\", the same words as the line under the box. Once the upload is done Send lights up.",
+      example: {
+        name: "Waiting for the upload",
+        props: { value: "Here's the deck for Thursday", uploading: true, attachments: [{ key: "deck", name: "q3-roadmap.key", fileType: "deck", badge: "KEY", size: "18 MB", status: "uploading", progress: 64 }] },
+      },
+    },
+    {
+      title: "Editing with Mod+Enter to send",
+      platforms: ["web", "desktop"],
+      handling: "The edit banner names the key that saves: ⌘↩ (Ctrl+Enter on Windows and Linux) with sendKey mod-enter, Enter otherwise, since plain Enter is a new line there.",
+      example: {
+        name: "Editing, Mod+Enter",
+        props: { mode: "editing", sendKey: "mod-enter", value: "Moving the release train to Thursday" },
+      },
     },
     {
       title: "Offline, then back",

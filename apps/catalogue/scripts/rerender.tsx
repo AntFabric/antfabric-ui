@@ -845,6 +845,29 @@ const HANDOFF_CASES: HandoffCase[] = [
   host.remove();
 }
 
+// A toast that leaves the region keeps the ones after it mounted: the second toast's node (and so its timer and its focus) survives the
+// first one going. Keyed by place, every toast after the one that left was a new node.
+if (!only.length || only.includes("toast-region")) {
+  const ReactKit = await import("@antfabric/ui-react");
+  const host = document.createElement("div");
+  document.body.appendChild(host);
+  const root = createRoot(host);
+  const toast = (key: string, message: string) => createElement(ReactKit.Toast, { key, message, duration: 6000 });
+  const region = (children: ReturnType<typeof createElement>[]) => createElement(Stage, { platform: "web", os: "browser", scheme: "light", theme: antfabric, children: createElement(ReactKit.ToastRegion, { children }) });
+  const quiet = logged.length;
+  await act(async () => root.render(region([toast("role", "Role saved."), toast("invite", "Grace Hopper was invited.")])));
+  const second = Array.from(host.querySelectorAll('[data-af-part="message"]')).find((el) => el.textContent === "Grace Hopper was invited.");
+  await act(async () => root.render(region([toast("invite", "Grace Hopper was invited.")])));
+  const after = Array.from(host.querySelectorAll('[data-af-part="message"]')).find((el) => el.textContent === "Grace Hopper was invited.");
+  if (!second || second !== after) {
+    errors++;
+    keep.error("  ✗ toast-region/web: removing the first toast remounted the second (its timer restarts and it is announced again)");
+  }
+  await act(async () => root.unmount());
+  host.remove();
+  logged.length = quiet;
+}
+
 /*
  * The web root once mounted, and what a consumer's own tests run it in. Each failure is an error:
  *   - a theme's sheet is in <head> once while any root draws it, and gone when the last one unmounts (a live colour picker made one per colour);

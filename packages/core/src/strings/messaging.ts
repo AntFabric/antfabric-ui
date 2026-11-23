@@ -163,7 +163,7 @@ export const messaging = {
     failedUpload: "Couldn't upload {name}",
     /** The link preview's accessible name: its title, then where it goes. */
     link: "{title}, {domain}",
-    /** The × that removes a link's preview (web and desktop). */
+    /** The × that removes a link's preview. */
     removePreview: "Remove preview",
     play: "Play voice note, {duration}",
     pause: "Pause voice note, {duration}",
@@ -239,5 +239,5 @@ export const messagingOnly = {
     commandsPhone: ["mobile"],
     record: ["mobile"],
   },
-  "attachment-card": { typeLabel: ["web"], image: ["web"], preview: ["web"], download: ["web"], removePreview: ["web"], fileOpenPhone: ["mobile"] },
+  "attachment-card": { typeLabel: ["web"], image: ["web"], preview: ["web"], download: ["web"], fileOpenPhone: ["mobile"] },
 } as const satisfies OnlyOn<typeof messaging>;

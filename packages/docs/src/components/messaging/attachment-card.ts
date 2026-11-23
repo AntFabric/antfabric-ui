@@ -153,7 +153,7 @@ const docs: ComponentDocs = {
     },
     onOpen: {
       type: "event",
-      description: "Desktop/web: preview (lightbox or file viewer). Mobile: MediaViewer for images, video and previewable files; Share (iOS) or Save to device (Android) for the rest.",
+      description: "Desktop/web: preview (lightbox or file viewer). Mobile: MediaViewer for images, video and previewable files; Share (iOS) or Save to device (Android) for the rest. A ready staged chip's body and a link card's press call it too (the web still follows the link; the phone opens only an http, https or mailto link itself).",
     },
     onDownload: {
       type: "event",
@@ -436,6 +436,20 @@ const docs: ComponentDocs = {
       title: "Image will not load",
       platforms: ["web", "desktop", "mobile"],
       handling: "A thumbnail that 404s or fails to decode falls back to the file card with the image badge, so the file can still be downloaded. A deleted or no-longer-shared file shows \"This file is no longer available\" with no actions.",
+    },
+    {
+      title: "A staged file is pressed",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "Once a staged chip is ready, its thumbnail or badge and name are one button that calls onOpen, so the sender can check the file before sending. While it uploads, is paused or failed, the body is not a button: Cancel and Retry are the chip's controls.",
+      example: {
+        name: "Staged and ready",
+        props: { compact: true, name: "q3-roadmap.pdf", fileType: "pdf", badge: "PDF", size: "2.4 MB", status: "ready" },
+      },
+    },
+    {
+      title: "A link that is not a web or mail link",
+      platforms: ["mobile"],
+      handling: "A press on a link card calls onOpen; the card opens the link itself only for http, https and mailto, so a message carrying another scheme (an app deep link, tel:, a file path) opens nothing unless the app does it from onOpen.",
     },
     {
       title: "Link preview from an untrusted page",

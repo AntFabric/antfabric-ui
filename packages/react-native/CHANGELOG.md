@@ -102,6 +102,14 @@ A component never shows the result of a request before the app confirms it (S2, 
 - Popover: the backdrop is named Close (`common`'s close; Popover takes `strings`), not the trigger's label, and the panel is placed again when the window's size changes (the phone turned) (L16, L19).
 - UpdateBanner: the restart sheet takes screen-reader focus at its title when it opens, and the escape gesture puts it away (L16).
 - BottomSheet: a sheet put away is hidden from TalkBack too (`importantForAccessibility`), not only from VoiceOver (L16).
+Messaging, agent and feedback:
+- AttachmentCard and Composer: a ready staged chip's thumbnail or badge and name are one button that calls `onOpen`, so Composer's `onAttachmentOpen` fires (M26). A link card calls `onOpen` when pressed and opens the link itself only for `http`, `https` and `mailto`; any other scheme a message carried is the app's to open from `onOpen`, or not at all. `removable` now draws Remove preview on a link card, as on the web (L26, L36).
+- Composer: while only an upload holds a typed message, Send stays pressable, so a tap says "Waiting for the upload to finish" (L28).
+- Toast: the Undo and Dismiss chips read the pill's ink in any form (#rgb, #rgba, #rrggbb, #rrggbbaa, rgb(), rgba(), hsl(), hsla()); `#fff` drew them blue and `rgb(…)` drew nothing. A colour name leaves them unfilled (M30).
+- TypingIndicator: the dots' animation runs only while someone is typing (L24).
+- Skeleton: while `visible` is false it is hidden from screen readers too (L30). A one-line row (`lines={1}`) draws the small 20pt lead, as the web does (L33).
+- ProgressBar: `value` left out is indeterminate, as a NaN was; it no longer draws and announces 40% (L32).
+- SwipeRow: a drag that starts on an open row starts from where the row rests, at once, instead of from a value the native driver reports a frame later (L34).
 
 ## 1.0.0
 

@@ -209,6 +209,11 @@ const docs: ComponentDocs = {
       handling: "A vertical scroll that starts on a row scrolls the list, never half-opens the row (the pan activates on horizontal movement only); the open row stays open until another opens or it is tapped closed.",
     },
     {
+      title: "A drag that starts on an open row",
+      platforms: ["mobile"],
+      handling: "The drag starts from where the row rests, open, at once (the animated value's own reading arrives a frame later on the native driver), so the row follows the finger from the tray's edge instead of jumping to closed first.",
+    },
+    {
       title: "Reduced motion",
       platforms: ["mobile"],
       handling: "The row still follows the finger — direct manipulation is not decorative motion — but snapping open or shut after release is instant.",

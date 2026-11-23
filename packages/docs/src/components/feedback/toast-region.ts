@@ -34,7 +34,7 @@ const docs: ComponentDocs = {
     },
     children: {
       type: "node",
-      description: "The toasts, oldest first.",
+      description: "The toasts, oldest first, each with its own React `key` (the notification's id), so one leaving never remounts the others.",
     },
   },
   platforms: {
@@ -76,6 +76,11 @@ const docs: ComponentDocs = {
       title: "More toasts than max",
       platforms: ["web", "desktop", "mobile"],
       handling: "Only the newest `max` are drawn; when one is dismissed, the next older one comes back into view.",
+    },
+    {
+      title: "A toast leaves while others stay",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "Each toast is held by its own `key`, not its place: when the oldest is dismissed, the ones after it keep their nodes, so their timers run on, they are not announced again, and focus on a later Undo stays where it is.",
     },
     {
       title: "A toast over an open dialog",

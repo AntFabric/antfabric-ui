@@ -113,6 +113,7 @@ export function Toast({ message: words, tone = "success", actionLabel = "", dism
   useEffect(() => {
     left.current = duration;
   }, [duration, words]);
+  // A new message is a new toast to read: its clock starts again (the reset above runs before this effect sets the timer).
   useEffect(() => {
     if (!duration || gone || paused) return;
     since.current = Date.now();
@@ -121,7 +122,7 @@ export function Toast({ message: words, tone = "success", actionLabel = "", dism
       clearTimeout(id);
       left.current = Math.max(0, left.current - (Date.now() - since.current));
     };
-  }, [duration, gone, paused]);
+  }, [duration, gone, paused, words]);
   const first = useRef(true);
   useEffect(() => {
     if (first.current) {

@@ -192,6 +192,15 @@ const docs: ComponentDocs = {
   states: ["hover", "pressed", "focus", "disabled"],
   edgeCases: [
     {
+      title: "Nobody to name yet",
+      platforms: ["web", "desktop"],
+      handling: "With `reactors` empty (the names still loading, or a product that does not send them), hover and focus open no card: an empty card would say nothing. The pill's name is the emoji and the count.",
+      example: {
+        name: "No reactors",
+        props: { emoji: "👀", count: 3, reactors: "" },
+      },
+    },
+    {
       title: "Hundreds of reactors",
       platforms: ["web", "desktop"],
       handling: "The sentence names up to 50 people and then \"and 112 others\", so the card is capped by content as well as by its 420px width. A name that will not wrap breaks anywhere rather than widening the card.",

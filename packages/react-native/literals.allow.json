@@ -6,7 +6,7 @@
   "packages/react-native/src/components/feedback/empty-state.tsx": { "colours": 0, "dimensions": 2, "text": 0 },
   "packages/react-native/src/components/feedback/inline-banner.tsx": { "colours": 0, "dimensions": 2, "text": 0 },
   "packages/react-native/src/components/feedback/progress-bar.tsx": { "colours": 0, "dimensions": 3, "text": 0 },
-  "packages/react-native/src/components/feedback/skeleton.tsx": { "colours": 0, "dimensions": 10, "text": 0 },
+  "packages/react-native/src/components/feedback/skeleton.tsx": { "colours": 0, "dimensions": 8, "text": 0 },
   "packages/react-native/src/components/feedback/toast.tsx": { "colours": 0, "dimensions": 3, "text": 0 },
   "packages/react-native/src/components/messaging/attachment-card.tsx": { "colours": 0, "dimensions": 17, "text": 0 },
   "packages/react-native/src/components/messaging/composer.tsx": { "colours": 0, "dimensions": 7, "text": 0 },

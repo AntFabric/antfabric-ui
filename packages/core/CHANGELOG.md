@@ -62,6 +62,9 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 - `formatShortcut(keys, "browser")` still reads as Ctrl, since a server render cannot know the visitor's machine. The web kit now gives the visitor's OS as `usePlatform().shortcutOs` (L73).
 - `initials` keeps the first character whole as a person sees it (`Intl.Segmenter`, or `Array.from` where there is none): `"🦊 Fox"` is `🦊F`, a ZWJ family or a flag stays one glyph. Before, an emoji was cut in half and drew `�` (L39).
 - Strings: an empty `popover` group, so the phone's Popover takes `strings` for its backdrop's name (`common`'s `close`). The doc comments of `connection-banner.tryNowLabel` and `update-banner.installLabel`, `restartLabel` and `retryLabel` say they are now descriptions, not names; the English text is unchanged (L16, L18).
+Messaging, agent and feedback:
+- The AttachmentCard recipe has a `chipOpen` part: the ready staged chip's open target (gap, radius and its focus ring), which `styles.chipOpen` reaches in both kits.
+- Strings: AttachmentCard's `removePreview` is read by the phone too (it drew no Remove preview before).
 
 ## 1.0.0
 

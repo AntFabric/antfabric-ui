@@ -283,6 +283,8 @@ function LinkCard(p: Card) {
         data-af-part="linkOpen"
         data-af-press
         aria-label={s("link", { title: p.title, domain: p.domain })}
+        // The browser follows the link; the app hears it was opened (to count it, or to open it in its own viewer instead).
+        onClick={() => p.open()}
         {...ui.handlers}
         style={css(pressable, { flexDirection: "row", alignItems: "flex-start", flex: 1 }, r.linkOpen)}
       >
@@ -352,16 +354,14 @@ function VoiceCard(p: Card & { playing: boolean; onPlaying: (on: boolean) => voi
 function Chip(p: Card) {
   const { strings } = p;
   const s = useStrings("attachment-card", strings);
-  const r = useRecipe(recipes["attachment-card"], { styles: p.styles });
+  const ui = useInteraction();
+  const r = useRecipe(recipes["attachment-card"], { state: { focus: ui.focused }, styles: p.styles });
   const shared = { strings: p.strings, styles: p.styles };
   const pct = Math.round(p.progress);
   const moving = p.status === "uploading" || p.status === "paused";
   const dir = useDirection();
-  return (
-    <div
-      data-af-part="chip"
-      style={css(row, rtl({ width: 260, maxWidth: "100%", paddingTop: t.space.xs, paddingRight: t.space["2xs"], paddingBottom: t.space.xs, paddingLeft: t.space.xs, borderRadius: 10 }, dir), r.chip)}
-    >
+  const body = (
+    <>
       {p.kind === "image" && p.src && (
         <img
           src={p.src}
@@ -401,6 +401,29 @@ function Chip(p: Card) {
           </span>
         )}
       </span>
+    </>
+  );
+  return (
+    <div
+      data-af-part="chip"
+      style={css(row, rtl({ width: 260, maxWidth: "100%", paddingTop: t.space.xs, paddingRight: t.space["2xs"], paddingBottom: t.space.xs, paddingLeft: t.space.xs, borderRadius: 10 }, dir), r.chip)}
+    >
+      {p.status === "ready" ? (
+        // A staged file that has arrived opens its preview, as it will once sent.
+        <button
+          type="button"
+          data-af-part="chipOpen"
+          data-af-press
+          aria-label={s("preview", { name: p.name })}
+          onClick={p.open}
+          {...ui.handlers}
+          style={css(pressable, { flexDirection: "row", alignItems: "center", flex: 1, minWidth: 0 }, r.chipOpen)}
+        >
+          {body}
+        </button>
+      ) : (
+        body
+      )}
       {p.status === "failed" && <IconButton icon="rotate-ccw" label={s("retryName", { name: p.name })} size="sm" disabled={p.retrying} aria-busy={p.retrying || undefined} onPress={p.retry} style={{ flexShrink: 0 }} />}
       <IconButton icon="x" label={moving ? s("cancelUpload", { name: p.name }) : s("remove", { name: p.name })} size="sm" onPress={p.cancel} style={{ flexShrink: 0 }} />
     </div>

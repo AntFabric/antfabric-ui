@@ -54,6 +54,7 @@ export const attachmentCard = defineRecipe({
     "bar",
     "duration",
     "chip",
+    "chipOpen",
     "chipThumb",
   ],
   styles: {
@@ -129,6 +130,8 @@ export const attachmentCard = defineRecipe({
       platforms: { mobile: { base: { size: "$text.bodySm" } } },
     },
     chip: { base: { gap: "$space.sm", borderWidth: "$border.wHairline", borderColor: "$border.subtle", bg: "$surface.card" } },
+    // A ready chip's thumbnail or badge and name are one press that opens the preview.
+    chipOpen: { base: { gap: "$space.sm", radius: "$radius.tag" }, states: { focus: { shadow: "$shadow.focus" } } },
     chipThumb: { base: { borderWidth: "$border.wHairline", borderColor: "$border.subtle" } },
   },
   // The image's focus edge is a 3px inset ring in `focus.ring`, a width the recipe's `ring` (one hairline) does not spell: the kit reads it.

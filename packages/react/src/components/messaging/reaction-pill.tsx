@@ -126,7 +126,8 @@ export function ReactionPill({
     if (!ui.focused) setDismissed(false);
   }, [ui.focused]);
   const add = variant === "add";
-  const peek = !add && !showReactors && !dismissed && (rested || ui.focused);
+  // Hover and focus open the who-reacted card only when there is someone to name.
+  const peek = !add && reactors !== "" && !showReactors && !dismissed && (rested || ui.focused);
 
   const r = useRecipe(recipes["reaction-pill"], {
     variants: { variant, showReactors },

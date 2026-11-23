@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent, type PointerEvent } from "react";
-import { recipes, usePending, useDirection, useStrings, type IconActionItem, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric/ui-core";
+import { recipes, useControllable, usePending, useDirection, useStrings, type IconActionItem, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useAnnounce } from "../../lib/announce";
 import { Icon } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { useInteraction } from "../../lib/interaction";
 import { box, css, pressable, row, rtl, text, truncate } from "../../lib/style";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { rootProps, setRef, type RootProps } from "../../lib/root-props";
 import { Avatar, type AvatarIdentity } from "../display/avatar";
 import { AttachmentCard } from "./attachment-card";
 import { MessageActions } from "./message-actions";
@@ -155,7 +155,7 @@ export function Message({
   forward = false,
   actions = [],
   more = false,
-  menuOpen = false,
+  menuOpen,
   onStatusChange,
   onRetry,
   onDelete,
@@ -172,6 +172,7 @@ export function Message({
   strings,
   styles,
   style,
+  ref: rootRef,
   ...rest
 }: MessageProps) {
   const s = useStrings("message", strings);
@@ -194,7 +195,19 @@ export function Message({
   const dir = useDirection();
   const press = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(press.current), []);
-  const hot = hovered || ui.hovered || within || opened;
+  // The ⋯ menu is anchored to the bar: while it is open the bar stays, wherever the pointer and focus have gone (into the menu).
+  const [menu = false, setMenu] = useControllable(menuOpen, onMenuOpenChange);
+  // A long press opens the bar on this row only: a press anywhere else puts it away, so a finger never leaves bars open on several rows.
+  const self = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!opened) return;
+    const away = (e: Event) => {
+      if (!self.current?.contains(e.target as Node | null)) setOpened(false);
+    };
+    document.addEventListener("pointerdown", away);
+    return () => document.removeEventListener("pointerdown", away);
+  }, [opened]);
+  const hot = hovered || ui.hovered || within || opened || menu;
   const deleted = state === "deleted";
   const sent = state === "sent";
   // A bar with nothing on it is not drawn.
@@ -256,6 +269,10 @@ export function Message({
       tabIndex={0}
       aria-label={s("label", { author, ai: agent ? s("ai") : "", time, state: said, mention: mentionsYou ? s("mentionsYou") : "", unread: unread ? s("unread") : "", pinned: pinned ? s("pinned") : "" })}
       {...rootProps(rest)}
+      ref={(el: HTMLDivElement | null) => {
+        self.current = el;
+        setRef(rootRef, el);
+      }}
       // A finger "enters" on every tap, which would flash the bar: touch gets it by long press instead.
       onPointerEnter={(e: PointerEvent<HTMLDivElement>) => {
         if (e.pointerType !== "touch") ui.handlers.onPointerEnter();
@@ -417,13 +434,13 @@ export function Message({
           forward={forward}
           actions={actions}
           more={more}
-          menuOpen={menuOpen}
+          menuOpen={menu}
           onReact={(emoji) => onReact?.(emoji)}
           onAddReaction={() => onAddReaction?.()}
           onReplyInThread={() => onOpenThread?.()}
           onForward={() => onForward?.()}
           onAction={(action) => onAction?.(action)}
-          onMenuOpenChange={onMenuOpenChange}
+          onMenuOpenChange={setMenu}
           style={{ position: "absolute", top: t.space["3xs"], ...rtl({ right: t.space.mdLg }, dir) }}
         />
       )}
