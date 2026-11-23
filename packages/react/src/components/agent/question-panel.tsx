@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { recipes, useControllable, useDirection, useStrings, type KitStrings, type QuestionOption, type ToolArg } from "@antfabric/ui-core";
+import { recipes, useControllable, usePending, useDirection, useStrings, type KitStrings, type QuestionOption, type ToolArg } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useAutoFocus } from "../../platform";
 import { useInteraction } from "../../lib/interaction";
@@ -46,13 +46,13 @@ export interface QuestionPanelProps extends RootProps<HTMLDivElement> {
   expanded?: boolean;
   /** Submit waits: an answer given offline has nowhere to go. */
   offline?: boolean;
-  /** The answer is on its way. Pressing Submit sets it; the app removes the panel once the answer lands. */
+  /** The answer is on its way. A press on Submit shows the same until the app answers; the app removes the panel once the answer lands. */
   sending?: boolean;
   onValueChange?: (value: string) => void;
   onTypedChange?: (typed: string) => void;
   onExpandedChange?: (expanded: boolean) => void;
-  /** The chosen row's key, or the typed answer, trimmed. */
-  onSubmit?: (answer: string) => void;
+  /** The chosen row's key, or the typed answer, trimmed. Submit shows Sending… until the app answers with `sending` or `offline`, or the returned promise settles. */
+  onSubmit?: (answer: string) => void | Promise<unknown>;
   /** This panel's built-in text (the waiting bar, the paused and offline lines, the confirm field's words, Submit) over the tree's and the English defaults. */
   strings?: Partial<KitStrings["question-panel"]>;
   /** Per-part styles over the theme: `{ root: {…}, title: {…} }`. */
@@ -173,7 +173,10 @@ export function QuestionPanel({
   const [entry = "", setEntry] = useControllable(typed, onTypedChange);
   const [open = true, setOpen] = useControllable(expanded, onExpandedChange);
   const shut = !open;
-  const [busy, setBusy] = useControllable(sending);
+  // Submit reports the answer and waits: `sending` is the app's, and a press waits through usePending until the app answers (a new
+  // `sending` or `offline`, or the promise onSubmit returns settling), so a failed send comes back to Submit.
+  const { pending, run } = usePending([sending, offline]);
+  const busy = sending || pending;
   const allowFocus = useAutoFocus();
   const heading = useRef<HTMLSpanElement | null>(null);
   const detailsScroll = useScrollRegion();
@@ -203,8 +206,8 @@ export function QuestionPanel({
   const move = (step: number) => choose(((index < 0 ? 0 : index) + step + options.length) % options.length, true);
   const submit = () => {
     if (!canSubmit) return;
-    setBusy(true);
-    onSubmit?.(field ? entry.trim() : chosen);
+    const answer = field ? entry.trim() : chosen;
+    run(onSubmit && (() => onSubmit(answer)));
   };
   const toggle = (to: boolean) => {
     toggled.current = true;

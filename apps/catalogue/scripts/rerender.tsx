@@ -627,7 +627,7 @@ for (const doc of components) {
     // Enter while an IME composes commits the candidate; plain Enter after it submits (the probe's control).
     const composing: [string, (spy: unknown[]) => ReturnType<typeof createElement>][] = [
       ["search-field", (spy) => createElement(Kit.SearchField, { placeholder: "Search messages", value: "デプロイ", onSubmit: () => spy.push(1) })],
-      ["question-panel", (spy) => createElement(Kit.QuestionPanel, { title: "What should the release be called?", field: true, typed: "春のリリース", onSubmit: (a: string) => spy.push(a) })],
+      ["question-panel", (spy) => createElement(Kit.QuestionPanel, { title: "What should the release be called?", field: true, typed: "春のリリース", onSubmit: (a: string) => void spy.push(a) })],
     ];
     for (const [id, draw] of composing) {
       if (!want(id)) continue;
