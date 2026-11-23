@@ -124,6 +124,16 @@ function parse(hex: string, what: string): RGB {
   return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) as RGB;
 }
 
+/** `rgb()`/`rgba()`/`hsl()`/`hsla()` with numbers only, comma, space or slash between them (written so that nothing backtracks). */
+const COLOUR_FN = /^(?:rgba?|hsla?)\(\s*[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:%|deg|turn|rad|grad)?(?:(?:\s*[,/]\s*|\s+)[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:%|deg|turn|rad|grad)?)*\s*\)$/i;
+
+/** A hand-picked colour as given, when it is one both kits draw: hex, `rgb()`/`rgba()` or `hsl()`/`hsla()` with numbers only (React Native has no `oklch()`). */
+function colour(v: unknown, what: string): string {
+  const ok = typeof v === "string" && (/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(v.trim()) || COLOUR_FN.test(v.trim()));
+  if (!ok) throw new Error(`brand.${what} must be a colour (#hex, rgb() or hsl()), got "${String(v)}"`);
+  return v as string;
+}
+
 const hex = ([r, g, b]: RGB) => `#${[r, g, b].map((n) => Math.round(n).toString(16).padStart(2, "0")).join("")}`;
 
 /** The product's `withAlpha` (tokens.ts:1060), written as `rgba()` like every other translucent token here: `.12`, not `0.12`. */
@@ -201,12 +211,12 @@ export function brandValues(brand: Partial<BrandTokens>, theme: Scheme, target: 
     out["accent.soft"] = alpha(a, dark ? 0.22 : 0.14);
   }
   if (brand.soft) {
-    out["brand.soft"] = brand.soft[theme];
+    out["brand.soft"] = colour(brand.soft[theme], `soft.${theme}`);
     out["brand.tint"] = brand.soft[theme];
   }
-  if (brand.softHover) out["brand.softHover"] = brand.softHover[theme];
-  if (brand.onSoft) out["fg.onBrandSoft"] = brand.onSoft[theme];
-  if (brand.tint) out["brand.tint"] = brand.tint[theme];
+  if (brand.softHover) out["brand.softHover"] = colour(brand.softHover[theme], `softHover.${theme}`);
+  if (brand.onSoft) out["fg.onBrandSoft"] = colour(brand.onSoft[theme], `onSoft.${theme}`);
+  if (brand.tint) out["brand.tint"] = colour(brand.tint[theme], `tint.${theme}`);
   if (brand.fonts?.sans !== undefined) fontValues("sans", brand.fonts.sans, target, out);
   if (brand.fonts?.display !== undefined) fontValues("display", brand.fonts.display, target, out);
   return out;

@@ -64,14 +64,22 @@ function walk(tree: Record<string, unknown>, web: boolean): Record<string, unkno
   );
 }
 
-/** Sets a theme's value at a dotted token path, which must already be a leaf of the merged tree (`defineTheme` checked it against its set). */
-function putLeaf(tree: Record<string, unknown>, path: string, value: string | number, theme: Theme) {
+/** A CSS length in a unit React Native has no number for (`0.5rem`, `1em`, `10%`), or a `calc()`-like function. px and ms are numbers already. */
+const CSS_LENGTH = /^(?:-?(?:\d+(?:\.\d*)?|\.\d+)[a-z%]+|(?:calc|min|max|clamp)\s*\(.*)$/i;
+
+/**
+ * Sets a theme's value at a dotted token path, which must already be a leaf of the merged tree (`defineTheme` checked it against its set).
+ * On the phone (`phone`), a leaf the kit reads as a number throws when the theme gives it a CSS length that stays a string.
+ */
+function putLeaf(tree: Record<string, unknown>, path: string, value: string | number, theme: Theme, phone: boolean) {
   const keys = path.split(".");
   const last = keys.pop()!;
   let at: unknown = tree;
   for (const k of keys) at = typeof at === "object" && at !== null ? (at as Record<string, unknown>)[k] : undefined;
   const leaf = typeof at === "object" && at !== null ? (at as Record<string, unknown>)[last] : undefined;
   if (typeof leaf !== "string" && typeof leaf !== "number") throw new Error(`resolveTokens: theme "${theme.name}" sets ${path}, which is not a token here`);
+  if (phone && typeof value === "string" && typeof resolve(leaf, false) === "number" && typeof resolve(value, false) === "string" && CSS_LENGTH.test(value.trim()))
+    throw new Error(`resolveTokens: theme "${theme.name}" sets ${path} to "${value}", a length the phone cannot read; give it in px or as a number`);
   (at as Record<string, unknown>)[last] = value;
 }
 
@@ -91,7 +99,8 @@ const RESOLVED_MAX = 64; // themes are a handful; a host that builds one per ren
  *
  * `theme` is laid over the base one layer at a time, as `tokenValues` and `themeCss` lay it: shared, scheme, profile, OS, the
  * base then the theme at each, so the base's Android switch still beats a theme's mobile-profile switch. A theme's font stack
- * becomes its first family off the web, as the kit's own does.
+ * becomes its first family off the web, as the kit's own does. On the mobile profile, a theme that gives a size the phone reads
+ * as a number in a unit it has none for (`0.5rem`, `1em`, `10%`, `calc(…)`) throws, naming the theme, the path and the value.
  *
  * A tenant's brand is a theme's too (`defineTheme({ name, brand })`), so there is no `brand` option here.
  *
@@ -118,7 +127,7 @@ export function resolveTokens(profile: keyof Tokens["profiles"], scheme: keyof T
   const merged: Record<string, unknown> = {};
   for (const [base, over] of layers) {
     if (base) merge(merged, base);
-    for (const [path, v] of Object.entries(over ?? {})) putLeaf(merged, path, v, theme!);
+    for (const [path, v] of Object.entries(over ?? {})) putLeaf(merged, path, v, theme!, profile === "mobile");
   }
   const out = walk(merged, !!opts.web);
   if (resolved.size >= RESOLVED_MAX) resolved.delete(resolved.keys().next().value!);

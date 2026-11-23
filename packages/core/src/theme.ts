@@ -143,10 +143,19 @@ function isLeaf(tree: Tree, path: string): boolean {
 /**
  * The first thing in a value a stylesheet cannot hold, as `[character, why]`, or `undefined`: `;`, `{`, `}`, `<`, `>`, a backslash
  * (it escapes the closing brace and swallows every block after it), a comment marker, and a quote, parenthesis or bracket nothing closes
- * (or closes without an opening). Inside a quoted string only its closing quote counts, as in CSS.
+ * (or closes without an opening). Inside a quoted string only its closing quote counts, as in CSS. Also a control character (a newline
+ * ends the declaration), `@` and `!` (an at-rule, `!important`), and a function that loads a resource (`url(`, `image(`, `image-set(`,
+ * `-webkit-image-set(`, `src(`, `element(`, `cross-fade(`): a tenant's theme must not make every viewer fetch a URL.
  */
 function flaw(v: string): [string, string] | undefined {
-  const bad = /[;{}<>\\]/.exec(v);
+  const control = /[\u0000-\u001f\u007f]/.exec(v);
+  if (control) {
+    const code = `U+${control[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, "0")}`;
+    return [code, `a control character (${code})`];
+  }
+  const fetches = /(?<![\w-])(-webkit-image-set|image-set|image|url|src|element|cross-fade)\s*\(/i.exec(v);
+  if (fetches) return [`${fetches[1]!.toLowerCase()}(`, `the function ${fetches[1]!.toLowerCase()}(`];
+  const bad = /[;{}<>\\@!]/.exec(v);
   if (bad) return [bad[0], bad[0] === "\\" ? "a backslash" : `"${bad[0]}"`];
   const comment = /\/\*|\*\//.exec(v);
   if (comment) return [comment[0], `the comment marker ${comment[0]}`];
@@ -229,7 +238,8 @@ const deepFreeze = <T>(v: T): T => {
 /**
  * Builds a theme from its layers (extends, brand, fonts, tokens; see the top of this file; `extends` left out is `themes.neutral`). Throws on a path `tokenSource` does
  * not have for its set, a value that is neither a string nor a number, a string a stylesheet cannot hold (`;`, `{`, `}`, `<`, `>`,
- * a backslash, a comment marker, or a quote, parenthesis or bracket nothing closes; a font family name is held to the same)
+ * `@`, `!`, a backslash, a control character, a comment marker, a function that loads a resource such as `url(`, or a quote, parenthesis or
+ * bracket nothing closes; a font family name is held to the same), a brand `soft`, `softHover`, `onSoft` or `tint` that is not a colour
  * or a reference that names no primitive, naming the theme, the layer and the path; and on a recipe override naming a recipe, part,
  * layer, variant prop or value, state, platform or style key the recipe does not have, or a value that is not a `$token` the tokens
  * have, `transparent` or `none`, naming the theme, the recipe and where. Frozen.

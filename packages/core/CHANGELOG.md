@@ -10,6 +10,8 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 3: theme sanitiser
 
+- `defineTheme` now rejects a value holding a control character (a newline, tab or carriage return), `@`, `!`, or a function that loads a resource (`url(`, `image(`, `image-set(`, `-webkit-image-set(`, `src(`, `element(`, `cross-fade(`); a brand `soft`, `softHover`, `onSoft` or `tint` must be a colour (hex, `rgb()` or `hsl()`); and `resolveTokens` for the phone throws on a theme that gives a size the phone reads as a number in `rem`, `em`, `%` (other than `50%`) or `calc()`. (H10, L73)
+
 ### Batch 4: packaging and icons
 
 ### Batch 5: data core
