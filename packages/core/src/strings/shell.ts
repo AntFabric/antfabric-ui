@@ -59,7 +59,7 @@ export const shell = {
     current: "current",
     /** Read after a tile's name when mentions are waiting there. */
     mentions: "{count} mentions",
-    /** Read after a tile's name when it has new messages nobody asked about (desktop). */
+    /** Read after a tile's (desktop) or row's (phone) name when it has new messages nobody asked about: its activity dot. */
     newMessages: "new messages",
     /** Read after a workspace's name while it is signed out. */
     signedOut: "signed out",
@@ -191,5 +191,5 @@ export const shell = {
 /** Keys one kit draws and the other has no use for. */
 export const shellOnly = {
   "sidebar-section": { expand: ["web"], collapse: ["web"], expandPhone: ["mobile"], collapsePhone: ["mobile"] },
-  "workspace-switcher": { addMenu: ["web"], current: ["web"], newMessages: ["web"] },
+  "workspace-switcher": { addMenu: ["web"], current: ["web"] },
 } as const satisfies OnlyOn<typeof shell>;

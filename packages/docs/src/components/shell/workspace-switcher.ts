@@ -128,8 +128,8 @@ const docs: ComponentDocs = {
       "Each tile's name says everything a sighted person reads off it: 'Northwind Health, 3 mentions, Command 2'.",
       "The current tile has aria-current; the black ring and the left bar are never the only signal.",
       "Signed-out tiles stay focusable and say 'signed out' — choosing one starts sign-in.",
-      "Web: a role=menu named by its 'Workspaces' heading (which sits outside the menu) holding menuitemradio links, the current one checked, and the add row. The menu is one tab stop (the current row); Up, Down, Home, End and typing a letter move between rows. Truncated names and hosts are in each row's tooltip.",
-      "Phone: a sheet (accessibilityViewIsModal) of buttons with the current one selected.",
+      "Web: a role=menu named by its 'Workspaces' heading (which sits outside the menu) holding menuitemradio links, the current one checked, and the add row. The menu is one tab stop (the current row, else the first, else the add row when there are no workspaces); Up, Down, Home, End and typing a letter move between rows, and Enter or Space chooses one (Space never scrolls the page). Truncated names and hosts are in each row's tooltip.",
+      "Phone: a sheet (accessibilityViewIsModal) of buttons with the current one selected. A row's name says what its badge or dot shows: 'Lumen Studio, 3 mentions', 'Northwind Health, new messages'.",
     ],
   },
   examples: [
@@ -156,6 +156,18 @@ const docs: ComponentDocs = {
   ],
   states: ["hover", "focus"],
   edgeCases: [
+    {
+      title: "No workspaces yet",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "With nothing signed in, only the add tile (desktop), the add row (web) or the add row (phone) is drawn. On the web the add row is then the menu's tab stop, so Tab still enters the menu.",
+      example: {
+        name: "Nothing signed in",
+        props: {
+          workspaces: [],
+        },
+        platforms: ["web"],
+      },
+    },
     {
       title: "Only one workspace signed in at a time (today)",
       platforms: ["desktop"],

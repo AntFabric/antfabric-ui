@@ -70,7 +70,9 @@ function Row({ ws, on, onPress, styles, strings, testID }: Shared & { testID?: s
   const r = useRecipe(recipes["workspace-switcher"], { state: { focus: press.focused }, styles });
   const live = !!ws.signedIn;
   const mentions = live && (ws.mentions ?? 0) > 0 ? ws.mentions! : 0;
-  const said = [on ? str("currentWorkspace") : "", mentions ? str("mentions", { count: mentions }) : "", live ? "" : str("signedOut")]
+  // The activity dot is said too, as on the desktop tile: it is not only a dot.
+  const activity = live && !!ws.activity && !mentions && !on;
+  const said = [on ? str("currentWorkspace") : "", mentions ? str("mentions", { count: mentions }) : "", activity ? str("newMessages") : "", live ? "" : str("signedOut")]
     .filter(Boolean)
     .reduce((label, detail) => str("withDetail", { label, detail }), ws.name);
   const row = partStyle(r, "row", { view: press.pressed ? { opacity: 0.6 } : undefined });
@@ -94,7 +96,7 @@ function Row({ ws, on, onPress, styles, strings, testID }: Shared & { testID?: s
         </Text>
       </View>
       {mentions && !on ? <Badge count={mentions} label={str("mentionsBadge")} style={{ alignSelf: "center" }} /> : null}
-      {live && ws.activity && !mentions && !on ? <Badge dot tone="neutral" style={{ alignSelf: "center" }} /> : null}
+      {activity ? <Badge dot tone="neutral" style={{ alignSelf: "center" }} /> : null}
       {on ? (
         <Enter motion="pop">
           <Icon testID={partId(testID, "workspace-switcher", "check")} name="check" {...glyphOf(r.check)} />
