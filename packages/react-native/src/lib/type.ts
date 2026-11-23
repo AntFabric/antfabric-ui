@@ -49,10 +49,11 @@ export function font(weight: Weight = "regular", face: Face = "sans", t?: Pick<N
 }
 
 /**
- * How far each kind of text grows with Dynamic Type and Android's font scale (`maxFontSizeMultiplier` on the `Text`). Reading text grows
- * as far as the person asked, up to 2×; a label inside a control grows less, and the control takes `minHeight` instead of `height` so the
- * grown label fits; chrome that must stay one line (a tab bar label, a badge count, an axis tick) grows least, and iOS's large content
- * viewer is the way to read it bigger.
+ * How far each kind of text grows with Dynamic Type and Android's font scale (`maxFontSizeMultiplier` on the `Text`). Reading text and a
+ * label inside a control grow as far as the person asked, up to 2× (WCAG 1.4.4's 200%): a control takes `minHeight` instead of `height`,
+ * so the grown label fits. Chrome that must stay one line in a fixed shape (a tab bar label, a badge count, an axis tick) grows least,
+ * since at 2× it would be cut off. Such a part is for iOS's large content viewer (`accessibilityShowsLargeContentViewer` with
+ * `accessibilityLargeContentTitle`), which shows it full size on a long press; the components that draw chrome do not turn it on yet.
  *
  *   <Text maxFontSizeMultiplier={fontScale.control} style={…}>
  */
@@ -60,7 +61,7 @@ export const fontScale = {
   /** Message text, list rows, descriptions, sheet bodies. */
   content: 2,
   /** A button's, chip's, field's or segment's label. */
-  control: 1.5,
+  control: 2,
   /** Tab bar labels, badge and count pills, chart ticks and centre values, a header's title. */
   chrome: 1.3,
 } as const;

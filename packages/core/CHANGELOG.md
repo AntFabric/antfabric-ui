@@ -58,6 +58,10 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 12: per-component fixes
 
+- `formatShortcut` reads the plus key: `"Mod++"` (or `"Shift+Plus"`) is `⌘+` on a Mac and `Ctrl+Plus` elsewhere. Before, it threw off the Mac, which crashed the render of any menu item or button with that shortcut (M52).
+- `formatShortcut(keys, "browser")` still reads as Ctrl, since a server render cannot know the visitor's machine. The web kit now gives the visitor's OS as `usePlatform().shortcutOs` (L73).
+- `initials` keeps the first character whole as a person sees it (`Intl.Segmenter`, or `Array.from` where there is none): `"🦊 Fox"` is `🦊F`, a ZWJ family or a flag stays one glyph. Before, an emoji was cut in half and drew `�` (L39).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:

@@ -125,6 +125,9 @@ if (!html.includes("<button")) throw new Error("no <button> in: " + html.slice(0
 if (!html.includes("Send")) throw new Error("no label in: " + html.slice(0, 400));
 if (!html.includes("data-af-part=")) throw new Error("no data-af-part in: " + html.slice(0, 400));
 if (!html.includes('data-af-platform="web"') || !html.includes("--af-")) throw new Error("no root attributes or token variables in: " + html.slice(0, 400));
+// The kit's sheet is named with the published version, so a host and a plugin on two versions do not share the first one's.
+const kitVersion = JSON.parse(readFileSync("node_modules/@antfabric/ui-react/package.json", "utf8")).version;
+if (!html.includes("antfabric-ui@" + kitVersion)) throw new Error("the kit's <style> is not named antfabric-ui@" + kitVersion + ": " + (html.match(/<style[^>]*>/) ?? [""])[0]);
 
 // A theme is a theme object: "dark" is a scheme, and a plain-JS consumer who passes it as a theme is told so. A host without the root writes the root's attributes with rootAttrs.
 for (const bad of [() => renderToStaticMarkup(createElement(AntFabricRoot, { theme: "dark" }, null)), () => renderToStaticMarkup(createElement(AntFabricProvider, { theme: "dark" }, null))]) {

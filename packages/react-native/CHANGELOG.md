@@ -95,6 +95,10 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 12: per-component fixes
 
+- A nested `ThemeProvider` (the way to scope `strings`) keeps the parent's `scheme`, `os` and `osVersion` when it is not given them. Before, it reset them to light and the device, so a chart under it drew light on a dark screen (M4).
+- `createStyles` holds each component's StyleSheet weakly by its token object, so the sheets of a theme that `resolveTokens` has let go of (a live theme picker) are freed. Before, the cache grew with every theme (M53).
+- `fontScale.control` is 2: a button's, chip's, field's or segment's label grows with Dynamic Type and Android's font scale up to 200% (WCAG 1.4.4). Before, it stopped at 150%. Those controls take `minHeight`, so the grown label fits. `fontScale.chrome` (tab bar labels, badges, axis ticks) stays 1.3 (M54).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:

@@ -77,6 +77,8 @@ for (const [name, opts] of Object.entries(PACKAGES)) {
     chunkNames: "chunks/[name]-[hash]",
     sourcemap: true,
     banner: opts.useClient ? { js: '"use client";' } : undefined,
+    // The version release-version.mjs wrote: the web kit names its stylesheet with it, so two versions on one page keep two sheets.
+    define: { __ANTFABRIC_UI_VERSION__: JSON.stringify(JSON.parse(readFileSync(join(dir, "package.json"), "utf8")).version) },
     logLevel: "warning",
   });
 

@@ -75,8 +75,10 @@ import { AntFabricRoot } from "@antfabric/ui-react";
   theme's sheet, for an app that ships the kit's once (below). Pass `theme` with either, and add `themeCss(theme)` to the app's stylesheet.
 - `strings`, `locale`: the kit's built-in text for the whole tree, per component id (`{ "text-field": { required: "Obligatoire" } }`); a component's own `strings` prop overrides it for one instance.
 
-The stylesheet is injected with the root as a hoisted `<style href="antfabric-ui">` (React 19), so it
-is server-rendered in the `<head>` and added once however many roots there are.
+The stylesheet is injected with the root as a hoisted `<style href="antfabric-ui@<version>">` (React 19), so it
+is server-rendered in the `<head>` and added once however many roots there are (once per kit version on the page). A theme's
+sheet is server-rendered the same way; once mounted, the root holds it itself, and the last root drawing a theme takes its
+sheet out of the `<head>`.
 
 **A strict Content Security Policy.** The root takes no `nonce`, and every component draws with inline
 `style` attributes, which a nonce does not cover. The page's `style-src` needs `'unsafe-inline'`. With

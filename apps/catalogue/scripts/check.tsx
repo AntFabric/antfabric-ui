@@ -2698,6 +2698,93 @@ function checkHelpers() {
       err(at, `@antfabric/ui-${kit} declares its own ${name}; core exports one under the same name (re-export it from core instead)`);
     }
   }
+
+  // The text helpers both kits draw with: a plus key is a key (it used to throw off the Mac), `browser` is Ctrl until the visitor is known,
+  // and an initial is a whole character as a person sees it (an emoji, a joined family), never half a surrogate pair.
+  const shortcuts: [string, string, string][] = [
+    ["Mod++", "windows", "Ctrl+Plus"],
+    ["Mod++", "mac", "⌘+"],
+    ["Ctrl+Shift++", "linux", "Ctrl+Shift+Plus"],
+    ["Shift+Plus", "windows", "Shift+Plus"],
+    ["Shift+Plus", "mac", "⇧+"],
+    ["+", "browser", "Plus"],
+    ["Mod+K", "browser", "Ctrl+K"],
+    ["Mod+K", "mac", "⌘K"],
+    ["Mod+K", "windows", "Ctrl+K"],
+    ["Mod+Shift+K", "ios", "⌘⇧K"],
+  ];
+  for (const [keys, os, want] of shortcuts) {
+    let got: string;
+    try {
+      got = Core.formatShortcut(keys, os);
+    } catch (e) {
+      got = `threw ${(e as Error).message}`;
+    }
+    if (got !== want) err(at, `formatShortcut(${JSON.stringify(keys)}, "${os}") is ${JSON.stringify(got)}, not ${JSON.stringify(want)}`);
+  }
+  const names: [string, string][] = [
+    ["Priya Raman", "PR"],
+    ["🦊 Fox", "🦊F"],
+    ["👨‍👩‍👧 Family", "👨‍👩‍👧F"],
+    ["🇮🇳 India", "🇮🇳I"],
+    ["王小明", "王"],
+    ["山田 太郎", "山太"],
+    ["  ", ""],
+  ];
+  for (const [name, want] of names) if (Core.initials(name) !== want) err(at, `initials(${JSON.stringify(name)}) is ${JSON.stringify(Core.initials(name))}, not ${JSON.stringify(want)}`);
+}
+
+// A provider nested to scope `strings` (or a theme) keeps what it is not given: the page's platform, OS, version and scheme, in both kits.
+// The charts read their colours from it, so a chart under a nested provider on a dark page is drawn dark.
+function checkNesting() {
+  const at = "themes";
+  const seen: ReactKit.PlatformInfo[] = [];
+  const Probe = () => (seen.push(ReactKit.usePlatform()), null);
+  const chart: ReturnType<typeof ReactData.useChartTokens>[] = [];
+  const ChartProbe = () => (chart.push(ReactData.useChartTokens()), null);
+  const inner = (children: ReactNode) => createElement(ReactKit.AntFabricProvider, { strings: { "text-field": { required: "Obligatoire" } }, children });
+  renderToString(
+    createElement(ReactKit.AntFabricRoot, { platform: "desktop", os: "windows", scheme: "dark", theme: antfabric, children: inner([createElement(Probe, { key: "p" }), createElement(ChartProbe, { key: "c" })]) }),
+  );
+  const got = seen[0];
+  if (!got || got.platform !== "desktop" || got.os !== "windows" || got.scheme !== "dark" || got.theme !== antfabric)
+    err(at, `an AntFabricProvider nested in a dark Windows desktop root reads ${got ? `${got.platform}/${got.os}/${got.scheme}/${got.theme.name}` : "nothing"}, not desktop/windows/dark/AntFabric`);
+  const dark = resolveTokens("desktop", "dark", { web: true, os: "windows", theme: antfabric });
+  const light = resolveTokens("desktop", "light", { web: true, os: "windows", theme: antfabric });
+  if (chart[0] !== dark || dark.chart.grid === light.chart.grid) err(at, "a chart under an AntFabricProvider nested in a dark root resolves other tokens than the dark root's (its colours go light)");
+  // A version and a platform carry over; a platform given that the parent does not have takes its own OS; the top is web, browser, light.
+  seen.length = 0;
+  renderToString(
+    createElement(ReactKit.AntFabricProvider, {
+      platform: "desktop",
+      os: "mac",
+      osVersion: 26,
+      theme: antfabric,
+      children: [createElement(ReactKit.AntFabricProvider, { key: "a", locale: "fr", children: createElement(Probe) }), createElement(ReactKit.AntFabricProvider, { key: "b", platform: "web", children: createElement(Probe) })],
+    }),
+  );
+  renderToString(createElement(ReactKit.AntFabricProvider, { theme: antfabric, children: createElement(Probe) }));
+  const [kept, web, top] = seen;
+  if (kept?.osVersion !== 26 || !kept.glass) err(at, `a provider nested in macOS 26 has osVersion ${String(kept?.osVersion)} and glass ${String(kept?.glass)}`);
+  if (web?.os !== "browser" || web.osVersion !== undefined) err(at, `a web provider nested in a Mac desktop one reads os ${String(web?.os)}, version ${String(web?.osVersion)}, not browser`);
+  if (top?.platform !== "web" || top.os !== "browser" || top.scheme !== "light" || top.shortcutOs !== "browser") err(at, `a provider with nothing above reads ${JSON.stringify(top && { ...top, theme: top.theme.name })}, not web, browser, light`);
+  // A root nested in a dark one writes the dark scheme and the parent's OS on its element.
+  const nestedRoot = renderToString(createElement(ReactKit.AntFabricRoot, { platform: "desktop", os: "windows", scheme: "dark", theme: antfabric, children: createElement(ReactKit.AntFabricRoot, { css: false, children: "x" }) })).replace(/<style\b[\s\S]*?<\/style>/g, "");
+  if ((nestedRoot.match(/data-af-theme="dark"/g) ?? []).length !== 2 || (nestedRoot.match(/data-af-os="windows"/g) ?? []).length !== 2) err(at, "an AntFabricRoot nested in a dark Windows root does not write data-af-theme=\"dark\" and data-af-os=\"windows\"");
+  // The phone: a ThemeProvider nested to scope strings keeps the scheme, OS and version.
+  const native: ReturnType<typeof NativeKit.useTheme>[] = [];
+  const NativeProbe = () => (native.push(NativeKit.useTheme()), null);
+  renderToString(
+    createElement(NativeKit.ThemeProvider, {
+      scheme: "dark",
+      os: "android",
+      theme: antfabric,
+      children: createElement(NativeKit.ThemeProvider, { strings: { "text-field": { required: "Obligatoire" } }, children: createElement(NativeProbe) }),
+    }),
+  );
+  const phone = native[0];
+  if (!phone || phone.scheme !== "dark" || phone.os !== "android" || phone.t !== resolveTokens("mobile", "dark", { web: RN.OS === "web", os: "android", theme: antfabric }))
+    err(at, `a ThemeProvider nested in a dark Android one reads ${phone ? `${phone.scheme}/${phone.os}` : "nothing"}, not dark/android with the dark tokens`);
 }
 
 // A tenant's colours over the defaults: only the brand family moves, nothing moves without a brand, and both kits draw it.
@@ -3287,6 +3374,7 @@ if (!only.length || only.includes("helpers")) checkHelpers();
 if (!only.length || only.includes("themes") || only.includes("brand")) {
   checkBrand();
   checkThemes();
+  checkNesting();
 }
 if (!only.length || only.includes("code")) {
   checkImports();

@@ -36,8 +36,9 @@ export function useTheme(): ThemeInfo {
 }
 
 export interface ThemeProviderProps {
+  /** Light or dark (default: the parent provider's, else light). */
   scheme?: Scheme;
-  /** Defaults to the device. The catalogue sets it to draw iOS and Android side by side. */
+  /** Defaults to the parent provider's, else the device. The catalogue sets it to draw iOS and Android side by side. */
   os?: "ios" | "android";
   osVersion?: number;
   /** The theme to draw with. Without one a nested provider takes its parent's, and the outermost one `neutral`. */
@@ -65,11 +66,15 @@ function assertTheme(theme: unknown): void {
     throw new Error(`ThemeProvider: theme takes a theme from defineTheme; light or dark is \`scheme\` (got ${typeof theme === "string" ? JSON.stringify(theme) : typeof theme})`);
 }
 
-export function ThemeProvider({ scheme = "light", os = deviceOS, osVersion, theme: given, strings, locale, dir, children }: ThemeProviderProps) {
+export function ThemeProvider({ scheme: givenScheme, os: givenOs, osVersion, theme: given, strings, locale, dir, children }: ThemeProviderProps) {
   assertTheme(given);
+  // What is not given is the parent's: a provider nested to scope `strings` keeps the scheme, OS and theme. The outermost one's parent is
+  // the context default: light, the device's OS and version, `neutral`.
   const parent = useContext(ThemeContext);
   const theme = given ?? parent.theme;
-  const version = osVersion ?? (os === deviceOS ? deviceVersion : undefined);
+  const scheme = givenScheme ?? parent.scheme;
+  const os = givenOs ?? parent.os;
+  const version = osVersion ?? (os === parent.os ? parent.osVersion : os === deviceOS ? deviceVersion : undefined);
   // The theme is keyed by its id: one built inline on every render does not re-theme the tree.
   // eslint-disable-next-line react-hooks/exhaustive-deps -- `theme.id` is `theme`'s content
   const value = useMemo<ThemeInfo>(() => ({ scheme, os, osVersion: version, glass: hasGlass(os, version), theme, t: tokensFor(scheme, os, theme) }), [scheme, os, version, theme.id]);
@@ -88,10 +93,11 @@ export function ThemeProvider({ scheme = "light", os = deviceOS, osVersion, them
  *   const useStyles = createStyles((t) => ({ root: { height: t.control.hMd } }));
  *   const s = useStyles();
  *
- * Anything that depends on a prop or on press state is added inline over these.
+ * Anything that depends on a prop or on press state is added inline over these. The sheets are held weakly by the token object they
+ * were built from, so a theme `resolveTokens` has let go of (a live theme picker) takes its sheets with it.
  */
 export function createStyles<S extends StyleSheet.NamedStyles<S>>(make: (t: NativeTokens) => S): () => S {
-  const cache = new Map<NativeTokens, S>();
+  const cache = new WeakMap<NativeTokens, S>();
   return function useStyles() {
     const { t } = useTheme();
     let s = cache.get(t);
