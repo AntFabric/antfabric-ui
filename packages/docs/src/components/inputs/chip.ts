@@ -43,7 +43,7 @@ const docs: ComponentDocs = {
     removed: {
       type: "boolean",
       default: false,
-      description: "The ✕ was pressed: the chip is gone. Set by the chip's own ✕ in the catalogue; in the apps the caller drops the chip from its list on onRemove.",
+      description: "The chip has been removed and draws nothing. The ✕ (and Backspace / Delete) only reports onRemove: the chip stays until the app drops it from its list or sets this.",
     },
     disabled: {
       type: "boolean",
@@ -53,25 +53,26 @@ const docs: ComponentDocs = {
       type: "event",
       args: "selected: boolean",
       changes: "selected",
-      description: "Called with `selected` as the press leaves it: flipped.",
+      description: "A filter chip: called with `selected` as the press leaves it, flipped. A suggestion or object chip never changes `selected` itself; its highlight is the app's.",
     },
     onPress: {
       type: "event",
-      description: "The chip was pressed. Its `selected` changes through `onSelectedChange`.",
+      description: "The chip was pressed. A filter's `selected` changes through `onSelectedChange`.",
     },
     onRemove: {
       type: "event",
+      description: "The ✕, or Backspace / Delete on the focused chip, asks to remove it. Once per press: a held key does not repeat it.",
     },
   },
   platforms: {
     web: {
       status: "ready",
-      base: "A row holding two sibling <button>s — the chip (aria-pressed on a filter) and its ✕ — never nested; inline styles over `t`, the root taking the hover and press of either; `selected` through useControllable; Backspace / Delete on a removable chip removes it",
+      base: "A row holding two sibling <button>s — the chip (aria-pressed on a filter) and its ✕ — never nested; inline styles over `t`, the root taking the hover and press of either; `selected` through useControllable; Backspace / Delete on a removable chip reports onRemove",
       import: "import { Chip } from \"@antfabric/ui-react\"",
       notes: [
         "A single-choice filter row is a ToggleGroup (or tablist when it switches a list in place); a multi-choice row is independent Toggles with aria-pressed.",
         "The ✕ is its own button, never inside the chip's button — nested buttons are invalid HTML and the parser splits them.",
-        "Pressing the chip toggles `selected` and the ink fill fades in; pressing the ✕ sets `removed` and the chip goes. Both are `on.press` actions, so the catalogue preview is interactive.",
+        "Pressing a filter chip toggles `selected` and the ink fill fades in; a suggestion or object chip only reports onPress. Pressing the ✕ reports onRemove, and the chip goes when the app drops it.",
       ],
       keyboard: [
         {
@@ -80,7 +81,7 @@ const docs: ComponentDocs = {
         },
         {
           keys: "Backspace / Delete",
-          action: "On a focused removable chip, removes it and moves focus to the next chip, or to the search field if none is left",
+          action: "On a focused removable chip, asks to remove it (once per press); when the app drops it, focus moves to the next chip, else the previous one, else the row",
         },
         {
           keys: "ArrowLeft / ArrowRight",
@@ -97,7 +98,7 @@ const docs: ComponentDocs = {
         "Home's three suggestion chips share the row EQUALLY (flex 1 1 0, min-width fit-content), so a narrow row wraps instead of clipping. object chips do not take an equal share.",
         "object is coral-soft with a coral-200 edge in Light; in Dark it wears the suggestion's edge and keeps the coral in the fill and label.",
         "Desktop has no filter chips today — the command palette's kind filter is ChoicePills (radio-group pills). Filter chips arrive with search filters (From:, In:).",
-        "Pressing toggles `selected` (150ms fill and ink cross-fade); the ✕ sets `removed`, and the caller drops the chip on onRemove.",
+        "Pressing a filter toggles `selected` (150ms fill and ink cross-fade); the ✕ reports onRemove, and the caller drops the chip.",
       ],
       keyboard: [
         {
@@ -106,7 +107,7 @@ const docs: ComponentDocs = {
         },
         {
           keys: "Backspace",
-          action: "Removes a focused removable chip",
+          action: "Asks to remove a focused removable chip, once per press",
         },
       ],
     },
@@ -119,7 +120,7 @@ const docs: ComponentDocs = {
         "Chosen is ink (surfaceInverse) with inverse ink; the rest are white with text.faint. Coral until the V2 Figma of 2026-10-16 (ADR-9406).",
         "The fill does NOT travel between chips: the chosen chip fills itself at once and the tapped chip gives a small bounce. A sliding pill was tried and turned down (\"No smooth motion\").",
         "The row scrolls sideways (at 393pt the last chip runs off the edge) and choosing a chip scrolls it fully into view.",
-        "Tapping toggles `selected`, with the 0.96 press bounce; the ✕ sets `removed`.",
+        "Tapping a filter toggles `selected`, with the 0.96 press bounce; the ✕ reports onRemove and the chip stays until the app drops it.",
       ],
       gestures: [
         {
@@ -132,7 +133,7 @@ const docs: ComponentDocs = {
         },
         {
           gesture: "Tap ✕",
-          action: "Removes; the ✕ has a 44pt hitSlop",
+          action: "Asks to remove (onRemove); the ✕ has a 44pt hitSlop, which the chip's row takes too so iOS reaches it",
         },
       ],
     },
@@ -142,7 +143,7 @@ const docs: ComponentDocs = {
     notes: [
       "A filter chip's main button exposes its state as aria-pressed (the phone: a toggle button with checked). A suggestion and an object chip are plain buttons.",
       "The count joins the label (\"DMs, 3\"); the ✕ is a second button named \"Remove {label}\", never just \"Remove\".",
-      "Backspace or Delete on a removable chip removes it. When the chip that has focus goes, focus moves to the next chip, else the previous one, else the row that held it; a keyboard user is not dropped to the top of the page.",
+      "Backspace or Delete on a removable chip asks to remove it, once per press (a held key does not remove a run of chips). When the app drops the chip that had focus, focus moves to the next chip, else the previous one, else the row that held it; a keyboard user is not dropped to the top of the page.",
       "Selection is not colour alone: a chosen chip changes its fill and exposes aria-pressed. Keyboard focus draws a ring on the chip.",
     ],
   },

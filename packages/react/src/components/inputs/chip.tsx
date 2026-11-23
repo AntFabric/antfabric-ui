@@ -1,6 +1,7 @@
-import { useRef, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
+import { focusDropped } from "../../lib/focus";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -21,10 +22,10 @@ export interface ChipProps extends RootProps<HTMLButtonElement> {
   count?: number;
   /** Adds a ✕ with its own label ("Remove From: Sam Lee") as a second target. */
   removable?: boolean;
-  /** The ✕ was pressed: the chip is gone. In the apps the caller drops the chip from its list on onRemove. */
+  /** The chip has been removed and draws nothing. The ✕ only reports `onRemove`: the app drops the chip from its list, or sets this. */
   removed?: boolean;
   disabled?: boolean;
-  /** Called with `selected` as the press leaves it: flipped. */
+  /** filter: called with `selected` as the press leaves it, flipped. A suggestion or object chip never changes `selected` itself. */
   onSelectedChange?: (selected: boolean) => void;
   /** The chip was pressed. Its `selected` changes through `onSelectedChange`. */
   onPress?: () => void;
@@ -83,25 +84,30 @@ export function Chip({
   const ui = useInteraction({ disabled });
   const x = useInteraction({ disabled });
   const [on = false, setOn] = useControllable(selected, onSelectedChange);
-  const [gone, setGone] = useControllable(removed);
   const rootRef = useRef<HTMLDivElement>(null);
+  // The ✕ only reports: the chip stays until the app drops it (unmounts it or sets `removed`). Where focus goes then is noted at the press,
+  // while the neighbours are still there, and used once the chip has gone, only if focus fell to the page with it.
+  const heir = useRef<{ to: HTMLElement; holder: boolean } | null>(null);
   const drop = () => {
-    // The chip that has focus is about to unmount: hand focus to its neighbour (the next chip, else the previous, else the row that holds
-    // it) before it goes, so a keyboard user is not dropped to the top of the page.
     const me = rootRef.current;
     if (me && me.contains(document.activeElement)) {
       const near = (el: Element | null) => el?.querySelector<HTMLElement>("button:not(:disabled)") ?? null;
       const to = near(me.nextElementSibling) ?? near(me.previousElementSibling);
-      if (to) to.focus({ preventScroll: true });
-      else if (me.parentElement) {
-        const holder = me.parentElement;
-        if (!holder.hasAttribute("tabindex")) holder.setAttribute("tabindex", "-1");
-        holder.focus({ preventScroll: true });
-      }
+      heir.current = to ? { to, holder: false } : me.parentElement ? { to: me.parentElement, holder: true } : null;
     }
-    setGone(true);
     onRemove?.();
   };
+  useEffect(() => {
+    if (removed) return;
+    // Runs once the app has set `removed` or unmounted the chip: the next chip, else the previous one, else the row that held it.
+    return () => {
+      const next = heir.current;
+      heir.current = null;
+      if (!next?.to.isConnected || !focusDropped()) return;
+      if (next.holder && !next.to.hasAttribute("tabindex")) next.to.setAttribute("tabindex", "-1");
+      next.to.focus({ preventScroll: true });
+    };
+  }, [removed]);
   // The root takes the hover and press of either target, as one chip.
   const hovered = ui.hovered || x.hovered;
   const pressed = ui.pressed || x.pressed;
@@ -113,7 +119,7 @@ export function Chip({
   });
   // The ✕ is its own target: its hover and focus are its own, though it sits on the chip's fill.
   const rx = useRecipe(recipes.chip, { variants: { variant }, state: { hover: x.hovered, focus: x.focused, on }, styles });
-  if (gone) return null;
+  if (removed) return null;
   const pass = splitRootProps(rest);
   return (
     <div ref={rootRef} data-af-part="root" {...pass.root} style={css(root, r.root, style)}>
@@ -127,13 +133,15 @@ export function Chip({
         title={label}
         disabled={ui.disabled}
         onClick={() => {
-          setOn(!on);
+          // Only a filter toggles: a suggestion's or an object's `selected` is the app's highlight, never left on by a press.
+          if (variant === "filter") setOn(!on);
           onPress?.();
         }}
         onKeyDown={(e) => {
           if (removable && (e.key === "Backspace" || e.key === "Delete")) {
             e.preventDefault();
-            drop();
+            // A held key repeats: one removal per press, so the chips that take focus after this one are not removed with it.
+            if (!e.repeat) drop();
           }
         }}
         {...ui.handlers}

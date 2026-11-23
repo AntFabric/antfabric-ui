@@ -234,7 +234,7 @@ const docs: ComponentDocs = {
     },
     mobile: {
       status: "ready",
-      base: "A Pressable trigger (the text field's 48pt box) and a sheet drawn under it that slides up through <Enter motion=\"slide-up\">: grabber, title, an optional SearchField, then Pressable radio rows in a ScrollView capped at 90% of the screen; `value`, `open` and `query` through useControllable. The sheet is not a Modal: the screen places the Select where its sheet should appear, and the backdrop and focus return are the screen's",
+      base: "A Pressable trigger (the text field's 48pt box) and a sheet drawn under it that slides up through <Enter motion=\"slide-up\">: grabber, title, an optional SearchField, then Pressable radio rows in a ScrollView capped at 90% of the screen; `value`, `open` and `query` through useControllable. The sheet is not a Modal: the screen places the Select where its sheet should appear, and the backdrop is the screen's. Opening focuses the search field (searchable) or puts the screen reader on the title; closing puts it back on the trigger",
       import: "import { Select } from \"@antfabric/ui-react-native\"",
       notes: [
         "No dropdown on the phone: a 48pt trigger (the text field's box) opens a bottom sheet. A popover anchored to a field is too small to tap reliably and lands under the keyboard.",
@@ -267,7 +267,7 @@ const docs: ComponentDocs = {
   },
   a11y: {
     role: "combobox",
-    label: "{label || placeholder}",
+    label: "{label || FormField label || placeholder}",
     notes: [
       "Web and desktop: the trigger is role=combobox with aria-haspopup=listbox, aria-expanded and aria-activedescendant; rows are role=option with aria-selected. Arrow keys, Home, End, Enter, Space and typing a letter work from the trigger; Escape closes and keeps focus on the trigger; Tab closes.",
       "A searchable select moves focus into the filter when it opens. The filter names the list it drives (aria-controls) and the row under the cursor (aria-activedescendant); the arrow keys and Enter work from it, Escape clears the text and then closes, and Tab moves on and closes the panel.",

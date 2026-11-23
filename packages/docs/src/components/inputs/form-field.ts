@@ -173,6 +173,18 @@ const docs: ComponentDocs = {
       width: 360,
     },
     {
+      name: "Switch, required and refused",
+      description: "The switch takes the field's aria-required and aria-invalid, and the error follows its name.",
+      props: {
+        label: "Recordings",
+        required: true,
+        error: "Turn this on to share #platform-eng's recordings with Fabric.",
+        hideLabel: true,
+        children: [{ el: "component", use: "switch", props: { label: "Share recordings with Fabric", checked: false } }],
+      },
+      width: 360,
+    },
+    {
       name: "Label hidden",
       description: "The label is still the control's name; a heading above asks the question.",
       props: {

@@ -5850,21 +5850,24 @@
         },
         "removed": {
           "type": "boolean",
-          "description": "The ✕ was pressed: the chip is gone. Set by the chip's own ✕ in the catalogue; in the apps the caller drops the chip from its list on onRemove.",
+          "description": "The chip has been removed and draws nothing. The ✕ (and Backspace / Delete) only reports onRemove: the chip stays until the app drops it from its list or sets this.",
           "default": false
         },
         "disabled": { "type": "boolean", "default": false },
         "onSelectedChange": {
           "type": "event",
-          "description": "Called with `selected` as the press leaves it: flipped.",
+          "description": "A filter chip: called with `selected` as the press leaves it, flipped. A suggestion or object chip never changes `selected` itself; its highlight is the app's.",
           "args": "selected: boolean",
           "changes": "selected"
         },
         "onPress": {
           "type": "event",
-          "description": "The chip was pressed. Its `selected` changes through `onSelectedChange`."
+          "description": "The chip was pressed. A filter's `selected` changes through `onSelectedChange`."
         },
-        "onRemove": { "type": "event" }
+        "onRemove": {
+          "type": "event",
+          "description": "The ✕, or Backspace / Delete on the focused chip, asks to remove it. Once per press: a held key does not repeat it."
+        }
       },
       "parts": ["root", "main", "icon", "count", "remove", "removeIcon"],
       "recipe": {
@@ -5990,7 +5993,7 @@
         "notes": [
           "A filter chip's main button exposes its state as aria-pressed (the phone: a toggle button with checked). A suggestion and an object chip are plain buttons.",
           "The count joins the label (\"DMs, 3\"); the ✕ is a second button named \"Remove {label}\", never just \"Remove\".",
-          "Backspace or Delete on a removable chip removes it. When the chip that has focus goes, focus moves to the next chip, else the previous one, else the row that held it; a keyboard user is not dropped to the top of the page.",
+          "Backspace or Delete on a removable chip asks to remove it, once per press (a held key does not remove a run of chips). When the app drops the chip that had focus, focus moves to the next chip, else the previous one, else the row that held it; a keyboard user is not dropped to the top of the page.",
           "Selection is not colour alone: a chosen chip changes its fill and exposes aria-pressed. Keyboard focus draws a ring on the chip."
         ]
       },
@@ -6080,18 +6083,18 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A row holding two sibling <button>s — the chip (aria-pressed on a filter) and its ✕ — never nested; inline styles over `t`, the root taking the hover and press of either; `selected` through useControllable; Backspace / Delete on a removable chip removes it",
+          "base": "A row holding two sibling <button>s — the chip (aria-pressed on a filter) and its ✕ — never nested; inline styles over `t`, the root taking the hover and press of either; `selected` through useControllable; Backspace / Delete on a removable chip reports onRemove",
           "import": "import { Chip } from \"@antfabric/ui-react\"",
           "notes": [
             "A single-choice filter row is a ToggleGroup (or tablist when it switches a list in place); a multi-choice row is independent Toggles with aria-pressed.",
             "The ✕ is its own button, never inside the chip's button — nested buttons are invalid HTML and the parser splits them.",
-            "Pressing the chip toggles `selected` and the ink fill fades in; pressing the ✕ sets `removed` and the chip goes. Both are `on.press` actions, so the catalogue preview is interactive."
+            "Pressing a filter chip toggles `selected` and the ink fill fades in; a suggestion or object chip only reports onPress. Pressing the ✕ reports onRemove, and the chip goes when the app drops it."
           ],
           "keyboard": [
             { "keys": "Enter / Space", "action": "Activates the chip" },
             {
               "keys": "Backspace / Delete",
-              "action": "On a focused removable chip, removes it and moves focus to the next chip, or to the search field if none is left"
+              "action": "On a focused removable chip, asks to remove it (once per press); when the app drops it, focus moves to the next chip, else the previous one, else the row"
             },
             {
               "keys": "ArrowLeft / ArrowRight",
@@ -6108,11 +6111,11 @@
             "Home's three suggestion chips share the row EQUALLY (flex 1 1 0, min-width fit-content), so a narrow row wraps instead of clipping. object chips do not take an equal share.",
             "object is coral-soft with a coral-200 edge in Light; in Dark it wears the suggestion's edge and keeps the coral in the fill and label.",
             "Desktop has no filter chips today — the command palette's kind filter is ChoicePills (radio-group pills). Filter chips arrive with search filters (From:, In:).",
-            "Pressing toggles `selected` (150ms fill and ink cross-fade); the ✕ sets `removed`, and the caller drops the chip on onRemove."
+            "Pressing a filter toggles `selected` (150ms fill and ink cross-fade); the ✕ reports onRemove, and the caller drops the chip."
           ],
           "keyboard": [
             { "keys": "Enter / Space", "action": "Activates" },
-            { "keys": "Backspace", "action": "Removes a focused removable chip" }
+            { "keys": "Backspace", "action": "Asks to remove a focused removable chip, once per press" }
           ]
         },
         "mobile": {
@@ -6124,7 +6127,7 @@
             "Chosen is ink (surfaceInverse) with inverse ink; the rest are white with text.faint. Coral until the V2 Figma of 2026-10-16 (ADR-9406).",
             "The fill does NOT travel between chips: the chosen chip fills itself at once and the tapped chip gives a small bounce. A sliding pill was tried and turned down (\"No smooth motion\").",
             "The row scrolls sideways (at 393pt the last chip runs off the edge) and choosing a chip scrolls it fully into view.",
-            "Tapping toggles `selected`, with the 0.96 press bounce; the ✕ sets `removed`."
+            "Tapping a filter toggles `selected`, with the 0.96 press bounce; the ✕ reports onRemove and the chip stays until the app drops it."
           ],
           "gestures": [
             {
@@ -6132,7 +6135,10 @@
               "action": "Chooses the filter with a small bounce (none under Reduce Motion)"
             },
             { "gesture": "Horizontal swipe", "action": "Scrolls the row" },
-            { "gesture": "Tap ✕", "action": "Removes; the ✕ has a 44pt hitSlop" }
+            {
+              "gesture": "Tap ✕",
+              "action": "Asks to remove (onRemove); the ✕ has a 44pt hitSlop, which the chip's row takes too so iOS reaches it"
+            }
           ]
         }
       },
@@ -10901,7 +10907,7 @@
         "disabled": { "type": "boolean", "default": false },
         "wiggle": {
           "type": "boolean",
-          "description": "A press wiggles the glyph for 0.8 s and onPress fires when the wiggle ends, because the sheet it opens covers the disc. One pending press at a time; at once under Reduce Motion.",
+          "description": "A press wiggles the glyph for 0.8 s and onPress fires when the wiggle ends, because the sheet it opens covers the disc. One pending press at a time; at once under Reduce Motion. Disabled during the wiggle, it drops the press and does not fire.",
           "default": false,
           "platforms": ["mobile"]
         },
@@ -11302,6 +11308,17 @@
           "props": {
             "label": "Sound",
             "description": "Plays when a message in a channel you follow arrives.",
+            "hideLabel": true
+          },
+          "slots": ["children"]
+        },
+        {
+          "name": "Switch, required and refused",
+          "description": "The switch takes the field's aria-required and aria-invalid, and the error follows its name.",
+          "props": {
+            "label": "Recordings",
+            "required": true,
+            "error": "Turn this on to share #platform-eng's recordings with Fabric.",
             "hideLabel": true
           },
           "slots": ["children"]
@@ -24067,7 +24084,7 @@
         "role": "radiogroup",
         "label": "{label}",
         "notes": [
-          "Each option is role=radio with aria-checked; the visible legend is aria-hidden because it is already the group's name. Inside a FormField with no label of its own, the field's label names the group.",
+          "Each option is role=radio with aria-checked; the visible legend is aria-hidden on the web because it is already the group's name. On the phone VoiceOver and TalkBack never read a container's name, so the legend is read there, before the options; with hideLabel the heading above asks the question. Inside a FormField with no label of its own, the field's label names the group.",
           "The group is one tab stop (the chosen option, or the first when nothing is chosen). The arrow keys move to the next enabled option and choose it, wrapping; with nothing chosen the first arrow press moves too. Left and right follow the direction of the tree.",
           "An option's description is its aria-describedby (the phone: its accessibilityHint). Inside a FormField the group takes the field's description, error, aria-invalid and aria-required.",
           "As cards, the card itself is the radio (aria-checked), so the choice is announced as it is for the list; the card draws no ring, since its edge shows the choice, and its preview is hidden from screen readers. Its name is its label then its tags (\"Sidebar In use\"; the phone says the tags in its hint, before the description). A card that cannot be chosen is disabled, dimmed and skipped by the arrows."
@@ -24666,7 +24683,7 @@
         },
         "label": {
           "type": "string",
-          "description": "Accessible name when it should differ from the placeholder. Falls back to the placeholder.",
+          "description": "Accessible name when it should differ from the placeholder. Falls back to a FormField's label, then the placeholder.",
           "default": ""
         },
         "shortcut": {
@@ -24796,11 +24813,11 @@
       },
       "a11y": {
         "role": "searchbox",
-        "label": "{label || placeholder}",
+        "label": "{label || FormField label || placeholder}",
         "notes": [
           "The glass is decoration. While busy it becomes a progressbar named by strings.search-field.loading (\"Loading\"; a product that wants \"Searching\" sets it).",
           "Enter submits and Escape clears the text, then blurs on the second press. When the clear button goes away with the text, focus moves to the field.",
-          "Inside a FormField with no label or placeholder of its own, the field's label names it, and it takes the field's description, error, aria-invalid and aria-required. Result counts are the product's to announce."
+          "Inside a FormField with no label of its own, the field's visible label names it (never the placeholder, WCAG 2.5.3), and it takes the field's description, error, aria-invalid and aria-required. Result counts are the product's to announce."
         ]
       },
       "states": ["hover", "focus", "disabled"],
@@ -25020,6 +25037,12 @@
           "default": "",
           "sample": "Notifications"
         },
+        "panel": {
+          "type": "string",
+          "description": "The id of the panel the strip switches: the chosen tab points at it (aria-controls). Each tab's id is the strip's id (or a generated one) and its key, `<id>-<key>`, so the panel can name itself with aria-labelledby.",
+          "default": "",
+          "platforms": ["web", "desktop"]
+        },
         "onValueChange": { "type": "event", "args": "key: string", "changes": "value" }
       },
       "parts": ["track", "card", "tab", "count"],
@@ -25133,14 +25156,21 @@
         "label": "{label}",
         "notes": [
           "Each segment is role=tab with aria-selected / accessibilityState.selected. The count chip is hidden and joins the tab's name instead: \"Mentions, 3\".",
-          "The strip is one tab stop; the arrow keys move to the neighbouring segment and choose it, and Home and End go to the first and last. In a right-to-left tree ArrowRight goes to the previous segment. There is no live region: the panel change is the feedback.",
-          "On the phone each segment's touch area is grown to 44pt without drawing more."
+          "The strip is one tab stop; the arrow keys move to the neighbouring segment and choose it, and Home and End go to the first and last. In a right-to-left tree ArrowRight goes to the previous segment. A key held with Alt, Cmd, Ctrl or Shift is not taken. There is no live region: the panel change is the feedback.",
+          "Web and desktop: each tab's id is the strip's id (or a generated one) and its key (`inbox-view-mentions`); given `panel`, the chosen tab points at that panel with aria-controls, and the panel names itself with aria-labelledby set to the chosen tab's id.",
+          "On the phone each segment's touch area is grown to 44pt without drawing more; the strip takes the same slop, since iOS drops a touch outside a parent before asking its children (a scrollable strip's ScrollView still clips it). VoiceOver and TalkBack never read a container's name, so each tab says the strip's label after its own, as its hint."
         ]
       },
       "states": ["hover", "pressed", "focus"],
       "examples": [
         { "name": "Notification rail", "props": {} },
         { "name": "Full width", "props": { "full": true }, "platforms": ["web", "desktop"] },
+        {
+          "name": "Switches a panel",
+          "description": "The chosen tab points at the panel it shows (aria-controls); the panel names itself after that tab.",
+          "props": { "panel": "notifications-panel" },
+          "platforms": ["web", "desktop"]
+        },
         {
           "name": "Tasks with counts",
           "props": {
@@ -25237,7 +25267,7 @@
           "keyboard": [
             {
               "keys": "ArrowLeft / ArrowRight",
-              "action": "Moves to and selects the previous / next segment (automatic activation); wraps at the ends"
+              "action": "Moves to and selects the previous / next segment (automatic activation); wraps at the ends. Only the plain keys: Alt / Cmd / Ctrl / Shift with an arrow are left to the browser"
             },
             { "keys": "Home / End", "action": "Selects the first / last segment" },
             {
@@ -25775,7 +25805,7 @@
       },
       "a11y": {
         "role": "combobox",
-        "label": "{label || placeholder}",
+        "label": "{label || FormField label || placeholder}",
         "notes": [
           "Web and desktop: the trigger is role=combobox with aria-haspopup=listbox, aria-expanded and aria-activedescendant; rows are role=option with aria-selected. Arrow keys, Home, End, Enter, Space and typing a letter work from the trigger; Escape closes and keeps focus on the trigger; Tab closes.",
           "A searchable select moves focus into the filter when it opens. The filter names the list it drives (aria-controls) and the row under the cursor (aria-activedescendant); the arrow keys and Enter work from it, Escape clears the text and then closes, and Tab moves on and closes the panel.",
@@ -26007,7 +26037,7 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "A Pressable trigger (the text field's 48pt box) and a sheet drawn under it that slides up through <Enter motion=\"slide-up\">: grabber, title, an optional SearchField, then Pressable radio rows in a ScrollView capped at 90% of the screen; `value`, `open` and `query` through useControllable. The sheet is not a Modal: the screen places the Select where its sheet should appear, and the backdrop and focus return are the screen's",
+          "base": "A Pressable trigger (the text field's 48pt box) and a sheet drawn under it that slides up through <Enter motion=\"slide-up\">: grabber, title, an optional SearchField, then Pressable radio rows in a ScrollView capped at 90% of the screen; `value`, `open` and `query` through useControllable. The sheet is not a Modal: the screen places the Select where its sheet should appear, and the backdrop is the screen's. Opening focuses the search field (searchable) or puts the screen reader on the title; closing puts it back on the trigger",
           "import": "import { Select } from \"@antfabric/ui-react-native\"",
           "notes": [
             "No dropdown on the phone: a 48pt trigger (the text field's box) opens a bottom sheet. A popover anchored to a field is too small to tap reliably and lands under the keyboard.",
@@ -28811,7 +28841,7 @@
         "label": "{label}",
         "notes": [
           "role=switch with aria-checked; announced \"Notification sound, switch, on\". The track is hidden: the state is in aria-checked.",
-          "The description is the control's aria-describedby (the phone: its accessibilityHint); inside a FormField the field's description and error follow it.",
+          "The description is the control's aria-describedby (the phone: its accessibilityHint); inside a FormField the field's description and error follow it, and on the web and desktop the switch takes its aria-invalid and aria-required.",
           "The thumb travels toward the end edge, so it moves the other way in a right-to-left tree. The on state is brand-coloured against a grey off track, and keyboard focus draws a ring on the track."
         ]
       },
@@ -31872,7 +31902,7 @@
         },
         "autoComplete": {
           "type": "string",
-          "description": "What the browser or the phone may fill in: email, username, current-password, new-password, one-time-code, tel, off."
+          "description": "What the browser or the phone may fill in: email, username, current-password, new-password, one-time-code, tel, off. On iOS a password field with new-password is offered a strong new password, not the saved one."
         },
         "inputMode": {
           "type": "enum",
@@ -31898,7 +31928,7 @@
         },
         "reveal": {
           "type": "boolean",
-          "description": "With type password: a Show / Hide button at the end of the field. On, the characters are shown until it is pressed again; its accessible name says Show password or Hide password, and aria-pressed says which.",
+          "description": "With type password: a Show / Hide button at the end of the field. On, the characters are shown until it is pressed again; its accessible name follows the word it shows, Show password or Hide password, with no aria-pressed (the name says the state).",
           "default": false
         },
         "helper": {
@@ -32153,7 +32183,7 @@
         "label": "{label}",
         "notes": [
           "The label is a real <label for> (the phone: the accessibility label, falling back to the placeholder); the placeholder is never the name unless there is no label.",
-          "The helper or the error is the input's aria-describedby (the phone: its accessibility hint) and the field sets aria-invalid; an error that appears is announced once, politely. Required is aria-required (the phone: said after the name).",
+          "The helper or the error is the input's aria-describedby (the phone: its accessibility hint) and the field sets aria-invalid; an error that appears is announced once, politely. Required is aria-required (the phone: \"Required\" said after the name, also when a tag is drawn in its place).",
           "The counter is part of the description, read when the field is focused; it is not a live region. When typing pauses within the last 10% of the limit (at least 5 characters) the characters left are announced, and reaching the limit is announced once.",
           "`type` sets the input type and, on the phone, the keyboard and secure entry; an address, a number or a password is always laid out left to right.",
           "Inside a FormField the control takes the field's id, description, error, aria-invalid and aria-required."

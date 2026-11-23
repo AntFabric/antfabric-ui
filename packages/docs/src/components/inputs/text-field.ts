@@ -37,7 +37,7 @@ const docs: ComponentDocs = {
     },
     autoComplete: {
       type: "string",
-      description: "What the browser or the phone may fill in: email, username, current-password, new-password, one-time-code, tel, off.",
+      description: "What the browser or the phone may fill in: email, username, current-password, new-password, one-time-code, tel, off. On iOS a password field with new-password is offered a strong new password, not the saved one.",
     },
     inputMode: {
       type: "enum",
@@ -64,7 +64,7 @@ const docs: ComponentDocs = {
     reveal: {
       type: "boolean",
       default: false,
-      description: "With type password: a Show / Hide button at the end of the field. On, the characters are shown until it is pressed again; its accessible name says Show password or Hide password, and aria-pressed says which.",
+      description: "With type password: a Show / Hide button at the end of the field. On, the characters are shown until it is pressed again; its accessible name follows the word it shows, Show password or Hide password, with no aria-pressed (the name says the state).",
     },
     helper: {
       type: "string",
@@ -212,7 +212,7 @@ const docs: ComponentDocs = {
     label: "{label}",
     notes: [
       "The label is a real <label for> (the phone: the accessibility label, falling back to the placeholder); the placeholder is never the name unless there is no label.",
-      "The helper or the error is the input's aria-describedby (the phone: its accessibility hint) and the field sets aria-invalid; an error that appears is announced once, politely. Required is aria-required (the phone: said after the name).",
+      "The helper or the error is the input's aria-describedby (the phone: its accessibility hint) and the field sets aria-invalid; an error that appears is announced once, politely. Required is aria-required (the phone: \"Required\" said after the name, also when a tag is drawn in its place).",
       "The counter is part of the description, read when the field is focused; it is not a live region. When typing pauses within the last 10% of the limit (at least 5 characters) the characters left are announced, and reaching the limit is announced once.",
       "`type` sets the input type and, on the phone, the keyboard and secure entry; an address, a number or a password is always laid out left to right.",
       "Inside a FormField the control takes the field's id, description, error, aria-invalid and aria-required.",

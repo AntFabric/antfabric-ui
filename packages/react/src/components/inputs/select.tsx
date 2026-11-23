@@ -99,7 +99,10 @@ const panel: CSSProperties = {
 
 /* A phone-sized browser gets the phone's own picker: the custom listbox is a desktop-pointer answer. */
 const PHONE = "(pointer: coarse) and (max-width: 599px)";
+// A test DOM (jsdom) has no matchMedia: no phone there, and nothing to listen to.
+const canMatch = () => typeof matchMedia === "function";
 const onPhoneChange = (notify: () => void) => {
+  if (!canMatch()) return () => {};
   const query = matchMedia(PHONE);
   query.addEventListener("change", notify);
   return () => query.removeEventListener("change", notify);
@@ -107,7 +110,7 @@ const onPhoneChange = (notify: () => void) => {
 const usePhoneBrowser = () =>
   useSyncExternalStore(
     onPhoneChange,
-    () => matchMedia(PHONE).matches,
+    () => canMatch() && matchMedia(PHONE).matches,
     () => false,
   );
 
@@ -328,8 +331,8 @@ export function Select({
     } else if (e.key === "Tab") {
       // From the trigger, Tab closes. From the filter it moves on, and focus leaving the select closes it.
       if (!fromFilter) show(false);
-    } else if (!fromFilter && e.key.length === 1 && !searchable) {
-      // Type-ahead: the next enabled row whose label starts with the letter.
+    } else if (!fromFilter && e.key.length === 1 && !searchable && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      // Type-ahead: the next enabled row whose label starts with the letter. A shortcut (Cmd+C, Ctrl+F, an Alt letter) is not typing.
       const k = e.key.toLowerCase();
       const order = [...enabled.slice(at + 1), ...enabled.slice(0, at + 1)];
       const hit = order.find((i) => i.label.toLowerCase().startsWith(k));

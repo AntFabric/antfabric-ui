@@ -124,6 +124,12 @@ Messaging, agent and feedback:
 - Skeleton: while `visible` is false it is hidden from screen readers too (`aria-hidden`), not only from sight (L30).
 - ProgressBar: `value` left out is indeterminate, as a NaN was; it no longer draws and announces 40% for an upload with no value yet. The docs default (40) is now only the catalogue's sample (L32).
 - EmptyState: new `headingLevel` (1 to 6, default 2) for the title, so it can keep the page's heading order (L35).
+- Chip: only a `filter` chip toggles `selected`; a `suggestion` or `object` chip no longer latches into its selected look after one press (L3). The ✕ and Backspace / Delete only report `onRemove`: the chip stays until your app drops it from its list (or sets `removed`), and then focus goes to the next chip, else the previous one, else the row. A held key reports once, so it no longer removes a run of chips (L4). If you relied on the chip hiding itself, drop it from your list in `onRemove`.
+- SearchField: inside a FormField the field's visible label names it, not the placeholder (WCAG 2.5.3; M6).
+- Switch: inside a FormField it takes the field's `aria-invalid` and `aria-required`, as Checkbox does (L13).
+- TextField: the password reveal button no longer says its state twice ("Hide password, pressed"). Its name follows the word it shows and `aria-pressed` is gone (L9).
+- Select: type-ahead ignores keys held with Cmd, Ctrl or Alt, so Cmd+C on an open select no longer moves the row under the cursor (L6). It mounts where there is no `matchMedia` (jsdom) (L8).
+- SegmentedControl: only plain arrows, Home and End move; Alt / Cmd / Ctrl / Shift with them are left to the browser (L5). Each tab has an id, the strip's `id` (or a generated one) and its key, and the new `panel` prop points the chosen tab at the panel it shows (`aria-controls`), so the panel can take `aria-labelledby` (L10). It mounts where there is no `ResizeObserver` (jsdom) (L8). IconButton still needs `matchMedia` under jsdom until `useCoarsePointer` is guarded.
 
 ## 1.0.0
 

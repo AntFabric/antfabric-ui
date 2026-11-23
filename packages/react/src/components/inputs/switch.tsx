@@ -55,6 +55,8 @@ export function Switch({ checked, label: name, description: detail = "", icon = 
       aria-checked={on}
       aria-label={name}
       aria-describedby={joinIds(!!detail && !hideLabel && descriptionId, form?.describedBy)}
+      aria-invalid={form?.invalid || undefined}
+      aria-required={form?.required || undefined}
       disabled={ui.disabled}
       onClick={() => setOn(!on)}
       {...ui.handlers}
