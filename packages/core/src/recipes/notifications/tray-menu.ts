@@ -61,7 +61,7 @@ export const trayMenu = defineRecipe({
       platforms: {
         mac: {
           base: { gap: "$space.xs", height: "$osTray.macRowH", paddingX: "$space.smMd", radius: "$osTray.macRowRadius", size: "$text.bodySm" },
-          states: { hover: { bg: "$info.default", fg: "$fg.onBrand" }, disabled: { fg: "$fg.faint" } },
+          states: { hover: { bg: "$info.default", fg: "$os.onFill" }, disabled: { fg: "$fg.faint" } },
         },
         linux: { base: { height: "$osTray.linuxRowH", radius: "$osTray.linuxRowRadius" } },
       },
