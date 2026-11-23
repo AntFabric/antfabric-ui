@@ -3,10 +3,15 @@
   "theme": "antfabric",
   "accepted": {
     "bottom-sheet": "B11: the 375 demo frame moves to the catalogue (M20, owner decision)",
-    "sheet": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); the phone's Sheet is a BottomSheet",
-    "empty-state": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
-    "fab": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
-    "icon-button": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
-    "inline-banner": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet"
+    "empty-state/mobile": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
+    "empty-state/mobile#neutral": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
+    "fab/mobile": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
+    "fab/mobile#neutral": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
+    "icon-button/mobile": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
+    "icon-button/mobile#neutral": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
+    "inline-banner/mobile": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
+    "inline-banner/mobile#neutral": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); a flow scene draws a BottomSheet",
+    "sheet/mobile": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); the phone's Sheet is a BottomSheet",
+    "sheet/mobile#neutral": "B11: the 375 demo frame moves to the catalogue (M20, owner decision); the phone's Sheet is a BottomSheet"
   }
 }
