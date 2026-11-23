@@ -58,6 +58,8 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 
 ### Batch 12: per-component fixes
 
+- Strings: an empty `popover` group, so the phone's Popover takes `strings` for its backdrop's name (`common`'s `close`). The doc comments of `connection-banner.tryNowLabel` and `update-banner.installLabel`, `restartLabel` and `retryLabel` say they are now descriptions, not names; the English text is unchanged (L16, L18).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:

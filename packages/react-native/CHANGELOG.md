@@ -95,6 +95,11 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 12: per-component fixes
 
+- Tabs: a `value` no tab has (or none) chooses no tab and draws no bar, as the docs said; the kit selected the first tab, even a disabled one. A disabled tab's dimming is part of the `tab` part, so `styles.tab` can restyle it (M23, owner decision).
+- Popover: the backdrop is named Close (`common`'s close; Popover takes `strings`), not the trigger's label, and the panel is placed again when the window's size changes (the phone turned) (L16, L19).
+- UpdateBanner: the restart sheet takes screen-reader focus at its title when it opens, and the escape gesture puts it away (L16).
+- BottomSheet: a sheet put away is hidden from TalkBack too (`importantForAccessibility`), not only from VoiceOver (L16).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:

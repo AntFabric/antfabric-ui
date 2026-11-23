@@ -8375,7 +8375,8 @@
         "notes": [
           "A change of state is spoken politely, never interrupting, and never as an alert: nothing here is an error. On the web the strip's message, the degraded note and \"Back online\" go through the page's own announcer when the state changes (a strip mounted holding its text is not read, and the way back would otherwise be silent). On the phone the card's title and message are spoken by the screen reader's announcement call, and the card is role=status.",
           "The pill is a labelled picture that stays on the page (role=img on the web); a change of its name is announced (not on first draw). Its label is a sentence (\"No connection to the backend\"), not the colour.",
-          "The strip's spinner is hidden from assistive technology; the message says what is happening."
+          "The strip's spinner is hidden from assistive technology; the message says what is happening.",
+          "Try now is named by its words (WCAG 2.5.3: a voice user says what they see); \"Try reconnecting now\" is its description and tooltip."
         ]
       },
       "examples": [
@@ -8568,6 +8569,11 @@
           "sample": "Release train is cut: 4.12.0 is on staging. Smoke tests start at 3."
         },
         "onReact": { "type": "event", "args": "emoji: string" },
+        "onMoreReactions": {
+          "type": "event",
+          "description": "The + after the quick set was pressed. The kit draws no emoji picker on web and desktop: the app opens its own (the message row's Add a reaction picker) and reacts through it. The phone's + opens the kit's emoji panel instead (picking).",
+          "platforms": ["web", "desktop"]
+        },
         "onSelect": { "type": "event", "args": "item: ContextMenuItem" },
         "onClose": { "type": "event" }
       },
@@ -8931,7 +8937,16 @@
               "keys": "Shift+F10 / ContextMenu key",
               "action": "Opens at the focused message's top-left corner"
             },
-            { "keys": "↑ / ↓", "action": "Moves between rows; ← / → move across the quick reactions" },
+            {
+              "keys": "↑ / ↓",
+              "action": "Moves between rows; ↑ from the first row (↓ from the last) moves to the quick reactions, and ↓ (↑) from them back to the rows"
+            },
+            { "keys": "← / → · Home / End", "action": "Move across the quick reactions and the +" },
+            {
+              "keys": "Enter / Space",
+              "action": "On a quick reaction: reacts; on the +: calls onMoreReactions"
+            },
+            { "keys": "Tab", "action": "Closes, from the rows and from the quick reactions" },
             { "keys": "Esc", "action": "Closes and returns focus to the message" }
           ]
         },
@@ -8948,6 +8963,10 @@
           "keyboard": [
             { "keys": "Shift+F10 / Menu key", "action": "Opens on the message cursor (Windows, Linux)" },
             { "keys": "Ctrl+click", "action": "Same as right-click on macOS" },
+            {
+              "keys": "↑ / ↓ · ← / →",
+              "action": "As on the web: ↑ from the first row reaches the quick reactions, ← → move across them"
+            },
             { "keys": "Esc", "action": "Closes this menu only and leaves the message cursor where it was" }
           ]
         },
@@ -9591,6 +9610,11 @@
           "title": "Pressed twice, slow, or failed",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "The CTA disables the moment it is pressed; the request carries an idempotency key. The spinner appears after 300 ms and stays at least 400 ms. While in flight, Cancel, Esc and the scrim do nothing — closing would hide the outcome. After 8 s the label reads \"Still deleting…\". A failure keeps the dialog open with the reason inline, and the same button retries."
+        },
+        {
+          "title": "A right-click, or a press on the scrim's scrollbar",
+          "platforms": ["web", "desktop"],
+          "handling": "A press on the scrim cancels only when the primary button goes down and comes up on it. A right-click or middle-click, a press on the scrollbar of a scrim that scrolls, and a drag that starts on the scrim and ends in the panel (selecting its text) leave it open."
         },
         {
           "title": "Esc and focus",
@@ -15831,6 +15855,11 @@
           "handling": "One line with an ellipsis; the panel never widens past its set width. The full label stays the accessible name and, on web and desktop, the tooltip."
         },
         {
+          "title": "A row that navigates",
+          "platforms": ["web", "desktop"],
+          "handling": "A row with `href` is an <a href role=\"menuitem\">: ⌘-click and middle-click open a new tab, a plain click calls onSelect. A link takes Enter by itself; the row also takes Space, as every other row does, and keeps it from scrolling the page."
+        },
+        {
           "title": "More rows than the window has room for",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "The panel caps at the space between the trigger and the window edge minus 8px and scrolls inside, keeping its shadow and corners. On a phone, a list longer than about eight rows is a sheet, not a dropdown."
@@ -15868,7 +15897,7 @@
           "import": "import { Menu } from \"@antfabric/ui-react\"",
           "notes": [
             "Portalling and placing the panel are the app's (it takes a `placement` of below or above and does not flip at the viewport's edge); the panel scrolls inside 80vh when it has many rows.",
-            "A row with `href` is a link item (<a href role=\"menuitem\">), so ⌘-click and middle-click open a new tab; a plain click calls onSelect.",
+            "A row with `href` is a link item (<a href role=\"menuitem\">), so ⌘-click and middle-click open a new tab; a plain click, Enter and Space call onSelect.",
             "Shortcut hints are drawn only for shortcuts the page actually owns; a browser-reserved one (⌘W, ⌘T, ⌘N, ⌘L) is replaced by the web alternative, never shown as a promise the browser will break.",
             "Right-click is not this component — see Context menu.",
             "In the catalogue the panel pops in, and pressing a checkable row flips its check (one row at a time, through `toggled`); the menu stays open, as a checkbox row does."
@@ -22163,6 +22192,16 @@
           "handling": "The popover is above the dialog in the layer stack: Esc and a press outside close the popover first, and the dialog keeps its own."
         },
         {
+          "title": "A dialog or popover opened from the panel",
+          "platforms": ["web", "desktop"],
+          "handling": "A layer opened from the panel's content is drawn in the overlay layer, outside the popover in the page, though React passes its clicks up through the popover. Only a press on the trigger toggles the popover: a click inside the inner layer leaves it open, and the inner layer, on top of the stack, takes Esc and a press outside first."
+        },
+        {
+          "title": "A right-click, or a drag that ends inside",
+          "platforms": ["web", "desktop"],
+          "handling": "A press outside is the primary button going down and coming up outside the panel and its trigger. A right-click, a middle-click, a press on a scrollbar and a drag from outside into the panel (selecting its text) leave it open."
+        },
+        {
           "title": "The page scrolls while it is open",
           "platforms": ["web", "desktop"],
           "handling": "The panel follows its trigger, re-placed on every scroll of any box and on resize. It does not close on scroll."
@@ -22201,7 +22240,11 @@
           "status": "ready",
           "base": "A Pressable round the trigger; while open, the panel is drawn in a transparent Modal over the screen, placed from the trigger's measureInWindow and flipped where there is no room. A press on the backdrop and Android's back close it",
           "import": "import { Popover } from \"@antfabric/ui-react-native\"",
-          "notes": ["`modal` marks the panel accessibilityViewIsModal, so a screen reader stays inside it."]
+          "notes": [
+            "`modal` marks the panel accessibilityViewIsModal, so a screen reader stays inside it.",
+            "The backdrop is a button named Close (`common`'s close), so a screen reader can put the panel away as a press outside does.",
+            "Placed once it is measured: from the trigger's window position when it opens, and again when the window's size changes (the phone turned, a split screen resized). It does not follow a scroll under it, which the Modal stops anyway."
+          ]
         }
       },
       "related": ["menu", "dialog", "hover-card", "tooltip"]
@@ -26288,7 +26331,11 @@
           "type": "node",
           "description": "The actions under the body, parted from it by a hairline, at the end of the row. Empty draws no footer."
         },
-        "showClose": { "type": "boolean", "description": "Draws the ✕ in the header.", "default": true },
+        "showClose": {
+          "type": "boolean",
+          "description": "Draws the ✕ in the header. On the phone the ✕ sits beside the title, so a sheet with no title draws none there: it is put away by its handle, a drag down, a press on the scrim or Android's back.",
+          "default": true
+        },
         "label": {
           "type": "string",
           "description": "The sheet's accessible name when it has no title (a navigation drawer: \"Menu\").",
@@ -26407,6 +26454,11 @@
           "handling": "The panel is never wider than the window: on a phone-width browser it fills it."
         },
         {
+          "title": "A right-click, or a press on the scrim's scrollbar",
+          "platforms": ["web", "desktop"],
+          "handling": "A press on the scrim cancels only when the primary button goes down and comes up on it. A right-click or middle-click, a press on the scrollbar of a scrim that scrolls, and a drag that starts on the scrim and ends in the panel (selecting its text) leave it open."
+        },
+        {
           "title": "Something must be finished first",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "With `dismissible` off, Esc and the scrim do nothing and the ✕ is disabled; the footer's actions close it."
@@ -26435,7 +26487,10 @@
           "status": "partial",
           "base": "The BottomSheet, with the title, the ✕, the subtitle at the top of the body and the footer under it; `side` and `width` are the web's. Drawn where it is mounted, as the BottomSheet is: the app presents it (a Modal or its navigator's sheet)",
           "import": "import { Sheet } from \"@antfabric/ui-react-native\"",
-          "alternative": "BottomSheet"
+          "alternative": "BottomSheet",
+          "notes": [
+            "The ✕ is drawn in the title row, so it needs a `title`: a sheet named only by `label` has its handle (named Dismiss) and the drag down instead."
+          ]
         }
       },
       "related": ["dialog", "bottom-sheet", "popover"]
@@ -31027,7 +31082,12 @@
         {
           "title": "Nothing chosen",
           "platforms": ["web", "desktop", "mobile"],
-          "handling": "A value that matches no tab draws no bar at all. The channel shelf depends on it: with the details or thread panel open, no shelf tab is showing, and a bar under Files would be the strip telling a lie. When a tab is chosen again the bar is placed there, not slid in from where it last was. Tab then lands on the first tab."
+          "handling": "A value that matches no tab (empty, or a key no tab has) chooses none and draws no bar at all; the kit never falls back to the first tab. The channel shelf depends on it: with the details or thread panel open, no shelf tab is showing, and a bar under Files would be the strip telling a lie. When a tab is chosen again the bar is placed there, not slid in from where it last was. Tab then lands on the first enabled tab, the strip's one tab stop while none is chosen."
+        },
+        {
+          "title": "Nothing chosen and the first tab disabled",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "A disabled tab is never chosen for the app: with no value matching, no tab is chosen, and on web and desktop Tab lands on the first enabled tab (Pinned here), from which the arrows move on, skipping the disabled one."
         },
         {
           "title": "More tabs than room",
@@ -34915,7 +34975,7 @@
       "a11y": {
         "notes": [
           "A change of stage is spoken when it happens, through the page's own announcer on the web and desktop (a failure assertively, with the updater's reason read out after the title) and through the screen reader's announcement call on the phone for a failure, the latest-version note and the store notice. Progress is not read out percent by percent. The card is not a live region itself: one that arrives holding its text is not read.",
-          "The card's button is named by the whole action (\"Restart to update to version 0.43.0\") and described by the title and the detail line, so reaching it reads the failure too. The web's reload line is announced the same way.",
+          "The card's button is named by what it shows, its title and its detail line (\"Restart to update v0.43.0\"), so a voice user says the words they see (WCAG 2.5.3) and reaching it reads the failure too; the whole action (\"Restart to update to version 0.43.0\") is its description and tooltip. The web's reload line is announced the same way.",
           "On the phone Android's back button puts the restart sheet away.",
           "The detail line truncates for sighted readers only; the full error is in the DOM and in the tooltip."
         ]

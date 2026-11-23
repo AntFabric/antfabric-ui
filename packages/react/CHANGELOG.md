@@ -99,6 +99,13 @@ A component never shows the result of a request before the app confirms it (S2, 
 
 ### Batch 12: per-component fixes
 
+- Popover: a click inside a layer opened from the panel (an inner Dialog or Popover) no longer closes it; only a press on the trigger toggles it (M13).
+- ContextMenu: the quick reactions are reachable from the keyboard: ↑ from the first row (↓ from the last) moves into them, ← → (Home, End) across them, ↓ (↑) back to the rows; Tab closes from them as from the rows. The + calls a new event `onMoreReactions` (web and desktop), where the app opens its own emoji picker; it did nothing before (M14).
+- Tabs: a `value` no tab has (or none) chooses no tab and draws no bar, as the docs said; the kit selected the first tab, even a disabled one. The first enabled tab is then the strip's tab stop. Pass the key of the tab you want chosen (M23, owner decision).
+- Menu: a link row (`href`) takes Space as every other row does (L14).
+- Dialog, Sheet, Popover: a press outside (the scrim) closes only when the primary button goes down and comes up outside. A right-click, a middle-click, a press on the scrim's scrollbar or a drag that ends in the panel leave it open (L15).
+- UpdateBanner: the card is named by its title and detail, what it shows; the action ("Install the update, version …") is its description and tooltip. ConnectionBanner: Try now is named by its words, "Try reconnecting now" its description and tooltip (L18, WCAG 2.5.3).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:
