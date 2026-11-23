@@ -93,10 +93,10 @@ export function Skeleton({
   return (
     <div
       data-af-part="root"
-      {...rootProps(rest)}
       role="group"
       aria-busy
       aria-label={name}
+      {...rootProps(rest)}
       style={css(
         box,
         { alignSelf: shape === "row" ? "stretch" : "flex-start", maxWidth: "100%", transition: "opacity 160ms ease-out" },

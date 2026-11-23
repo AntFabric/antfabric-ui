@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type Ref } from "react";
 import { cap, recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { box, css, pressable, row, text } from "../../lib/style";
 
 export type SegmentedControlSize = "sm" | "md";
@@ -15,6 +15,7 @@ export interface SegmentedControlItem {
   count?: number;
 }
 
+/** `id`, `aria-*` and `ref` name the tablist; `className` and `data-*` go on the root (`splitRootProps`). */
 export interface SegmentedControlProps extends RootProps<HTMLDivElement> {
   items: SegmentedControlItem[];
   /** The chosen item's key. A value that matches no item is allowed and draws no card — for a strip whose panel can be closed. */
@@ -111,6 +112,8 @@ export function SegmentedControl({ items, value, size = "md", full = false, scro
   // ONE card travels between segments. It is measured after mount; until then (and on the server)
   // the chosen segment draws its own card in the same place.
   const ref = useRef<HTMLDivElement>(null);
+  const pass = splitRootProps(rest);
+  const { ref: passedRef, ...control } = pass.control as { ref?: Ref<HTMLDivElement> } & Record<string, unknown>;
   const [slot, setSlot] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   useEffect(() => {
     const strip = ref.current;
@@ -138,7 +141,7 @@ export function SegmentedControl({ items, value, size = "md", full = false, scro
 
   return (
     <div
-      {...rootProps(rest)}
+      {...pass.root}
       style={css(
         row,
         { alignItems: "stretch", alignSelf: "flex-start", maxWidth: "100%" },
@@ -147,7 +150,17 @@ export function SegmentedControl({ items, value, size = "md", full = false, scro
         style,
       )}
     >
-      <div ref={ref} role="tablist" aria-label={label || undefined} onKeyDown={move} data-af-part="track" style={css(track, partStyle(r, "track", full && { flexGrow: 1 }))}>
+      <div
+        ref={(el) => {
+          ref.current = el;
+          setRef(passedRef, el);
+        }}
+        role="tablist"
+        aria-label={label || undefined}
+        onKeyDown={move}
+        {...control}
+        data-af-part="track"
+        style={css(track, partStyle(r, "track", full && { flexGrow: 1 }))}>
         {slot && (
           <span
             aria-hidden

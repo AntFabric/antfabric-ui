@@ -81,8 +81,8 @@ export function SessionState({ state = "expired", returnTo = "", error = "", off
     <div
       data-af-part="root"
       role="region"
-      {...rootProps(rest)}
       aria-label={title}
+      {...rootProps(rest)}
       onKeyDown={(e) => {
         if (e.key === "Escape" && state === "waiting" && !web) onCancel?.();
       }}

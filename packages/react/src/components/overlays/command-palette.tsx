@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode, type Ref } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
@@ -9,7 +9,7 @@ import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, input, pressable, row, text, truncate } from "../../lib/style";
 import { announce } from "../../lib/announce";
 import { useOverlayFocus } from "../../lib/focus";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { Avatar, type AvatarIdentity, type AvatarPresence } from "../display/avatar";
 import { Kbd } from "../display/kbd";
 
@@ -44,6 +44,7 @@ export interface CommandPaletteGroup {
   items: CommandPaletteItem[];
 }
 
+/** `id`, `aria-*` and `ref` name the dialog (the panel); `className` and `data-*` go on the root, the backdrop (`splitRootProps`). */
 export interface CommandPaletteProps extends RootProps<HTMLDivElement> {
   query?: string;
   /** The field's placeholder. Default: the `placeholder` string. */
@@ -173,6 +174,8 @@ export function CommandPalette({
   // The focus contract: focus moves to the field when the palette mounts, Tab stays inside, and focus returns to the opener when it
   // unmounts. Esc is the field's own (it clears the query first), and closes from anywhere else in the panel.
   const focus = useOverlayFocus<HTMLDivElement>({ trap: true, initial: () => field.current, onEscape: () => onClose?.() });
+  const pass = splitRootProps(rest);
+  const { ref, ...named } = pass.control as { ref?: Ref<HTMLDivElement> } & Record<string, unknown>;
   const asking = !groups[0] && !loading && q !== "" && ask;
 
   // How many results there are, said once when typing pauses: never per keystroke, never as a region that arrives holding its text.
@@ -212,7 +215,7 @@ export function CommandPalette({
   return (
     <div
       data-af-part="root"
-      {...rootProps(rest)}
+      {...pass.root}
       style={css(
         box,
         {
@@ -230,11 +233,15 @@ export function CommandPalette({
       )}
     >
       <div
-        ref={focus.ref}
+        ref={(el) => {
+          focus.ref.current = el;
+          setRef(ref, el);
+        }}
         role="dialog"
         aria-modal
         aria-label={s("label")}
         onKeyDown={focus.onKeyDown}
+        {...named}
         data-af-part="panel"
         style={css(box, { maxWidth: "100%", overflow: "hidden", ...enter("pop") }, r.panel)}
       >

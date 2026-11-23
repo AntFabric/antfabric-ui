@@ -6,7 +6,7 @@ import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { splitRootProps, type RootProps } from "../../lib/root-props";
 import { box, css, enter, input, row, rtl, text } from "../../lib/style";
 import { joinIds, useFormField } from "./form-field";
 import { Button } from "../actions/button";
@@ -15,7 +15,8 @@ export type TextFieldSize = "lg" | "sm";
 export type TextFieldType = "text" | "email" | "password" | "search" | "tel" | "url" | "number";
 export type TextFieldInputMode = "text" | "email" | "numeric" | "decimal" | "tel" | "url" | "search" | "none";
 
-export interface TextFieldProps extends RootProps<HTMLDivElement> {
+/** `id`, `aria-*` and `ref` name the input; `className` and `data-*` go on the root (`splitRootProps`). */
+export interface TextFieldProps extends RootProps<HTMLInputElement> {
   /** Visible label and the field's accessible name. */
   label?: string;
   value?: string;
@@ -118,7 +119,9 @@ export function TextField({
   const revealing = reveal && type === "password";
   const drawnType = revealing && visible ? "text" : type;
   const form = useFormField();
-  const id = form?.id ?? own;
+  const pass = splitRootProps(rest);
+  // A FormField's label points at its own id; outside one, a passed `id` replaces the kit's, so the label and the helper still line up.
+  const id = form?.id ?? (pass.control.id as string | undefined) ?? own;
   const dir = useDirection();
   const ui = useInteraction({ disabled });
   const [current = "", setText] = useControllable(value, onValueChange);
@@ -158,7 +161,7 @@ export function TextField({
   });
   const mustHave = required || !!form?.required;
   return (
-    <div data-af-part="root" {...rootProps(rest)} style={css(box, { alignSelf: "stretch", width: "100%" }, r.root, style)}>
+    <div data-af-part="root" {...pass.root} style={css(box, { alignSelf: "stretch", width: "100%" }, r.root, style)}>
       {(label || tag || required) && (
         <div style={css(row, { justifyContent: "space-between", gap: t.space.sm })}>
           {label && (
@@ -181,7 +184,6 @@ export function TextField({
           </span>
         )}
         <input
-          id={id}
           data-af-part="input"
           data-af-input
           type={drawnType}
@@ -194,7 +196,6 @@ export function TextField({
           placeholder={placeholder}
           aria-invalid={invalid || form?.invalid || undefined}
           aria-required={mustHave || undefined}
-          aria-describedby={joinIds(form?.describedBy, said, maxLength > 0 && `${id}-counter`)}
           disabled={disabled}
           readOnly={readOnly}
           maxLength={maxLength > 0 ? maxLength : undefined}
@@ -203,6 +204,10 @@ export function TextField({
           onKeyDown={(e) => {
             if (e.key === "Enter" && !isComposing(e)) onSubmit?.();
           }}
+          {...pass.control}
+          id={id}
+          // A product's description is read after the kit's own.
+          aria-describedby={joinIds(form?.describedBy, said, maxLength > 0 && `${id}-counter`, pass.control["aria-describedby"] as string | undefined)}
           style={css(input, { flexGrow: 1, alignSelf: "stretch" }, partStyle(r, "input", disabled && { cursor: "not-allowed" }))}
         />
         {(trailing || revealing) && (

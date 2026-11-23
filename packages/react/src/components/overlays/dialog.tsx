@@ -1,4 +1,4 @@
-import { useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import { useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode, type Ref } from "react";
 import { recipes, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
@@ -6,13 +6,14 @@ import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, row, text, truncate } from "../../lib/style";
 import { focusables, useOverlayFocus } from "../../lib/focus";
 import { OverlayLayer, useLayerHost, useLayerStack } from "../../lib/layer";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { Button } from "../actions/button";
 import { IconButton } from "../actions/icon-button";
 
 export type DialogKind = "confirm" | "form";
 export type DialogTone = "danger" | "primary";
 
+/** `id`, `aria-*` and `ref` name the dialog (the panel); `className` and `data-*` go on the root, the backdrop (`splitRootProps`). */
 export interface DialogProps extends RootProps<HTMLDivElement> {
   /** confirm: a decision about something already chosen, 440 wide with a glyph tile. form: fields to fill, 540 wide with a header strip and a close button. */
   kind?: DialogKind;
@@ -152,6 +153,8 @@ function DialogView({
     initial: (panel) => (form ? focusables(panel).find((el) => el.matches("input, textarea, select")) : actions.current?.querySelector<HTMLElement>("button")) ?? panel,
   });
   const panel = focus.ref;
+  const pass = splitRootProps(rest);
+  const { ref, ...named } = pass.control as { ref?: Ref<HTMLDivElement> } & Record<string, unknown>;
   // Only the top overlay takes Esc and a press on the scrim; a dialog that must be answered takes them and does nothing.
   useLayerStack(floating, () => [panel.current], { onEscape: () => dismissible && cancel(), onOutside: () => dismissible && cancel() });
 
@@ -181,7 +184,7 @@ function DialogView({
   const drawn = (
     <div
       data-af-part="root"
-      {...rootProps(rest)}
+      {...pass.root}
       style={css(
         box,
         {
@@ -210,13 +213,18 @@ function DialogView({
         </>
       )}
       <div
-        ref={panel}
+        ref={(el) => {
+          panel.current = el;
+          setRef(ref, el);
+        }}
         role={kind === "confirm" ? "alertdialog" : "dialog"}
         aria-modal
         aria-labelledby={`${id}-title`}
-        aria-describedby={body ? `${id}-body` : undefined}
         tabIndex={-1}
         onKeyDown={keyboard}
+        {...named}
+        // A product's description is read after the body.
+        aria-describedby={[body ? `${id}-body` : "", (named["aria-describedby"] as string | undefined) ?? ""].filter(Boolean).join(" ") || undefined}
         data-af-part="panel"
         style={css(panelLook, partStyle(r, "panel", form && formLook))}
       >

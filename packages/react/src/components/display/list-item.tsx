@@ -157,13 +157,13 @@ export function ListItem({
       role={role === "link" ? undefined : role}
       title={title}
       aria-keyshortcuts={shortcut ? ariaShortcut(shortcut, os) : undefined}
-      {...rootProps(rest)}
       aria-label={count > 0 ? s("withUnreadCount", { label: named, count }) : unread ? s("withUnread", { label: named }) : named}
       aria-current={on && role === "link" ? "page" : undefined}
       aria-checked={role === "checkbox" ? on : undefined}
       aria-selected={role === "option" ? on : undefined}
       // aria-disabled, not disabled: a disabled menu row stays focusable so its reason can be heard.
       aria-disabled={ui.disabled || undefined}
+      {...rootProps(rest)}
       onClick={(e: MouseEvent) => {
         if (ui.disabled) {
           e.preventDefault();

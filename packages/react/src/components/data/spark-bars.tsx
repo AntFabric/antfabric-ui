@@ -52,7 +52,7 @@ export function SparkBars({ data, y, width = 96, height = 36, animate = false, t
   const { gap } = barLayout(width, rows.length, t.chart.barGap);
   const said = label || s("summary", { count: values.length, latest: fmt(format, values[last], undefined, locale) });
   return (
-    <span data-af-part="root" {...rootProps(rest)} role="img" aria-label={said} style={frame}>
+    <span data-af-part="root" role="img" aria-label={said} {...rootProps(rest)} style={frame}>
       <BarChart accessibilityLayer={false} width={width} height={height} data={rows} margin={{ top: 0, right: 0, bottom: 0, left: 0 }} barCategoryGap={gap / 2} style={{ display: "block" }}>
         <YAxis hide domain={[lo, hi === lo ? lo + 1 : hi]} />
         <Bar dataKey="v" maxBarSize={t.kpi.sparkBarMaxW} radius={[t.kpi.sparkBarRadius, t.kpi.sparkBarRadius, 0, 0]} tooltipType="none" {...rechartsMotion(animate, reduced)}>
