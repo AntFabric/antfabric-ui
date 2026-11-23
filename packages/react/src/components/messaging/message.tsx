@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent, type PointerEvent } from "react";
-import { recipes, useControllable, useDirection, useStrings, type IconActionItem, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric/ui-core";
+import { recipes, usePending, useDirection, useStrings, type IconActionItem, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -72,15 +72,15 @@ export interface MessageProps extends RootProps<HTMLDivElement> {
   more?: boolean;
   /** The ⋯ menu is open: the bar's button stays pressed. */
   menuOpen?: boolean;
-  /** Called with `status` as Retry leaves it (sending). */
+  /** Reports the request Retry makes (sending). The row waits for the app to pass the new `status`; it never moves it. */
   onStatusChange?: (status: MessageStatus) => void;
-  /** Retry was pressed on a failed message: the app posts it again. */
-  onRetry?: () => void;
+  /** Retry was pressed on a failed message: the app posts it again. Retry spins until the app answers with `status`, or the promise settles. */
+  onRetry?: () => void | Promise<unknown>;
   onDelete?: () => void;
   /** The thread summary, or Reply in thread on the actions bar. */
   onOpenThread?: () => void;
-  /** A quick reaction or a reaction pill was pressed: toggle yours with this emoji. The server owns the counts. */
-  onReact?: (emoji: string) => void;
+  /** A quick reaction or a reaction pill was pressed: toggle yours with this emoji. The server owns the counts: the pill is busy until the app passes the new `reactions`, or the promise settles. */
+  onReact?: (emoji: string) => void | Promise<unknown>;
   /** The add pill or the bar's smile-plus was pressed: open the emoji picker. */
   onAddReaction?: () => void;
   onForward?: () => void;
@@ -109,7 +109,7 @@ const LONG_PRESS = 450;
 /** Layout no token decides; the colours, sizes and type are the recipe's (`message`). */
 const statusLine: CSSProperties = { ...row, flexWrap: "wrap", gap: t.space["2xs"] };
 
-function StatusAction({ label, children, onPress, styles }: Pick<MessageProps, "styles"> & { label: string; children: string; onPress: () => void }) {
+function StatusAction({ label, children, busy = false, onPress, styles }: Pick<MessageProps, "styles"> & { label: string; children: string; busy?: boolean; onPress: () => void }) {
   const ui = useInteraction();
   const r = useRecipe(recipes.message, { state: { hover: ui.hovered, focus: ui.focused }, styles });
   return (
@@ -118,9 +118,11 @@ function StatusAction({ label, children, onPress, styles }: Pick<MessageProps, "
       data-af-part="action"
       data-af-press
       aria-label={label}
-      onClick={() => onPress()}
+      aria-busy={busy || undefined}
+      aria-disabled={busy || undefined}
+      onClick={() => !busy && onPress()}
       {...ui.handlers}
-      style={css(pressable, { textDecoration: "underline", textUnderlineOffset: "2px" }, r.action)}
+      style={css(pressable, { textDecoration: "underline", textUnderlineOffset: "2px" }, r.action, busy && { cursor: "progress" })}
     >
       {children}
     </button>
@@ -135,7 +137,7 @@ export function Message({
   gutterTime = "",
   body = "",
   edited = false,
-  status,
+  status: state = "sent",
   agent = false,
   compact = false,
   unread = false,
@@ -173,11 +175,17 @@ export function Message({
 }: MessageProps) {
   const s = useStrings("message", strings);
   const ui = useInteraction();
-  const [state = "sent", setState] = useControllable(status, onStatusChange);
-  const retry = () => {
-    setState("sending");
-    onRetry?.();
-  };
+  // Retry reports the request and goes busy until the app answers: the status is the app's, never moved here.
+  const { pending: retrying, run } = usePending([state]);
+  const retry = () =>
+    run(
+      onStatusChange || onRetry
+        ? () => {
+            onStatusChange?.("sending");
+            return onRetry?.();
+          }
+        : undefined,
+    );
   // The bar shows on hover, on focus anywhere in the row (the row is a tab stop itself, so a text-only message has one), and
   // after a long press or the context-menu key (`opened`), which is how touch and Shift+F10 reach it.
   const [within, setWithin] = useState(false);
@@ -228,14 +236,12 @@ export function Message({
           onDownload={() => on.current.onAttachmentDownload?.(a)}
           onCancel={() => on.current.onAttachmentCancel?.(a)}
           onRetry={canRetryAttachment ? () => on.current.onAttachmentRetry?.(a) : undefined}
-          // The attachment's own `status` is the truth: the card does not move to uploading before the app says so.
-          onStatusChange={canRetryAttachment ? () => {} : undefined}
         />
       )),
     [attachments, canRetryAttachment],
   );
   const reactionPills = useMemo(
-    () => reactions.map((x) => <ReactionPill key={x.emoji} emoji={x.emoji} count={x.count} mine={x.mine ?? false} reactors={x.reactors ?? ""} disabled={!sent} onPress={canReact ? () => react(x.emoji) : undefined} />),
+    () => reactions.map((x) => <ReactionPill key={x.emoji} emoji={x.emoji} count={x.count} mine={x.mine ?? false} reactors={x.reactors ?? ""} disabled={!sent} onMineChange={canReact ? () => react(x.emoji) : undefined} />),
     [reactions, sent, canReact, react],
   );
 
@@ -375,7 +381,7 @@ export function Message({
             <span aria-hidden data-af-part="statusSep" style={css(text, r.statusSep)}>
               ·
             </span>
-            <StatusAction label={s("retryLabel")} onPress={retry} styles={styles}>
+            <StatusAction label={s("retryLabel")} busy={retrying} onPress={retry} styles={styles}>
               {s("retry")}
             </StatusAction>
             <span aria-hidden data-af-part="statusSep" style={css(text, r.statusSep)}>

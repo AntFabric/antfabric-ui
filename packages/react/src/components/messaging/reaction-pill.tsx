@@ -1,5 +1,5 @@
 import { useEffect, useId, useState, type CSSProperties } from "react";
-import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { cap, recipes, useControllable, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
@@ -23,8 +23,11 @@ export interface ReactionPillProps extends RootProps<HTMLDivElement> {
   showReactors?: boolean;
   /** The message is still sending or failed: no server id to react to. */
   disabled?: boolean;
-  /** Called with `mine` as the press leaves it: flipped (a reaction only). */
-  onMineChange?: (mine: boolean) => void;
+  /**
+   * Called with `mine` as the press leaves it: flipped (a reaction only). Given `mine` too, it reports the request: the pill is busy until
+   * the app passes the new `mine` or `count` (or the returned promise settles), and never shows the reaction before then.
+   */
+  onMineChange?: (mine: boolean) => void | Promise<unknown>;
   /** The pill was pressed: a reaction flips `mine`, add opens the emoji picker. */
   onPress?: () => void;
   /** This pill's built-in text (its accessible name, the add pill's label) over the tree's and the English defaults. */
@@ -76,7 +79,22 @@ export function ReactionPill({
   const ui = useInteraction({ disabled });
   const [on = false, setOn] = useControllable(mineProp, onMineChange);
   const mine = mineProp ?? false;
-  // Uncontrolled, a press moves the count with `mine` (optimistic); controlled, the caller's count is the truth.
+  // Controlled, a press is a request: busy until the app answers with `mine` or `count`, which are the truth. Uncontrolled, a press moves
+  // the count with `mine` on its own.
+  const controlled = mineProp !== undefined && onMineChange !== undefined;
+  const { pending, run } = usePending([mineProp, count]);
+  const toggle = () => {
+    if (!controlled) {
+      setOn(!on);
+      onPress?.();
+      return;
+    }
+    run(() => {
+      const out = onMineChange?.(!on);
+      onPress?.();
+      return out;
+    });
+  };
   const n = count + (on === mine ? 0 : on ? 1 : -1);
   const [rested, setRested] = useState(false);
   // The card is hoverable (the pointer can move onto it to read it) and Escape dismisses it until the pointer or focus leaves.
@@ -140,11 +158,10 @@ export function ReactionPill({
           aria-label={s("label", { emoji, count: cap(n, 999), reactors: reactors ? s("reactorsSuffix", { reactors }) : "" }).trim()}
           aria-describedby={peek || showReactors ? cardId : undefined}
           aria-pressed={on}
+          aria-busy={pending || undefined}
+          aria-disabled={pending || undefined}
           disabled={ui.disabled}
-          onClick={() => {
-            setOn(!on);
-            onPress?.();
-          }}
+          onClick={() => toggle()}
           {...ui.handlers}
           style={css(look, enter("pop"))}
         >
