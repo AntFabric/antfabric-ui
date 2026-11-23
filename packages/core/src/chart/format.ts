@@ -50,6 +50,57 @@ export type FormatSpec = FormatName | FormatOptions | ((value: any) => string);
 const nf = (locale: string, o: Intl.NumberFormatOptions) => new Intl.NumberFormat(locale, o);
 const df = (locale: string, o: Intl.DateTimeFormatOptions, timeZone?: string) => new Intl.DateTimeFormat(locale, { ...o, timeZone });
 
+/**
+ * Whether this engine's `Intl.NumberFormat` takes `signDisplay` and `notation: "compact"`. Hermes (React Native) may not, and an option it does
+ * not know is dropped or throws, so a signed percent would lose its `+` and a compact figure print in full. Probed once, on the first format that needs it.
+ */
+let support: { sign: boolean; compact: boolean } | null = null;
+const probe = (f: () => boolean) => {
+  try {
+    return f();
+  } catch {
+    return false;
+  }
+};
+const intlSupport = () =>
+  (support ??= {
+    sign: probe(() => nf("en-US", { signDisplay: "exceptZero" }).format(1) === "+1"),
+    compact: probe(() => nf("en-US", { notation: "compact" }).format(1200) === "1.2K"),
+  });
+
+/** `signDisplay: "exceptZero"` by hand, for an engine without it: `+` on a gain, the format's own minus on a loss, nothing on what rounds to zero. */
+export function exceptZero(f: Intl.NumberFormat, v: number): string {
+  const abs = f.format(Math.abs(v));
+  if (abs === f.format(0)) return abs;
+  return v < 0 ? f.format(v) : `+${abs}`;
+}
+
+/** The steps a compact figure is written in, largest first, for an engine without `notation: "compact"`. */
+const COMPACT_STEPS: readonly [number, string][] = [
+  [1e12, "T"],
+  [1e9, "B"],
+  [1e6, "M"],
+  [1e3, "K"],
+  [1, ""],
+];
+
+/**
+ * `notation: "compact"` by hand, for an engine without it: the value over the largest step it reaches, through `f` (a format of at most one fraction
+ * digit), with the step's letter after it; a figure that rounds up to a thousand of its step is one of the next (999,950 is `1M`, not `1000K`). The
+ * letters are English, as `Intl` writes `en`.
+ */
+export function shortNumber(f: Intl.NumberFormat, v: number): string {
+  const a = Math.abs(v);
+  const last = COMPACT_STEPS.length - 1;
+  for (let i = 0; i <= last; i++) {
+    const [n] = COMPACT_STEPS[i]!;
+    if (a < n && i < last) continue;
+    const [by, letter] = COMPACT_STEPS[i > 0 && Math.round((a / n) * 10) >= 10000 ? i - 1 : i]!;
+    return `${f.format(v / by)}${letter}`;
+  }
+  return f.format(v);
+}
+
 /** `"2026-03-01"`: a calendar day, with no time and no zone. */
 const DAY_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -84,14 +135,24 @@ const numeric = (s: string) => s.trim() !== "" && !Number.isNaN(Number(s));
 export const FORMATS: Record<FormatName, (v: any, o: FormatOptions, locale: string, words: FormatWords) => string> = {
   integer: (v: number, _, l) => nf(l, { maximumFractionDigits: 0 }).format(v),
   decimal: (v: number, o, l) => nf(l, { maximumFractionDigits: o.digits ?? 1 }).format(v) + (o.unit ?? ""),
-  compact: (v: number, _, l) => nf(l, { notation: "compact", maximumFractionDigits: 1 }).format(v),
-  percent: (v: number, o, l) => nf(l, { style: "percent", maximumFractionDigits: o.digits ?? 1, signDisplay: o.sign ? "exceptZero" : "auto" }).format(v),
-  // The sign is the rounded number's, so -0.0001 is 0.0 pts and not -0.0 pts.
-  points: (v: number, o, l, w) => {
-    const sign = o.sign === false ? undefined : nf(l, { maximumFractionDigits: 1, signDisplay: "exceptZero" }).formatToParts(v * 100).find((p) => p.type === "minusSign" || p.type === "plusSign")?.type;
-    return w.points({ value: `${sign === "plusSign" ? "+" : sign === "minusSign" ? "-" : ""}${nf(l, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(Math.abs(v * 100))}` });
+  compact: (v: number, _, l) => (intlSupport().compact ? nf(l, { notation: "compact", maximumFractionDigits: 1 }).format(v) : shortNumber(nf(l, { maximumFractionDigits: 1 }), v)),
+  percent: (v: number, o, l) => {
+    const digits = o.digits ?? 1;
+    if (!o.sign) return nf(l, { style: "percent", maximumFractionDigits: digits }).format(v);
+    return intlSupport().sign ? nf(l, { style: "percent", maximumFractionDigits: digits, signDisplay: "exceptZero" }).format(v) : exceptZero(nf(l, { style: "percent", maximumFractionDigits: digits }), v);
   },
-  currency: (v: number, o, l) => nf(l, { style: "currency", currency: o.currency ?? "USD", notation: o.compact ? "compact" : "standard", maximumFractionDigits: o.compact ? 1 : (o.digits ?? 0) }).format(v),
+  // The sign is the rounded number's, so -0.0001 is 0.0 pts and not -0.0 pts. Worked out from the rounded figure itself, so no `Intl` sign option is needed.
+  points: (v: number, o, l, w) => {
+    const abs = nf(l, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const figure = abs.format(Math.abs(v * 100));
+    const sign = o.sign === false || figure === abs.format(0) ? "" : v < 0 ? "-" : "+";
+    return w.points({ value: `${sign}${figure}` });
+  },
+  currency: (v: number, o, l) => {
+    const money = { style: "currency", currency: o.currency ?? "USD" } as const;
+    if (!o.compact) return nf(l, { ...money, maximumFractionDigits: o.digits ?? 0 }).format(v);
+    return intlSupport().compact ? nf(l, { ...money, notation: "compact", maximumFractionDigits: 1 }).format(v) : shortNumber(nf(l, { ...money, maximumFractionDigits: 1 }), v);
+  },
   month: dateFormat({ month: "short" }),
   day: dateFormat({ month: "short", day: "numeric" }),
   date: dateFormat({ month: "short", day: "numeric", year: "numeric" }),

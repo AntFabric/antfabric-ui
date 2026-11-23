@@ -41,10 +41,11 @@ export type Direction = "up" | "down" | "flat";
 
 /**
  * What moved, before it has words: its direction, whether there is a number at all, and the amount as the Delta's format prints it without a sign (`4.4%`;
- * empty when it is flat or not a number). The kit says it ("Up 4.4%", "No change", "Change unavailable") from its own strings. `format` is the Delta's (default a percent).
+ * empty when it is flat or not a number), in `locale`, so it is said as the figure beside it is printed (`11,3 %` in German). The kit says it ("Up 4.4%",
+ * "No change", "Change unavailable") from its own strings. `format` is the Delta's (default a percent).
  */
-export function moved(delta: number, words: FormatWords, format?: FormatSpec): { direction: Direction; known: boolean; value: string } {
+export function moved(delta: number, words: FormatWords, format?: FormatSpec, locale?: string): { direction: Direction; known: boolean; value: string } {
   const known = Number.isFinite(delta);
   const direction: Direction = !known || delta === 0 ? "flat" : delta > 0 ? "up" : "down";
-  return { direction, known, value: direction === "flat" ? "" : fmt(withoutSign(format ?? "percent"), Math.abs(delta), words) };
+  return { direction, known, value: direction === "flat" ? "" : fmt(withoutSign(format ?? "percent"), Math.abs(delta), words, locale) };
 }
