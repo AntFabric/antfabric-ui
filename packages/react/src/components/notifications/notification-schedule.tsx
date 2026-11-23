@@ -166,7 +166,7 @@ export function NotificationSchedule({
             <div style={css(row, { gap: t.space.xs, padding: `${t.space.xs} ${t.space.sm}` }, enter("fade"))}>
               <Field label={s("pauseUntilDate")} value={date} onValue={setDate} styles={styles} />
               <Field label={s("pauseUntilTime")} value={time} onValue={setTime} styles={styles} />
-              <Button label={s("pauseButton")} size="sm" variant="ink" onPress={() => pause(picker?.key ?? "custom", picker?.until ?? s("untilCustom", { date, time }))} />
+              <Button label={s("pauseButton")} size="sm" variant="ink" disabled={!picker?.until && (!date.trim() || !time.trim())} onPress={() => pause(picker?.key ?? "custom", picker?.until ?? s("untilCustom", { date, time }))} />
             </div>
           )}
           {(note || quietHours) && <div aria-hidden data-af-part="divider" style={css(divider, r.divider)} />}
