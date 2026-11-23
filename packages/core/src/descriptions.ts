@@ -305,9 +305,8 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
     web: "Proposal: 32, over desktop's 28.",
   },
   "control.hIconSm": {
-    text: "Small round icon button: a chip's remove cross, a toast's dismiss.",
-    mobile: "32pt, not 20.",
-    web: "Proposal: 24, the minimum target, over desktop's 20.",
+    text: "Small round icon button: a toast's dismiss, IconButton's sm. 24 on web and desktop, WCAG 2.2's minimum target (the product's desktop draws 20).",
+    mobile: "32pt, not 24.",
   },
   "icon.sizeLg": {
     text: "Large icon: empty states, dialogs, permission prompts, the tab bar.",
@@ -454,8 +453,7 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
     mobile: "16pt, not 13.",
   },
   "chip.removeSize": {
-    text: "Box of a chip's remove cross: 20 on web and desktop. Smaller than control.hIconSm, the cross's target elsewhere.",
-    mobile: "24pt, not 20.",
+    text: "Box of a chip's remove cross: 24 on every platform, WCAG 2.2's minimum target on web and desktop (it was 20). The phone reaches 44pt by hitSlop.",
   },
   "chip.maxW": "Widest a chip grows before its label truncates.",
   "select.padLeftSm": "Left padding of the compact select, before its value.",
@@ -609,12 +607,12 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "osWindow.winCaptionW": "Width of a Windows caption button.",
   "osWindow.linuxCaption": "Diameter of a GNOME caption button.",
   "icon.strokeThin": "Stroke of the Windows caption glyphs, Fluent's thin line.",
+  "os.macLightEdge": "Hairline around a macOS traffic-light button, the same in both themes because the lights are the OS's own.",
+  "os.winClosePressed": "Fill of the Windows close button while pressed, darker than os.winClose; the same in both themes.",
   "os.onFill": {
     text: "Text and glyphs an operating system draws white on its own fills and pictures: the macOS menu highlight, the red app badge, the Windows close button, a tray menu's hovered row, the home and lock screens. White in both themes, whatever ink the brand takes (fg.onBrand).",
     sameInDark: true,
   },
-  "os.macLightEdge": "Hairline around a macOS traffic-light button, the same in both themes because the lights are the OS's own.",
-  "os.winClosePressed": "Fill of the Windows close button while pressed, darker than os.winClose; the same in both themes.",
   "tab.countSize": "Minimum width and height of the count pill beside a tab's label: 20pt on the phone, 18 on web and desktop.",
   "tab.indicatorRadius": "Corner radius of the line under the chosen tab.",
   "osMenu.macItemH": "Height of a title in the macOS menu bar at rest.",

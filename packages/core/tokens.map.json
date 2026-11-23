@@ -451,7 +451,7 @@
   },
   "chip.removeSize": {
     "source": "unmapped",
-    "note": "ours: a chip's remove cross, 20 on web and desktop, 24 on the phone"
+    "note": "ours: a chip's remove cross, 24 on every platform (B10: web and desktop were 20, under WCAG 2.2's 24px target)"
   },
   "choice.dotSize": {
     "source": "unmapped",
@@ -498,7 +498,8 @@
     "mobile": "mobile:control.iconHeight"
   },
   "control.hIconSm": {
-    "source": "--control-h-icon-sm"
+    "source": "--control-h-icon-sm",
+    "note": "B10: 24 on the desktop where the product's is 20, WCAG 2.2's minimum target (2.5.8), as the web already was"
   },
   "control.hInput": {
     "source": "--control-h-input"
@@ -1146,11 +1147,11 @@
     "source": "unmapped",
     "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
   },
-  "os.statusFg": {
   "os.onFill": {
     "source": "unmapped",
     "note": "ours (B10): the white an OS draws on its own fills (the macOS menu highlight, the red badge, the Windows close button, a tray menu's hovered row, the home and lock screens), split off fg.onBrand when fg.onBrand turned to ink on coral"
   },
+  "os.statusFg": {
     "source": "unmapped",
     "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
   },

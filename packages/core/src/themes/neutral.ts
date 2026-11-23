@@ -150,8 +150,8 @@ export const neutralInput: ThemeInput = {
       mobile: { radius: { card: 12 }, control: { hLg: 48 }, segmentedControl: { h: 34 } },
       // The switch's thumb shadow was navy on the web and the desktop.
       web: { switch: { thumbShadow: "0 1px 2px rgba(0,0,0,.18)" }, segmentedControl: { h: 26 } },
-      // The desktop's small icon button and smallest control were 20 and 22px: 24, WCAG 2.2's minimum target (2.5.8), as on the web.
-      desktop: { switch: { thumbShadow: "0 1px 2px rgba(0,0,0,.18)" }, control: { hIconSm: 24, hXxs: 24 }, segmentedControl: { h: 24 } },
+      // The desktop's smallest control was 22px: 24, WCAG 2.2's minimum target (2.5.8), as on the web. (Its small icon button is 24 in the schema since B10.)
+      desktop: { switch: { thumbShadow: "0 1px 2px rgba(0,0,0,.18)" }, control: { hXxs: 24 }, segmentedControl: { h: 24 } },
     },
   },
   // What the tokens cannot say, because the recipe names the shape or the colour (NEUTRAL.md, "Recipe overrides"): controls that were
@@ -177,11 +177,9 @@ export const neutralInput: ThemeInput = {
     "search-field": { root: { base: { height: "$control.hMd", borderColor: "$border.default" } } },
     dialog: { field: { base: { borderColor: "$border.default" } } },
     "question-panel": { field: { base: { borderColor: "$border.default" } } },
-    // 24px targets on the web and the desktop (WCAG 2.2 2.5.8, X-05): a label-less checkbox, a radio row, a chip's ✕, the connection
-    // banner's retry and a notification row's actions were 15 to 22px. The phone reaches 44pt by hitSlop and is left as it is.
-    checkbox: { root: { platforms: { web: { base: { minHeight: "$control.hit", minWidth: "$control.hit" } }, desktop: { base: { minHeight: "$control.hit", minWidth: "$control.hit" } } } } },
-    chip: { remove: { platforms: { web: { base: { square: "$control.hXxs" } }, desktop: { base: { square: "$control.hXxs" } } } }, count: { base: { opacity: "none" } } },
-    "notification-item": { rowAction: { base: { minHeight: "$control.hit" } } },
+    // 24px targets on the web and the desktop (WCAG 2.2 2.5.8, X-05): a radio row and the connection banner's retry were under 24px. The
+    // phone reaches 44pt by hitSlop and is left as it is. (A label-less checkbox, a chip's ✕ and a notification row's actions are 24 in the schema since B10.)
+    chip: { count: { base: { opacity: "none" } } },
     // Text that faded to 0.7 or 0.6 over its own ink fell under 4.5:1 (X-06): a chip's count (2.89:1), the shortcut on a danger button
     // (2.98:1) and a sending message's time (2.38:1). Neutral draws them at full ink; the status line still says "Sending…".
     message: { root: { variants: { status: { sending: { opacity: "none" } } } } },

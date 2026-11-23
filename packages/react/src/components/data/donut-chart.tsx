@@ -123,7 +123,8 @@ function Item({ label, value, share, color, on, active, picked, onPick, onToggle
           <span data-af-part="share" style={css(text, { fontVariantNumeric: "tabular-nums" }, r.share)}>{share}</span>
         </span>
       </button>
-      {/* The swatch's own control, laid over the swatch and a little around it: a transparent button, so the swatch is drawn once. */}
+      {/* The swatch's own control: a transparent button beside the row's (not inside it), centred on the swatch and `control.hit` square, WCAG 2.2's
+          24px target, so the swatch is drawn once and the button reaches past it. */}
       <button
         type="button"
         data-af-press
@@ -134,10 +135,10 @@ function Item({ label, value, share, color, on, active, picked, onPick, onToggle
         {...swatchUi.handlers}
         style={css(pressable, {
           position: "absolute",
-          top: r.item.paddingTop ?? t.space.xs,
-          left: `calc(${r.item.paddingLeft ?? t.space.sm} - ${t.space["3xs"]})`,
-          width: `calc(${t.space.smMd} + ${t.space["2xs"]})`,
-          height: t.text.captionLine,
+          top: `calc(${r.item.paddingTop ?? t.space.xs} + (${t.text.captionLine} - ${t.control.hit}) / 2)`,
+          left: `calc(${r.item.paddingLeft ?? t.space.sm} + (${t.space.smMd} - ${t.control.hit}) / 2)`,
+          width: t.control.hit,
+          height: t.control.hit,
           borderRadius: t.radius.circle,
           background: "transparent",
           boxShadow: swatchUi.focused ? t.shadow.focus : "none",

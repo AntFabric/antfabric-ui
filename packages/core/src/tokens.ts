@@ -1092,7 +1092,7 @@ export const tokenSource = {
       chip: {
         h: "{primitives.raw.36}",
         padX: 13,
-        removeSize: "{primitives.raw.20}",
+        removeSize: "{primitives.raw.24}",
       },
       textField: {
         prefixPull: -4,
@@ -1160,7 +1160,7 @@ export const tokenSource = {
         hSm: "{primitives.raw.32}",
         hLg: "{primitives.raw.36}",
         hIcon: "{primitives.raw.28}",
-        hIconSm: "{primitives.raw.20}",
+        hIconSm: "{primitives.raw.24}",
         hit: 24,
       },
       row: {
@@ -1265,7 +1265,7 @@ export const tokenSource = {
       chip: {
         h: "{primitives.raw.34}",
         padX: 13,
-        removeSize: "{primitives.raw.20}",
+        removeSize: "{primitives.raw.24}",
       },
       textField: {
         prefixPull: -4,
