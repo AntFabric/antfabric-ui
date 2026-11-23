@@ -157,7 +157,9 @@ export function RadioGroup({ options, value, label = "", hideLabel = false, appe
   return (
     <View testID={partId(testID, "radio-group", "root")} accessibilityRole="radiogroup" accessibilityLabel={label || form?.label || undefined} accessibilityHint={form?.hint} accessibilityState={{ disabled }} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
       {label && !hideLabel ? (
-        <Text testID={partId(testID, "radio-group", "legend")} aria-hidden style={[r.legend.view, r.legend.text]}>
+        // iOS and Android never read the group's own name, so there the drawn question is read before the options. The web reads the
+        // radiogroup's name, and hides the legend so it is not said twice.
+        <Text testID={partId(testID, "radio-group", "legend")} aria-hidden={Platform.OS === "web"} style={[r.legend.view, r.legend.text]}>
           {label}
         </Text>
       ) : null}

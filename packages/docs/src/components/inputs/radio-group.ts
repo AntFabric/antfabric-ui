@@ -148,7 +148,7 @@ const docs: ComponentDocs = {
     role: "radiogroup",
     label: "{label}",
     notes: [
-      "Each option is role=radio with aria-checked; the visible legend is aria-hidden because it is already the group's name. Inside a FormField with no label of its own, the field's label names the group.",
+      "Each option is role=radio with aria-checked; the visible legend is aria-hidden on the web because it is already the group's name. On the phone VoiceOver and TalkBack never read a container's name, so the legend is read there, before the options; with hideLabel the heading above asks the question. Inside a FormField with no label of its own, the field's label names the group.",
       "The group is one tab stop (the chosen option, or the first when nothing is chosen). The arrow keys move to the next enabled option and choose it, wrapping; with nothing chosen the first arrow press moves too. Left and right follow the direction of the tree.",
       "An option's description is its aria-describedby (the phone: its accessibilityHint). Inside a FormField the group takes the field's description, error, aria-invalid and aria-required.",
       "As cards, the card itself is the radio (aria-checked), so the choice is announced as it is for the list; the card draws no ring, since its edge shows the choice, and its preview is hidden from screen readers. Its name is its label then its tags (\"Sidebar In use\"; the phone says the tags in its hint, before the description). A card that cannot be chosen is disabled, dimmed and skipped by the arrows.",
