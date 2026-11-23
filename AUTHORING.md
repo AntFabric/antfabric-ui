@@ -219,7 +219,9 @@ export const switchRecipe = defineRecipe({
   A prop that a press changes (`checked`, `open`, `value`, `active`) goes through
   `useControllable(value, onEvent)`, and its event is declared in the docs with `changes: "<prop>"`.
   That makes it controlled when an app passes both and keeps its own state otherwise, so the
-  catalogue's previews stay pressable.
+  catalogue's previews stay pressable. Never default that prop in the destructuring (the event alone would then hold it at
+  the default); default the result: `const [on = false, setOn] = useControllable(checked, onCheckedChange)`
+  (`pnpm check conventions`, rule `controllable-default`).
 - **Built-in text:** a component has no fixed words of its own (aria labels, "Not now", "Required", a counter): it reads them from the
   dictionary in `packages/core/src/strings/<category>.ts`, keyed by its docs id, and a product overrides them per tree (`strings` on
   `AntFabricRoot` / `AntFabricProvider` / `ThemeProvider`, with `locale`) or per instance (the component's `strings` prop).

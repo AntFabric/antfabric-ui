@@ -88,8 +88,8 @@
  *            The probe also fails a component whose recipe has a `root` part when a drawing shows its parts and no root of its own
  *            (the web: its outermost part is not `root`; the phone: a part of it with no `<id>.root`); today's are in `stylesProofTodo` as `<kit>:root`
  *   conventions  reports/api/conventions.md as far as a machine reads it (`pnpm check conventions`, and part of `code`): no component declares
- *            `onChange` or `collapsed` (docs or either kit), a `required` prop has no documented `default`, and every `changes: "<prop>"` event is named
- *            `on<Prop>Change`. What breaks a rule today is in `conventionsTodo` in reports/generic.json (`{ id: ["<rule>: <detail>"] }`): a violation not
+ *            `onChange` or `collapsed` (docs or either kit), a `required` prop has no documented `default`, every `changes: "<prop>"` event is named
+ *            `on<Prop>Change`, and a prop passed to `useControllable` with its event has no destructuring default (handler only keeps its own state). What breaks a rule today is in `conventionsTodo` in reports/generic.json (`{ id: ["<rule>: <detail>"] }`): a violation not
  *            listed fails and a listed one that now passes must come off, so the list only shrinks
  *   defaults  a documented non-event prop with a `default` (not `required`) is the kit's: in the web and the phone kit, the component drawn
  *            with every documented default and again with that one left out draws the same markup. Mismatches are in `defaultsTodo`
@@ -156,6 +156,7 @@ import { sourceFile } from "./sources";
 import * as ReactRecipe from "../../../packages/react/src/lib/recipe";
 import * as NativeRecipe from "../../../packages/react-native/src/lib/recipe";
 import { placeholdersOf, readStrings, type FileStrings } from "./strings-ast";
+import { readControllable } from "./controllable-ast";
 import { platformOnly, type PlatformOnly, type StringTemplate } from "../../../packages/core/src/strings";
 import { PART_MARKS, canonical, normalise, unknownVars, type DrawnIn } from "./snapshot-hash";
 import { citedPaths, componentsJson, llmsTxt } from "./agent-surface";
@@ -1019,8 +1020,11 @@ function checkCode(doc: ComponentDocs, platform: Platform) {
   for (const m of src.matchAll(/\bon(?:Click|Press|PointerDown|KeyDown)=\{(on[A-Z][A-Za-z0-9]*)\}/g)) {
     err(at, `${m[0]} hands the app the DOM or native event — call it with its documented args: () => ${m[1]}?.(…)`);
   }
-  for (const m of src.matchAll(/useControllable\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*,\s*(on[A-Z][A-Za-z0-9]*)\s*\)/g)) {
-    if (doc.props[m[2]!]?.changes !== m[1]) err(at, `useControllable(${m[1]}, ${m[2]}) — declare it in the docs as ${m[2]}: { changes: "${m[1]}" }`);
+  // Read from the syntax tree, so a renamed local (`{ checked: checkedProp }`) still names its prop.
+  for (const c of readControllable(file, src)) {
+    const prop = c.prop ?? (/^[A-Za-z_]\w*$/.test(c.arg) ? c.arg : undefined);
+    if (!prop || !c.handler || !/^on[A-Z]/.test(c.handler)) continue;
+    if (doc.props[c.handler]?.changes !== prop) err(at, `useControllable(${c.arg}, ${c.handler}) — declare it in the docs as ${c.handler}: { changes: "${prop}" }`);
   }
   // Atomic design holds in the code, not only in the catalogue's order: what a component draws is never bigger than it.
   for (const m of src.matchAll(/from\s+"\.\.?\/(?:[a-z-]+\/)?([a-z0-9-]+)"/g)) {
@@ -1036,6 +1040,9 @@ function checkCode(doc: ComponentDocs, platform: Platform) {
 //   no-collapsed       no component declares `collapsed`: a panel that opens and closes takes `expanded` (rule 3)
 //   required-no-default  a `required` prop has no documented `default`: its catalogue value is its `sample` (rule 6)
 //   change-event-name  every event that is declared `changes: "<prop>"` is named `on<Prop>Change` (rule 1)
+//   controllable-default  a prop passed to `useControllable(<prop>, on<Prop>Change)` has no default in the destructuring (either kit, read from the
+//                      syntax tree by scripts/controllable-ast.ts): with one, the handler alone would hold it at the default. Default the result
+//                      instead, `const [on = false, setOn] = useControllable(checked, onCheckedChange)` (rule 1)
 const upperFirst = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 function conventionViolations(doc: ComponentDocs): string[] {
   const out = new Set<string>();
@@ -1043,6 +1050,10 @@ function conventionViolations(doc: ComponentDocs): string[] {
   for (const kit of ["react", "react-native"] as const) {
     const file = sourceFile(kit, doc.id);
     for (const m of (file && propsOf(readFileSync(file, "utf8"), pascal(doc.id))) || []) declared.add(m);
+  }
+  for (const kit of ["react", "react-native"] as const) {
+    const file = sourceFile(kit, doc.id);
+    for (const c of file ? readControllable(file, readFileSync(file, "utf8")) : []) if (c.defaulted && c.handler) out.add(`controllable-default: ${c.prop}`);
   }
   if (declared.has("onChange")) out.add("no-onChange: onChange");
   if (declared.has("collapsed")) out.add("no-collapsed: collapsed");
