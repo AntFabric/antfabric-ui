@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { AccessibilityInfo, KeyboardAvoidingView, Modal, Platform, Pressable, Text, View, findNodeHandle, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { recipes, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon, type IconName } from "../../lib/icon";
 import { announce, useBackHandler } from "../../lib/a11y";
@@ -30,7 +30,7 @@ export interface DialogProps extends RootProps {
   cancelLabel?: string;
   /** Fields or anything else between the body and the buttons. */
   children?: ReactNode;
-  /** The confirm is in flight: it spins, and Cancel and Close go quiet until it settles. Pressing the CTA sets it. */
+  /** The confirm is in flight: it spins and cannot be pressed again. Cancel and Close still cancel. A press shows it until the app answers. */
   loading?: boolean;
   /** Why the last attempt failed. The sheet stays open; pressing the CTA again retries. */
   error?: string;
@@ -40,7 +40,8 @@ export interface DialogProps extends RootProps {
   modal?: boolean;
   /** The handle, a press on the scrim and Android's back cancel it. Off for a step that must be answered with a button. */
   dismissible?: boolean;
-  onConfirm?: () => void;
+  /** Reports the request. Return a promise, or answer with `error` or by closing; until then the CTA spins. */
+  onConfirm?: () => void | Promise<unknown>;
   onCancel?: () => void;
   /** Per-part styles over the theme: `{ sheet: {…}, title: {…}, body: {…} }`. */
   styles?: PartStyles<"dialog">;
@@ -97,18 +98,13 @@ export function Dialog({
   const str = useStrings("dialog", strings);
   const r = useRecipe(recipes.dialog, { styles });
   const errorIcon = glyphBox(partStyle(r, "errorIcon", { view: { marginTop: t.space["3xs"] } }).view);
-  const [busy, setBusy] = useControllable(loading);
-  // A failure settles the request: the CTA is pressable again, to retry.
-  const [failed, setFailed] = useState(error);
-  if (failed !== error) {
-    setFailed(error);
-    if (error) setBusy(loading);
-  }
-  const cancel = () => !busy && onCancel?.();
+  // A press waits for the app's answer: a new `error` or `loading`, or the promise `onConfirm` returns settling. Then the CTA can retry.
+  const { pending, run } = usePending([error, loading]);
+  const busy = loading || pending;
+  // Cancelling stays live while the request is in flight: the app may abandon it.
+  const cancel = () => onCancel?.();
   const confirm = () => {
-    if (busy) return;
-    setBusy(true);
-    onConfirm?.();
+    if (!loading) run(onConfirm);
   };
   // Android's back button cancels; a screen reader starts at the title when the dialog opens.
   useBackHandler(dismissible ? cancel : undefined);
@@ -137,12 +133,12 @@ export function Dialog({
         onAccessibilityEscape={() => dismissible && cancel()}
         style={[s.sheet, r.sheet.view]}
       >
-        <Pressable testID={partId(testID, "dialog", "handle")} accessibilityRole="button" accessibilityLabel={str("dismiss")} hitSlop={12} disabled={busy} onPress={() => dismissible && cancel()} style={[s.handle, r.handle.view]} />
+        <Pressable testID={partId(testID, "dialog", "handle")} accessibilityRole="button" accessibilityLabel={str("dismiss")} hitSlop={12} onPress={() => dismissible && cancel()} style={[s.handle, r.handle.view]} />
         <View style={s.header}>
           <Text ref={heading} testID={partId(testID, "dialog", "title")} accessibilityRole="header" numberOfLines={2} style={[s.title, r.title.view, r.title.text]}>
             {title}
           </Text>
-          <IconButton icon="x" label={str("close")} disabled={busy} onPress={() => cancel()} />
+          <IconButton icon="x" label={str("close")} onPress={() => cancel()} />
         </View>
         {body ? <Text testID={partId(testID, "dialog", "body")} style={[r.body.view, r.body.text]}>{body}</Text> : null}
         {children ? (
@@ -157,7 +153,7 @@ export function Dialog({
         {/* The CTA first and Cancel under it, where the thumb rests after reading. */}
         <View style={s.actions}>
           <Button label={confirmLabel ?? str("confirm")} variant={tone === "danger" ? "danger" : "primary"} size="lg" full loading={busy} onPress={() => confirm()} />
-          <Button label={cancelLabel ?? str("cancel")} variant="secondary" size="lg" full disabled={busy} onPress={() => cancel()} />
+          <Button label={cancelLabel ?? str("cancel")} variant="secondary" size="lg" full onPress={() => cancel()} />
         </View>
         {keyboard ? null : <View testID={partId(testID, "dialog", "home")} style={r.home.view} />}
       </Enter>

@@ -1,5 +1,5 @@
-import { useId, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import { recipes, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -30,7 +30,7 @@ export interface DialogProps extends RootProps<HTMLDivElement> {
   cancelLabel?: string;
   /** Fields or anything else between the body and the actions. */
   children?: ReactNode;
-  /** The confirm is in flight: its button spins; Cancel, Close and Esc do nothing until it settles. Pressing the CTA sets it. */
+  /** The confirm is in flight: its button spins and cannot be pressed again. Cancel, Close and Esc still cancel. A press shows it until the app answers. */
   loading?: boolean;
   /** Why the last attempt failed. The dialog stays open; pressing the CTA again retries. */
   error?: string;
@@ -45,7 +45,8 @@ export interface DialogProps extends RootProps<HTMLDivElement> {
   modal?: boolean;
   /** Esc, a press on the scrim and Android's back cancel it. Off for a step that must be answered with a button. */
   dismissible?: boolean;
-  onConfirm?: () => void;
+  /** Reports the request. Return a promise, or answer with `error` or by closing; until then the CTA spins. */
+  onConfirm?: () => void | Promise<unknown>;
   onCancel?: () => void;
   /** Per-part styles over the theme: `{ panel: {…}, title: {…}, actions: {…} }`. */
   styles?: PartStyles<"dialog">;
@@ -132,19 +133,14 @@ function DialogView({
   const s = useStrings("dialog", strings);
   const r = useRecipe(recipes.dialog, { variants: { kind }, styles });
   const actions = useRef<HTMLDivElement>(null);
-  const [busy, setBusy] = useControllable(loading);
-  // A failure settles the request: the CTA is pressable again, to retry.
-  const [failed, setFailed] = useState(error);
-  if (failed !== error) {
-    setFailed(error);
-    if (error) setBusy(loading);
-  }
+  // A press waits for the app's answer: a new `error` or `loading`, or the promise `onConfirm` returns settling. Then the CTA can retry.
+  const { pending, run } = usePending([error, loading]);
+  const busy = loading || pending;
   const form = kind === "form";
-  const cancel = () => !busy && onCancel?.();
+  // Cancelling stays live while the request is in flight: the app may abandon it.
+  const cancel = () => onCancel?.();
   const confirm = () => {
-    if (busy) return;
-    setBusy(true);
-    onConfirm?.();
+    if (!loading) run(onConfirm);
   };
 
   // The focus contract: focus moves in when the dialog mounts (a form to its first field, a confirm to Cancel, so a reflexive Enter never
@@ -242,7 +238,7 @@ function DialogView({
               </h2>
               {subtitle && <span data-af-part="subtitle" style={css(text, truncate(1), r.subtitle)}>{subtitle}</span>}
             </div>
-            <IconButton part="close" icon="x" label={s("close")} disabled={busy} onPress={() => cancel()} style={r.close} />
+            <IconButton part="close" icon="x" label={s("close")} onPress={() => cancel()} style={r.close} />
           </div>
         )}
         <div data-af-scroll data-af-part="scroll" style={css(box, { gap: t.space.md, overflowY: "auto" }, partStyle(r, "scroll", form && { padding: t.space.lg }))}>
@@ -263,7 +259,7 @@ function DialogView({
             partStyle(r, "actions", { marginTop: form ? 0 : t.space.xl }, form && { paddingInline: t.space.lg, paddingBlock: t.space.mdLg }),
           )}
         >
-          <Button label={cancelLabel ?? s("cancel")} variant="secondary" size="lg" disabled={busy} onPress={() => cancel()} style={{ minWidth: t.dialog.actionMinW }} />
+          <Button label={cancelLabel ?? s("cancel")} variant="secondary" size="lg" onPress={() => cancel()} style={{ minWidth: t.dialog.actionMinW }} />
           <Button
             label={confirmLabel ?? s("confirm")}
             variant={tone === "danger" ? "danger" : "primary"}
