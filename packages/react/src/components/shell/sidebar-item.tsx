@@ -100,7 +100,8 @@ function SidebarItemView({
   const s = useStrings("sidebar-item", strings);
   const ui = useInteraction();
   const dir = useDirection();
-  // The ⋮ is there for a pointer over the row and for keyboard focus in it, so a keyboard user reaches Move, Mute and Leave.
+  // The ⋮ is there for a pointer over the row and for keyboard focus in it, so a keyboard user reaches Move, Mute and Leave. Hidden, it takes
+  // no press: a tap on a touch screen (no hover first) lands on the row, not on an invisible ⋮.
   const [over, setOver] = useState(false);
   const [within, setWithin] = useState(false);
   const hasMenu = actionsVisible || !!onMenu;
@@ -178,7 +179,7 @@ function SidebarItemView({
         {muted && meta("bell-off")}
         {mentions > 0 && <Badge count={mentions} label={s("mentions")} style={{ alignSelf: "center" }} />}
       </button>
-      {hasMenu && <IconButton icon="ellipsis-vertical" label={s("options", { name })} size="sm" style={css(rtl(menuAt, dir), { opacity: showMenu ? 1 : 0 })} onPress={() => onMenu?.()} />}
+      {hasMenu && <IconButton icon="ellipsis-vertical" label={s("options", { name })} size="sm" style={css(rtl(menuAt, dir), { opacity: showMenu ? 1 : 0 }, !showMenu && { pointerEvents: "none" })} onPress={() => onMenu?.()} />}
     </div>
   );
 }

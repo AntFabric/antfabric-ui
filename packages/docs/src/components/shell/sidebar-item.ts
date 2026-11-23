@@ -101,7 +101,7 @@ const docs: ComponentDocs = {
       type: "boolean",
       default: false,
       platforms: ["web", "desktop"],
-      description: "The row's ⋮ (Move to…, Mute, Leave), always shown when set. With `onMenu` alone it is there but transparent until the pointer is over the row or keyboard focus is in it; the room for it is reserved, so showing it never reflows the row.",
+      description: "The row's ⋮ (Move to…, Mute, Leave), always shown when set. With `onMenu` alone it is there but transparent until the pointer is over the row or keyboard focus is in it, and takes no press while transparent (a tap on a touch screen lands on the row); the room for it is reserved, so showing it never reflows the row.",
     },
     onPress: {
       type: "event",
@@ -528,7 +528,7 @@ const docs: ComponentDocs = {
     {
       title: "Hover-only ⋮ on touch",
       platforms: ["web", "desktop", "mobile"],
-      handling: "On a phone the ⋮ does not exist: long-press opens the action sheet and swipe reveals Mark as read and Mute. On a touch laptop (pointer: coarse) the ⋮ is always visible on the open row and the row grows to 40px.",
+      handling: "On a phone the ⋮ does not exist: long-press opens the action sheet and swipe reveals Mark as read and Mute. On a touch screen with the web or desktop kit, a hidden ⋮ takes no press (pointer-events: none until it shows), so a tap at the row's end opens the row rather than an invisible menu; pass `actionsVisible` to keep the ⋮ there for touch. On a touch laptop (pointer: coarse) the ⋮ is always visible on the open row and the row grows to 40px.",
       example: {
         name: "Phone, long-press target",
         props: {
