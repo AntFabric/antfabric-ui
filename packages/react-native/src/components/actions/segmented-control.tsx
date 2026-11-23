@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Animated, I18nManager, PanResponder, Pressable, ScrollView, Text, View, type ViewStyle } from "react-native";
 import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
@@ -108,41 +108,40 @@ export function SegmentedControl({ items, value, full = false, scrollable = fals
   const lensX = useRef(new Animated.Value(0)).current;
   const [lens, setLens] = useState<{ y: number; w: number; h: number } | null>(null);
   const lensOn = glass && !scrollable && at >= 0;
-  const drag = useRef({ from: 0, at }).current;
-  drag.at = at;
-  const responder = useMemo(
-    () =>
-      PanResponder.create({
-        onMoveShouldSetPanResponderCapture: (_, g) => lensOn && Math.abs(g.dx) > 6 && Math.abs(g.dx) > Math.abs(g.dy),
-        onPanResponderGrant: () => {
-          const from = slots.current[drag.at];
-          if (!from) return;
-          drag.from = from.x;
-          lensX.setValue(from.x);
-          setLens({ y: from.y, w: from.w, h: from.h });
-        },
-        onPanResponderMove: (_, g) => {
-          const all = slots.current;
-          const last = all[all.length - 1];
-          const w = all[drag.at]?.w ?? 0;
-          if (last) lensX.setValue(Math.min(Math.max(drag.from + g.dx, all[0]!.x), last.x + last.w - w));
-        },
-        onPanResponderRelease: (_, g) => {
-          const all = slots.current;
-          const centre = drag.from + g.dx + (all[drag.at]?.w ?? 0) / 2;
-          const off = (i: number) => Math.abs((all[i]?.x ?? 0) + (all[i]?.w ?? 0) / 2 - centre);
-          let best = drag.at;
-          all.forEach((_, i) => {
-            if (off(i) < off(best)) best = i;
-          });
-          setLens(null);
-          const landed = items[best];
-          if (landed) setCurrent(landed.key);
-        },
-        onPanResponderTerminate: () => setLens(null),
-      }),
-    [lensOn, items, setCurrent, lensX, drag],
-  );
+  // The responder is made once and reads the latest props from here: one rebuilt by a parent's re-render mid-drag would lose the gesture.
+  const drag = useRef({ from: 0, at, lensOn, items, setCurrent }).current;
+  Object.assign(drag, { at, lensOn, items, setCurrent });
+  const responder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponderCapture: (_, g) => drag.lensOn && Math.abs(g.dx) > 6 && Math.abs(g.dx) > Math.abs(g.dy),
+      onPanResponderGrant: () => {
+        const from = slots.current[drag.at];
+        if (!from) return;
+        drag.from = from.x;
+        lensX.setValue(from.x);
+        setLens({ y: from.y, w: from.w, h: from.h });
+      },
+      onPanResponderMove: (_, g) => {
+        const all = slots.current;
+        const last = all[all.length - 1];
+        const w = all[drag.at]?.w ?? 0;
+        if (last) lensX.setValue(Math.min(Math.max(drag.from + g.dx, all[0]!.x), last.x + last.w - w));
+      },
+      onPanResponderRelease: (_, g) => {
+        const all = slots.current;
+        const centre = drag.from + g.dx + (all[drag.at]?.w ?? 0) / 2;
+        const off = (i: number) => Math.abs((all[i]?.x ?? 0) + (all[i]?.w ?? 0) / 2 - centre);
+        let best = drag.at;
+        all.forEach((_, i) => {
+          if (off(i) < off(best)) best = i;
+        });
+        setLens(null);
+        const landed = drag.items[best];
+        if (landed) drag.setCurrent(landed.key);
+      },
+      onPanResponderTerminate: () => setLens(null),
+    }),
+  ).current;
 
   const strip = (
     <View testID={partId(testID, "segmented-control", "track")} accessibilityRole="tablist" accessibilityLabel={label || undefined} {...rootProps(rest)} {...(lensOn ? responder.panHandlers : null)} style={[s.track, partStyle(r, "track", { view: full && { flexGrow: 1 } }).view]}>
