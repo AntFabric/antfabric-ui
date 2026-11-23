@@ -122,14 +122,14 @@ function AlsoSend({ on, to, onToggle, strings, styles }: Pick<ComposerProps, "st
 
 export function Composer({
   placeholder = "",
-  value = "",
+  value,
   mode = "default",
   sendKey = "enter",
   uploading = false,
   attachments = [],
   lengthHint = "",
   tooLong = false,
-  alsoSend = false,
+  alsoSend,
   alsoSendTo = "",
   formatting = false,
   attach = false,
@@ -163,8 +163,8 @@ export function Composer({
 }: ComposerProps) {
   const s = useStrings("composer", strings);
   const { os } = usePlatform();
-  const [draft, setDraft] = useControllable(value, onValueChange);
-  const [also, setAlso] = useControllable(alsoSend, onAlsoSendChange);
+  const [draft = "", setDraft] = useControllable(value, onValueChange);
+  const [also = false, setAlso] = useControllable(alsoSend, onAlsoSendChange);
   const [inside, setInside] = useState(false);
   const field = useRef<HTMLTextAreaElement>(null);
   const dir = useDirection();

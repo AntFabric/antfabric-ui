@@ -73,7 +73,7 @@ export function IconButton({
   variant = "ghost",
   shape = "circle",
   size = "md",
-  active = false,
+  active,
   toggle = false,
   tone = "neutral",
   badge = 0,
@@ -92,7 +92,7 @@ export function IconButton({
   const s = useStyles();
   const str = useStrings("icon-button", strings);
   const press = usePress({ disabled });
-  const [on, setOn] = useControllable(active, onActiveChange);
+  const [on = false, setOn] = useControllable(active, onActiveChange);
   // A phone has no hover, and a press only scales: the recipe's phone layers keep the resting fill under the finger.
   const r = useRecipe(recipes["icon-button"], { variants: { variant, shape, size, active: on, tone }, state: { pressed: press.pressed, focus: press.focused, disabled: press.disabled }, styles });
   const side = r.root.view.width as number;

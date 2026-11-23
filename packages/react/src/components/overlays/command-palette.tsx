@@ -129,10 +129,10 @@ function Pill({ label, on, styles, onPress }: { label: string; on: boolean; styl
 }
 
 export function CommandPalette({
-  query = "",
+  query,
   placeholder,
   filters = [],
-  filter = "",
+  filter,
   selected = "",
   groups = [],
   loading = false,
@@ -157,8 +157,8 @@ export function CommandPalette({
   const fieldUi = useInteraction();
   const r = useRecipe(recipes["command-palette"], { state: { focus: fieldUi.focused }, styles });
   const field = useRef<HTMLInputElement>(null);
-  const [q, setQ] = useControllable(query, onQueryChange);
-  const [kind, setKind] = useControllable(filter, onFilterChange);
+  const [q = "", setQ] = useControllable(query, onQueryChange);
+  const [kind = "", setKind] = useControllable(filter, onFilterChange);
   const [pick, setPick] = useControllable(selected);
   const all = groups.flatMap((g) => g.items);
   const isOn = (item: CommandPaletteItem) => (pick ? item.key === pick : !!item.selected);

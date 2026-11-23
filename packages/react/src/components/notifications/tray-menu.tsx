@@ -206,10 +206,10 @@ function Submenu({
   );
 }
 
-export function TrayMenu({ appName, items = [], tone = "idle", statusText = "", date = "", clock = "", openMenu = "", onSelect, onOpenMenuChange, styles, strings, style, ...rest }: TrayMenuProps) {
+export function TrayMenu({ appName, items = [], tone = "idle", statusText = "", date = "", clock = "", openMenu, onSelect, onOpenMenuChange, styles, strings, style, ...rest }: TrayMenuProps) {
   const { os, glass: liquid } = usePlatform();
   // A submenu opens and closes on its own; the app's next `openMenu` takes over when it comes.
-  const [openKey, setOpen] = useControllable(openMenu, onOpenMenuChange);
+  const [openKey = "", setOpen] = useControllable(openMenu, onOpenMenuChange);
   const mac = os === "mac";
   const linux = os === "linux";
   const idle = tone === "idle";

@@ -2,12 +2,34 @@ import { createContext, createElement, useCallback, useContext, useId, useMemo, 
 import type { InteractionState } from "./types";
 
 /**
+ * Equal for re-seeding: the same value, or two arrays (or two plain objects) whose items are the same
+ * values, so an inline `selected={["a"]}` or `sort={{ … }}` is not a new value on every render.
+ */
+function same(a: unknown, b: unknown): boolean {
+  if (Object.is(a, b)) return true;
+  if (Array.isArray(a) && Array.isArray(b)) return a.length === b.length && a.every((x, i) => Object.is(x, b[i]));
+  if (!plain(a) || !plain(b)) return false;
+  const keys = Object.keys(a);
+  return keys.length === Object.keys(b).length && keys.every((k) => Object.prototype.hasOwnProperty.call(b, k) && Object.is(a[k], b[k]));
+}
+
+function plain(x: unknown): x is Record<string, unknown> {
+  if (typeof x !== "object" || x === null) return false;
+  const proto = Object.getPrototypeOf(x);
+  return proto === Object.prototype || proto === null;
+}
+
+/**
  * A prop that a press changes (`checked`, `open`, `value`, `selected`), with the event that reports
  * the change.
  *
- * Controlled when the caller passes both: the component shows `value` and asks for changes through
- * `onChange`. Given only the value, the component keeps its own state, starting from the value and
- * following it whenever the caller passes a new one, and still reports each change.
+ * Controlled when the caller passes both the value and `onChange`: the component shows `value` and
+ * asks for changes through `onChange`. Left out (`undefined`), the component keeps its own state and
+ * still reports each change, whether or not the caller passes `onChange`: handler only keeps its own
+ * state. Given only the value, it starts from the value and follows it whenever the caller passes a
+ * new one (arrays and plain objects compared by their items, not their identity). So a component
+ * never gives the prop a default in its destructuring: it defaults the result,
+ * `const [on = false, setOn] = useControllable(checked, onCheckedChange)`.
  */
 export function useControllable<T>(value: T, onChange?: (next: T) => void): [T, (next: T) => void];
 /** A prop with no default: left out, the component keeps its own state (and still reports each change) even when the caller passes the event. The state is `undefined` until the first change. */
@@ -15,7 +37,7 @@ export function useControllable<T>(value: T | undefined, onChange?: (next: T) =>
 export function useControllable<T>(value: T, onChange?: (next: T) => void): [T, (next: T) => void] {
   const [inner, setInner] = useState(value);
   const [seed, setSeed] = useState(value);
-  if (!Object.is(seed, value)) {
+  if (!same(seed, value)) {
     setSeed(value);
     setInner(value);
   }

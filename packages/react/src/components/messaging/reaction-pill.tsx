@@ -60,7 +60,7 @@ const pill: CSSProperties = {
 export function ReactionPill({
   emoji,
   count = 1,
-  mine = false,
+  mine: mineProp,
   reactors = "",
   variant = "reaction",
   showReactors = false,
@@ -74,7 +74,8 @@ export function ReactionPill({
 }: ReactionPillProps) {
   const s = useStrings("reaction-pill", strings);
   const ui = useInteraction({ disabled });
-  const [on, setOn] = useControllable(mine, onMineChange);
+  const [on = false, setOn] = useControllable(mineProp, onMineChange);
+  const mine = mineProp ?? false;
   // Uncontrolled, a press moves the count with `mine` (optimistic); controlled, the caller's count is the truth.
   const n = count + (on === mine ? 0 : on ? 1 : -1);
   const [rested, setRested] = useState(false);

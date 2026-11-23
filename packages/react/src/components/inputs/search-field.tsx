@@ -52,7 +52,7 @@ const root: CSSProperties = {
 const focusOffset: CSSProperties = { outlineOffset: -2 };
 
 export function SearchField({
-  value = "",
+  value,
   placeholder = "",
   label = "",
   shortcut = "",
@@ -73,7 +73,7 @@ export function SearchField({
   const s = useStrings("search-field", strings);
   const form = useFormField();
   const ui = useInteraction({ disabled });
-  const [query, setQuery] = useControllable(value, onValueChange);
+  const [query = "", setQuery] = useControllable(value, onValueChange);
   const name = label || placeholder;
   // Inside a FormField, with no name of its own, the field's label names it.
   const named = name ? { "aria-label": name } : form ? { "aria-labelledby": form.labelId } : {};

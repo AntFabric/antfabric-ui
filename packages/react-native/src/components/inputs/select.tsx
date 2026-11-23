@@ -126,13 +126,13 @@ function Row({ item, chosen, active, pick, styles, testID }: { item: SelectItem;
 
 export function Select({
   items,
-  value = "",
+  value,
   label = "",
   placeholder = "",
-  open = false,
+  open,
   activeKey = "",
   searchable = false,
-  query = "",
+  query,
   searchPlaceholder,
   invalid = false,
   disabled = false,
@@ -151,11 +151,11 @@ export function Select({
   const s = useStyles();
   const str = useStrings("select", strings);
   const press = usePress({ disabled });
-  const [current, setCurrent] = useControllable(value, onValueChange);
-  const [isOpen, setOpen] = useControllable(open, onOpenChange);
+  const [current = "", setCurrent] = useControllable(value, onValueChange);
+  const [isOpen = false, setOpen] = useControllable(open, onOpenChange);
   // Android's back button closes the sheet.
   useBackHandler(() => setOpen(false), isOpen);
-  const [filter, setFilter] = useControllable(query, onQueryChange);
+  const [filter = "", setFilter] = useControllable(query, onQueryChange);
   // A phone has no hover; the trigger takes the wash while pressed (the recipe's `pressed`).
   const r = useRecipe(recipes.select, { state: { pressed: press.pressed, focus: press.focused, invalid: invalid || !!form?.invalid, disabled: press.disabled }, styles });
   const chosen = items.find((i) => i.key === current);

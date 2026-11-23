@@ -386,7 +386,7 @@ export function AttachmentCard({
   badge = "",
   typeLabel = "",
   size = "",
-  status = "ready",
+  status,
   progress = 0,
   error = "",
   src = "",
@@ -413,7 +413,7 @@ export function AttachmentCard({
   const s = useStyles();
   const str = useStrings("attachment-card", strings);
   const r = useRecipe(recipes["attachment-card"], { styles });
-  const [state, setState] = useControllable(status, onStatusChange);
+  const [state = "ready", setState] = useControllable(status, onStatusChange);
   const [on, setOn] = useControllable(playing);
   // A thumbnail that will not load falls back to the file card with the image glyph, so the file can still be opened.
   const [broken, setBroken] = useState<string | null>(null);

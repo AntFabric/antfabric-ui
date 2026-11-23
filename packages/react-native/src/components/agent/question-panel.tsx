@@ -130,9 +130,9 @@ export function QuestionPanel({
   placeholder = "",
   confirmText = "",
   confirmOption = "",
-  value = "",
-  typed = "",
-  expanded = true,
+  value,
+  typed,
+  expanded,
   autoFocus = false,
   offline = false,
   sending = false,
@@ -148,9 +148,9 @@ export function QuestionPanel({
 }: QuestionPanelProps) {
   const s = useStyles();
   const str = useStrings("question-panel", strings);
-  const [chosen, setChosen] = useControllable(value, onValueChange);
-  const [entry, setEntry] = useControllable(typed, onTypedChange);
-  const [open, setOpen] = useControllable(expanded, onExpandedChange);
+  const [chosen = "", setChosen] = useControllable(value, onValueChange);
+  const [entry = "", setEntry] = useControllable(typed, onTypedChange);
+  const [open = true, setOpen] = useControllable(expanded, onExpandedChange);
   const shut = !open;
   const [busy, setBusy] = useControllable(sending);
   const [focus, setFocus] = useState<"field" | "confirm" | null>(null);

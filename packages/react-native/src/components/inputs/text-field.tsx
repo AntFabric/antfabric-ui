@@ -100,7 +100,7 @@ const useStyles = createStyles(() => ({
 
 export function TextField({
   label = "",
-  value = "",
+  value,
   placeholder = "",
   type = "text",
   autoComplete,
@@ -134,7 +134,7 @@ export function TextField({
   // A password with `reveal` shows its characters while the Show button is on.
   const [visible, setVisible] = useState(false);
   const revealing = reveal && type === "password";
-  const [current, setText] = useControllable(value, onValueChange);
+  const [current = "", setText] = useControllable(value, onValueChange);
   const [hasFocus, setFocus] = useState(false);
   const [justCopied, setCopied] = useControllable(copied);
   const copiedSaid = str("copied");

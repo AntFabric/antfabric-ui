@@ -47,7 +47,7 @@ export interface SheetProps extends RootProps<HTMLDivElement> {
  * in a stage the size of a small window.
  */
 export function Sheet({
-  open = false,
+  open,
   onOpenChange,
   side = "end",
   width = 0,
@@ -65,7 +65,7 @@ export function Sheet({
 }: SheetProps) {
   const s = useStrings("sheet", strings);
   const r = useRecipe(recipes.sheet, { styles });
-  const [shown, setShown] = useControllable(open, onOpenChange);
+  const [shown = false, setShown] = useControllable(open, onOpenChange);
   const marker = useRef<HTMLSpanElement | null>(null);
   const layer = useLayerHost(marker, shown);
   const floating = shown && !layer.inPlace && !!layer.host;

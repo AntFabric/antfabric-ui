@@ -37,11 +37,11 @@ const square: CSSProperties = {
   transition: `background ${t.duration.base}, border-color ${t.duration.base}, transform ${t.duration.fast} ${t.ease.out}`,
 };
 
-export function Checkbox({ label: name, description: detail = "", checked = false, indeterminate = false, hideLabel = false, disabled = false, onCheckedChange, styles, style, ...rest }: CheckboxProps) {
+export function Checkbox({ label: name, description: detail = "", checked, indeterminate = false, hideLabel = false, disabled = false, onCheckedChange, styles, style, ...rest }: CheckboxProps) {
   const ui = useInteraction({ disabled });
   const form = useFormField();
   const descriptionId = `${useId()}-description`;
-  const [isChecked, setChecked] = useControllable(checked, onCheckedChange);
+  const [isChecked = false, setChecked] = useControllable(checked, onCheckedChange);
   const [innerMixed, setMixed] = useControllable(indeterminate);
   // While the app owns `checked` it owns the dash too: it clears it when it takes the change.
   const mixed = onCheckedChange ? indeterminate : innerMixed;

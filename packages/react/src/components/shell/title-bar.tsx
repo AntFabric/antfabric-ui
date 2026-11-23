@@ -167,8 +167,8 @@ export function TitleBar({
   fullscreen = false,
   maximized = false,
   focused = true,
-  menuOpen = false,
-  sidebarExpanded = false,
+  menuOpen,
+  sidebarExpanded,
   actions = [],
   trailing,
   onSidebarExpandedChange,
@@ -189,8 +189,8 @@ export function TitleBar({
   const s = useStrings("title-bar", strings);
   const { os, glass: isGlass } = usePlatform();
   const r = useRecipe(recipes["title-bar"], { variants: { focused }, styles });
-  const [open, setOpen] = useControllable(menuOpen, onMenuOpenChange);
-  const [sidebar, setSidebar] = useControllable(sidebarExpanded, onSidebarExpandedChange);
+  const [open = false, setOpen] = useControllable(menuOpen, onMenuOpenChange);
+  const [sidebar = false, setSidebar] = useControllable(sidebarExpanded, onSidebarExpandedChange);
   const caption: Caption | null = os === "windows" ? "windows" : os === "linux" ? "linux" : null;
   const restore = os === "windows" ? s("restoreDown") : s("restore");
   const placeholder = searchPlaceholder || s("searchPlaceholder");

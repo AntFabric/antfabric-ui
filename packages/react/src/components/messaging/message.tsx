@@ -135,7 +135,7 @@ export function Message({
   gutterTime = "",
   body = "",
   edited = false,
-  status = "sent",
+  status,
   agent = false,
   compact = false,
   unread = false,
@@ -173,7 +173,7 @@ export function Message({
 }: MessageProps) {
   const s = useStrings("message", strings);
   const ui = useInteraction();
-  const [state, setState] = useControllable(status, onStatusChange);
+  const [state = "sent", setState] = useControllable(status, onStatusChange);
   const retry = () => {
     setState("sending");
     onRetry?.();

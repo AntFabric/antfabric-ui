@@ -50,12 +50,12 @@ const root: CSSProperties = {
 
 const nowrap: CSSProperties = { ...text, whiteSpace: "nowrap", flexShrink: 0 };
 
-export function ThreadSummary({ replyCount, lastReply = "", participants = [], unreadCount = 0, following = false, onFollowingChange, onPress, strings, styles, style, ...rest }: ThreadSummaryProps) {
+export function ThreadSummary({ replyCount, lastReply = "", participants = [], unreadCount = 0, following, onFollowingChange, onPress, strings, styles, style, ...rest }: ThreadSummaryProps) {
   const s = useStrings("thread-summary", strings);
   const ui = useInteraction();
   const dir = useDirection();
   const locale = useLocale();
-  const [follow, setFollow] = useControllable(following, onFollowingChange);
+  const [follow = false, setFollow] = useControllable(following, onFollowingChange);
   const r = useRecipe(recipes["thread-summary"], { state: { hover: ui.hovered, pressed: ui.pressed, focus: ui.focused }, styles });
   if (!(replyCount > 0)) return null;
   // Grouping and digits follow the reader's locale, so "1,204" is "1.204" for a German reader.

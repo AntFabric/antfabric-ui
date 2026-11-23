@@ -62,11 +62,11 @@ const bubble: CSSProperties = {
  * the control is `aria-describedby` the bubble. With `children` the bubble floats beside them; with none it draws the built-in icon button
  * and the bubble in flow, as the catalogue does.
  */
-export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = true, triggerIcon = "bell-off", children, open = false, onOpenChange, styles, style, ref, ...rest }: TooltipProps) {
+export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = true, triggerIcon = "bell-off", children, open, onOpenChange, styles, style, ref, ...rest }: TooltipProps) {
   const r = useRecipe(recipes.tooltip, { styles });
   const { os } = usePlatform();
   const id = useId();
-  const [shown, setShown] = useControllable(open, onOpenChange);
+  const [shown = false, setShown] = useControllable(open, onOpenChange);
   const host = useRef<HTMLDivElement | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   // The control already says the label, so the bubble describes only what is more (the shortcut).

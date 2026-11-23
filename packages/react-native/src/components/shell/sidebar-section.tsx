@@ -75,8 +75,8 @@ function glyphOf(p: PartStyle) {
 export function SidebarSection({
   label,
   icon = "",
-  expanded = true,
-  selected = "",
+  expanded,
+  selected,
   unread = 0,
   addLabel = "",
   actionsVisible = true,
@@ -101,9 +101,9 @@ export function SidebarSection({
   const reduceMotion = useReducedMotion();
   // A phone has no hover, so there is none here.
   const r = useRecipe(recipes["sidebar-section"], { variants: { divided }, state: { focus: press.focused }, styles });
-  const [isOpen, setExpanded] = useControllable(expanded, onExpandedChange);
+  const [isOpen = true, setExpanded] = useControllable(expanded, onExpandedChange);
   const shut = !isOpen;
-  const [open, setOpen] = useControllable(selected, onSelectedChange);
+  const [open = "", setOpen] = useControllable(selected, onSelectedChange);
   const shown = items.filter((item) => !shut || (open ? item.key === open : item.active));
   const chevron = glyphOf(r.chevron);
   const star = glyphOf(r.starIcon);

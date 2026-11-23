@@ -48,7 +48,7 @@ export function Chip({
   label,
   icon = "",
   variant = "filter",
-  selected = false,
+  selected,
   count = 0,
   removable = false,
   removed = false,
@@ -67,7 +67,7 @@ export function Chip({
   const str = useStrings("chip", strings);
   const press = usePress({ disabled });
   const x = usePress({ disabled });
-  const [on, setOn] = useControllable(selected, onSelectedChange);
+  const [on = false, setOn] = useControllable(selected, onSelectedChange);
   const [gone, setGone] = useControllable(removed);
   const pressing = press.pressed || x.pressed;
   // A phone has no hover. A press washes an unchosen chip; a chosen one keeps its fill and only bounces.

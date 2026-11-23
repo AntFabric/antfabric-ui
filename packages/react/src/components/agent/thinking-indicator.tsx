@@ -58,9 +58,9 @@ function useStill(): boolean {
   return still;
 }
 
-export function ThinkingIndicator({ steps = [], agentName = "", words = [], since = 0, expanded = true, onExpandedChange, strings, styles, style, ...rest }: ThinkingIndicatorProps) {
+export function ThinkingIndicator({ steps = [], agentName = "", words = [], since = 0, expanded, onExpandedChange, strings, styles, style, ...rest }: ThinkingIndicatorProps) {
   const s = useStrings("thinking-indicator", strings);
-  const [unfolded, setUnfolded] = useControllable(expanded, onExpandedChange);
+  const [unfolded = true, setUnfolded] = useControllable(expanded, onExpandedChange);
   const still = useStill();
   const dir = useDirection();
   const [mood, setMood] = useState(0);

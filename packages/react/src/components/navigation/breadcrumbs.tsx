@@ -108,11 +108,11 @@ function StatusPill({ status, word, detail, action, spoken, styles, onPress }: {
   );
 }
 
-export function Breadcrumbs({ items, expanded = true, lights = false, status = "", statusLabel = "", statusDetail = "", statusAction = "", label, onNavigate, onExpandedChange, onStatus, styles, strings, style, ref, ...rest }: BreadcrumbsProps) {
+export function Breadcrumbs({ items, expanded, lights = false, status = "", statusLabel = "", statusDetail = "", statusAction = "", label, onNavigate, onExpandedChange, onStatus, styles, strings, style, ref, ...rest }: BreadcrumbsProps) {
   const s = useStrings("breadcrumbs", strings);
   const { platform, os } = usePlatform();
   const desktop = platform === "desktop";
-  const [unfolded, setExpanded] = useControllable(expanded, onExpandedChange);
+  const [unfolded = true, setExpanded] = useControllable(expanded, onExpandedChange);
   const folded = !unfolded;
   const last = items.length - 1;
   const r = useRecipe(recipes.breadcrumbs, { styles });

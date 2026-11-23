@@ -99,9 +99,8 @@ export function ContextMenu({ quickReactions = [], picked = [], items = [], labe
   const s = useStyles();
   const [search, setSearch] = useState("");
   const str = useStrings("context-menu", strings);
-  // The person's own quick reactions, as one string so a new array of the same emoji is not a change.
-  const [own, setOwn] = useControllable(picked.join(" "));
-  const owned = own.split(" ").filter(Boolean);
+  // The person's own quick reactions (a new array of the same emoji is not a change).
+  const [owned, setOwned] = useControllable(picked);
   const [open, setOpen] = useControllable(picking);
   const r = useRecipe(recipes["context-menu"], { styles });
   const { placeholderTextColor, ...inputText } = r.input.text;
@@ -111,7 +110,7 @@ export function ContextMenu({ quickReactions = [], picked = [], items = [], labe
   const searchIcon = glyphBox(r.searchIcon.view);
   const mine = (emoji: string) => owned.includes(emoji);
   const react = (emoji: string) => {
-    setOwn((mine(emoji) ? owned.filter((e) => e !== emoji) : [...owned, emoji]).join(" "));
+    setOwned(mine(emoji) ? owned.filter((e) => e !== emoji) : [...owned, emoji]);
     onReact?.(emoji);
   };
   // A cell of the panel: pressing it reacts, and a screen reader reads it as a button named by the emoji.

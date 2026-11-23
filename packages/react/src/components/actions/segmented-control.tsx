@@ -102,10 +102,10 @@ const KEYS: Record<string, (at: number, n: number) => number> = {
   End: (_, n) => n - 1,
 };
 
-export function SegmentedControl({ items, value = "", size = "md", full = false, scrollable = false, label = "", onValueChange, styles, strings, style, ...rest }: SegmentedControlProps) {
+export function SegmentedControl({ items, value, size = "md", full = false, scrollable = false, label = "", onValueChange, styles, strings, style, ...rest }: SegmentedControlProps) {
   const dir = useDirection();
   const r = useRecipe(recipes["segmented-control"], { styles });
-  const [current, setCurrent] = useControllable(value, onValueChange);
+  const [current = "", setCurrent] = useControllable(value, onValueChange);
   const at = items.findIndex((i) => i.key === current);
 
   // ONE card travels between segments. It is measured after mount; until then (and on the server)

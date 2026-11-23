@@ -172,13 +172,13 @@ function AlsoSend({ on, to, onToggle, strings, styles }: Pick<ComposerProps, "st
 
 export function Composer({
   placeholder = "",
-  value = "",
+  value,
   mode = "default",
   uploading = false,
   attachments = [],
   lengthHint = "",
   tooLong = false,
-  alsoSend = false,
+  alsoSend,
   alsoSendTo = "",
   formatting = false,
   attach = false,
@@ -214,8 +214,8 @@ export function Composer({
 }: ComposerProps) {
   const s = useStyles();
   const str = useStrings("composer", strings);
-  const [draft, setDraft] = useControllable(value, onValueChange);
-  const [also, setAlso] = useControllable(alsoSend, onAlsoSendChange);
+  const [draft = "", setDraft] = useControllable(value, onValueChange);
+  const [also = false, setAlso] = useControllable(alsoSend, onAlsoSendChange);
   const [inside, setInside] = useState(false);
 
   const locked = mode === "readonly" || mode === "archived";

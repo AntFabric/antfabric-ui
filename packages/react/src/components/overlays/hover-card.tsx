@@ -100,7 +100,7 @@ export function HoverCard({
   placement = "down",
   showTrigger = true,
   children,
-  open = false,
+  open,
   onOpenChange,
   onMessage,
   onViewProfile,
@@ -114,7 +114,7 @@ export function HoverCard({
   const s = useStrings("hover-card", strings);
   const dir = useDirection();
   const panel = useId();
-  const [isOpen, setIsOpen] = useControllable(open, onOpenChange);
+  const [isOpen = false, setIsOpen] = useControllable(open, onOpenChange);
   const host = useRef<HTMLDivElement | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const floating = children !== undefined && children !== null && children !== false;
