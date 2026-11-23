@@ -274,6 +274,16 @@ const docs: ComponentDocs = {
       },
     },
     {
+      title: "Laid out but not yet visible",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "While `visible` is false (its first 300 ms) the placeholder is hidden from screen readers too, not only from sight: nothing is announced and there is no \"Loading\" group to find until it fades in.",
+      example: {
+        name: "Not yet visible",
+        props: { shape: "row", label: "Loading conversations", visible: false },
+        width: 320,
+      },
+    },
+    {
       title: "Text scaled to 130%",
       platforms: ["mobile"],
       handling: "Each bar sits in a line box of fontSize × 1.4 at the current scale, so the skeleton row is as tall as the real row it stands in for and nothing jumps when the text arrives.",

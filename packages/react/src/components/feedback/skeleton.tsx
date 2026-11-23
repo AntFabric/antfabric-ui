@@ -96,6 +96,8 @@ export function Skeleton({
       role="group"
       aria-busy
       aria-label={name}
+      // Invisible for its first moments: nothing is said, and nothing is there to find.
+      aria-hidden={!visible || undefined}
       {...rootProps(rest)}
       style={css(
         box,
