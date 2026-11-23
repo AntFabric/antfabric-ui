@@ -188,6 +188,22 @@ const docs: ComponentDocs = {
   ],
   edgeCases: [
     {
+      title: "A preview shorter than max",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "When the server sends fewer faces than `max` (two of a ten-person channel), the stack draws the two and +8: +N counts everyone the faces do not show, `total` minus the faces drawn.",
+      example: {
+        name: "Two faces of ten",
+        props: {
+          max: 4,
+          total: 10,
+          people: [
+            { name: "Priya Raman", identity: "indigo" },
+            { name: "Marcus Chen", identity: "green" },
+          ],
+        },
+      },
+    },
+    {
       title: "Photos side by side",
       platforms: ["web", "desktop", "mobile"],
       handling: "Without the ring, three photos read as one smeared image. Every face — the lead's too — wears a 2px ring in the ground's colour; a stack on a selected or sidebar row passes that ground so the ring cuts rather than outlines.",

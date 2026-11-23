@@ -116,16 +116,24 @@ export function InAppBanner({
   const r = useRecipe(recipes["in-app-banner"], { state: { focus: ui.focused }, styles });
   const rField = useRecipe(recipes["in-app-banner"], { state: { focus: typing.focused }, styles });
   const [gone, setGone] = useControllable(dismissed);
+  const [open, setOpen] = useControllable(replying);
+  const [draft, setDraft] = useControllable(replyText);
   // Dismissing puts this notification away, not the banner: a new one (another title, context, body or time) shows again, back at
-  // `dismissed`. Body is part of it because two messages from one sender in one minute share a title and a time.
+  // `dismissed`. Body is part of it because two messages from one sender in one minute share a title and a time. The reply and its draft
+  // are the notification's too: the next one starts at `replying` and `replyText`, not with the last one's box open.
   const notification = [title, context, body, time].join("\n");
   const [shown, setShown] = useState(notification);
   if (shown !== notification) {
     setShown(notification);
     setGone(dismissed);
+    setOpen(replying);
+    setDraft(replyText);
   }
-  const [open, setOpen] = useControllable(replying);
-  const [draft, setDraft] = useControllable(replyText);
+  // The hit area's name says everything the card shows: the title and conversation, the time, the lead and body, the queue, then "Open".
+  const heading = context ? s("titleIn", { title, context }) : title;
+  const timed = time ? s("withDetail", { label: heading, detail: time }) : heading;
+  const told = body ? s("withBody", { label: timed, body: lead ? s("leadBody", { lead, body }) : body }) : timed;
+  const named = s("toOpen", { label: queued > 0 ? s("withDetail", { label: told, detail: s("more", { count: queued }) }) : told });
   // The card goes with its × (and with Escape, and an action that dismisses): focus moves to the nearest control that stays.
   const cardRef = useRef<HTMLDivElement | null>(null);
   const dismiss = (reason: InAppBannerDismissReason) => {
@@ -175,7 +183,7 @@ export function InAppBanner({
             type="button"
             data-af-part="hit"
             data-af-press
-            aria-label={context ? s("openIn", { title, context, body }) : s("open", { title, body })}
+            aria-label={named}
             onClick={() => onOpen?.()}
             {...ui.handlers}
             style={css(rtl(hit, dir), r.hit)}

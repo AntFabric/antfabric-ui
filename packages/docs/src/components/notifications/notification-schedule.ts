@@ -245,6 +245,19 @@ const docs: ComponentDocs = {
       },
     },
     {
+      title: "A field left empty",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "Pause in the Custom… picker is disabled until both the date and the time hold something, so it never pauses 'until , '. (A picker option with its own `until` pauses until that, whatever the fields hold.)",
+      example: {
+        name: "Custom, nothing typed",
+        props: {
+          custom: true,
+          customDate: "",
+          customTime: "",
+        },
+      },
+    },
+    {
       title: "Our pause and the OS's Focus",
       platforms: ["web", "desktop", "mobile"],
       handling: "Independent, and both apply: macOS/iOS Focus, Windows Do not disturb and Android DND hold what we send; our pause means we do not send. The pill only ever describes ours — we cannot read the OS's Focus state reliably, so we never claim it.",

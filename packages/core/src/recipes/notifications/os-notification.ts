@@ -150,7 +150,7 @@ export const osNotification = defineRecipe({
       },
     },
     action: {
-      states: { focus: { shadow: "$shadow.focus" } },
+      states: { focus: { shadow: "$shadow.focus" }, disabled: { opacity: "$opacity.disabled" } },
       platforms: {
         mac: { base: { paddingX: "$space.smMd", fg: "$fg.strong", height: "$osNotification.macActionH", radius: "$osNotification.macActionRadius", bg: "$surface.overlay", size: "$text.bodySm", weight: "$font.weightMedium" }, states: { hover: { bg: "$surface.selected" } } },
         windows: {

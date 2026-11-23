@@ -84,6 +84,7 @@ const useStyles = createStyles((t) => ({
   disc: { flex: 1, alignItems: "center", justifyContent: "center" },
   grow: { flex: 1 },
   action: { alignItems: "center", justifyContent: "center" },
+  actionBadge: { position: "absolute", top: -t.space["2xs"], right: -t.space["2xs"], borderWidth: t.border.wThick, borderColor: t.surface.card },
   lens: { position: "absolute", left: 0, top: 0, borderRadius: t.radius.pill, pointerEvents: "none" },
   lensGlass: { ...StyleSheet.absoluteFillObject, borderRadius: t.radius.pill },
   safeArea: { alignItems: "center", justifyContent: "flex-end", paddingBottom: t.space.sm },
@@ -197,21 +198,27 @@ function Squeezed({ tab, testID, onPress, styles, strings }: { tab?: NavItem; te
   );
 }
 
-function Action({ action, testID, onPress, styles }: { action: ActionItem; testID?: string; onPress: () => void; styles?: PartStyles<"tab-bar"> }) {
+function Action({ action, testID, onPress, styles, strings }: { action: ActionItem; testID?: string; onPress: () => void; styles?: PartStyles<"tab-bar">; strings?: Partial<KitStrings["tab-bar"]> }) {
   const s = useStyles();
-  const press = usePress();
-  const r = useRecipe(recipes["tab-bar"], { state: { focus: press.focused }, styles });
+  const str = useStrings("tab-bar", strings);
+  const press = usePress({ disabled: action.disabled });
+  const r = useRecipe(recipes["tab-bar"], { state: { focus: press.focused, disabled: press.disabled }, styles });
+  const badge = action.badge ?? 0;
   const root = partStyle(r, "action", { view: [s.action, press.pressed && s.pressed] });
   return (
     <Pressable
       testID={partId(testID, "tab-bar", "action")}
       accessibilityRole="button"
-      accessibilityLabel={action.label}
+      // A count on the button is read with its name, as a tab's is.
+      accessibilityLabel={badge > 0 ? str("tab", { label: action.label, count: badge, what: str("new") }) : action.label}
+      accessibilityState={press.disabled ? { disabled: true } : undefined}
+      disabled={press.disabled}
       onPress={() => onPress()}
       {...press.handlers}
       style={root.view}
     >
       {action.icon ? <Icon testID={partId(testID, "tab-bar", "actionIcon")} name={action.icon} {...glyphOf(r.actionIcon, 28)} /> : null}
+      {badge > 0 ? <Badge count={badge} label={str("new")} style={s.actionBadge} /> : null}
     </Pressable>
   );
 }
@@ -433,7 +440,7 @@ export function TabBar({ tabs = [], active, expanded, keyboardUp = false, safeAr
             />
           ) : null}
           {squeezed ? <View style={s.grow} /> : null}
-          {squeezed || !action ? null : <Action action={action} testID={testID} onPress={() => onAction?.(action)} styles={styles} />}
+          {squeezed || !action ? null : <Action action={action} testID={testID} onPress={() => onAction?.(action)} styles={styles} strings={strings} />}
         </View>
       )}
       {safeArea ? (

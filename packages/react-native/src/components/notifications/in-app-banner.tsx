@@ -107,6 +107,11 @@ export function InAppBanner({
     setGone(true);
     onDismiss?.(reason);
   };
+  // The hit area's name says everything the card shows: the title and conversation, the time, the lead and body, the queue, then "Open".
+  const heading = context ? str("titleIn", { title, context }) : title;
+  const timed = time ? str("withDetail", { label: heading, detail: time }) : heading;
+  const told = body ? str("withBody", { label: timed, body: lead ? str("leadBody", { lead, body }) : body }) : timed;
+  const named = str("toOpen", { label: queued > 0 ? str("withDetail", { label: told, detail: str("more", { count: queued }) }) : told });
 
   // A swipe up follows the finger and dismisses past 30pt; short of that it settles back.
   const y = useRef(new Animated.Value(0)).current;
@@ -142,7 +147,7 @@ export function InAppBanner({
               <Pressable
                 testID={partId(testID, "in-app-banner", "hit")}
                 accessibilityRole="button"
-                accessibilityLabel={context ? str("openIn", { title, context, body }) : str("open", { title, body })}
+                accessibilityLabel={named}
                 accessibilityActions={[{ name: "dismiss", label: str("dismiss") }]}
                 onAccessibilityAction={(e) => (e.nativeEvent.actionName === "dismiss" ? dismiss("swipe") : undefined)}
                 onPress={() => onOpen?.()}

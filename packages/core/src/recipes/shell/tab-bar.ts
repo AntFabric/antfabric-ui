@@ -22,7 +22,7 @@ export const tabBar = defineRecipe({
     squeezedSurface: { base: { radius: "$radius.circle", bg: "$surface.card", borderWidth: "$border.wHairline", borderColor: "$border.subtle", shadow: "$shadow.float" } },
     disc: { base: { radius: "$radius.circle", bg: "$brand.tint" } },
     discIcon: { base: { square: "$icon.sizeLg", fg: "$brand.default" } },
-    action: { base: { square: "$tabbar.h", radius: "$radius.circle", bg: "$brand.tint", shadow: "$shadow.float" }, states: { focus: { shadow: "$shadow.focus" } } },
+    action: { base: { square: "$tabbar.h", radius: "$radius.circle", bg: "$brand.tint", shadow: "$shadow.float" }, states: { focus: { shadow: "$shadow.focus" }, disabled: { opacity: "$opacity.disabled" } } },
     actionIcon: { base: { fg: "$brand.default" } },
     safeArea: { base: { height: "$homeIndicator.h" }, platforms: { android: { base: { height: "$osHeader.androidNavH" } } } },
     home: {

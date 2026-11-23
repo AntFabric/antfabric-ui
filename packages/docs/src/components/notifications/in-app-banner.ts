@@ -94,7 +94,7 @@ const docs: ComponentDocs = {
       type: "boolean",
       default: false,
       platforms: ["web", "desktop"],
-      description: "The inline reply is open. Web and desktop only — on a phone a tap opens the conversation with the composer focused.",
+      description: "The inline reply is open. Web and desktop only — on a phone a tap opens the conversation with the composer focused. A new notification (another title, context, body or time) starts again from `replying` and `replyText`, as it does from `dismissed`.",
     },
     replyText: {
       type: "string",
@@ -214,6 +214,7 @@ const docs: ComponentDocs = {
     role: "status",
     notes: [
       "A banner that arrives is announced politely as \"Priya Raman. #platform-eng. …\" (through the page's announcer on the web, the screen reader's announcement call on the phone) — never assertive, and it never takes focus. A failed inline reply is announced at once.",
+      "The open button's name says everything the card shows: 'Priya Raman in #platform-eng, 2m: Mentioned you · can you look at the deck?, +2 more waiting. Open'. With no body it is the title, the time and 'Open', never an empty ': .'.",
       "The kit has no auto-dismiss timer: the app owns it and must stop it while the banner has focus or the pointer is on it, and give a screen-reader user longer (WCAG 2.2.1).",
       "Reply moves focus into the field, and Escape in the field closes the reply and keeps the draft without dismissing the banner (Escape elsewhere on the card dismisses it); focus goes back to Reply when the reply closes. These are the web's: the phone has no reply field.",
     ],
@@ -311,6 +312,30 @@ const docs: ComponentDocs = {
           queued: 4,
         },
       },
+    },
+    {
+      title: "No preview text",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "An event with nothing to preview (a call, a file with no caption) draws its title and time only, and its open button is named 'Design crit starts in 5 min, now. Open' rather than with an empty body.",
+      example: {
+        name: "Title only",
+        props: {
+          title: "Design crit starts in 5 min",
+          body: "",
+          lead: "",
+          leading: "tile",
+          icon: "video",
+          sender: "",
+          context: "",
+          replyable: false,
+          time: "now",
+        },
+      },
+    },
+    {
+      title: "The next one arrives while you reply",
+      platforms: ["web", "desktop"],
+      handling: "The reply and its draft belong to the notification they answer. When the banner moves on to another (a new title, context, body or time), it starts from `replying` and `replyText` again, so a half-typed reply to Marcus never ends up in the box under Aisha's message. The app keeps the draft if it wants to offer it back.",
     },
     {
       title: "You are typing",

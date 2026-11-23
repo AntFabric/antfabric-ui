@@ -188,6 +188,7 @@ const docs: ComponentDocs = {
       "Inside a menu Up, Down, Home, End and typing a letter move between entries, Left and Right go to the neighbouring menu, and Escape closes the menu and returns focus to the entry that opened it. The Windows ☰ panel and GNOME popover use the same keys; Right opens an entry's flyout, Left or Escape closes it.",
       "The web ⋯ menu is a picture of an open menu (the app owns opening it), so it has no Escape of its own. Its entries take Up, Down, Home, End and typing; the Theme row is a radiogroup that is one stop in that order: Left, Right, Up and Down inside it move between Light, Dark and System and check the option they reach, and Tab leaves it.",
       "Disabled items stay in the menu and are announced as dimmed — a command that vanishes is harder to find again than one that is greyed.",
+      "An entry with `checked` (true or false) is a toggle: a menuitemcheckbox with aria-checked, so its tick is read as checked or not checked, not only seen. Up, Down, Home, End and typing reach it like any entry.",
       "Every entry draws a focus ring. A long menu scrolls inside the window (80% of its height) instead of running off it.",
     ],
   },
@@ -389,6 +390,36 @@ const docs: ComponentDocs = {
             {
               label: "Zoom Out",
               shortcut: "Mod+-",
+            },
+          ]),
+        },
+        platforms: ["desktop"],
+        width: 760,
+      },
+    },
+    {
+      title: "A toggle entry",
+      platforms: ["desktop"],
+      handling: "View › Show Sidebar and Show Status Bar are toggles: an entry with `checked` draws its tick when true and keeps the tick's room when false, so the labels line up, and a screen reader hears it as checked or not checked (menuitemcheckbox). Choosing it reports the entry; the app flips `checked` in its next `menus`.",
+      example: {
+        name: "Show Sidebar checked",
+        props: {
+          menus: appMenusWith("view", [
+            {
+              label: "Show Sidebar",
+              shortcut: "Mod+Shift+S",
+              checked: true,
+            },
+            {
+              label: "Show Status Bar",
+              checked: false,
+            },
+            {
+              type: "separator",
+            },
+            {
+              label: "Actual Size",
+              shortcut: "Mod+0",
             },
           ]),
         },

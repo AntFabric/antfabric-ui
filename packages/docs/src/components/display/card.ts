@@ -71,10 +71,10 @@ const docs: ComponentDocs = {
   platforms: {
     web: {
       status: "ready",
-      base: "A <div> with a stretched <button> under the content as its one press target (nested controls sit above it); hover from useInteraction fills it, keyboard focus rings the whole card; inline styles over `t`",
+      base: "A <div> with a stretched <button> under the content as its one press target (the content, nested controls and text, sits above it); hover from useInteraction fills it, keyboard focus rings the whole card; inline styles over `t`",
       import: "import { Card } from \"@antfabric/ui-react\"",
       notes: [
-        "An interactive card is a stretched link: one <a href> (with `href`) or <button> covers the card, and nested controls sit above it with position: relative. A <button> wrapping the whole card would make every nested button invalid HTML.",
+        "An interactive card is a stretched link: one <a href> (with `href`) or <button> fills the card, drawn under its content (z-index -1 inside the card, which isolates its own stacking context), so whatever the product nests, a plain <a>, a <button>, a field, stays its own control and the card's text can be selected. A press on the card's padding is the target's; a press on its text opens the card too (through the link with `href`, so ⌘-click still opens a tab), unless it ended a text selection. A <button> wrapping the whole card would make every nested button invalid HTML.",
         "A card that navigates (`href`) is an <a>, so middle-click and ⌘-click open it in a new tab.",
         "With no `label`, the target is named by the card's first heading (aria-labelledby) or, with none, by the card's text; give a `label` when that is not what the card is for.",
       ],
@@ -416,7 +416,36 @@ const docs: ComponentDocs = {
     {
       title: "Buttons inside a clickable card",
       platforms: ["web", "desktop", "mobile"],
-      handling: "The nested control wins: on web and desktop it sits above the stretched press target (position: relative) and stops propagation; on mobile the inner Pressable claims the responder, so the card does not open. Never put a card's only primary action inside it AND on the card itself.",
+      handling: "The nested control wins: on web and desktop the stretched press target is drawn under the card's content, so a nested button, a plain link or a field takes its own press, and a press inside one never opens the card; on mobile the inner Pressable claims the responder, so the card does not open. Text in an interactive card can be selected: a press that ends a selection does not open it. Never put a card's only primary action inside it AND on the card itself.",
+      example: {
+        name: "A button inside an interactive card",
+        props: {
+          level: "inner",
+          elevate: "none",
+          interactive: true,
+          label: "Open Design crit, Thursday",
+          children: [
+            {
+              el: "text",
+              text: "Design crit · Thursday 15:00",
+              style: {
+                fontSize: "$text.body",
+                color: "$fg.strong",
+              },
+            },
+            {
+              el: "component",
+              use: "button",
+              props: {
+                label: "Join",
+                size: "sm",
+                variant: "soft",
+              },
+            },
+          ],
+        },
+        width: 280,
+      },
     },
     {
       title: "Keyboard and screen reader",

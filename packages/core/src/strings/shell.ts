@@ -17,6 +17,16 @@ export const shell = {
     typing: "typing…",
     /** The accessible name of the row's ⋮ button (web and desktop), and of the phone's long-press accessibility action. */
     options: "Options for {name}",
+    /** Read after the name when the row's face wears the agent sparkle. */
+    agent: "AI agent",
+    /** Read after the name for the face's green presence dot. */
+    presenceActive: "active",
+    /** Read after the name for the away dot. */
+    presenceAway: "away",
+    /** Read after the name for the do-not-disturb dot. */
+    presenceDnd: "do not disturb",
+    /** Read after the name for the offline ring. */
+    presenceOffline: "offline",
   },
   "sidebar-section": {
     /** The + action's name when the section has no `addLabel` of its own. */
@@ -49,7 +59,7 @@ export const shell = {
     current: "current",
     /** Read after a tile's name when mentions are waiting there. */
     mentions: "{count} mentions",
-    /** Read after a tile's name when it has new messages nobody asked about (desktop). */
+    /** Read after a tile's (desktop) or row's (phone) name when it has new messages nobody asked about: its activity dot. */
     newMessages: "new messages",
     /** Read after a workspace's name while it is signed out. */
     signedOut: "signed out",
@@ -113,6 +123,16 @@ export const shell = {
     searchHint: "Search ({keys})",
     /** The profile button's accessible name and tooltip: it opens the profile and sign-out menu. */
     profile: "{name}, profile and sign out",
+    /** The profile button's accessible name while its face shows a presence: the name, the presence word, then what it opens. */
+    profileWithPresence: "{name}, {presence}, profile and sign out",
+    /** The presence word for the face's green dot. */
+    presenceActive: "active",
+    /** The presence word for the away dot. */
+    presenceAway: "away",
+    /** The presence word for the do-not-disturb dot. */
+    presenceDnd: "do not disturb",
+    /** The presence word for the offline ring. */
+    presenceOffline: "offline",
   },
   "title-bar": {
     /** The bar's accessible name. */
@@ -171,5 +191,5 @@ export const shell = {
 /** Keys one kit draws and the other has no use for. */
 export const shellOnly = {
   "sidebar-section": { expand: ["web"], collapse: ["web"], expandPhone: ["mobile"], collapsePhone: ["mobile"] },
-  "workspace-switcher": { addMenu: ["web"], current: ["web"], newMessages: ["web"] },
+  "workspace-switcher": { addMenu: ["web"], current: ["web"] },
 } as const satisfies OnlyOn<typeof shell>;

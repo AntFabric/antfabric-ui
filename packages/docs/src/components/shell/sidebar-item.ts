@@ -101,7 +101,7 @@ const docs: ComponentDocs = {
       type: "boolean",
       default: false,
       platforms: ["web", "desktop"],
-      description: "The row's ⋮ (Move to…, Mute, Leave), always shown when set. With `onMenu` alone it is there but transparent until the pointer is over the row or keyboard focus is in it; the room for it is reserved, so showing it never reflows the row.",
+      description: "The row's ⋮ (Move to…, Mute, Leave), always shown when set. With `onMenu` alone it is there but transparent until the pointer is over the row or keyboard focus is in it, and takes no press while transparent (a tap on a touch screen lands on the row); the room for it is reserved, so showing it never reflows the row.",
     },
     onPress: {
       type: "event",
@@ -200,6 +200,7 @@ const docs: ComponentDocs = {
     notes: [
       "A button on every platform (there is no href prop): the row reports `onPress` and the app navigates. Middle-click and open-in-new-tab are the app's to add.",
       "The whole row is one accessible name: '#design-crit, 3 mentions, muted, draft'. The glyph and the badge's own number are hidden so nothing is read twice.",
+      "A row with `avatar` says its face in words, after the name: 'Fabric, AI agent' for the sparkle, 'Lena Fischer, away' for the presence dot. Neither is colour or shape alone.",
       "The open conversation has aria-current=\"page\" (selected on the phone); selection is never carried by colour alone. Pressing the open row leaves it open.",
       "Web and desktop: with `onMenu` the row's ⋮ appears while the row has pointer hover or keyboard focus and stays in the tab order; the context menu and Shift+F10 or the Menu key on the row also call `onMenu`.",
       "Phone: `onLongPress` is also an accessibility action, 'Options for #design-crit', so a screen reader, Voice Control or Switch Control user can run it.",
@@ -527,7 +528,7 @@ const docs: ComponentDocs = {
     {
       title: "Hover-only ⋮ on touch",
       platforms: ["web", "desktop", "mobile"],
-      handling: "On a phone the ⋮ does not exist: long-press opens the action sheet and swipe reveals Mark as read and Mute. On a touch laptop (pointer: coarse) the ⋮ is always visible on the open row and the row grows to 40px.",
+      handling: "On a phone the ⋮ does not exist: long-press opens the action sheet and swipe reveals Mark as read and Mute. On a touch screen with the web or desktop kit, a hidden ⋮ takes no press (pointer-events: none until it shows), so a tap at the row's end opens the row rather than an invisible menu; pass `actionsVisible` to keep the ⋮ there for touch. On a touch laptop (pointer: coarse) the ⋮ is always visible on the open row and the row grows to 40px.",
       example: {
         name: "Phone, long-press target",
         props: {

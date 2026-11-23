@@ -81,13 +81,13 @@ export function Avatar({ name, src = "", size = "md", shape = "circle", identity
   // A name with no letters (an emoji, a phone number) gets the person glyph, not an empty disc.
   const letters = /\p{L}/u.test(name);
   const r = useRecipe(recipes.avatar, { variants: { size, shape, identity, presence }, styles });
-  // Presence is announced in words, never by colour alone.
+  // Presence and the agent sparkle are announced in words, never by colour and shape alone. The sparkle takes the dot's place.
   const said = presence === "active" ? s("presenceActive") : presence === "away" ? s("presenceAway") : presence === "dnd" ? s("presenceDnd") : s("presenceOffline");
   return (
     <span
       data-af-part="root"
       role={decorative ? undefined : "img"}
-      aria-label={decorative ? undefined : presence === "none" ? name : s("labelWithPresence", { name, presence: said })}
+      aria-label={decorative ? undefined : agent ? s("labelAgent", { name }) : presence === "none" ? name : s("labelWithPresence", { name, presence: said })}
       aria-hidden={decorative || undefined}
       {...rootProps(rest)}
       style={css(root, partStyle(r, "root", SMALL[size]), style)}

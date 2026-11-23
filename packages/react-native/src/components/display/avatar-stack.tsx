@@ -42,7 +42,8 @@ export function AvatarStack({ people, max = 3, total = 0, size = "sm", ground = 
   // Nobody draws nothing: no ghost discs.
   if (people.length === 0) return null;
   const count = Math.max(total, people.length);
-  const hidden = count - max;
+  // +N is everyone the faces do not show: a preview shorter than `max` draws fewer faces, and the rest are hidden.
+  const hidden = count - Math.min(max, people.length);
   // A face is as tall as the chip. Each overlaps the one before by a third, and wears the chip's ring (the ground's colour).
   const side = r.more.view.height as number;
   const ring: ViewStyle = { borderWidth: size === "xs" ? 1.5 : (r.more.view.borderWidth as number), borderColor: r.more.view.borderColor, marginStart: -side / 3 };

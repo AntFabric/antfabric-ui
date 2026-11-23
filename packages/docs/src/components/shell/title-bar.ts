@@ -33,7 +33,7 @@ const docs: ComponentDocs = {
     searchPlaceholder: {
       type: "string",
       default: "",
-      description: "The field's text. Empty uses the `searchPlaceholder` string (\"Search\"); a product says what it searches.",
+      description: "The field's text, and its accessible name, so what the field shows is what it is called. Empty uses the `searchPlaceholder` string (\"Search\") on the field and the `searchLabel` string as its name; a product says what it searches.",
     },
     searchKeys: {
       type: "string",
@@ -327,7 +327,19 @@ const docs: ComponentDocs = {
     {
       title: "Keyboard and screen reader",
       platforms: ["desktop"],
-      handling: "Tab order: ☰ (Windows/Linux), Back, Forward, History, Search, Help. Window controls are skipped, as the native ones are. F6 moves between the title bar and the regions below it, so nobody has to tab through the rail to reach search.",
+      handling: "Tab order: ☰ (Windows/Linux), Back, Forward, History, Search, Help. Window controls are skipped, as the native ones are: Windows and GNOME never put the caption buttons in the tab order, and Alt+Space opens the system window menu (Minimise, Maximise, Close) from anywhere in the window, so a keyboard user reaches them there. F6 moves between the title bar and the regions below it, so nobody has to tab through the rail to reach search.",
+    },
+    {
+      title: "A product's own placeholder",
+      platforms: ["desktop"],
+      handling: "`searchPlaceholder` is both the words on the field and its accessible name, so a speech user who says what they see reaches it (WCAG 2.5.3). Without it the field shows the `searchPlaceholder` string and is named by the `searchLabel` string.",
+      example: {
+        name: "Search messages and files",
+        props: {
+          searchPlaceholder: "Search messages and files",
+        },
+        width: 1100,
+      },
     },
     {
       title: "Hidden in the tray, then reopened",

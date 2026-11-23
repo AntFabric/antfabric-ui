@@ -65,6 +65,8 @@ Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.
 Messaging, agent and feedback:
 - The AttachmentCard recipe has a `chipOpen` part: the ready staged chip's open target (gap, radius and its focus ring), which `styles.chipOpen` reaches in both kits.
 - Strings: AttachmentCard's `removePreview` is read by the phone too (it drew no Remove preview before).
+- Strings: `avatar.labelAgent`; `sidebar-item` `agent` and the presence words; `nav-rail` `profileWithPresence` and the presence words; `workspace-switcher.newMessages` is read by both kits now. `in-app-banner` `open` and `openIn` give way to `titleIn`, `withBody`, `leadBody` and `toOpen` (with the common `withDetail`): a product that overrode `open` or `openIn` moves its text to these.
+- Recipes: `tab-bar` `action` and `os-notification` `action` gain a `disabled` state (`opacity.disabled`).
 
 ## 1.0.0
 

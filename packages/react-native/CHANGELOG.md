@@ -118,6 +118,14 @@ Messaging, agent and feedback:
 - Chip: only a `filter` chip toggles `selected` (L3). The ✕ only reports `onRemove`: the chip stays until your app drops it from its list or sets `removed` (L4).
 - SegmentedControl: the iOS 26 lens keeps its drag when the parent re-renders mid-gesture (L11).
 - Fab: a Fab disabled while it wiggles drops the press and does not fire (L12).
+- Display, notifications and shell:
+  - Avatar is named "{name}, AI agent" when it wears the agent sparkle; SidebarItem's row name adds its face's agent or presence (M36).
+  - SidebarSection: + is drawn only with `onAdd`; the header takes a long press only with `onMenu`, and the rows only with `onItemLongPress` (L37).
+  - TabBar: the floating action draws its `badge` on its corner and reads it with its name, and `disabled` dims it and takes no press (L38). OsNotification's actions honour `disabled`.
+  - AvatarStack: +N is everyone the faces do not show (2 faces of 10 read +8, was +7) (L40).
+  - NotificationSchedule: the Custom picker's Pause is disabled until both fields hold something (L41).
+  - WorkspaceSwitcher: a row's activity dot is read in its name, "new messages" (L44).
+  - InAppBanner: the open button's name says the title and conversation, the time, the lead and body and the queue, then "Open"; with no body it is no longer "Title: . Open" (L47).
 
 ## 1.0.0
 

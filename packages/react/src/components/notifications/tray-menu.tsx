@@ -226,7 +226,8 @@ export function TrayMenu({ appName, items = [], tone = "idle", statusText = "", 
   });
   const closeSub = (key: string) => {
     setOpen("");
-    keys.ref.current?.querySelector<HTMLElement>(`[data-af-key="${key}"]`)?.focus();
+    // Compared as a value, so a key holding `"` or `\` is not a selector.
+    Array.from(keys.ref.current?.querySelectorAll<HTMLElement>("[data-af-key]") ?? []).find((el) => el.dataset.afKey === key)?.focus();
   };
   const trayIcon = <Icon part="trayIcon" name={idle ? "circle-dot" : "circle"} size={14} style={css(idle ? undefined : filled, r.trayIcon)} />;
   const glyph = (item: TrayMenuItem) =>

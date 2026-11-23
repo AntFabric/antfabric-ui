@@ -29,7 +29,7 @@ const docs: ComponentDocs = {
       type: "string",
       default: "",
       sample: "AntFabric",
-      description: "The wordmark beside the tile while expanded. With no `logo` and no `title`, the lockup is not drawn at the menu level.",
+      description: "The wordmark beside the tile while expanded. With no `logo` and no `title`, the lockup is not drawn at the menu level; with a `title` and no `logo` it is drawn only while expanded (collapsed, there would be nothing in it).",
     },
     home: {
       type: "string",
@@ -256,6 +256,7 @@ const docs: ComponentDocs = {
       "Drill-in: the list is a <nav> named for where it is ('Mode', or 'Channels sections'). The top tile is a button named 'Channels. Back to the main menu', so the destination is announced where the logo was.",
       "Drill-in: opening a destination or going back replaces the pressed row, so focus moves to the row that is now current instead of falling to the page. Escape in a destination's sections goes back.",
       "The workspace chip and the profile button are menu buttons (aria-haspopup=\"menu\"); their aria-expanded follows `workspaceMenuOpen` and `profileMenuOpen`, which the app sets while its menu is open.",
+      "The profile button says the face's presence in words: 'Priya Raman, active, profile and sign out' (`profileWithPresence`); with `presence: \"none\"` it is 'Priya Raman, profile and sign out'.",
       "The destination list scrolls when it does not fit, so the utilities and the profile stay in view. Every row, the utilities and the profile draw a focus ring.",
     ],
   },
@@ -406,6 +407,18 @@ const docs: ComponentDocs = {
   ],
   states: ["focus"],
   edgeCases: [
+    {
+      title: "A wordmark with no logo",
+      platforms: ["web", "desktop"],
+      handling: "A product that passes a `title` and no `logo` gets its wordmark while the rail is expanded. Collapsed there is no tile to draw it in, so the lockup is left out rather than drawn as an empty button that Tab would stop on.",
+      example: {
+        name: "Collapsed, title only",
+        props: {
+          logo: "",
+          expanded: false,
+        },
+      },
+    },
     {
       title: "Big counts in a 64px column",
       platforms: ["web", "desktop"],

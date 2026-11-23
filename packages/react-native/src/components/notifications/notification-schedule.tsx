@@ -176,7 +176,7 @@ export function NotificationSchedule({
             <Enter motion="fade" style={s.customRow}>
               <Field testID={testID} label={str("pauseUntilDate")} value={date} onValue={setDate} styles={styles} />
               <Field testID={testID} label={str("pauseUntilTime")} value={time} onValue={setTime} styles={styles} />
-              <Button label={str("pauseButton")} size="sm" variant="ink" onPress={() => pause(picker?.key ?? "custom", picker?.until ?? str("untilCustom", { date, time }))} />
+              <Button label={str("pauseButton")} size="sm" variant="ink" disabled={!picker?.until && (!date.trim() || !time.trim())} onPress={() => pause(picker?.key ?? "custom", picker?.until ?? str("untilCustom", { date, time }))} />
             </Enter>
           ) : null}
           {note || quietHours ? <View testID={partId(testID, "notification-schedule", "divider")} accessibilityElementsHidden importantForAccessibility="no" style={[s.divider, r.divider.view]} /> : null}
