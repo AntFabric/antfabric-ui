@@ -2222,6 +2222,9 @@ function parityIdOf(key: string) {
 }
 /** An entry of `accepted` is a component or screen id (every key of it may move) or one snapshot key (`bar-chart/mobile@mounted`: that key alone). */
 const parityAccepted = (key: string) => key in PARITY.accepted || parityIdOf(key) in PARITY.accepted;
+/** An entry `token:<path>` accepts that token leaf of `packages/core/tokens.json`, or every leaf under it when it names a group (`token:chart`). */
+const TOKEN_ACCEPT = "token:";
+const tokenAccepted = (path: string) => Object.keys(PARITY.accepted).some((k) => k.startsWith(TOKEN_ACCEPT) && (path === k.slice(TOKEN_ACCEPT.length) || path.startsWith(`${k.slice(TOKEN_ACCEPT.length)}.`)));
 
 const git = (...args: string[]) => spawnSync("git", args, { cwd: repoRoot(), encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
 const canon = (v: unknown): string => JSON.stringify(v, (_, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => a.localeCompare(b))) : x));
@@ -2255,7 +2258,7 @@ function checkParity() {
   // An accepted entry names a render the commit had (an id, or one of its keys), and says why. Prefer the key when only one moved.
   const ids = new Set(Object.keys(base.was).map(parityIdOf));
   for (const [id, why] of Object.entries(PARITY.accepted)) {
-    if (!ids.has(id) && !(id in base.was)) warn("reports/parity.json", `accepted: ${id} is neither an id nor a snapshot key the commit ${paritySha()} had`);
+    if (!id.startsWith(TOKEN_ACCEPT) && !ids.has(id) && !(id in base.was)) warn("reports/parity.json", `accepted: ${id} is neither an id nor a snapshot key the commit ${paritySha()} had`);
     if (!why.trim()) err("reports/parity.json", `accepted: ${id} has no reason`);
   }
 
@@ -2274,10 +2277,16 @@ function checkParity() {
   if (oldTokens.status !== 0) return warn(at, `${tokensFile} is not in ${paritySha()}: the token check is skipped`);
   const before = dtcgLeaves(JSON.parse(oldTokens.stdout));
   const after = dtcgLeaves(JSON.parse(readFileSync(join(repoRoot(), tokensFile), "utf8")));
+  for (const id of Object.keys(PARITY.accepted)) {
+    if (!id.startsWith(TOKEN_ACCEPT)) continue;
+    const want = id.slice(TOKEN_ACCEPT.length);
+    if (![...before.keys()].some((p) => p === want || p.startsWith(`${want}.`))) warn("reports/parity.json", `accepted: ${id} names no token leaf or group the commit ${paritySha()} had`);
+  }
   for (const [path, was] of before) {
+    if (tokenAccepted(path)) continue;
     const is = after.get(path);
     if (!is) err(tokensFile, `${path}: a token the parity commit ${paritySha()} had is gone`);
-    else if (canon(is.value) !== canon(was.value)) err(tokensFile, `${path}: $value changed since ${paritySha()} (${canon(was.value)} → ${canon(is.value)})`);
+    else if (canon(is.value) !== canon(was.value)) err(tokensFile, `${path}: $value changed since ${paritySha()} (${canon(was.value)} → ${canon(is.value)}); accept token:${path} in reports/parity.json if that is meant`);
     else if (canon(is.modes) !== canon(was.modes)) err(tokensFile, `${path}: $extensions modes changed since ${paritySha()} (${canon(was.modes)} → ${canon(is.modes)})`);
   }
 }

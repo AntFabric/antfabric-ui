@@ -1,5 +1,33 @@
 # @antfabric/ui-react-native
 
+## 1.1.0
+
+Fixes from the 1.0 component review (`reports/audit/2026-11-23-component-review.md`). Each batch notes what a consumer sees; the headings are folded into Fixed, Changed and Added before release.
+
+### Batch 1: controlled state
+
+### Batch 2: focus, Escape and IME
+
+### Batch 3: theme sanitiser
+
+### Batch 4: packaging and icons
+
+### Batch 5: data core
+
+### Batch 6: the app drives the state
+
+### Batch 7: announcements
+
+### Batch 8: focus hand-off
+
+### Batch 9: pass-through props
+
+### Batch 10: contrast and target size
+
+### Batch 11: React Native overlays
+
+### Batch 12: per-component fixes
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:
