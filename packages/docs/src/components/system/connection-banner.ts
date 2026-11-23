@@ -86,6 +86,7 @@ const docs: ComponentDocs = {
       "A change of state is spoken politely, never interrupting, and never as an alert: nothing here is an error. On the web the strip's message, the degraded note and \"Back online\" go through the page's own announcer when the state changes (a strip mounted holding its text is not read, and the way back would otherwise be silent). On the phone the card's title and message are spoken by the screen reader's announcement call, and the card is role=status.",
       "The pill is a labelled picture that stays on the page (role=img on the web); a change of its name is announced (not on first draw). Its label is a sentence (\"No connection to the backend\"), not the colour.",
       "The strip's spinner is hidden from assistive technology; the message says what is happening.",
+      "Try now is named by its words (WCAG 2.5.3: a voice user says what they see); \"Try reconnecting now\" is its description and tooltip.",
     ],
   },
   examples: [
