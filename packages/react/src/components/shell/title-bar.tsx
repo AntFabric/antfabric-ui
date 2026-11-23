@@ -188,7 +188,7 @@ export function TitleBar({
   ...rest
 }: TitleBarProps) {
   const s = useStrings("title-bar", strings);
-  const { os, glass: isGlass } = usePlatform();
+  const { os, glass: isGlass, shortcutOs } = usePlatform();
   // macOS moves the lights to the right and Windows its caption buttons to the left in a right-to-left tree: the insets follow them.
   const dir = useDirection();
   const r = useRecipe(recipes["title-bar"], { variants: { focused }, styles });
@@ -254,7 +254,7 @@ export function TitleBar({
             placeholder={placeholder}
             keys={searchKeys}
             label={searchName}
-            hint={s("searchHint", { placeholder, keys: formatShortcut(searchKeys, os) })}
+            hint={s("searchHint", { placeholder, keys: formatShortcut(searchKeys, shortcutOs) })}
             onPress={() => onSearch?.()}
             styles={styles}
           />

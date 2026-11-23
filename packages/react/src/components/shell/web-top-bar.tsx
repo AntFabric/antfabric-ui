@@ -138,7 +138,7 @@ export function WebTopBar({
   ...rest
 }: WebTopBarProps) {
   const s = useStrings("web-top-bar", strings);
-  const { os } = usePlatform();
+  const { shortcutOs } = usePlatform();
   const dir = useDirection();
   const r = useRecipe(recipes["web-top-bar"], { styles });
   const [open = false, setOpen] = useControllable(menuOpen, onMenuOpenChange);
@@ -218,7 +218,7 @@ export function WebTopBar({
               placeholder={placeholder}
               keys={searchKeys}
               label={searchName}
-              hint={s("searchHint", { placeholder, keys: formatShortcut(searchKeys, os) })}
+              hint={s("searchHint", { placeholder, keys: formatShortcut(searchKeys, shortcutOs) })}
               onPress={() => onSearch?.()}
               styles={styles}
             />

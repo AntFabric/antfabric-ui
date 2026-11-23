@@ -182,7 +182,7 @@ export function NavRail({
   ...rest
 }: NavRailProps) {
   const s = useStrings("nav-rail", strings);
-  const { os } = usePlatform();
+  const { shortcutOs } = usePlatform();
   const dir = useDirection();
   const open = expanded;
   const [current = "", setCurrent] = useControllable(active, onActiveChange);
@@ -204,7 +204,7 @@ export function NavRail({
   const rPill = useRecipe(recipes["nav-rail"], { state: { hover: pill.hovered, focus: pill.focused }, styles });
   const rSearch = useRecipe(recipes["nav-rail"], { state: { focus: search.focused }, styles });
   const rProfile = useRecipe(recipes["nav-rail"], { state: { hover: profile.hovered, focus: profile.focused }, styles });
-  const searchTitle = s("searchHint", { keys: formatShortcut(searchKeys, os) });
+  const searchTitle = s("searchHint", { keys: formatShortcut(searchKeys, shortcutOs) });
   const fade = enter("fade");
 
   const drills = variant === "drill-in";

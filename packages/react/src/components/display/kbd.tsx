@@ -65,7 +65,7 @@ export function ariaShortcut(keys: string, os: OS): string {
 }
 
 export function Kbd({ keys, tone = "default", part = "root", styles, strings, style, ...rest }: KbdProps) {
-  const { os } = usePlatform();
+  const { shortcutOs } = usePlatform();
   const s = useStrings("kbd", strings);
   // How each key is said, on a Mac and elsewhere: the accessible name is words, not glyphs.
   const said = useMemo<Record<string, [mac: string, other: string]>>(
@@ -96,8 +96,8 @@ export function Kbd({ keys, tone = "default", part = "root", styles, strings, st
   return (
     <kbd data-af-part={part} {...rootProps(rest)} style={css(root, partStyle(r, "root", tone === "bare" && BARE), style)}>
       {/* The glyphs are for eyes; the words are what a screen reader reads (a <kbd> has no role to carry a name). */}
-      <span aria-hidden style={css(text, { lineHeight: 1, whiteSpace: "nowrap" })}>{formatShortcut(keys, os)}</span>
-      <span style={visuallyHidden}>{spoken(keys, os, said)}</span>
+      <span aria-hidden style={css(text, { lineHeight: 1, whiteSpace: "nowrap" })}>{formatShortcut(keys, shortcutOs)}</span>
+      <span style={visuallyHidden}>{spoken(keys, shortcutOs, said)}</span>
     </kbd>
   );
 }

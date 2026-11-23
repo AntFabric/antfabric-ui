@@ -131,7 +131,7 @@ export function ListItem({
   ...rest
 }: ListItemProps) {
   const s = useStrings("list-item", strings);
-  const { os } = usePlatform();
+  const { shortcutOs } = usePlatform();
   const dir = useDirection();
   const ui = useInteraction({ disabled });
   const [on = false, setOn] = useControllable(selected, onSelectedChange);
@@ -156,7 +156,7 @@ export function ListItem({
       data-af-press
       role={role === "link" ? undefined : role}
       title={title}
-      aria-keyshortcuts={shortcut ? ariaShortcut(shortcut, os) : undefined}
+      aria-keyshortcuts={shortcut ? ariaShortcut(shortcut, shortcutOs) : undefined}
       aria-label={count > 0 ? s("withUnreadCount", { label: named, count }) : unread ? s("withUnread", { label: named }) : named}
       aria-current={on && role === "link" ? "page" : undefined}
       aria-checked={role === "checkbox" ? on : undefined}
