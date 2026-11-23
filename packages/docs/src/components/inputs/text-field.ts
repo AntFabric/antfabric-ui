@@ -64,7 +64,7 @@ const docs: ComponentDocs = {
     reveal: {
       type: "boolean",
       default: false,
-      description: "With type password: a Show / Hide button at the end of the field. On, the characters are shown until it is pressed again; its accessible name says Show password or Hide password, and aria-pressed says which.",
+      description: "With type password: a Show / Hide button at the end of the field. On, the characters are shown until it is pressed again; its accessible name follows the word it shows, Show password or Hide password, with no aria-pressed (the name says the state).",
     },
     helper: {
       type: "string",

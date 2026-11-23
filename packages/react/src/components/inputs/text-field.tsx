@@ -216,8 +216,9 @@ export function TextField({
             {revealing && (
               <Button
                 label={s(visible ? "hide" : "show")}
+                // The name follows the visible word (WCAG 2.5.3), so the state is in the name and there is no aria-pressed: never both
+                // ("Hide password, pressed").
                 aria-label={s(visible ? "hideLabel" : "showLabel")}
-                aria-pressed={visible}
                 variant="ghost"
                 size="sm"
                 disabled={disabled}
