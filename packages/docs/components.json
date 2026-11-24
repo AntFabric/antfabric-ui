@@ -5190,7 +5190,7 @@
                   "fg": "$color.text.onInverse",
                   "states": {
                     "hover": { "bg": "$color.background.brand.default", "fg": "$color.text.onBrand" },
-                    "pressed": { "bg": "$color.background.brand.pressed" }
+                    "pressed": { "bg": "$color.background.brand.pressed", "fg": "$color.text.onBrand" }
                   }
                 },
                 "danger": {
@@ -19241,7 +19241,7 @@
               "weight": "$font.weight.semibold"
             },
             "states": {
-              "on": { "bg": "$color.background.brand.soft", "fg": "$color.background.brand.pressed" },
+              "on": { "bg": "$color.background.brand.soft", "fg": "$color.text.brand" },
               "hover": { "bg": "$color.background.hover" },
               "hover+on": { "bg": "$color.background.brand.soft" },
               "focus": { "shadow": "$elevation.shadow.focus" }
@@ -19268,7 +19268,6 @@
         "tokens": [
           "border.width.hairline",
           "color.background.brand.default",
-          "color.background.brand.pressed",
           "color.background.brand.soft",
           "color.background.card",
           "color.background.chrome",
@@ -19277,6 +19276,7 @@
           "color.border.muted",
           "color.border.subtle",
           "color.text.body",
+          "color.text.brand",
           "color.text.faint",
           "color.text.onBrand",
           "color.text.strong",
@@ -20991,10 +20991,7 @@
               }
             }
           },
-          "actionText": {
-            "on": ["mobile"],
-            "base": { "size": "$font.size.bodySm", "fg": "$color.background.brand.pressed" }
-          },
+          "actionText": { "on": ["mobile"], "base": { "size": "$font.size.bodySm", "fg": "$color.text.brand" } },
           "replyField": {
             "on": ["desktop", "mobile"],
             "base": {
@@ -21058,7 +21055,7 @@
                   "square": "$osNotification.winSendSize",
                   "radius": "$osNotification.controlRadius",
                   "bg": "transparent",
-                  "fg": "$color.background.brand.pressed"
+                  "fg": "$color.text.brand"
                 },
                 "states": { "hover": { "bg": "$color.background.hover" } }
               },
@@ -21068,7 +21065,7 @@
                   "square": "none",
                   "radius": "$radius.circle",
                   "bg": "transparent",
-                  "fg": "$color.background.brand.pressed"
+                  "fg": "$color.text.brand"
                 }
               }
             }
@@ -21136,7 +21133,6 @@
           "border.width.hairline",
           "color.background.brand.default",
           "color.background.brand.hover",
-          "color.background.brand.pressed",
           "color.background.card",
           "color.background.hover",
           "color.background.muted",
@@ -21148,6 +21144,7 @@
           "color.border.strong",
           "color.border.subtle",
           "color.text.body",
+          "color.text.brand",
           "color.text.danger",
           "color.text.faint",
           "color.text.info",

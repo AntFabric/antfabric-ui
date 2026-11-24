@@ -35,7 +35,7 @@ export const navRail = defineRecipe({
     row: {
       base: { square: "$navRail.itemSize", radius: "$radius.pill", fg: "$color.text.faint", size: "$font.size.body", weight: "$font.weight.semibold" },
       // `on` is the current destination: the coral-soft pill, which hovering keeps.
-      states: { on: { bg: "$color.background.brand.soft", fg: "$color.background.brand.pressed" }, hover: { bg: "$color.background.hover" }, "hover+on": { bg: "$color.background.brand.soft" }, focus: { shadow: "$elevation.shadow.focus" } },
+      states: { on: { bg: "$color.background.brand.soft", fg: "$color.text.brand" }, hover: { bg: "$color.background.hover" }, "hover+on": { bg: "$color.background.brand.soft" }, focus: { shadow: "$elevation.shadow.focus" } },
     },
     icon: { base: { square: "$size.icon.lg" } },
     separator: { base: { height: "$border.width.hairline", bg: "$color.border.subtle" } },

@@ -271,6 +271,7 @@
     "color.border.subtle": "color semantic",
     "color.border.warning": "color semantic",
     "color.text.body": "color semantic",
+    "color.text.brand": "color semantic",
     "color.text.danger": "color semantic",
     "color.text.dangerHover": "color semantic",
     "color.text.data.onAccentSoft": "color semantic",

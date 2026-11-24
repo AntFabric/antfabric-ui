@@ -27,7 +27,7 @@ export const button = defineRecipe({
           ghost: { bg: "transparent", fg: "$color.text.body", states: { hover: { bg: "$color.background.hover" }, pressed: { bg: "$color.background.selected" } } },
           soft: { bg: "$color.background.brand.soft", fg: "$color.text.onBrandSoft", states: { hover: { bg: "$color.background.brand.softHover" }, pressed: { bg: "$color.background.brand.softHover" } } },
           // Ink turns coral on hover and one step deeper (brand.active) while pressed, like primary (owner decision, 2026-11-03).
-          ink: { bg: "$color.background.inverse", fg: "$color.text.onInverse", states: { hover: { bg: "$color.background.brand.default", fg: "$color.text.onBrand" }, pressed: { bg: "$color.background.brand.pressed" } } },
+          ink: { bg: "$color.background.inverse", fg: "$color.text.onInverse", states: { hover: { bg: "$color.background.brand.default", fg: "$color.text.onBrand" }, pressed: { bg: "$color.background.brand.pressed", fg: "$color.text.onBrand" } } },
           danger: { bg: "$color.background.danger.default", fg: "$color.text.onDanger", states: { hover: { bg: "$color.background.danger.hover" }, pressed: { bg: "$color.background.danger.hover" } } },
         },
       },

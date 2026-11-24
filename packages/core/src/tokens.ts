@@ -584,8 +584,8 @@ export const tokenSource = {
           brand: {
             tint: "#fde8e8",
             default: "{primitives.color.coral.500}",
-            hover: "{primitives.color.coral.600}",
-            pressed: "{primitives.color.coral.700}",
+            hover: "{primitives.color.coral.400}",
+            pressed: "{primitives.color.coral.300}",
             soft: "{primitives.color.coral.50}",
             softHover: "{primitives.color.coral.100}",
           },
@@ -667,7 +667,7 @@ export const tokenSource = {
           selected: "{primitives.color.border-alpha.default}",
           brand: "{primitives.color.coral.200}",
           inverse: "rgba(255,255,255,.18)",
-          focus: "{primitives.color.neutral-alpha.halo}",
+          focus: "{primitives.other.ash-450}",
         },
         text: {
           success: "{primitives.color.success.aa}",
@@ -694,6 +694,7 @@ export const tokenSource = {
           onInverse: "{primitives.color.neutral.50}",
           onBrandSoft: "{primitives.color.coral.800}",
           link: "{primitives.color.coral.700}",
+          brand: "{primitives.color.coral.700}",
           data: {
             onAccentSoft: "#0057c2",
             onPositive: "#067647",
@@ -736,7 +737,7 @@ export const tokenSource = {
           menu: "0 1px 2px rgba(14,24,40,.06), 0 8px 24px rgba(14,24,40,.08)",
           modal: "0 1px 3px rgba(14,24,40,.06), 0 16px 40px rgba(14,24,40,.08)",
           tooltip: "0 1px 2px rgba(14,24,40,.06), 0 4px 12px rgba(14,24,40,.08)",
-          focus: "0 0 0 3px rgba(14,24,40,.16)",
+          focus: "0 0 0 1px #ffffff, 0 0 0 3px #6b6b6b",
           glass: "inset 0 1px 0.5px rgba(255,255,255,.9), inset 0 -0.5px 0.5px rgba(255,255,255,.4), inset 0 0 0 0.5px rgba(255,255,255,.55), 0 0 0 0.5px rgba(14,24,40,.08), 0 8px 28px rgba(14,24,40,.14)",
           glassContrast: "inset 0 0 0 1px rgba(14,24,40,.42), 0 8px 28px rgba(14,24,40,.16)",
         },
@@ -790,7 +791,7 @@ export const tokenSource = {
           brand: {
             tint: "#382525",
             default: "{primitives.color.coral.500}",
-            hover: "{primitives.color.coral.600}",
+            hover: "{primitives.color.coral.400}",
             pressed: "#ffb8ab",
             soft: "{primitives.color.charcoal-coral.soft}",
             softHover: "{primitives.color.charcoal-coral-soft.hover}",
@@ -873,7 +874,7 @@ export const tokenSource = {
           selected: "{primitives.color.charcoal.550}",
           brand: "{primitives.color.coral.800}",
           inverse: "{primitives.color.charcoal-950-alpha.16}",
-          focus: "{primitives.color.shade.halo}",
+          focus: "{primitives.color.charcoal.400}",
         },
         text: {
           success: "#85d3af",
@@ -900,6 +901,7 @@ export const tokenSource = {
           onInverse: "{primitives.color.charcoal.950}",
           onBrandSoft: "{primitives.color.coral.100}",
           link: "{primitives.color.coral.300}",
+          brand: "#ffb8ab",
           data: {
             onAccentSoft: "#9cc7ff",
             onPositive: "#75e0a7",
@@ -942,7 +944,7 @@ export const tokenSource = {
           menu: "0 1px 2px rgba(0,0,0,.28), 0 8px 24px rgba(0,0,0,.36)",
           modal: "0 1px 3px rgba(0,0,0,.28), 0 16px 40px rgba(0,0,0,.36)",
           tooltip: "0 1px 2px rgba(0,0,0,.28), 0 4px 12px rgba(0,0,0,.36)",
-          focus: "0 0 0 3px rgba(255,255,255,.22)",
+          focus: "0 0 0 1px #161618, 0 0 0 3px #a1a1a9",
           glass: "inset 0 1px 0.5px rgba(255,255,255,.24), inset 0 0 0 0.5px rgba(255,255,255,.14), 0 10px 30px rgba(0,0,0,.42)",
           glassContrast: "inset 0 0 0 1px rgba(255,255,255,.55), 0 10px 30px rgba(0,0,0,.45)",
         },

@@ -2629,5 +2629,9 @@
   "zIndex.tooltip": {
     "source": "unmapped",
     "note": "no z-index scale in the product's tokens.json"
+  },
+  "color.text.brand": {
+    "source": "unmapped",
+    "note": "ours (24 November 2026): the brand's colour as text, split from color.background.brand.pressed, which the nav rail and a notification's action read as text; the pressed fill then lightened so the ink on it passes 4.5:1"
   }
 }

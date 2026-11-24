@@ -163,7 +163,7 @@ export const osNotification = defineRecipe({
         mobile: { base: { height: "$osNotification.iosControlH", radius: "$osNotification.iosActionRadius", bg: "transparent" } },
       },
     },
-    actionText: { on: ["mobile"], base: { size: "$font.size.bodySm", fg: "$color.background.brand.pressed" } },
+    actionText: { on: ["mobile"], base: { size: "$font.size.bodySm", fg: "$color.text.brand" } },
     replyField: {
       on: ["desktop", "mobile"],
       base: { height: "$osNotification.fieldH", radius: "$osNotification.macActionRadius", paddingX: "$space.smMd", bg: "$color.background.card", borderWidth: "$border.width.hairline", borderColor: "$color.border.muted", size: "$font.size.bodySm", fg: "$color.text.strong" },
@@ -179,9 +179,9 @@ export const osNotification = defineRecipe({
       base: { square: "$osNotification.sendSize", bg: "$color.background.brand.default", fg: "$color.text.onBrand" },
       states: { hover: { bg: "$color.background.brand.hover" }, focus: { shadow: "$elevation.shadow.focus" }, disabled: { opacity: "$opacity.disabled" } },
       platforms: {
-        windows: { base: { square: "$osNotification.winSendSize", radius: "$osNotification.controlRadius", bg: "transparent", fg: "$color.background.brand.pressed" }, states: { hover: { bg: "$color.background.hover" } } },
+        windows: { base: { square: "$osNotification.winSendSize", radius: "$osNotification.controlRadius", bg: "transparent", fg: "$color.text.brand" }, states: { hover: { bg: "$color.background.hover" } } },
         ios: { base: { square: "none", radius: "$radius.circle" } },
-        android: { base: { square: "none", radius: "$radius.circle", bg: "transparent", fg: "$color.background.brand.pressed" } },
+        android: { base: { square: "none", radius: "$radius.circle", bg: "transparent", fg: "$color.text.brand" } },
       },
     },
     statusIcon: { on: ["desktop", "mobile"], base: { fg: "$color.text.danger" } },

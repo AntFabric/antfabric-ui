@@ -40,6 +40,14 @@ Two role words changed with the move: `brand.active` is `color.background.brand.
 
 A theme's id (`data-af-theme-id`) does not change, so stored themes and cached theme sheets stay valid.
 
+### What draws differently
+
+Three accessibility fixes change AntFabric's own look in three states (`neutral` and your own themes keep the values they set):
+
+- **Hover and pressed on a brand fill are lighter**, so the ink on them holds 4.5:1. If you set `color.background.brand.pressed` because you used it as a text colour, set `color.text.brand` instead: that is what the nav rail and notification actions read now.
+- **The focus ring is a solid grey with a 1px gap**, which holds 3:1, in place of the translucent halo.
+- **A tenant brand's hover and pressed fills** lighten under ink text (they used to darken); under white text they darken, in dark as well.
+
 ### Fourteen tokens now follow the role they always equalled
 
 `chart.gridColor` is an alias of `color.border.subtle`, `color.text.placeholder` of `color.text.faint`, and twelve more (each package's changelog has the list). A theme that sets the role now moves the alias. A theme of yours that sets one of those roles and wants the chart or table to stay as it was sets the alias too. AntFabric and `neutral` draw exactly what they drew.

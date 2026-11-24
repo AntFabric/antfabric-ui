@@ -65,6 +65,7 @@ export const BRAND_PATHS = [
   "color.background.accent.soft",
   "color.text.onBrandSoft",
   "color.text.onBrand",
+  "color.text.brand",
   "color.text.link",
   "color.border.brand",
   "color.background.unread",
@@ -196,9 +197,9 @@ export function onBrandFor(fill: RGB): string {
  *  - `color.background.accent.soft`       14% / 22% of `accent`                          :193
  *  - `color.text.onBrand`        white or ink by contrast on `primary` (`onBrandFor`); the product's is always white
  * The product has no hover, pressed, link or brand-border token (its phone presses with opacity), so
- * those are this repository's: `color.background.brand.hover` is `primary` 10% toward black, `color.background.brand.pressed` 25% toward
- * black on light and 60% toward white on dark (the default coral goes the same way: #c02616 and
- * #ffb8ab), `color.text.link` is the pressed colour on light and 35% toward white on dark, and
+ * those are this repository's: `color.background.brand.hover` and `color.background.brand.pressed` move away from the text drawn on them (10% and
+ * 25% toward black under white text, 15% and 35% toward white under ink), `color.text.brand` is `primary` 25% toward black on light and
+ * 60% toward white on dark (the default coral's are #c02616 and #ffb8ab), `color.text.link` is that colour on light and 35% toward white on dark, and
  * `color.border.brand` is 60% toward white on light and 40% toward black on dark.
  *
  * A hand-picked `soft`, `softHover`, `onSoft` or `tint` replaces its derived value.
@@ -213,8 +214,12 @@ export function brandValues(brand: Partial<BrandTokens>, theme: Scheme, target: 
     const p = parse(brand.primary, "primary");
     const active = dark ? mix(p, WHITE, 0.6) : mix(p, BLACK, 0.25);
     out["color.background.brand.default"] = hex(p);
-    out["color.background.brand.hover"] = hex(mix(p, BLACK, 0.1));
-    out["color.background.brand.pressed"] = hex(active);
+    // The hover and pressed fills move away from the text drawn on them (`color.text.onBrand`), so that text keeps its contrast: darker
+    // under white text, lighter under ink. The brand as text (`color.text.brand`) is the colour the pressed fill used to be.
+    const white = onBrandFor(p) === "#ffffff";
+    out["color.background.brand.hover"] = hex(white ? mix(p, BLACK, 0.1) : mix(p, WHITE, 0.15));
+    out["color.background.brand.pressed"] = hex(white ? mix(p, BLACK, 0.25) : mix(p, WHITE, 0.35));
+    out["color.text.brand"] = hex(active);
     out["color.background.brand.soft"] = alpha(p, dark ? 0.22 : 0.12);
     out["color.background.brand.softHover"] = alpha(p, dark ? 0.32 : 0.2);
     out["color.text.onBrandSoft"] = hex(p);

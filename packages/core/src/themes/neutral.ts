@@ -131,6 +131,7 @@ export const neutralInput: ThemeInput = {
             onInverse: "#fafafa",
             onBrandSoft: "#18181b",
             link: "#18181b",
+            brand: "#3f3f46",
             tag: {
               neutral: "#52525b",
               brand: "#fafafa",
@@ -247,6 +248,7 @@ export const neutralInput: ThemeInput = {
             onInverse: "#18181b",
             onBrandSoft: "#fafafa",
             link: "#fafafa",
+            brand: "#d4d4d8",
             tag: {
               neutral: "#d4d4d8",
               brand: "#18181b",
