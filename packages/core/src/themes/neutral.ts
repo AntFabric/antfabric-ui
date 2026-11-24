@@ -63,7 +63,7 @@ export const neutralInput: ThemeInput = {
         chart: {
           // The chart neutrals and the table's divider are aliases of the kit's roles (`chart.gridColor` is `color.border.subtle`), and would follow
           // this theme's zinc. They are held at the values this preset has always drawn, so adding the aliases changed nothing here; letting
-          // them follow is the owner's call.
+          // them follow was considered and declined by the owner (24 November 2026): they stay as they are.
           gridColor: "#e7e7e7",
           axisColor: "#0e1828",
           labelColor: "#6b6b6b",
@@ -182,7 +182,7 @@ export const neutralInput: ThemeInput = {
         chart: {
           // The chart neutrals and the table's divider are aliases of the kit's roles (`chart.gridColor` is `color.border.subtle`), and would follow
           // this theme's zinc. They are held at the values this preset has always drawn, so adding the aliases changed nothing here; letting
-          // them follow is the owner's call.
+          // them follow was considered and declined by the owner (24 November 2026): they stay as they are.
           gridColor: "#2c2c2f",
           axisColor: "#e4e4e7",
           labelColor: "#909098",
