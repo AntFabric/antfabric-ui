@@ -28,11 +28,11 @@ export interface IconProps {
  */
 export function Icon({ name, size, color, strokeWidth, testID, style }: IconProps) {
   const { t } = useTheme();
-  const s = size ?? t.icon.size;
+  const s = size ?? t.size.icon.default;
   const Glyph = (typeof name === "string" ? iconFor(name) : name) as Glyph | null;
   if (!Glyph) return <View testID={`missing-icon:${name as string}`} style={[{ width: s, height: s }, style]} />;
   // In the catalogue (React Native Web) the glyph is a DOM <svg>, which takes `data-testid` and rejects `testID`.
-  return <Glyph size={s} color={color ?? t.fg.body} strokeWidth={strokeWidth ?? t.icon.stroke} style={style} {...(Platform.OS === "web" ? { "data-testid": testID } : { testID })} />;
+  return <Glyph size={s} color={color ?? t.color.text.body} strokeWidth={strokeWidth ?? t.size.stroke.default} style={style} {...(Platform.OS === "web" ? { "data-testid": testID } : { testID })} />;
 }
 
 /**
@@ -41,11 +41,11 @@ export function Icon({ name, size, color, strokeWidth, testID, style }: IconProp
  */
 export function Spinner({ size, color, label = "Loading", decorative = false, testID, style }: { size?: number; color?: string; label?: string; decorative?: boolean; testID?: string; style?: ViewStyle }) {
   const { t } = useTheme();
-  const s = size ?? t.icon.size;
+  const s = size ?? t.size.icon.default;
   const a11y = decorative ? { accessible: false, importantForAccessibility: "no-hide-descendants" as const } : { accessibilityRole: "progressbar" as const, accessibilityLabel: label };
   return (
     <View {...a11y} testID={testID} style={[{ width: s, height: s, alignItems: "center", justifyContent: "center" }, style]}>
-      <ActivityIndicator size="small" color={color ?? t.fg.muted} style={s < 20 ? { transform: [{ scale: s / 20 }] } : undefined} />
+      <ActivityIndicator size="small" color={color ?? t.color.text.muted} style={s < 20 ? { transform: [{ scale: s / 20 }] } : undefined} />
     </View>
   );
 }

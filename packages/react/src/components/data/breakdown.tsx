@@ -102,7 +102,7 @@ function Part({ part, value, share, color, active, picked, onPick, onHot, styles
           ui.handlers.onBlur();
           onHot(false);
         }}
-        style={css(pressable, partStyle(r, "part", { display: "grid", gridTemplateColumns: `${t.space.smMd} 1fr`, alignItems: "center", alignSelf: "stretch", marginInline: neg(t.space.sm), textAlign: "left", fontFamily: tk.chart.font, transition: `background-color ${t.duration.base} ${t.ease.out}`, columnGap: t.space.sm }))}
+        style={css(pressable, partStyle(r, "part", { display: "grid", gridTemplateColumns: `${t.space.smMd} 1fr`, alignItems: "center", alignSelf: "stretch", marginInline: neg(t.space.sm), textAlign: "left", fontFamily: tk.chart.font, transition: `background-color ${t.motion.duration.base} ${t.motion.easing.out}`, columnGap: t.space.sm }))}
       >
         <span aria-hidden data-af-part="swatch" style={partStyle(r, "swatch", { background: color })} />
         <span data-af-part="label" style={css(text, { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }, r.label)}>{part.label}</span>
@@ -169,7 +169,7 @@ export function Breakdown({ data, name, value, title, subtitle = "", format = "i
                     onPointerEnter={() => setHot(i)}
                     onPointerLeave={() => setHot((h) => (h === i ? null : h))}
                     onClick={() => pick(i)}
-                    style={partStyle(r, "segment", { flex: `${p.value} 0 0`, cursor: "pointer", background: colors[i], opacity: at === null || at === i ? 1 : DIMMED, transition: `opacity ${t.duration.base} ${t.ease.out}` }, radii(k === 0, k === drawn.length - 1))}
+                    style={partStyle(r, "segment", { flex: `${p.value} 0 0`, cursor: "pointer", background: colors[i], opacity: at === null || at === i ? 1 : DIMMED, transition: `opacity ${t.motion.duration.base} ${t.motion.easing.out}` }, radii(k === 0, k === drawn.length - 1))}
                   />
                 ))
               ) : (
@@ -177,7 +177,7 @@ export function Breakdown({ data, name, value, title, subtitle = "", format = "i
                 <span data-af-part="segment" style={partStyle(r, "segment", { flex: 1, background: tk.chart.track }, radii(true, true))} />
               )}
             </div>
-            <ul data-af-part="list" aria-label={str("parts")} style={css({ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${t.chart.partMinW}, 1fr))`, columnGap: t.space.lg, listStyle: "none", margin: 0, padding: 0 }, r.list)}>
+            <ul data-af-part="list" aria-label={str("parts")} style={css({ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${t.chart.partMinWidth}, 1fr))`, columnGap: t.space.lg, listStyle: "none", margin: 0, padding: 0 }, r.list)}>
               {parts.map((p, i) => (
                 <Part key={p.key} part={p} value={fmt(format, p.value, formatWords, locale)} share={fmt(WHOLE, shareOf(p.value, total), formatWords, locale)} color={colors[i]!} active={at === i} picked={pickedAt === i} onPick={() => pick(i)} onHot={(isHot) => setHot((h) => (isHot ? i : h === i ? null : h))} styles={styles} strings={strings} />
               ))}

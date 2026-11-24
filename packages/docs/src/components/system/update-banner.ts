@@ -402,7 +402,7 @@ const docs: ComponentDocs = {
               padding: 12,
               justify: "flex-end",
               align: "flex-start",
-              bg: "$surface.recessed",
+              bg: "$color.background.recessed",
               radius: "$radius.card",
             },
             children: [
@@ -431,7 +431,7 @@ const docs: ComponentDocs = {
               padding: 12,
               justify: "flex-end",
               align: "flex-start",
-              bg: "$surface.recessed",
+              bg: "$color.background.recessed",
               radius: "$radius.card",
             },
             children: [
@@ -474,7 +474,7 @@ const docs: ComponentDocs = {
               padding: 12,
               justify: "flex-end",
               align: "flex-start",
-              bg: "$surface.recessed",
+              bg: "$color.background.recessed",
               radius: "$radius.card",
             },
             children: [
@@ -516,7 +516,7 @@ const docs: ComponentDocs = {
               padding: 12,
               justify: "flex-end",
               align: "flex-start",
-              bg: "$surface.recessed",
+              bg: "$color.background.recessed",
               radius: "$radius.card",
             },
             children: [
@@ -559,7 +559,7 @@ const docs: ComponentDocs = {
               padding: 12,
               justify: "flex-end",
               align: "flex-start",
-              bg: "$surface.recessed",
+              bg: "$color.background.recessed",
               radius: "$radius.card",
             },
             children: [
@@ -602,7 +602,7 @@ const docs: ComponentDocs = {
               padding: 12,
               justify: "flex-end",
               align: "flex-start",
-              bg: "$surface.recessed",
+              bg: "$color.background.recessed",
               radius: "$radius.card",
             },
             children: [
@@ -644,7 +644,7 @@ const docs: ComponentDocs = {
               padding: 12,
               justify: "flex-end",
               align: "flex-start",
-              bg: "$surface.recessed",
+              bg: "$color.background.recessed",
               radius: "$radius.card",
             },
             children: [
@@ -671,8 +671,8 @@ const docs: ComponentDocs = {
               width: 560,
               height: 260,
               paddingTop: 24,
-              bg: "$surface.card",
-              border: "1px solid $border.subtle",
+              bg: "$color.background.card",
+              border: "1px solid $color.border.subtle",
               radius: "$radius.card",
             },
             children: [
@@ -701,8 +701,8 @@ const docs: ComponentDocs = {
               width: 560,
               height: 260,
               paddingTop: 24,
-              bg: "$surface.card",
-              border: "1px solid $border.subtle",
+              bg: "$color.background.card",
+              border: "1px solid $color.border.subtle",
               radius: "$radius.card",
             },
             children: [
@@ -744,8 +744,8 @@ const docs: ComponentDocs = {
               width: 560,
               height: 260,
               paddingTop: 24,
-              bg: "$surface.card",
-              border: "1px solid $border.subtle",
+              bg: "$color.background.card",
+              border: "1px solid $color.border.subtle",
               radius: "$radius.card",
             },
             children: [
@@ -786,8 +786,8 @@ const docs: ComponentDocs = {
               width: 560,
               height: 260,
               paddingTop: 24,
-              bg: "$surface.card",
-              border: "1px solid $border.subtle",
+              bg: "$color.background.card",
+              border: "1px solid $color.border.subtle",
               radius: "$radius.card",
             },
             children: [

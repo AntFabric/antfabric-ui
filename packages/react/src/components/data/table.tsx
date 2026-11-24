@@ -96,7 +96,7 @@ export interface TableProps extends RootProps<HTMLDivElement> {
   emptyLine?: string;
   /** Shorter rows: 36px, for a table that is mostly data. */
   dense?: boolean;
-  /** When the table's own box is narrower than `table.cardsBelow` (600px): `scroll` keeps the grid and scrolls it sideways, `cards` draws the phone's card per row (the title column, its badge and actions, then a label and value line for each other column) with a sort bar above. Measured on the table's box, not the window. */
+  /** When the table's own box is narrower than `table.cardsBreakpoint` (600px): `scroll` keeps the grid and scrolls it sideways, `cards` draws the phone's card per row (the title column, its badge and actions, then a label and value line for each other column) with a sort bar above. Measured on the table's box, not the window. */
   narrow?: TableNarrow;
   /** What the table is: its caption, and the scroll region's accessible name. */
   label: string;
@@ -173,7 +173,7 @@ function Content({ column, emphasis, children }: { column: TableColumn; emphasis
 function RowLink({ children, onPress }: { children: ReactNode; onPress: () => void }) {
   const ui = useInteraction();
   return (
-    <button type="button" data-af-press onClick={() => onPress()} {...ui.handlers} style={css(pressable, { alignItems: "flex-start", textAlign: "inherit", borderRadius: t.radius.row }, ui.focused && { boxShadow: t.shadow.focus })}>
+    <button type="button" data-af-press onClick={() => onPress()} {...ui.handlers} style={css(pressable, { alignItems: "flex-start", textAlign: "inherit", borderRadius: t.radius.row }, ui.focused && { boxShadow: t.elevation.shadow.focus })}>
       {children}
     </button>
   );
@@ -460,12 +460,12 @@ export function Table({ columns, rows, rowKey = "key", sort, onSortChange, selec
       body = (
         <div data-af-part="cards" role="list" aria-label={label} aria-busy style={css(box, r.cards)}>
           {Array.from({ length: pageSize > 0 ? Math.min(pageSize, 3) : 3 }, (_, i) => {
-            const titleLine = <Skeleton shape="line" width={t.table.loadCardL} height={t.table.loadH} label={s("loadingLines", { label })} />;
+            const titleLine = <Skeleton shape="line" width={t.table.loadCardWidthLg} height={t.table.loadHeight} label={s("loadingLines", { label })} />;
             return (
               <div key={i} role="listitem" data-af-part="card" style={css(box, r.card)}>
                 {i === 0 ? titleLine : <span aria-hidden>{titleLine}</span>}
                 <span aria-hidden>
-                  <Skeleton shape="line" width={t.table.loadCardS} height={t.table.loadH} label={s("loadingLines", { label })} />
+                  <Skeleton shape="line" width={t.table.loadCardWidthSm} height={t.table.loadHeight} label={s("loadingLines", { label })} />
                 </span>
               </div>
             );
@@ -555,7 +555,7 @@ export function Table({ columns, rows, rowKey = "key", sort, onSortChange, selec
                     {selectable ? <td data-af-part="checkCell" style={css(cellBox, r.checkCell)} /> : null}
                     {columns.map((c, j) => {
                       const first = i === 0 && j === 0;
-                      const line = <Skeleton shape="line" width={[t.table.loadS, t.table.loadM, t.table.loadL][(i + j) % 3]} height={t.table.loadH} label={s("loadingLines", { label })} />;
+                      const line = <Skeleton shape="line" width={[t.table.loadWidthSm, t.table.loadWidthMd, t.table.loadWidthLg][(i + j) % 3]} height={t.table.loadHeight} label={s("loadingLines", { label })} />;
                       return (
                         <td key={c.key} data-af-part="cell" style={css(cellBox, r.cell)}>
                           <Content column={c}>{first ? line : <span aria-hidden>{line}</span>}</Content>

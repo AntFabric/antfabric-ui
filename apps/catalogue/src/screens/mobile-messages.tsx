@@ -17,7 +17,7 @@ export default function MobileMessages() {
   // One filter at a time, so the chips are held here rather than each keeping its own.
   const [filter, setFilter] = useState("All");
   return (
-    <View style={{ flex: 1, position: "relative", backgroundColor: t.surface.app }}>
+    <View style={{ flex: 1, position: "relative", backgroundColor: t.color.background.app }}>
       <MobileHeader variant="main" title="Messages" statusBar={false} userName="Priya Raman" actions={[{ key: "notifications", icon: "bell", label: "Notifications", badge: 3 }]} />
 
       <View style={{ flexDirection: "row", gap: t.space.sm, paddingHorizontal: t.space.lg, paddingVertical: t.space.sm, overflow: "hidden" }}>

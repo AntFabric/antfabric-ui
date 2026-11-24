@@ -5,7 +5,7 @@ import BrandPreview from "../islands/BrandPreview";
 import TokenTable from "../components/TokenTable.astro";
 import { defaultsFor, OS_VERSIONS, PLATFORM_META, PLATFORMS, registry, usedIds, type OS, type Platform } from "../lib/library";
 import { slug } from "../lib/search";
-import { groups, refCount, rowCount, valueOf } from "../lib/token-ref";
+import { groups, internalCount, refCount, rowCount, valueOf } from "../lib/token-ref";
 import { BRAND_PATHS, kebab, MOTION, tokens } from "@antfabric/ui-core";
 import { BRAND_SAMPLE, SAMPLE_TENANT } from "../lib/brand";
 
@@ -25,7 +25,7 @@ const refs = refCount();
 const profileNote = (p: Platform) => String((tokens.profiles[p] as { $description?: string }).$description ?? "");
 const caption = (section: string, g: string) => `${section}: ${g}`;
 const TOPICS = ["Colour", "Tenant branding", "Type", "Space", "Radius", "Size", "Components", "Data", "Elevation", "Motion", "Layers and opacity", "Materials: Liquid Glass and blur"];
-const textRoles = groups("type")[0]!.rows.filter((r) => !r.path.endsWith("Line")).map((r) => r.path.slice("text.".length));
+const textRoles = groups("type").find((g) => g.name === "font.size")!.rows.map((r) => r.path.slice("font.size.".length));
 const brandIds = BRAND_SAMPLE.map((s) => s.id);
 const brandUse = `import { defineTheme, themes } from "@antfabric/ui-core";
 
@@ -42,9 +42,9 @@ export const antagents = defineTheme({
 // Web and desktop: the root takes it, and writes its scoped sheet and data-af-theme-id
 <AntFabricRoot theme={antagents}>…</AntFabricRoot>`;
 // Data: the palette and the status colours as swatches in each theme, the plot's geometry per platform as marks; the tables below carry every token.
-const SERIES = Array.from({ length: 8 }, (_, i) => `chart.series${i + 1}`);
+const SERIES = Array.from({ length: 8 }, (_, i) => `chart.series${i + 1}Color`);
 const STATUS = [["accent", "onAccentSoft"], ["positive", "onPositive"], ["negative", "onNegative"], ["warning", "onWarning"]] as const;
-const THEME_OF = (t: "light" | "dark") => ({ card: valueOf("surface.card", "desktop", t), border: valueOf("border.subtle", "desktop", t), ink: valueOf("fg.strong", "desktop", t), muted: valueOf("fg.muted", "desktop", t) });
+const THEME_OF = (t: "light" | "dark") => ({ card: valueOf("color.background.card", "desktop", t), border: valueOf("color.border.subtle", "desktop", t), ink: valueOf("color.text.strong", "desktop", t), muted: valueOf("color.text.muted", "desktop", t) });
 const dataTitles: Record<string, [title: string, note: string]> = {
   "chart-theme": ["Chart colours", "The eight series and the neutrals a chart draws with. The series are a palette of their own, after the reference dashboard (blue, orange, purple, teal first); the neutrals are the kit's, so a chart follows the theme."],
   "data-theme": ["Data status colours", "A fill, a soft wash and the ink that reads on it, for each of the data components' four meanings. These are not brand, success, danger or warning: no data component reads those."],
@@ -64,6 +64,7 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
     <h1>Foundations</h1>
     <p class="lede">
       The {count} design tokens every component reads, one row each: its name, its CSS variable, its value in each mode, and what it is for.
+      {internalCount()} more are internal and not listed: one component's private geometry (an offset, a loading placeholder's width) and the pictures of OS chrome. They resolve and can be themed like any other; <code class="mono">pnpm describe tokens --internal</code> lists them.
       The same tokens are a W3C Design Tokens file at <a href="/tokens.json"><code class="mono">/tokens.json</code></a>.
       The values live in <code class="mono">packages/core/src/tokens.ts</code> and each row's description in <code class="mono">packages/core/src/descriptions.ts</code>.
     </p>
@@ -75,13 +76,13 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
   <section class="section">
     <h2 id={slug("How tokens are named")}>How tokens are named</h2>
     <p class="sub">
-      A token's <b>name</b> is its path in <code class="mono">tokens.ts</code>, like <code class="mono">fg.muted</code>. The React kit reads it as <code class="mono">t.fg.muted</code>, a CSS variable.
-      The <b>variable</b> is <code class="mono">--af-</code> and the path with dots as hyphens and every capital split: <code class="mono">fg.onBrand</code> is <code class="mono">--af-fg-on-brand</code>, <code class="mono">control.hMd</code> is <code class="mono">--af-control-h-md</code>.
+      A token's <b>name</b> is its path in <code class="mono">tokens.ts</code>, like <code class="mono">fg.muted</code>. The React kit reads it as <code class="mono">t.color.text.muted</code>, a CSS variable.
+      The <b>variable</b> is <code class="mono">--af-</code> and the path with dots as hyphens and every capital split: <code class="mono">fg.onBrand</code> is <code class="mono">--af-color-text-on-brand</code>, <code class="mono">control.hMd</code> is <code class="mono">--af-size-control-md</code>.
       The copy button on a row copies the variable.
     </p>
     <ul class="how">
       <li><b>Modes.</b> Colours and shadows switch by theme, so they have a Light and a Dark value on every platform. Sizes and type switch by platform, so they have a Web, Desktop and Mobile value; a token only one platform reads (the phone's font files) has just that one, and where an OS changes a platform's value (Android's switch) a line under it says so. A scale has one value; where the phone has its own, a line under the value says so.</li>
-      <li><b>Highlighted rows</b> have a value that differs between platforms. The web profile is a proposal: there is no AntFabric web app to copy values from yet.</li>
+      <li><b>Highlighted rows</b> have a value that differs between platforms. The web profile's values are this library's own, confirmed by design: there is no AntFabric web app to copy values from yet.</li>
       <li><b>Aliases.</b> A value with an arrow, like <code class="mono">→ {"{primitives.color.neutral.900}"}</code>, is a token that points at another one; the value beside it is what it resolves to.{refs === 0 ? " No token is an alias yet." : ` ${refs} tokens are aliases.`}</li>
       <li><b>Descriptions</b> say when to use a token, not what it is. Where a platform's use differs, a Mobile or Web note follows.</li>
     </ul>
@@ -135,15 +136,15 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
             textRoles.map((r) => (
               <tr>
                 <th scope="row" class="tok-name">
-                  <code>text.{r}</code>
+                  <code>font.size.{r}</code>
                 </th>
                 {PLATFORMS.map((p) => (
                   <td class="tok-val">
-                    <div class="spec" style={`font-size:${valueOf(`text.${r}`, p)};line-height:${valueOf(`text.${r}Line`, p)};font-family:var(--af-font-${r.startsWith("h") || r === "display" ? "display" : "sans"});font-weight:var(--af-font-weight-${weight(r)})`}>
+                    <div class="spec" style={`font-size:${valueOf(`font.size.${r}`, p)};line-height:${valueOf(`font.lineHeight.${r}`, p)};font-family:var(--af-font-family-${r.startsWith("h") || r === "display" ? "display" : "sans"});font-weight:var(--af-font-weight-${weight(r)})`}>
                       {r === "display" ? "Fabric" : r.startsWith("h") ? "Release train" : "Priya shared the deck"}
                     </div>
                     <div class="faint mono">
-                      {valueOf(`text.${r}`, p)} / {valueOf(`text.${r}Line`, p)}
+                      {valueOf(`font.size.${r}`, p)} / {valueOf(`font.lineHeight.${r}`, p)}
                     </div>
                   </td>
                 ))}
@@ -156,7 +157,7 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
     {
       groups("type").map((g) => (
         <>
-          <h3 id={`type-${kebab(g.name)}`}>{g.name === "text" ? "Size and line height" : g.name === "font" ? "Families and weights" : g.name === "fontFiles" ? "Font files on the phone" : "Letter spacing"}</h3>
+          <h3 id={`type-${kebab(g.name)}`}>{({ "font.family": "Families", "font.weight": "Weights", "font.size": "Sizes", "font.lineHeight": "Line heights", "font.letterSpacing": "Letter spacing", fontFiles: "Font files on the phone" } as Record<string, string>)[g.name] ?? g.name}</h3>
           <TokenTable rows={g.rows} caption={caption("Type", g.name)} />
         </>
       ))
@@ -189,7 +190,7 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
       {
         PLATFORMS.map((p) => (
           <div class="card">
-            <b style="color:var(--af-fg-strong)">{PLATFORM_META[p].label}</b>
+            <b style="color:var(--af-color-text-strong)">{PLATFORM_META[p].label}</b>
             <p class="muted" style="font-size:13px;margin-top:6px">{profileNote(p)}</p>
           </div>
         ))
@@ -262,19 +263,19 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
       {
         PLATFORMS.map((p) => (
           <div class="card" style="padding:14px">
-            <b style="color:var(--af-fg-strong)">{PLATFORM_META[p].label}</b>
-            <div style={`display:flex;align-items:flex-end;gap:14px;margin-top:12px;color:${valueOf("fg.muted", p)};font-family:${valueOf("chart.font", p)};font-size:${valueOf("chart.labelSize", p)}`}>
-              <div style={`width:${valueOf("chart.barMaxW", p)};height:56px;border-radius:${valueOf("chart.barRadius", p)} ${valueOf("chart.barRadius", p)} 0 0;background:${valueOf("chart.series1", p)}`} />
+            <b style="color:var(--af-color-text-strong)">{PLATFORM_META[p].label}</b>
+            <div style={`display:flex;align-items:flex-end;gap:14px;margin-top:12px;color:${valueOf("color.text.muted", p)};font-family:${valueOf("chart.fontFamily", p)};font-size:${valueOf("chart.labelSize", p)}`}>
+              <div style={`width:${valueOf("chart.barMaxWidth", p)};height:56px;border-radius:${valueOf("chart.barRadius", p)} ${valueOf("chart.barRadius", p)} 0 0;background:${valueOf("chart.series1Color", p)}`} />
               <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
-                <div style={`height:${valueOf("chart.barH", p)};width:70%;border-radius:${valueOf("chart.barRadius", p)};background:${valueOf("chart.series3", p)}`} />
+                <div style={`height:${valueOf("chart.barHeight", p)};width:70%;border-radius:${valueOf("chart.barRadius", p)};background:${valueOf("chart.series3Color", p)}`} />
                 <div style="display:flex;align-items:center">
-                  <i style={`flex:1;height:0;border-top:${valueOf("chart.lineW", p)} solid ${valueOf("chart.series2", p)}`} />
-                  <i style={`width:calc(2 * ${valueOf("chart.pointR", p)});height:calc(2 * ${valueOf("chart.pointR", p)});border-radius:50%;background:${valueOf("chart.series2", p)}`} />
+                  <i style={`flex:1;height:0;border-top:${valueOf("chart.lineWidth", p)} solid ${valueOf("chart.series2Color", p)}`} />
+                  <i style={`width:calc(2 * ${valueOf("chart.pointRadius", p)});height:calc(2 * ${valueOf("chart.pointRadius", p)});border-radius:50%;background:${valueOf("chart.series2Color", p)}`} />
                 </div>
-                <i style={`display:block;height:0;border-top:${valueOf("chart.sparkW", p)} solid ${valueOf("chart.series6", p)}`} />
+                <i style={`display:block;height:0;border-top:${valueOf("chart.sparkWidth", p)} solid ${valueOf("chart.series6Color", p)}`} />
               </div>
             </div>
-            <div style={`margin-top:10px;font-family:${valueOf("chart.font", p)};font-size:${valueOf("chart.labelSize", p)};color:${valueOf("chart.label", p)}`}>Jan Feb Mar · 12.4k</div>
+            <div style={`margin-top:10px;font-family:${valueOf("chart.fontFamily", p)};font-size:${valueOf("chart.labelSize", p)};color:${valueOf("chart.labelColor", p)}`}>Jan Feb Mar · 12.4k</div>
           </div>
         ))
       }
@@ -302,7 +303,7 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
     {
       groups("motion").map((g) => (
         <>
-          <h3 id={`motion-${kebab(g.name)}`}>{g.name === "duration" ? "Durations" : "Curves"}</h3>
+          <h3 id={`motion-${kebab(g.name)}`}>{g.name === "motion.duration" ? "Durations" : "Curves"}</h3>
           <TokenTable rows={g.rows} caption={caption("Motion", g.name)} />
         </>
       ))
@@ -346,7 +347,7 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
     {
       groups("layers").map((g) => (
         <>
-          <h3 id={`layers-${kebab(g.name)}`}>{g.name === "z" ? "Layers" : "Opacity"}</h3>
+          <h3 id={`layers-${kebab(g.name)}`}>{g.name === "zIndex" ? "Layers" : "Opacity"}</h3>
           <TokenTable rows={g.rows} caption={caption("Layers and opacity", g.name)} />
         </>
       ))

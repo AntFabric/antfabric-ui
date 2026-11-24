@@ -66,7 +66,7 @@ const docs: ComponentDocs = {
         "Shipped from the data subpath: recharts is reached only from there. The plot is BarChart's own (the kit's `RechartsBars`): the same grid, axes, tooltip, lit category and motion.",
         "The chosen metric is always drawn under one data key, `__metric`, whichever it is. recharts then tweens the same bars to their new heights over 600ms on the kit's ease-out, and each bar's fill eases to the new metric's colour, instead of drawing a new series from zero. The value axis re-fits to the new metric. Reduced motion turns the tween off and the colour change stays a plain swap.",
         "The chosen tab has a recessed fill and a 2px rule in its series colour along its foot; the rule fades in over the kit's base duration. A tab's colour is the same whichever tab is chosen.",
-        "Tabs share the strip's width and keep a least width (`chart.tabMinW`); a strip with more tabs than the card is wide scrolls sideways.",
+        "Tabs share the strip's width and keep a least width (`chart.tabMinWidth`); a strip with more tabs than the card is wide scrolls sideways.",
         "A long daily series keeps every bar and the tooltip has every day; recharts leaves out the axis labels that would run together.",
       ],
       keyboard: [

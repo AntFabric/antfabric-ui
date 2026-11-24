@@ -38,12 +38,12 @@ function Item({ field, label, on, color, onPress, index, texture = false }: { fi
         gap: t.space.xs,
         padding: `${t.space["3xs"]} ${t.space.sm}`,
         borderRadius: t.radius.pill,
-        background: ui.hovered ? t.hover.surface : "transparent",
-        boxShadow: ui.focused ? t.shadow.focus : "none",
-        color: on ? t.fg.muted : t.fg.faint,
-        fontFamily: t.chart.font,
-        fontSize: t.text.caption,
-        lineHeight: t.text.captionLine,
+        background: ui.hovered ? t.color.background.hover : "transparent",
+        boxShadow: ui.focused ? t.elevation.shadow.focus : "none",
+        color: on ? t.color.text.muted : t.color.text.faint,
+        fontFamily: t.chart.fontFamily,
+        fontSize: t.font.size.caption,
+        lineHeight: t.font.lineHeight.caption,
         textDecoration: on ? "none" : "line-through",
       })}
     >

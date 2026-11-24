@@ -34,7 +34,7 @@ export function MetricValue({ value, format = DEFAULT_FORMAT, size = "md", style
   const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   const r = useRecipe(recipes["metric-value"], { variants: { size }, styles });
   const t = useChartTokens();
-  const shown = useTween(value, { easing: t.ease.out, off: useReducedMotion() });
+  const shown = useTween(value, { easing: t.motion.easing.out, off: useReducedMotion() });
   const digits = r.root.text.fontSize as number;
   const root = partStyle(r, "root", { text: { lineHeight: Math.round(digits * LINE), fontVariant: ["proportional-nums"] } });
   const unit = partStyle(r, "unit", { text: { fontSize: digits * UNIT_SCALE } });

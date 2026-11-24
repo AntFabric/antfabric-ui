@@ -68,7 +68,7 @@ export function ThreadSummary({ replyCount, lastReply = "", participants = [], u
   return (
     <Pressable
       testID={partId(testID, "thread-summary", "root")}
-      hitSlop={hitSlopTo(t.control.hit, t.control.hIconSm)}
+      hitSlop={hitSlopTo(t.size.target.min, t.size.control.iconSm)}
       {...rootProps(rest)}
       accessibilityRole="button"
       accessibilityLabel={rest.accessibilityLabel ?? label}

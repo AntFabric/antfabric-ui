@@ -13,23 +13,23 @@ export const avatarStack = defineRecipe({
       base: {
         paddingX: "$space.2xs",
         radius: "$radius.pill",
-        bg: "$surface.muted",
-        fg: "$fg.muted",
-        font: "$font.sans",
-        weight: "$font.weightSemibold",
-        borderWidth: "$border.wThick",
-        borderColor: "$surface.card",
+        bg: "$color.background.muted",
+        fg: "$color.text.muted",
+        font: "$font.family.sans",
+        weight: "$font.weight.semibold",
+        borderWidth: "$border.width.thick",
+        borderColor: "$color.background.card",
       },
       variants: {
-        size: { xs: { height: "$avatar.xs" }, sm: { height: "$avatar.sm" }, md: { height: "$avatar.md", size: "$text.caption" } },
+        size: { xs: { height: "$size.avatar.xs" }, sm: { height: "$size.avatar.sm" }, md: { height: "$size.avatar.md", size: "$font.size.caption" } },
         ground: {
-          default: { borderColor: "$surface.card" },
-          sidebar: { borderColor: "$surface.sidebar" },
-          recessed: { borderColor: "$surface.recessed" },
-          selected: { borderColor: "$surface.selected" },
+          default: { borderColor: "$color.background.card" },
+          sidebar: { borderColor: "$color.background.sidebar" },
+          recessed: { borderColor: "$color.background.recessed" },
+          selected: { borderColor: "$color.background.selected" },
         },
       },
-      platforms: { mobile: { base: { size: "$text.caption" } } }, // idiom: one step larger count
+      platforms: { mobile: { base: { size: "$font.size.caption" } } }, // idiom: one step larger count
     },
   },
 });

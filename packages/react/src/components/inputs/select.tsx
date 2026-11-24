@@ -23,7 +23,7 @@ export interface SelectItem {
   /** Sits muted on the same line. */
   supportingText?: string;
   icon?: IconName;
-  /** The icon's tint, as a token: `$info.default`. */
+  /** The icon's tint, as a token: `$color.text.info`. */
   color?: string;
   /** A photo URL; "" draws initials. Leave it out for no avatar. */
   avatar?: string;
@@ -74,8 +74,8 @@ export interface SelectProps extends RootProps<HTMLButtonElement | HTMLSelectEle
   style?: CSSProperties;
 }
 
-/** `$info.default` → `var(--af-info-default)`; anything else passes through. */
-const tint = (color?: string) => (color ? color.replace(/\$([a-z][\w.-]*)/gi, (_, p: string) => `var(${cssVarName(p)})`) : t.fg.subtle);
+/** `$color.text.info` → `var(--af-color-text-info)`; anything else passes through. */
+const tint = (color?: string) => (color ? color.replace(/\$([a-z][\w.-]*)/gi, (_, p: string) => `var(${cssVarName(p)})`) : t.color.text.subtle);
 
 /** Layout and motion no token decides; what the tokens decide (size, edge, fill, type) is the recipe's. */
 const trigger: CSSProperties = {
@@ -84,7 +84,7 @@ const trigger: CSSProperties = {
   alignItems: "center",
   width: "100%",
   textAlign: "start",
-  transition: `border-color ${t.duration.base}, background ${t.duration.base}, color ${t.duration.base}`,
+  transition: `border-color ${t.motion.duration.base}, background ${t.motion.duration.base}, color ${t.motion.duration.base}`,
 };
 
 /** `link` has no box: it is as wide as its value. */

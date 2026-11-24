@@ -16,35 +16,35 @@ export const searchField = defineRecipe({
     root: {
       base: {
         gap: "$space.sm",
-        height: "$control.hLg",
+        height: "$size.control.lg",
         paddingLeft: "$space.md",
         paddingRight: "$space.sm",
         radius: "$radius.control",
-        bg: "$hover.surface",
-        borderWidth: "$border.wHairline",
-        borderColor: "$border.subtle",
-        shadow: "$shadow.hairline",
-        font: "$font.sans",
+        bg: "$color.background.hover",
+        borderWidth: "$border.width.hairline",
+        borderColor: "$color.border.subtle",
+        shadow: "$elevation.shadow.hairline",
+        font: "$font.family.sans",
       },
       // Hover moves the fill only, and the kit never turns it on for a focused or disabled field.
-      states: { on: { borderColor: "$border.active" }, hover: { bg: "$surface.raised" }, focus: { borderColor: "$border.active" }, disabled: { opacity: "$opacity.disabled" } },
+      states: { on: { borderColor: "$color.border.selected" }, hover: { bg: "$color.background.raised" }, focus: { borderColor: "$color.border.selected" }, disabled: { opacity: "$opacity.disabled" } },
       platforms: {
-        web: { states: { focus: { outlineWidth: "$border.wHairline", outlineColor: "$border.active" } } },
-        desktop: { states: { focus: { outlineWidth: "$border.wHairline", outlineColor: "$border.active" } } },
+        web: { states: { focus: { outlineWidth: "$border.width.hairline", outlineColor: "$color.border.selected" } } },
+        desktop: { states: { focus: { outlineWidth: "$border.width.hairline", outlineColor: "$color.border.selected" } } },
         mobile: {
           // idiom: the 44pt touch height (a minimum too), a one-step-larger gap, and a tighter right edge for the clear button's own touch target.
-          base: { gap: "$space.md", height: "$control.hMd", minHeight: "$control.hMd", paddingRight: "$space.2xs", radius: "$radius.input" },
-          states: { focus: { ring: "$border.active" } },
+          base: { gap: "$space.md", height: "$size.control.md", minHeight: "$size.control.md", paddingRight: "$space.2xs", radius: "$radius.input" },
+          states: { focus: { ring: "$color.border.selected" } },
         },
       },
     },
-    icon: { base: { square: "$icon.size", fg: "$fg.subtle" } },
-    spinner: { base: { square: "$icon.size", fg: "$brand.default" } },
+    icon: { base: { square: "$size.icon.default", fg: "$color.text.subtle" } },
+    spinner: { base: { square: "$size.icon.default", fg: "$color.background.brand.default" } },
     input: {
-      base: { size: "$text.bodySm", weight: "$font.weightMedium", fg: "$fg.body" },
-      platforms: { mobile: { base: { size: "$text.body", placeholder: "$fg.placeholder" } } }, // idiom: one step larger
+      base: { size: "$font.size.bodySm", weight: "$font.weight.medium", fg: "$color.text.body" },
+      platforms: { mobile: { base: { size: "$font.size.body", placeholder: "$color.text.placeholder" } } }, // idiom: one step larger
     },
-    launcherLabel: { on: ["web", "desktop"], base: { size: "$text.bodySm", weight: "$font.weightMedium", fg: "$fg.faint" } },
+    launcherLabel: { on: ["web", "desktop"], base: { size: "$font.size.bodySm", weight: "$font.weight.medium", fg: "$color.text.faint" } },
     launcher: { on: ["web", "desktop"], base: { inset: "$space.none" } },
   },
 });

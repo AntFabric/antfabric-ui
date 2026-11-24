@@ -37,7 +37,7 @@ const docs: ComponentDocs = {
         "Shipped from the data subpath: recharts is reached only from there. The chart is handed an explicit width and height.",
         "The same `rechartsTheme(useChartTokens(), useReducedMotion())` as LineChart and BarChart, exported beside the chart: the grid, axes, bar and line geometry and the dash patterns are the tokens', so a ComposedChart written with recharts matches this one.",
         "Both series are in the scale whether or not the legend has them on, so turning the line off does not make the axis jump.",
-        "The line is drawn as PeriodCompare's last period is (`chart.previousW`, the series dash, round ends) and behind the bars (in recharts' own area layer, over the grid and under the bars), so a bar keeps its own top where the two meet. Its dots stay over the bars: solid in the line's colour, ringed by the card.",
+        "The line is drawn as PeriodCompare's last period is (`chart.previousWidth`, the series dash, round ends) and behind the bars (in recharts' own area layer, over the grid and under the bars), so a bar keeps its own top where the two meet. Its dots stay over the bars: solid in the line's colour, ringed by the card.",
         "ComposedChart draws its cursor as a line whatever it is given, so the hovered category is marked by the line charts' dashed crosshair, not BarChart's wash.",
       ],
       keyboard: [
@@ -64,7 +64,7 @@ const docs: ComponentDocs = {
       import: "import { ComboChart } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "`giftedTheme(useChartTokens())` is the chart tokens as gifted-charts' own props, exported beside the chart; a chart the kit does not ship, written with gifted-charts and the same call, matches this one.",
-        "The line is drawn by the bar chart over the bars, as PeriodCompare's last period is (`chart.previousW`, dashed). gifted-charts draws a point as one circle with no stroke, so each dot is two: a disc of the card on the first line, and the dot in the line's colour on a second line that draws no stroke.",
+        "The line is drawn by the bar chart over the bars, as PeriodCompare's last period is (`chart.previousWidth`, dashed). gifted-charts draws a point as one circle with no stroke, so each dot is two: a disc of the card on the first line, and the dot in the line's colour on a second line that draws no stroke.",
         "The points sit on the bars' centres: gifted-charts steps a line by a bar's width plus its `spacing`, so the kit passes the gap between bars, not the whole category.",
         "The line draws in with the bars unless the person reduces motion. Under react-native-web (the catalogue, `pnpm check`) gifted-charts' animation is off.",
       ],

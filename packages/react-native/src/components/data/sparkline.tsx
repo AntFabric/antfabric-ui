@@ -66,16 +66,16 @@ export function Sparkline({ data, y, width = 120, height = 32, area = false, mar
   const root = partStyle(r, "root", { view: { width, height } });
   const frame = [s.root, root.view, style];
   if (!values.length) return <View testID={partId(testID, "sparkline", "root")} {...rootProps(rest)} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={frame} />;
-  const color = tone === "positive" ? t.data.positive : tone === "negative" ? t.data.negative : t.chart.series1;
+  const color = tone === "positive" ? t.color.background.data.positive : tone === "negative" ? t.color.background.data.negative : t.chart.series1Color;
   const [lo, hi] = valueDomain(values.map((v) => ({ v })), ["v"], { zero: false });
   const span = hi - lo || 1;
   const floor = lo - span * (flush ? AIR_UNDER_FLUSH : AIR);
-  const edge = flush ? 0 : t.chart.pointR;
+  const edge = flush ? 0 : t.chart.pointRadius;
   const said = label || str("trend", { from: fmt(format, values[0], formatWords, locale), to: fmt(format, values[values.length - 1], formatWords, locale) });
   // One point has no line to draw: it is a dot.
   const last = values.length - 1;
   const dots = marker || values.length === 1;
-  const points = values.map((value, i) => ({ value, hideDataPoint: !(dots && i === last), dataPointRadius: t.chart.pointR - 1, dataPointColor: color }));
+  const points = values.map((value, i) => ({ value, hideDataPoint: !(dots && i === last), dataPointRadius: t.chart.pointRadius - 1, dataPointColor: color }));
   return (
     <View testID={partId(testID, "sparkline", "root")} accessible accessibilityRole="image" accessibilityLabel={said} {...rootProps(rest)} style={frame}>
       <LineChart
@@ -92,7 +92,7 @@ export function Sparkline({ data, y, width = 120, height = 32, area = false, mar
         labelsExtraHeight={0}
         disableScroll
         curved
-        thickness={t.chart.sparkW}
+        thickness={t.chart.sparkWidth}
         color={color}
         hideDataPoints={!dots}
         areaChart={area}

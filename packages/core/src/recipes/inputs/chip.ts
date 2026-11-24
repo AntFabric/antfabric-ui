@@ -1,7 +1,7 @@
 import { defineRecipe, type VariantStyle } from "../../recipe";
 
 /** The remove button's hover wash: a grey disc under the ✕. */
-const washed: VariantStyle = { states: { hover: { bg: "$surface.muted" } } };
+const washed: VariantStyle = { states: { hover: { bg: "$color.background.muted" } } };
 
 /**
  * Chip. Written from the React kit's table. `on` is "chosen" (`selected`): ink for a filter, the hover look for a suggestion, a deeper coral for an
@@ -16,68 +16,68 @@ export const chip = defineRecipe({
   styles: {
     root: {
       base: {
-        maxWidth: "$chip.maxW",
-        height: "$chip.h",
+        maxWidth: "$chip.maxWidth",
+        height: "$chip.height",
         radius: "$radius.pill",
-        borderWidth: "$border.wHairline",
-        borderColor: "$border.subtle",
-        bg: "$surface.card",
-        fg: "$fg.faint",
-        font: "$font.sans",
-        size: "$text.caption",
-        weight: "$font.weightMedium",
+        borderWidth: "$border.width.hairline",
+        borderColor: "$color.border.subtle",
+        bg: "$color.background.card",
+        fg: "$color.text.faint",
+        font: "$font.family.sans",
+        size: "$font.size.caption",
+        weight: "$font.weight.medium",
       },
       variants: {
         variant: {
           filter: {
-            states: { hover: { bg: "$hover.surface", fg: "$fg.strong" }, pressed: { bg: "$hover.surface" }, on: { bg: "$surface.inverse", borderColor: "$surface.inverse", fg: "$fg.onInverse" } },
+            states: { hover: { bg: "$color.background.hover", fg: "$color.text.strong" }, pressed: { bg: "$color.background.hover" }, on: { bg: "$color.background.inverse", borderColor: "$color.background.inverse", fg: "$color.text.onInverse" } },
           },
           suggestion: {
             radius: "$radius.control",
-            shadow: "$shadow.hairline",
-            fg: "$fg.muted",
+            shadow: "$elevation.shadow.hairline",
+            fg: "$color.text.muted",
             states: {
-              hover: { bg: "$hover.surface", fg: "$fg.strong" },
-              pressed: { bg: "$hover.surface" },
-              on: { bg: "$hover.surface", borderColor: "$border.subtle", fg: "$fg.strong" },
-              focus: { halo: "$shadow.hairline" },
+              hover: { bg: "$color.background.hover", fg: "$color.text.strong" },
+              pressed: { bg: "$color.background.hover" },
+              on: { bg: "$color.background.hover", borderColor: "$color.border.subtle", fg: "$color.text.strong" },
+              focus: { halo: "$elevation.shadow.hairline" },
             },
           },
           object: {
             radius: "$radius.control",
-            bg: "$brand.soft",
-            borderColor: "$border.brand",
-            fg: "$fg.onBrandSoft",
-            weight: "$font.weightSemibold",
-            states: { hover: { bg: "$brand.softHover", fg: "$fg.onBrandSoft" }, pressed: { bg: "$brand.softHover" }, on: { bg: "$brand.softHover", borderColor: "$border.brand", fg: "$fg.onBrandSoft" } },
+            bg: "$color.background.brand.soft",
+            borderColor: "$color.border.brand",
+            fg: "$color.text.onBrandSoft",
+            weight: "$font.weight.semibold",
+            states: { hover: { bg: "$color.background.brand.softHover", fg: "$color.text.onBrandSoft" }, pressed: { bg: "$color.background.brand.softHover" }, on: { bg: "$color.background.brand.softHover", borderColor: "$color.border.brand", fg: "$color.text.onBrandSoft" } },
           },
         },
       },
-      states: { focus: { shadow: "$shadow.focus" }, disabled: { opacity: "$opacity.disabled" } },
+      states: { focus: { shadow: "$elevation.shadow.focus" }, disabled: { opacity: "$opacity.disabled" } },
       platforms: {
-        mobile: { base: { size: "$text.bodySm" } }, // idiom: one step larger
+        mobile: { base: { size: "$font.size.bodySm" } }, // idiom: one step larger
       },
     },
     main: {
-      base: { gap: "$space.sm", paddingLeft: "$chip.padX", paddingRight: "$chip.padX" },
+      base: { gap: "$space.sm", paddingLeft: "$chip.paddingX", paddingRight: "$chip.paddingX" },
       variants: { removable: { true: { paddingRight: "$space.2xs" }, false: {} } },
     },
-    icon: { base: { square: "$icon.sizeMd" } },
-    count: { base: { weight: "$font.weightSemibold", opacity: "$opacity.secondary" } },
+    icon: { base: { square: "$size.icon.md" } },
+    count: { base: { weight: "$font.weight.semibold", opacity: "$opacity.secondary" } },
     remove: {
       base: { square: "$chip.removeSize", marginRight: "$space.xs", radius: "$radius.circle" },
       variants: {
         variant: {
           // The ✕ on a chosen ink chip washes lighter, to stay visible on the dark fill.
-          filter: { states: { hover: { bg: "$surface.muted" }, "hover+on": { bg: "$surface.inverseHover" } } },
+          filter: { states: { hover: { bg: "$color.background.muted" }, "hover+on": { bg: "$color.background.inverseHover" } } },
           suggestion: washed,
           object: washed,
         },
       },
-      states: { focus: { shadow: "$shadow.focus" } },
+      states: { focus: { shadow: "$elevation.shadow.focus" } },
     },
-    removeIcon: { base: { square: "$icon.sizeSm" }, platforms: { mobile: { base: { square: "$icon.sizeMd" } } } }, // idiom: one step larger
+    removeIcon: { base: { square: "$size.icon.sm" }, platforms: { mobile: { base: { square: "$size.icon.md" } } } }, // idiom: one step larger
   },
   // The phone grows the touch area to this (`hitSlopTo`); nothing is drawn with it.
-  reads: ["$control.hit"],
+  reads: ["$size.target.min"],
 });

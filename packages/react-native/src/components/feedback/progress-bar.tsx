@@ -80,17 +80,17 @@ export function ProgressBar({
       width.setValue(pct);
       return;
     }
-    const run = Animated.timing(width, { toValue: pct, duration: t.duration.slow, easing: Easing.ease, useNativeDriver: false });
+    const run = Animated.timing(width, { toValue: pct, duration: t.motion.duration.slow, easing: Easing.ease, useNativeDriver: false });
     run.start();
     return () => run.stop();
-  }, [pct, width, t.duration.slow, reduceMotion]);
+  }, [pct, width, t.motion.duration.slow, reduceMotion]);
 
   // An unknown one slides a third of the track across it, every 1.4 s; reduced motion parks it in the middle.
   const [span, setSpan] = useState(0);
   const slide = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     if (!unknown || reduceMotion) return;
-    const run = Animated.loop(Animated.timing(slide, { toValue: 1, duration: 1400, easing: bezier(t.ease.standard), useNativeDriver: native }));
+    const run = Animated.loop(Animated.timing(slide, { toValue: 1, duration: 1400, easing: bezier(t.motion.easing.standard), useNativeDriver: native }));
     run.start();
     return () => run.stop();
   }, [unknown, slide, t.duration, t.ease, reduceMotion]);

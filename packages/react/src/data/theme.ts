@@ -42,14 +42,14 @@ export function rechartsMotion(on: boolean, reduced: boolean) {
   return on && !reduced ? { isAnimationActive: true, animationDuration: MOTION["grow-x"].duration, animationEasing: "ease-out" as const } : { isAnimationActive: false };
 }
 
-/** recharts' animation props for a chart's own draw-in and its tweens: one curve, the kit's `ease.out` (recharts takes a `cubic-bezier(…)` string). Off under reduced motion. */
+/** recharts' animation props for a chart's own draw-in and its tweens: one curve, the kit's `motion.easing.out` (recharts takes a `cubic-bezier(…)` string). Off under reduced motion. */
 export function rechartsDraw(t: ChartTokens, reduced: boolean) {
-  return reduced ? { isAnimationActive: false } : { isAnimationActive: true, animationDuration: CHART_DRAW, animationEasing: t.ease.out as "ease-out" };
+  return reduced ? { isAnimationActive: false } : { isAnimationActive: true, animationDuration: CHART_DRAW, animationEasing: t.motion.easing.out as "ease-out" };
 }
 
 /** The same for the tooltip's glide from one point to the next. */
 export function rechartsGlide(t: ChartTokens, reduced: boolean) {
-  return reduced ? { isAnimationActive: false } : { isAnimationActive: true, animationDuration: CHART_GLIDE, animationEasing: t.ease.out as "ease-out" };
+  return reduced ? { isAnimationActive: false } : { isAnimationActive: true, animationDuration: CHART_GLIDE, animationEasing: t.motion.easing.out as "ease-out" };
 }
 
 /**
@@ -64,22 +64,22 @@ export function rechartsTheme(t: ChartTokens, reduced = false) {
   const dashed = `${t.chart.gridDash} ${t.chart.gridGap}`;
   return {
     series: seriesColors(t),
-    font: t.chart.font,
+    font: t.chart.fontFamily,
     /** Dashed horizontal rules; `vertical` for a horizontal bar chart's. */
-    grid: { stroke: t.chart.grid, strokeDasharray: dashed, vertical: false },
+    grid: { stroke: t.chart.gridColor, strokeDasharray: dashed, vertical: false },
     /** No axis line or tick marks; the label is the chart's quiet text. */
-    axis: { axisLine: false, tickLine: false, tick: { fill: t.chart.label, fontSize: t.chart.labelSize, fontFamily: t.chart.font } },
+    axis: { axisLine: false, tickLine: false, tick: { fill: t.chart.labelColor, fontSize: t.chart.labelSize, fontFamily: t.chart.fontFamily } },
     /** Where the pointer is: a dashed line through a point, or a wash behind a bar. */
-    cursor: { line: { stroke: t.chart.crosshair, strokeWidth: t.border.wHairline, strokeDasharray: dashed }, bar: { fill: t.hover.surface, radius: t.radius.row } },
+    cursor: { line: { stroke: t.chart.crosshairColor, strokeWidth: t.border.width.hairline, strokeDasharray: dashed }, bar: { fill: t.color.background.hover, radius: t.radius.row } },
     /** The tooltip's glide between points, and the card it holds drawn with `ChartTooltip` (`content`). */
-    tooltip: { ...rechartsGlide(t, reduced), cursor: { stroke: t.chart.crosshair, strokeWidth: t.border.wHairline, strokeDasharray: dashed } },
+    tooltip: { ...rechartsGlide(t, reduced), cursor: { stroke: t.chart.crosshairColor, strokeWidth: t.border.width.hairline, strokeDasharray: dashed } },
     /** A chart's own draw-in and its tween to new values, and the tooltip's glide. */
     motion: { draw: rechartsDraw(t, reduced), glide: rechartsGlide(t, reduced) },
-    reference: { stroke: t.chart.reference, strokeDasharray: `${t.chart.referenceDash} ${t.chart.referenceGap}` },
-    line: { strokeWidth: t.chart.lineW, strokeLinecap: "round" as const, dotRadius: t.chart.pointR, seriesDash: `${t.chart.seriesDash} ${t.chart.seriesGap}` },
+    reference: { stroke: t.chart.referenceColor, strokeDasharray: `${t.chart.referenceDash} ${t.chart.referenceGap}` },
+    line: { strokeWidth: t.chart.lineWidth, strokeLinecap: "round" as const, dotRadius: t.chart.pointRadius, seriesDash: `${t.chart.seriesDash} ${t.chart.seriesGap}` },
     /** `maxBarSize` for grouped bars, `soloMaxBarSize` for a category that holds one bar (one series showing, or stacked). */
-    bar: { radius: t.chart.barRadius, maxBarSize: t.chart.barMaxW, soloMaxBarSize: t.chart.barSoloW, gap: t.chart.barGap },
+    bar: { radius: t.chart.barRadius, maxBarSize: t.chart.barMaxWidth, soloMaxBarSize: t.chart.barSoloWidth, gap: t.chart.barGap },
     /** The ring a point or a segment is cut from the card with. */
-    card: t.surface.card,
+    card: t.color.background.card,
   };
 }

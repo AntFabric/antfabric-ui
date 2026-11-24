@@ -79,7 +79,7 @@ export function KpiCard({ label, value, format = { type: "currency" }, delta, de
   const formatWords: FormatWords = { unavailable: s("unavailable"), points: ({ value }) => s("formatPoints", { value }), duration: ({ minutes, seconds }) => s("formatDuration", { minutes, seconds }) };
   const frame = css({ overflow: "hidden", minWidth: 0, gap: 0 }, style);
   if (loading) {
-    const lines = [{ width: t.kpi.loadM, height: t.kpi.loadLineH }, { width: t.kpi.loadL, height: t.kpi.loadValueH }, { width: t.kpi.loadXl, height: t.kpi.loadLineH }];
+    const lines = [{ width: t.kpi.loadWidthMd, height: t.kpi.loadLineHeight }, { width: t.kpi.loadWidthLg, height: t.kpi.loadValueHeight }, { width: t.kpi.loadWidthXl, height: t.kpi.loadLineHeight }];
     return <Card pad="none" elevate="card" style={frame} children={<div role="group" data-af-part="root" aria-busy aria-label={s("loading", { label })} {...rootProps(rest)} style={css(box, r.root)}><LoadingLines lines={lines} label={s("loadingLines", { label })} /></div>} />;
   }
   // The sentence about the change: core says which way it went and by how much, the words are the card's.
@@ -113,7 +113,7 @@ export function KpiCard({ label, value, format = { type: "currency" }, delta, de
                 {said ? (
                   <span data-af-part="moved" style={css(row, r.moved)}>
                     {said.text}
-                    <Icon name={TRENDING[said.direction]} size={t.icon.sizeMd} color={r.moved.color} />
+                    <Icon name={TRENDING[said.direction]} size={t.size.icon.md} color={r.moved.color} />
                   </span>
                 ) : null}
                 {note ? <span data-af-part="note" style={css(text, r.note)}>{note}</span> : null}

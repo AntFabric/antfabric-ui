@@ -174,7 +174,7 @@ export function Popover({
       style={css(box, { alignSelf: "flex-start", alignItems: "flex-start", gap: t.space.xs }, partStyle(r, "root", floating ? undefined : { flexDirection: DIRECTION[side] }), style)}
     >
       {floating ? children : showTrigger && <Button label={triggerLabel} variant="secondary" size="sm" onPress={() => setShown(!shown)} />}
-      {shown && (floating ? (layer.inPlace || !layer.host ? <div style={{ position: "absolute", top: "100%", left: 0, zIndex: t.z.popover }}>{body(false)}</div> : <OverlayLayer host={layer.host} zIndex={t.z.popover} modal={modal} near={host}>{body(true)}</OverlayLayer>) : body(false))}
+      {shown && (floating ? (layer.inPlace || !layer.host ? <div style={{ position: "absolute", top: "100%", left: 0, zIndex: t.zIndex.popover }}>{body(false)}</div> : <OverlayLayer host={layer.host} zIndex={t.zIndex.popover} modal={modal} near={host}>{body(true)}</OverlayLayer>) : body(false))}
     </div>
   );
 }

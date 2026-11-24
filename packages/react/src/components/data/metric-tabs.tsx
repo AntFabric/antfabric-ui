@@ -99,7 +99,7 @@ function Tab({ metric, id, panel, locale, total, format, color, on, first, onPre
         {metric.label}
       </span>
       <MetricValue value={total} format={metric.format ?? format} size="sm" />
-      <span aria-hidden data-af-part="rule" style={partStyle(r, "rule", { position: "absolute", left: 0, right: 0, bottom: neg(t.border.wHairline), background: color, opacity: on ? 1 : 0, transition: `opacity ${t.duration.base} ${t.ease.out}`, pointerEvents: "none" })} />
+      <span aria-hidden data-af-part="rule" style={partStyle(r, "rule", { position: "absolute", left: 0, right: 0, bottom: neg(t.border.width.hairline), background: color, opacity: on ? 1 : 0, transition: `opacity ${t.motion.duration.base} ${t.motion.easing.out}`, pointerEvents: "none" })} />
     </button>
   );
 }
@@ -146,7 +146,7 @@ export function MetricTabs({ data, x, metrics, title, subtitle = "", format = "i
     summary: (v) => str("summary", v),
   }) : str("noData", { title });
   const nothing = data.length === 0 || tabs.length === 0;
-  const lines = [{ width: t.kpi.loadM, height: t.kpi.loadValueH }];
+  const lines = [{ width: t.kpi.loadWidthMd, height: t.kpi.loadValueHeight }];
   return (
     <ChartCard
       r={r} viewAsTable={str("viewAsTable")} viewAsChart={str("viewAsChart")}

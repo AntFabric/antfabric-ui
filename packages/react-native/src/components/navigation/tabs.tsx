@@ -40,7 +40,7 @@ export interface TabsProps extends RootProps<ScrollView> {
 /** Layout no token decides; sizes, fills, edges, spacing and type are the recipe's. */
 const useStyles = createStyles((t) => ({
   strip: { alignSelf: "stretch", flexGrow: 0 },
-  content: { flexDirection: "row", alignItems: "stretch", gap: t.space.lg, paddingHorizontal: t.gutter.pane },
+  content: { flexDirection: "row", alignItems: "stretch", gap: t.space.lg, paddingHorizontal: t.space.gutter.pane },
   tab: { flexDirection: "row", alignItems: "center", justifyContent: "center", flexShrink: 0 },
   count: { alignItems: "center", justifyContent: "center" },
   countText: { fontVariant: ["tabular-nums"] },
@@ -56,10 +56,10 @@ function Tab({ item, on, full, styles, strings, testID, onLayout, onPress }: { i
   // The bar grows in under the chosen tab and fades from the one it left.
   const bar = useRef(new Animated.Value(on ? 1 : 0)).current;
   useEffect(() => {
-    const run = Animated.timing(bar, { toValue: on ? 1 : 0, duration: t.duration.base, easing: Easing.bezier(0.16, 1, 0.3, 1), useNativeDriver: Platform.OS !== "web" });
+    const run = Animated.timing(bar, { toValue: on ? 1 : 0, duration: t.motion.duration.base, easing: Easing.bezier(0.16, 1, 0.3, 1), useNativeDriver: Platform.OS !== "web" });
     run.start();
     return () => run.stop();
-  }, [on, bar, t.duration.base]);
+  }, [on, bar, t.motion.duration.base]);
   // A phone has no hover; a press inks the label while it is down, and the chosen tab stays strong.
   const r = useRecipe(recipes.tabs, { state: { on, pressed: press.pressed && !on, focus: press.focused }, styles });
   const tab = partStyle(r, "tab", { view: [full && { flexGrow: 1 }, item.disabled && { opacity: t.opacity.disabled }], text: { lineHeight: (r.tab.text.fontSize as number) * 1.2 } });

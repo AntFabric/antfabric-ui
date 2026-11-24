@@ -29,7 +29,7 @@ export interface AvatarStackProps extends RootProps {
 const useStyles = createStyles((t) => ({
   root: { flexDirection: "row", alignItems: "center", alignSelf: "flex-start" },
   more: { flexDirection: "row", alignItems: "center", justifyContent: "center", zIndex: 1 },
-  moreText: { lineHeight: t.text.caption, fontVariant: ["tabular-nums"] },
+  moreText: { lineHeight: t.font.size.caption, fontVariant: ["tabular-nums"] },
 }));
 
 /** +237 stays legible as the chip grows; past four digits it reads +10k. */

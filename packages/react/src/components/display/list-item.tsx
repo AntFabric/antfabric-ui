@@ -79,7 +79,7 @@ const root: CSSProperties = {
   borderBottomWidth: 0,
   borderBottomStyle: "none",
   borderBottomColor: "currentcolor",
-  transition: `background ${t.duration.fast}, opacity ${t.duration.fast}`,
+  transition: `background ${t.motion.duration.fast}, opacity ${t.motion.duration.fast}`,
 };
 
 // Beside a tile the row is roomier.
@@ -101,7 +101,7 @@ const check: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   background: "transparent",
-  transition: `background ${t.duration.base}, border-color ${t.duration.base}, transform ${t.duration.fast} ${t.ease.out}`,
+  transition: `background ${t.motion.duration.base}, border-color ${t.motion.duration.base}, transform ${t.motion.duration.fast} ${t.motion.easing.out}`,
 };
 
 export function ListItem({
@@ -195,11 +195,11 @@ export function ListItem({
       {shortcut && <Kbd keys={shortcut} tone="bare" style={{ alignSelf: "center" }} />}
       {role === "checkbox" && (
         <span aria-hidden data-af-part="check" style={css(check, r.check)}>
-          {on && <Icon part="tick" name="check" size={r.tick.width} style={partStyle(r, "tick", { strokeWidth: t.icon.strokeTick }, enter("pop"))} />}
+          {on && <Icon part="tick" name="check" size={r.tick.width} style={partStyle(r, "tick", { strokeWidth: t.size.stroke.tick }, enter("pop"))} />}
         </span>
       )}
       {on && role === "option" && <Icon part="selectedIcon" name="check" size={r.selectedIcon.width} color={r.selectedIcon.color} style={partStyle(r, "selectedIcon", enter("pop"))} />}
-      {chevron && <Icon name="chevron-right" size={t.icon.sizeMd} color={t.fg.faint} style={dir === "rtl" ? { transform: "scaleX(-1)" } : undefined} />}
+      {chevron && <Icon name="chevron-right" size={t.size.icon.md} color={t.color.text.faint} style={dir === "rtl" ? { transform: "scaleX(-1)" } : undefined} />}
     </Row>
   );
 }

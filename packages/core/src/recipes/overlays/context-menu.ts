@@ -7,47 +7,47 @@ import { defineRecipe, type PartRecipe } from "../../recipe";
  * pressed fill are the web's (item 43).
  * The `more` button is the + : drawn like a reaction, and `on` (coral) while the phone's emoji panel is open.
  * Read by the kit: the glass surface's radius (Liquid Glass is a state the recipe does not know), and the rows' pull out to the sheet's
- * edges (a negative margin of `$gutter.pane`, which no token spells).
+ * edges (a negative margin of `$space.gutter.pane`, which no token spells).
  */
 const reaction = (on: PartRecipe["states"]): PartRecipe => ({
-  base: { square: "$control.hIcon", radius: "$radius.control", borderWidth: "$border.wHairline", borderColor: "transparent" },
-  states: { ...on, hover: { bg: "$hover.surface" }, pressed: { bg: "$surface.selected" }, focus: { shadow: "$shadow.focus" } },
-  platforms: { mobile: { base: { square: "$control.hMd" } } }, // idiom: the 44pt touch button
+  base: { square: "$size.control.icon", radius: "$radius.control", borderWidth: "$border.width.hairline", borderColor: "transparent" },
+  states: { ...on, hover: { bg: "$color.background.hover" }, pressed: { bg: "$color.background.selected" }, focus: { shadow: "$elevation.shadow.focus" } },
+  platforms: { mobile: { base: { square: "$size.control.md" } } }, // idiom: the 44pt touch button
 });
 
 export const contextMenu = defineRecipe({
   parts: ["root", "target", "author", "time", "message", "panel", "divider", "reaction", "more", "emoji", "moreIcon", "sheet", "handle", "title", "picker", "search", "searchIcon", "input", "heading", "grid", "home"],
   styles: {
-    root: { base: { font: "$font.sans" }, platforms: { mobile: { base: { bg: "$scrim.default" } } } },
-    target: { on: ["web", "desktop"], base: { radius: "$radius.row", bg: "$surface.selected" } },
-    author: { on: ["web", "desktop"], base: { size: "$text.bodySm", weight: "$font.weightBold", fg: "$fg.strong" } },
-    time: { on: ["web", "desktop"], base: { size: "$text.caption", weight: "$font.weightNormal", fg: "$fg.faint" } },
-    message: { on: ["web", "desktop"], base: { size: "$text.body", line: "$text.bodyLine", fg: "$fg.body" } },
+    root: { base: { font: "$font.family.sans" }, platforms: { mobile: { base: { bg: "$color.background.scrim.default" } } } },
+    target: { on: ["web", "desktop"], base: { radius: "$radius.row", bg: "$color.background.selected" } },
+    author: { on: ["web", "desktop"], base: { size: "$font.size.bodySm", weight: "$font.weight.bold", fg: "$color.text.strong" } },
+    time: { on: ["web", "desktop"], base: { size: "$font.size.caption", weight: "$font.weight.normal", fg: "$color.text.faint" } },
+    message: { on: ["web", "desktop"], base: { size: "$font.size.body", line: "$font.lineHeight.body", fg: "$color.text.body" } },
     panel: {
       on: ["web", "desktop"],
-      base: { width: "$menu.wContext", padding: "$space.2xs", zIndex: "$z.popover", bg: "$surface.card", borderWidth: "$border.wHairline", borderColor: "$border.subtle", radius: "$radius.rail", shadow: "$shadow.menu" },
+      base: { width: "$menu.widthContext", padding: "$space.2xs", zIndex: "$zIndex.popover", bg: "$color.background.card", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle", radius: "$radius.rail", shadow: "$elevation.shadow.menu" },
       // With the pressed message drawn above it, the panel is set in from the message's edge.
-      variants: { showTarget: { true: { marginLeft: "$contextMenu.sceneOffset" } } },
+      variants: { showTarget: { true: { marginLeft: "$contextMenu.sceneOffsetX" } } },
     },
-    divider: { on: ["web", "desktop"], base: { height: "$border.wHairline", bg: "$border.subtle" } },
-    reaction: reaction({ on: { bg: "$brand.soft", borderColor: "$brand.default" } }),
+    divider: { on: ["web", "desktop"], base: { height: "$border.width.hairline", bg: "$color.border.subtle" } },
+    reaction: reaction({ on: { bg: "$color.background.brand.soft", borderColor: "$color.background.brand.default" } }),
     // The + never carries the coral ring: on the phone it only tints while the emoji panel is open.
-    more: reaction({ on: { bg: "$brand.soft" } }),
+    more: reaction({ on: { bg: "$color.background.brand.soft" } }),
     emoji: {
-      base: { size: "$emoji.size" },
-      platforms: { mobile: { base: { size: "$text.lead", line: "$text.leadLine", weight: "$font.weightNormal", fg: "$fg.strong" } } },
+      base: { size: "$contextMenu.emojiFontSize" },
+      platforms: { mobile: { base: { size: "$font.size.lead", line: "$font.lineHeight.lead", weight: "$font.weight.normal", fg: "$color.text.strong" } } },
     },
-    moreIcon: { base: { square: "$icon.size", fg: "$fg.muted" }, states: { on: { fg: "$brand.default" } } },
-    sheet: { on: ["mobile"], base: { bg: "$surface.card", paddingX: "$gutter.pane", radiusTop: "$radius.sheet" } },
-    handle: { on: ["mobile"], base: { width: "$sheet.grabberW", height: "$sheet.grabberH", radius: "$radius.pill", bg: "$border.muted" } },
-    title: { on: ["mobile"], base: { size: "$text.lead", line: "$sheet.titleLine", weight: "$font.weightSemibold", fg: "$fg.strong" } },
-    picker: { on: ["mobile"], base: { radius: "$radius.input", borderWidth: "$border.wHairline", borderColor: "$border.subtle" } },
-    search: { on: ["mobile"], base: { height: "$control.hXs", radius: "$radius.pill", bg: "$surface.muted" } },
-    searchIcon: { on: ["mobile"], base: { square: "$icon.sizeMd", fg: "$fg.muted" } },
-    input: { on: ["mobile"], base: { size: "$text.bodySm", weight: "$font.weightNormal", fg: "$fg.body", placeholder: "$fg.placeholder" } },
-    heading: { on: ["mobile"], base: { size: "$text.caption", line: "$text.captionLine", weight: "$font.weightSemibold", fg: "$fg.faint" } },
-    grid: { on: ["mobile"], base: { size: "$emoji.grid", weight: "$font.weightNormal", fg: "$fg.strong" } },
-    home: { on: ["mobile"], base: { height: "$homeIndicator.h" } },
+    moreIcon: { base: { square: "$size.icon.default", fg: "$color.text.muted" }, states: { on: { fg: "$color.background.brand.default" } } },
+    sheet: { on: ["mobile"], base: { bg: "$color.background.card", paddingX: "$space.gutter.pane", radiusTop: "$radius.sheet" } },
+    handle: { on: ["mobile"], base: { width: "$sheet.grabberWidth", height: "$sheet.grabberHeight", radius: "$radius.pill", bg: "$color.border.muted" } },
+    title: { on: ["mobile"], base: { size: "$font.size.lead", line: "$sheet.titleLineHeight", weight: "$font.weight.semibold", fg: "$color.text.strong" } },
+    picker: { on: ["mobile"], base: { radius: "$radius.input", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle" } },
+    search: { on: ["mobile"], base: { height: "$size.control.xs", radius: "$radius.pill", bg: "$color.background.muted" } },
+    searchIcon: { on: ["mobile"], base: { square: "$size.icon.md", fg: "$color.text.muted" } },
+    input: { on: ["mobile"], base: { size: "$font.size.bodySm", weight: "$font.weight.normal", fg: "$color.text.body", placeholder: "$color.text.placeholder" } },
+    heading: { on: ["mobile"], base: { size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.semibold", fg: "$color.text.faint" } },
+    grid: { on: ["mobile"], base: { size: "$contextMenu.emojiGridFontSize", weight: "$font.weight.normal", fg: "$color.text.strong" } },
+    home: { on: ["mobile"], base: { height: "$size.layout.homeIndicator" } },
   },
-  reads: ["$sheet.glassRadius", "$gutter.pane", "$control.hit"],
+  reads: ["$sheet.glassRadius", "$space.gutter.pane", "$size.target.min"],
 });

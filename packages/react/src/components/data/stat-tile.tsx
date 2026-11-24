@@ -58,7 +58,7 @@ export function StatTile({ label, icon = "", aside = "", value, format = "intege
   const tk = useChartTokens();
   const frame = css({ overflow: "hidden", minWidth: 0 }, style);
   if (loading) {
-    const lines = [{ width: t.kpi.loadM, height: t.kpi.loadLineH }, { width: t.kpi.loadS, height: t.kpi.loadValueH }, { width: t.kpi.loadL, height: t.kpi.loadLineH }];
+    const lines = [{ width: t.kpi.loadWidthMd, height: t.kpi.loadLineHeight }, { width: t.kpi.loadWidthSm, height: t.kpi.loadValueHeight }, { width: t.kpi.loadWidthLg, height: t.kpi.loadLineHeight }];
     return <Card pad="none" elevate="card" style={frame} children={<div role="group" data-af-part="root" aria-busy aria-label={s("loading", { label })} {...rootProps(rest)} style={css(box, r.root)}><LoadingLines lines={lines} label={s("loadingLines", { label })} /></div>} />;
   }
   // A ring takes the place of a trend; no rows or no y is no visual.

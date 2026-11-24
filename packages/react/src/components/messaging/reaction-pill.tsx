@@ -58,7 +58,7 @@ const pill: CSSProperties = {
   alignItems: "center",
   paddingInline: 7,
   lineHeight: 1,
-  transition: `background ${t.duration.fast} ${t.ease.standard}, border-color ${t.duration.fast}`,
+  transition: `background ${t.motion.duration.fast} ${t.motion.easing.standard}, border-color ${t.motion.duration.fast}`,
 };
 
 export function ReactionPill({

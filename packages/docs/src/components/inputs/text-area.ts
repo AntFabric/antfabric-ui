@@ -45,7 +45,7 @@ const docs: ComponentDocs = {
     mono: {
       type: "boolean",
       default: false,
-      description: "Sets the text in the monospace face (`font.mono`) at the regular weight, for code, JSON and templates. Spellcheck, capitals and autocorrect are off and the text is laid out left to right.",
+      description: "Sets the text in the monospace face (`font.family.mono`) at the regular weight, for code, JSON and templates. Spellcheck, capitals and autocorrect are off and the text is laid out left to right.",
     },
     name: {
       type: "string",

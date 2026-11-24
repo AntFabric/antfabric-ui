@@ -44,7 +44,7 @@ const root: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   alignSelf: "flex-start",
-  transition: `background ${t.duration.fast} ${t.ease.standard}, color ${t.duration.fast}, transform ${t.duration.fast}`,
+  transition: `background ${t.motion.duration.fast} ${t.motion.easing.standard}, color ${t.motion.duration.fast}, transform ${t.motion.duration.fast}`,
 };
 
 export function Button({

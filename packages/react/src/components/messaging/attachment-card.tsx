@@ -222,7 +222,7 @@ function ImageCard(p: Card & { onBroken: () => void }) {
         disabled={ui.disabled}
         onClick={p.open}
         {...ui.handlers}
-        style={css(pressable, { width: "100%" }, ui.hovered && { opacity: 0.94 }, ui.focused && { boxShadow: `inset 0 0 0 3px ${t.focus.ring}` }, ui.disabled && { cursor: "default" })}
+        style={css(pressable, { width: "100%" }, ui.hovered && { opacity: 0.94 }, ui.focused && { boxShadow: `inset 0 0 0 3px ${t.color.border.focus}` }, ui.disabled && { cursor: "default" })}
       >
         <img src={p.src} alt="" width={360} height={225} loading="lazy" decoding="async" onError={p.onBroken} style={{ display: "block", width: "100%", height: 225, objectFit: "cover", flexShrink: 0 }} />
       </button>

@@ -106,7 +106,7 @@ function GoalItem({ goal, color, format, dim, picked, onPick, onHot, styles, str
           ui.handlers.onBlur();
           onHot(false);
         }}
-        style={css(pressable, partStyle(r, "goal", { alignSelf: "stretch", textAlign: "left", fontFamily: tk.chart.font, opacity: dim ? DIMMED : 1, transition: `opacity ${t.duration.base} ${t.ease.out}` }))}
+        style={css(pressable, partStyle(r, "goal", { alignSelf: "stretch", textAlign: "left", fontFamily: tk.chart.font, opacity: dim ? DIMMED : 1, transition: `opacity ${t.motion.duration.base} ${t.motion.easing.out}` }))}
       >
         <span data-af-part="goalHead" style={css(row, r.goalHead)}>
           <span aria-hidden data-af-part="swatch" style={partStyle(r, "swatch", { flexShrink: 0, background: color })} />
@@ -116,7 +116,7 @@ function GoalItem({ goal, color, format, dim, picked, onPick, onHot, styles, str
         <span style={css(row, { flexWrap: "wrap", alignItems: "baseline", columnGap: t.space.sm, paddingLeft: lead })}>
           {goal.known ? (
             <span data-af-part="of" style={css(text, { fontVariantNumeric: "tabular-nums" }, r.of)}>
-              <b data-af-part="done" style={css({ fontWeight: t.font.weightSemibold }, r.done)}>{fmt(format, goal.done, formatWords, locale)}</b> / {fmt(format, goal.target, formatWords, locale)}
+              <b data-af-part="done" style={css({ fontWeight: t.font.weight.semibold }, r.done)}>{fmt(format, goal.done, formatWords, locale)}</b> / {fmt(format, goal.target, formatWords, locale)}
             </span>
           ) : null}
           <span data-af-part="left" style={css(text, r.left)}>{left}</span>
@@ -200,7 +200,7 @@ export function GoalRings({ data, name, value, goal, title, subtitle = "", forma
                         onMouseLeave={() => setHot((h) => (h === k ? null : h))}
                         onClick={() => pick(k)}
                       >
-                        <Cell fill={g.ratio > 0 ? palette[k % palette.length]! : "transparent"} fillOpacity={dimmed(k) ? DIMMED : 1} style={{ cursor: "pointer", outline: "none", transition: `fill-opacity ${t.duration.base} ${t.ease.out}` }} />
+                        <Cell fill={g.ratio > 0 ? palette[k % palette.length]! : "transparent"} fillOpacity={dimmed(k) ? DIMMED : 1} style={{ cursor: "pointer", outline: "none", transition: `fill-opacity ${t.motion.duration.base} ${t.motion.easing.out}` }} />
                         <Cell fill="transparent" />
                       </Pie>
                     ))}

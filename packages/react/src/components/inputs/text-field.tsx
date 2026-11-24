@@ -78,7 +78,7 @@ const SAID_MS = 600;
 /** Layout and motion no token decides; what the tokens decide (sizes, colours, type, edges) is the recipe's. */
 const field: CSSProperties = {
   ...row,
-  transition: `border-color ${t.duration.base}, background ${t.duration.base}, box-shadow ${t.duration.base}`,
+  transition: `border-color ${t.motion.duration.base}, background ${t.motion.duration.base}, box-shadow ${t.motion.duration.base}`,
 };
 
 export function TextField({

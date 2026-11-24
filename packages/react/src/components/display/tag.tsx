@@ -37,7 +37,7 @@ const root: CSSProperties = {
   userSelect: "none",
   // Invisible until forced colours drop the fill; then it keeps the tag's shape without moving it. The width and colour are the recipe's.
   outlineOffset: -1,
-  transition: `background ${t.duration.base}, color ${t.duration.base}`,
+  transition: `background ${t.motion.duration.base}, color ${t.motion.duration.base}`,
 };
 
 /** A fact about its row, never a control: no press, no hover, not focusable. `size` only differs on the phone. */

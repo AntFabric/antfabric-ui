@@ -10,66 +10,66 @@ import { defineRecipe } from "../../recipe";
 export const textField = defineRecipe({
   parts: ["root", "label", "tag", "field", "leadingIcon", "prefix", "input", "trailing", "error", "errorIcon", "errorText", "helper", "counter"],
   styles: {
-    root: { base: { gap: "$space.xs", font: "$font.sans" }, platforms: { mobile: { base: { gap: "$space.sm" } } } }, // idiom: one step larger
+    root: { base: { gap: "$space.xs", font: "$font.family.sans" }, platforms: { mobile: { base: { gap: "$space.sm" } } } }, // idiom: one step larger
     label: {
-      base: { size: "$text.caption", line: "$text.captionLine", weight: "$font.weightSemibold", fg: "$fg.body" },
-      states: { disabled: { fg: "$fg.faint" } },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.semibold", fg: "$color.text.body" },
+      states: { disabled: { fg: "$color.text.faint" } },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm" } } }, // idiom: one step larger
     },
     tag: {
       base: {
         paddingY: "$space.3xs",
-        paddingX: "$textField.tagPadX",
+        paddingX: "$textField.tagPaddingX",
         radius: "$radius.pill",
-        bg: "$brand.soft",
-        borderWidth: "$border.wHairline",
-        borderColor: "$brand.softHover",
-        fg: "$fg.onBrandSoft",
-        size: "$text.caption",
-        weight: "$font.weightSemibold",
-        tracking: "$tracking.caps",
+        bg: "$color.background.brand.soft",
+        borderWidth: "$border.width.hairline",
+        borderColor: "$color.background.brand.softHover",
+        fg: "$color.text.onBrandSoft",
+        size: "$font.size.caption",
+        weight: "$font.weight.semibold",
+        tracking: "$font.letterSpacing.caps",
       },
     },
     field: {
-      base: { gap: "$space.sm", height: "$control.hInput", paddingX: "$space.mdLg", radius: "$radius.input", bg: "$surface.card", borderWidth: "$border.wHairline", borderColor: "$border.subtle" },
-      variants: { size: { lg: {}, sm: { height: "$control.hSm", paddingX: "$space.md", radius: "$radius.control" } } },
+      base: { gap: "$space.sm", height: "$size.control.input", paddingX: "$space.mdLg", radius: "$radius.input", bg: "$color.background.card", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle" },
+      variants: { size: { lg: {}, sm: { height: "$size.control.sm", paddingX: "$space.md", radius: "$radius.control" } } },
       // Hover moves the fill only, and the kit never turns it on for a focused, invalid, read-only or disabled field.
       states: {
-        readOnly: { bg: "$surface.recessed" },
-        disabled: { bg: "$surface.muted" },
-        hover: { bg: "$hover.surface" },
-        focus: { borderColor: "$border.active", ring: "$border.active" },
-        invalid: { borderColor: "$danger.default" },
-        "invalid+focus": { borderColor: "$danger.default", ring: "$danger.default" },
+        readOnly: { bg: "$color.background.recessed" },
+        disabled: { bg: "$color.background.muted" },
+        hover: { bg: "$color.background.hover" },
+        focus: { borderColor: "$color.border.selected", ring: "$color.border.selected" },
+        invalid: { borderColor: "$color.text.danger" },
+        "invalid+focus": { borderColor: "$color.text.danger", ring: "$color.text.danger" },
       },
       // idiom: a one-step-larger gap and inset, and a height that is a minimum (the 48pt touch field).
-      platforms: { mobile: { base: { gap: "$space.md", paddingX: "$space.md", height: "none", minHeight: "$control.hInput" } } },
+      platforms: { mobile: { base: { gap: "$space.md", paddingX: "$space.md", height: "none", minHeight: "$size.control.input" } } },
     },
-    leadingIcon: { base: { square: "$icon.sizeMd", fg: "$fg.faint" }, platforms: { mobile: { base: { square: "$icon.size" } } } },
+    leadingIcon: { base: { square: "$size.icon.md", fg: "$color.text.faint" }, platforms: { mobile: { base: { square: "$size.icon.default" } } } },
     prefix: {
-      base: { marginRight: "$textField.prefixPull", size: "$text.body", weight: "$font.weightMedium", fg: "$fg.faint" },
-      variants: { size: { sm: { size: "$text.caption" } } },
+      base: { marginRight: "$textField.prefixOffsetX", size: "$font.size.body", weight: "$font.weight.medium", fg: "$color.text.faint" },
+      variants: { size: { sm: { size: "$font.size.caption" } } },
     },
     input: {
-      base: { font: "$font.sans", size: "$text.body", weight: "$font.weightMedium", fg: "$fg.body" },
-      variants: { size: { sm: { size: "$text.caption" } } },
-      states: { disabled: { fg: "$fg.faint" } },
-      platforms: { mobile: { base: { placeholder: "$fg.placeholder" } } },
+      base: { font: "$font.family.sans", size: "$font.size.body", weight: "$font.weight.medium", fg: "$color.text.body" },
+      variants: { size: { sm: { size: "$font.size.caption" } } },
+      states: { disabled: { fg: "$color.text.faint" } },
+      platforms: { mobile: { base: { placeholder: "$color.text.placeholder" } } },
     },
-    trailing: { base: { marginRight: "$textField.trailingPull" } },
-    error: { base: { gap: "$space.2xs", fg: "$danger.default" } },
-    errorIcon: { base: { square: "$icon.sizeSm" }, platforms: { mobile: { base: { square: "$icon.sizeMd" } } } },
+    trailing: { base: { marginRight: "$textField.trailingOffsetX" } },
+    error: { base: { gap: "$space.2xs", fg: "$color.text.danger" } },
+    errorIcon: { base: { square: "$size.icon.sm" }, platforms: { mobile: { base: { square: "$size.icon.md" } } } },
     errorText: {
-      base: { size: "$text.caption", line: "$text.captionLine", weight: "$font.weightMedium" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine", fg: "$danger.default" } } },
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.medium" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", fg: "$color.text.danger" } } },
     },
     helper: {
-      base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal" } } },
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal" } } },
     },
     counter: {
-      base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" },
-      platforms: { mobile: { base: { weight: "$font.weightNormal" } } },
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint" },
+      platforms: { mobile: { base: { weight: "$font.weight.normal" } } },
     },
   },
 });

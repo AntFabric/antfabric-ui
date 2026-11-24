@@ -562,7 +562,7 @@ const docs: ComponentDocs = {
             style: {
               width: 380,
               paddingY: 12,
-              bg: "$surface.card",
+              bg: "$color.background.card",
             },
             children: [
               {

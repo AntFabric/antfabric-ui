@@ -2,9 +2,11 @@
  * Tokens → the values React Native styles take: numbers for sizes and durations, strings for colours.
  *
  * The React Native kit's `useTheme().t` is this, for the mobile profile and the current scheme, so a
- * component reads `t.control.hMd` and `t.brand.default` exactly as the React kit does.
+ * component reads `t.size.control.md` and `t.color.background.brand.default` exactly as the React kit does.
  */
 
+import { followAliases } from "./alias";
+import { addDeprecated, type DeprecatedTokens } from "./deprecated";
 import type { Theme } from "./theme";
 import { assertBuilt } from "./theme-built";
 import { platformOf, tokens, type Tokens } from "./tokens";
@@ -31,10 +33,13 @@ export type Vars<T> = T extends string | number ? string : { [K in keyof Clean<T
  * not intersect to nothing. Every theme has the same keys; a profile has the keys its platform reads
  * (a font file is a leaf of the mobile profile only).
  */
-export type NativeTokens = Native<Tokens["shared"]> & Native<Tokens["themes"]["light"]> & Native<Tokens["profiles"]["mobile"]>;
+type NativeNow = Native<Tokens["shared"]> & Native<Tokens["themes"]["light"]> & Native<Tokens["profiles"]["mobile"]>;
+/** With the renamed tokens' old keys (`deprecated.ts`), each marked `@deprecated`, until the next major version. */
+export type NativeTokens = NativeNow & DeprecatedTokens<NativeNow>;
 
 /** The same shape with every leaf a `var(--af-…)` string: the React kit's `t`. */
-export type TokenVars = Vars<Tokens["shared"]> & Vars<Tokens["themes"]["light"]> & Vars<Tokens["profiles"]["web"]>;
+type VarsNow = Vars<Tokens["shared"]> & Vars<Tokens["themes"]["light"]> & Vars<Tokens["profiles"]["web"]>;
+export type TokenVars = VarsNow & DeprecatedTokens<VarsNow>;
 
 type Tree = { readonly [k: string]: string | number | Tree };
 
@@ -129,9 +134,18 @@ export function resolveTokens(profile: keyof Tokens["profiles"], scheme: keyof T
     if (base) merge(merged, base);
     for (const [path, v] of Object.entries(over ?? {})) putLeaf(merged, path, v, theme!, profile === "mobile");
   }
-  const out = walk(merged, !!opts.web);
+  // An alias the theme left alone follows its target, as it does in the web's sheet: a theme that sets `color.border.subtle` moves `chart.gridColor` too.
+  if (sets) {
+    const node = (path: string): [Record<string, unknown> | undefined, string] => {
+      const keys = path.split(".");
+      const last = keys.pop()!;
+      return [keys.reduce<unknown>((at, k) => (typeof at === "object" && at !== null ? (at as Record<string, unknown>)[k] : undefined), merged) as Record<string, unknown> | undefined, last];
+    };
+    followAliases({ platform: profile, scheme, os }, sets, (path) => { const [at, k] = node(path); return at?.[k] as string | number | undefined; }, (path, v) => { const [at, k] = node(path); if (at) at[k] = v; });
+  }
+  const out = addDeprecated(walk(merged, !!opts.web));
   if (resolved.size >= RESOLVED_MAX) resolved.delete(resolved.keys().next().value!);
-  const value = freeze(out) as NativeTokens;
+  const value = freeze(out) as unknown as NativeTokens;
   resolved.set(key, value);
   return value;
 }
@@ -146,5 +160,6 @@ export function tokenVars(): TokenVars {
         return [k, typeof v === "object" && v !== null ? map(v as Record<string, unknown>, name) : `var(--af-${kebab(name)})`];
       }),
     );
-  return map(merged, "") as TokenVars;
+  // A renamed token's old key holds the new variable itself, so it works whether or not the host ships the deprecated sheet.
+  return addDeprecated(map(merged, "")) as unknown as TokenVars;
 }

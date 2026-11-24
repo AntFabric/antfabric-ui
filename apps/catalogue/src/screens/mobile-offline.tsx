@@ -8,7 +8,7 @@ import { composerTools, messageBar } from "@antfabric/ui-docs/samples";
 export default function MobileOffline() {
   const { t } = useTheme();
   return (
-    <View style={{ flex: 1, backgroundColor: t.surface.app }}>
+    <View style={{ flex: 1, backgroundColor: t.color.background.app }}>
       <MobileHeader
         variant="pushed"
         title="platform-eng"

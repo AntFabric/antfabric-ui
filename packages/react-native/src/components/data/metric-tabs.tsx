@@ -61,7 +61,7 @@ const useStyles = createStyles((t) => ({
   scrolled: { flexGrow: 0, flexShrink: 0, flexBasis: "auto" },
   scroller: { flexGrow: 1 },
   label: { flexDirection: "row", alignItems: "center" },
-  rule: { position: "absolute", left: 0, right: 0, bottom: -t.border.wHairline },
+  rule: { position: "absolute", left: 0, right: 0, bottom: -t.border.width.hairline },
 }));
 
 interface TabProps {

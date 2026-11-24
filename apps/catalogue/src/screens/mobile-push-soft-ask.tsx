@@ -7,7 +7,7 @@ import { TAB_BAR_ACTION, TAB_BAR_TABS } from "@antfabric/ui-docs/samples";
 export default function MobilePushSoftAsk() {
   const { t } = useTheme();
   return (
-    <View style={{ flex: 1, position: "relative", backgroundColor: t.surface.app }}>
+    <View style={{ flex: 1, position: "relative", backgroundColor: t.color.background.app }}>
       <MobileHeader variant="main" title="Messages" statusBar={false} userName="Priya Raman" actions={[{ key: "notifications", icon: "bell", label: "Notifications", badge: 3 }]} />
 
       <ScrollView
@@ -41,7 +41,7 @@ export default function MobilePushSoftAsk() {
         <TabBar tabs={TAB_BAR_TABS} active="messages" action={TAB_BAR_ACTION} safeArea={false} />
       </View>
 
-      <View style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, justifyContent: "flex-end", zIndex: t.z.modal, backgroundColor: t.scrim.default }}>
+      <View style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, justifyContent: "flex-end", zIndex: t.zIndex.modal, backgroundColor: t.color.background.scrim.default }}>
         <PermissionPrompt permission="default" presentation="sheet" />
       </View>
     </View>

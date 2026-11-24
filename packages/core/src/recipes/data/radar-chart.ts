@@ -9,5 +9,5 @@ import { chartCardParts, chartCardStyles, chartReads } from "./chart-card";
 export const radarChart = defineRecipe({
   parts: chartCardParts,
   styles: chartCardStyles,
-  reads: [...chartReads, "$fg.body"],
+  reads: [...chartReads, "$color.text.body"],
 });

@@ -45,7 +45,7 @@ export const antagents = defineTheme({
 
   // Per component, part, variant and state.
   recipes: {
-    button: { root: { base: { radius: "$radius.control", weight: "$font.weightBold" } } },
+    button: { root: { base: { radius: "$radius.control", weight: "$font.weight.bold" } } },
   },
 });`;
 
@@ -64,14 +64,14 @@ const recipe = `recipes: {
   button: {
     root: {
       // Every button, on every platform.
-      base: { radius: "$radius.control", weight: "$font.weightBold" },
+      base: { radius: "$radius.control", weight: "$font.weight.bold" },
       // One variant, in one state.
-      variants: { variant: { primary: { states: { hover: { bg: "$brand.active" } } } } },
+      variants: { variant: { primary: { states: { hover: { bg: "$color.background.brand.pressed" } } } } },
       // One platform (or one OS) only.
-      platforms: { mobile: { base: { weight: "$font.weightSemibold" } } },
+      platforms: { mobile: { base: { weight: "$font.weight.semibold" } } },
     },
     // Another part of the same recipe.
-    shortcut: { base: { size: "$text.caption" } },
+    shortcut: { base: { size: "$font.size.caption" } },
   },
 }`;
 
@@ -187,7 +187,7 @@ import { antagents } from "./theme";
     <Code code={recipe} />
     <ul class="how" style="margin-top:16px">
       <li>A key you write replaces the recipe's key at the same part, layer, variant value, state and platform. Everything you do not write stays.</li>
-      <li>Values are token references (<code class="mono">"$brand.active"</code>) or literals. A reference follows the theme, the scheme and the platform; a literal does not.</li>
+      <li>Values are token references (<code class="mono">"$color.background.brand.pressed"</code>) or literals. A reference follows the theme, the scheme and the platform; a literal does not.</li>
       <li><code class="mono">"none"</code> removes a key, including one an earlier layer set.</li>
       <li>A theme cannot add a part, a variant prop or a variant value. Use <code class="mono">styles</code> below for a one-off.</li>
       <li>A theme that extends another keeps the parent's recipe overrides and replaces them cell by cell.</li>

@@ -54,7 +54,7 @@ export interface SidebarSectionProps extends RootProps<HTMLDivElement> {
 
 const header: CSSProperties = { ...row, gap: t.space["2xs"], paddingBottom: t.space["2xs"], paddingLeft: t.space.smMd, paddingRight: t.space.xs };
 
-const toggle: CSSProperties = { ...pressable, flexDirection: "row", alignItems: "center", flex: 1, textAlign: "left", transition: `color ${t.duration.fast}` };
+const toggle: CSSProperties = { ...pressable, flexDirection: "row", alignItems: "center", flex: 1, textAlign: "left", transition: `color ${t.motion.duration.fast}` };
 
 /** A row of the list: memoised, with a press and a menu that name its key through one shared handler each. */
 const Row = memo(function Row({ itemKey, item, selectedName, onSelect, onMenu }: { itemKey: string; item: Omit<SidebarSectionItem, "key">; selectedName: string; onSelect: (key: string) => void; onMenu?: (key: string) => void }) {
@@ -124,7 +124,7 @@ export function SidebarSection({
             part="chevron"
             name="chevron-down"
             size={r.chevron.width}
-            style={partStyle(r, "chevron", { transform: shut ? (dir === "rtl" ? "rotate(90deg)" : "rotate(-90deg)") : "rotate(0deg)", transition: `transform ${t.duration.fast} ${t.ease.standard}` })}
+            style={partStyle(r, "chevron", { transform: shut ? (dir === "rtl" ? "rotate(90deg)" : "rotate(-90deg)") : "rotate(0deg)", transition: `transform ${t.motion.duration.fast} ${t.motion.easing.standard}` })}
           />
           {icon ? <Icon part="starIcon" name={icon} size={r.starIcon.width} style={r.starIcon} /> : null}
           <span style={css(text, truncate(1), { flexShrink: 1 })}>{label}</span>
@@ -132,7 +132,7 @@ export function SidebarSection({
         </button>
         {/* Each is drawn only when it fires something. */}
         {actionsVisible && (onAdd || onMenu) && (
-          <div style={css(row, { gap: t.space["3xs"], opacity: revealed ? 1 : 0, transition: `opacity ${t.duration.fast}` })}>
+          <div style={css(row, { gap: t.space["3xs"], opacity: revealed ? 1 : 0, transition: `opacity ${t.motion.duration.fast}` })}>
             {onAdd ? <IconButton icon="plus" label={addLabel || s("add")} size="sm" onPress={() => onAdd()} /> : null}
             {onMenu ? <IconButton icon="ellipsis" label={s("options", { label })} size="sm" onPress={() => onMenu()} /> : null}
           </div>

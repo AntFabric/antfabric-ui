@@ -60,7 +60,7 @@ const useStyles = createStyles((t) => ({
   meta: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline" },
   actions: { flexDirection: "row" },
   action: { flex: 1 },
-  more: { alignSelf: "flex-start", justifyContent: "center", minHeight: t.control.hit },
+  more: { alignSelf: "flex-start", justifyContent: "center", minHeight: t.size.target.min },
   moreText: { textDecorationLine: "underline" },
 }));
 

@@ -42,8 +42,8 @@ export function Delta({ value, inverse = false, format = DEFAULT_FORMAT, size = 
   const direction = !known || value === 0 ? "flat" : value > 0 ? "up" : "down";
   // Good or bad is the direction against `inverse`: two inputs, which a recipe's variants cannot join, so the kit picks the pair (the recipe's `reads`).
   const tone = direction === "flat" ? "neutral" : (direction === "up") !== inverse ? "positive" : "negative";
-  const ink = tone === "positive" ? t.data.onPositive : tone === "negative" ? t.data.onNegative : t.fg.muted;
-  const fill = tone === "positive" ? t.data.positiveSoft : tone === "negative" ? t.data.negativeSoft : t.surface.muted;
+  const ink = tone === "positive" ? t.color.text.data.onPositive : tone === "negative" ? t.color.text.data.onNegative : t.color.text.muted;
+  const fill = tone === "positive" ? t.color.background.data.positiveSoft : tone === "negative" ? t.color.background.data.negativeSoft : t.color.background.muted;
   const good = tone === "positive";
   const change = () => ({ value: fmt(withoutSign(format), Math.abs(value), formatWords, locale) });
   const said = !known ? s("changeUnavailable") : direction === "flat" ? s("noChange") : direction === "up" ? (good ? s("upGood", change()) : s("upBad", change())) : good ? s("downGood", change()) : s("downBad", change());

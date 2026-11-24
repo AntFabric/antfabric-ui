@@ -128,7 +128,7 @@ export function ListItem({
   // Dims to 0.6 under the finger and eases back.
   const dim = useRef(new Animated.Value(press.pressed ? 0.6 : 1)).current;
   useEffect(() => {
-    const run = Animated.timing(dim, { toValue: press.pressed ? 0.6 : 1, duration: t.duration.fast, easing: bezier(t.ease.out), useNativeDriver: Platform.OS !== "web" });
+    const run = Animated.timing(dim, { toValue: press.pressed ? 0.6 : 1, duration: t.motion.duration.fast, easing: bezier(t.motion.easing.out), useNativeDriver: Platform.OS !== "web" });
     run.start();
     return () => run.stop();
   }, [press.pressed, dim, t.duration, t.ease]);
@@ -179,7 +179,7 @@ export function ListItem({
         <View testID={partId(testID, "list-item", "check")} importantForAccessibility="no-hide-descendants" style={[s.box, checkBox.view]}>
           {on ? (
             <Enter motion="pop">
-              <Icon testID={partId(testID, "list-item", "tick")} name="check" size={tick.size} strokeWidth={t.icon.strokeTick} color={r.tick.text.color ?? checkBox.text.color} style={tick.style} />
+              <Icon testID={partId(testID, "list-item", "tick")} name="check" size={tick.size} strokeWidth={t.size.stroke.tick} color={r.tick.text.color ?? checkBox.text.color} style={tick.style} />
             </Enter>
           ) : null}
         </View>

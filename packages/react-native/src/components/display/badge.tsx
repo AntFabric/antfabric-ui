@@ -32,7 +32,7 @@ export interface BadgeProps extends RootProps {
 /** Layout no token decides; what the tokens decide (colour, type, the dot's size) is the recipe's. */
 const useStyles = createStyles((t) => ({
   root: { flexDirection: "row", alignItems: "center", justifyContent: "center", alignSelf: "flex-start", height: 20, minWidth: 20 },
-  dot: { minWidth: t.dot.size, paddingHorizontal: 0 },
+  dot: { minWidth: t.size.dot.default, paddingHorizontal: 0 },
   count: { lineHeight: 12, fontVariant: ["tabular-nums"] },
 }));
 

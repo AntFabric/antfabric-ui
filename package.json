@@ -17,6 +17,7 @@
     "frames": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json --import ./apps/catalogue/scripts/native.mjs apps/catalogue/scripts/frames.tsx",
     "describe": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/describe.mts",
     "tokens:build": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/tokens-build.mts",
+    "api:lock": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/api-lock.mts",
     "report": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/report.mts",
     "literals:tighten": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/report.mts --tighten",
     "primitives": "tsx --tsconfig apps/catalogue/scripts/tsconfig.json apps/catalogue/scripts/primitives.mts",

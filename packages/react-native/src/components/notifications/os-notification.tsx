@@ -94,9 +94,9 @@ const useStyles = createStyles((t) => ({
   content: { flex: 1, minWidth: 0, gap: 1 }, /* structural: 1px optical gap between title and body */
   headRow: { flexDirection: "row", alignItems: "baseline", gap: t.space.sm },
   title: { flex: 1 },
-  avatarSlot: { flexShrink: 0, marginTop: t.border.wHairline },
+  avatarSlot: { flexShrink: 0, marginTop: t.border.width.hairline },
   largeIcon: { flexShrink: 0 },
-  appIcon: { marginTop: t.border.wHairline, alignItems: "center", justifyContent: "center" },
+  appIcon: { marginTop: t.border.width.hairline, alignItems: "center", justifyContent: "center" },
   appBadge: { position: "absolute", right: -t.space["2xs"], bottom: -t.space["2xs"], alignItems: "center", justifyContent: "center" },
   header: { flexDirection: "row", alignItems: "center", gap: t.space.sm },
   smallIcon: { alignItems: "center", justifyContent: "center" },
@@ -110,7 +110,7 @@ const useStyles = createStyles((t) => ({
   menu: { alignSelf: "flex-end", marginTop: t.space.sm },
   menuSheet: { overflow: "hidden", ...blur },
   menuRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  stack: { alignItems: "center", marginTop: -t.border.wHairline },
+  stack: { alignItems: "center", marginTop: -t.border.width.hairline },
   sliver: { borderTopWidth: 0, ...blur },
 }));
 
@@ -328,7 +328,7 @@ export function OsNotification({
                   <Text testID={partId(testID, "os-notification", "source")} numberOfLines={1} style={[face(os), { flex: 1 }, r.source.view, r.source.text]}>
                     {preview && context ? str("sourcePhoneIn", { app: appName, context, time }) : str("sourcePhone", { app: appName, time })}
                   </Text>
-                  <Icon name={open ? "chevron-up" : "chevron-down"} size={18} color={t.fg.muted} />
+                  <Icon name={open ? "chevron-up" : "chevron-down"} size={18} color={t.color.text.muted} />
                 </View>
                 <View style={s.row}>
                   <View style={s.content}>

@@ -15,7 +15,7 @@
 import { existsSync } from "node:fs";
 import { relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { cssVarName, descriptions, isReference, recipeEntries, recipes, tokenSource, tokens, type Recipe, type RecipeEntry, type TokenNote } from "@antfabric/ui-core";
+import { canonicalPath, cssVarName, descriptions, isReference, naming, recipeEntries, recipes, renames, tokenMeta, tokenSource, tokens, type Recipe, type RecipeEntry, type TokenNote } from "@antfabric/ui-core";
 import { categories, components, registry } from "@antfabric/ui-docs";
 import type { ComponentDocs, PropDoc } from "@antfabric/ui-docs";
 import { sourceFile } from "./sources";
@@ -26,6 +26,7 @@ const rel = (p: string) => relative(root, p);
 const argv = process.argv.slice(2);
 const json = argv.includes("--json");
 const args = argv.filter((a) => !a.startsWith("--"));
+const flags = new Set(argv.filter((a) => a.startsWith("--")));
 
 const out = (data: unknown, text: () => string) => console.log(json ? JSON.stringify(data, null, 2) : text());
 const fail = (message: string): never => {
@@ -281,23 +282,110 @@ function tokenGroupText(group: string, rows: ReturnType<typeof tokenData>[]): st
   return L.join("\n");
 }
 
+/** `--internal` lists the internal tokens too: without it a listing is the documented set. */
+const shown = (path: string) => flags.has("--internal") || tokenMeta(path).visibility === "public";
+
 function tokenGroups() {
   const counts = new Map<string, number>();
-  for (const l of leaves()) counts.set(groupOf(l.path), (counts.get(groupOf(l.path)) ?? 0) + 1);
+  for (const l of leaves()) if (shown(l.path)) counts.set(groupOf(l.path), (counts.get(groupOf(l.path)) ?? 0) + 1);
   return [...counts].map(([group, count]) => ({ group, count }));
 }
 
 /* ---------- the command ---------- */
 
-if (args[0] === "tokens") {
+/** `--find "chip height"`: the tokens whose path or description holds every word, the path's matches first. An old name finds its new one. */
+function findTokens(query: string) {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const split = (path: string) => path.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/\./g, " ").toLowerCase();
+  const old = Object.entries(renames as Record<string, string>);
+  return leaves()
+    .map((l) => {
+      const was = old.filter(([, now]) => now === l.path).map(([o]) => o);
+      const name = `${split(l.path)} ${l.path.toLowerCase()} ${was.map((o) => `${split(o)} ${o.toLowerCase()}`).join(" ")}`;
+      const text = String((descriptions as Record<string, string | TokenNote>)[l.path] === undefined ? "" : (tokenData(l).description ?? "")).toLowerCase();
+      const inName = words.filter((w) => name.includes(w)).length;
+      return { l, was, score: words.every((w) => name.includes(w) || text.includes(w)) ? inName * 10 + 1 : 0 };
+    })
+    .filter((x) => x.score)
+    .sort((a, b) => b.score - a.score || a.l.path.localeCompare(b.l.path))
+    .slice(0, 25)
+    .map(({ l, was }) => ({ ...tokenData(l), ...explain(l.path), ...(was.length ? { was } : {}) }));
+}
+
+/** What a name says: its tier, who owns it, and its words. */
+function explain(path: string) {
+  const meta = tokenMeta(path);
+  const segments = path.split(".");
+  const parts =
+    meta.tier === "semantic"
+      ? { category: segments[0]!, ...(segments.length > 2 ? { property: segments[1]!, role: segments.slice(2).join(".") } : { role: segments.slice(1).join(".") }) }
+      : (() => {
+          const key = segments.slice(1).join(".");
+          const m = new RegExp(`^(.*?)(${Object.keys(naming.componentProperties).sort((a, b) => b.length - a.length).join("|")})(.*)$`).exec(key[0]!.toUpperCase() + key.slice(1));
+          const lower = (x: string) => (x ? x[0]!.toLowerCase() + x.slice(1) : x);
+          return { component: segments[0]!, ...(m ? { ...(m[1] ? { part: lower(m[1]) } : {}), property: lower(m[2]!), ...(m[3] ? { variant: lower(m[3]) } : {}) } : { key }) };
+        })();
+  return { tier: meta.tier, type: meta.type, ...(meta.owners.length ? { components: [...meta.owners] } : {}), ...(meta.visibility === "internal" ? { visibility: "internal" } : {}), name: parts };
+}
+
+if (args[0] === "tokens" && flags.has("--grammar")) {
+  out(naming, () =>
+    [
+      "How tokens are named (packages/core/src/naming.ts, /naming.json; held by `pnpm check names`)",
+      "",
+      "  semantic    category.property.role          color.text.muted · size.control.md · font.lineHeight.body",
+      "  component   componentId.partPropertyVariant  chip.removeSize · select.panelMaxHeight · chart.gridColor",
+      "",
+      "Categories and their properties:",
+      ...Object.entries(naming.categories).map(([c, v]) => `  ${c.padEnd(10)} ${v.properties ? Object.keys(v.properties).join(" | ") : "(no property level)"}   ${v.is}`),
+      "",
+      `A component key ends in: ${Object.keys(naming.componentProperties).join(", ")}`,
+      `Then a size (${naming.sizes.slice(0, 6).join(", ")}) or a state (${Object.keys(naming.states).join(", ")}).`,
+      "A mode (light, dark; web, desktop, mobile, android) is never in a name.",
+      "",
+      "Other words for the same thing:",
+      ...Object.entries(naming.glossary).map(([w, m]) => `  ${w.padEnd(18)} ${m}`),
+    ].join("\n"),
+  );
+} else if (args[0] === "tokens" && flags.has("--deprecated")) {
+  const list = Object.entries(renames as Record<string, string>).map(([was, now]) => ({ was, now }));
+  out(list, () => [...list.map((r) => `${r.was.padEnd(Math.max(...list.map((x) => x.was.length)) + 2)}→ ${r.now}`), "", `${list.length} renamed tokens. The old names work until the next major version; \`npx af-tokens-codemod <dir>\` rewrites them.`].join("\n"));
+} else if (args[0] === "tokens" && flags.has("--find")) {
+  const query = args.slice(1).join(" ");
+  if (!query) fail('Say what to look for: pnpm describe tokens --find "chip height"');
+  const found = findTokens(query);
+  out(found, () => (found.length ? found.map((r) => `${r.path}  ${r.cssVar}${r.visibility ? "  (internal)" : ""}\n  ${segments(r.values)}${r.was ? `\n  was ${r.was.join(", ")}` : ""}${r.description ? `\n${prose(r.description, "  ")}` : ""}`).join("\n\n") : `No token matches "${query}". Try pnpm describe tokens --grammar for the words names use.`));
+} else if (args[0] === "tokens" && flags.has("--explain")) {
+  const given = args[1];
+  if (!given) fail("Name a token: pnpm describe tokens --explain chip.removeSize");
+  const path = canonicalPath(given!);
+  const leaf = leaves().find((l) => l.path === path);
+  if (!leaf) fail(`No token "${given}". pnpm describe tokens --find "<words>" searches by word.`);
+  const data = { ...tokenData(leaf!), ...explain(path), ...(path !== given ? { renamedFrom: given } : {}) };
+  out(data, () =>
+    [
+      `${data.path}  ${data.cssVar}`,
+      ...(data.renamedFrom ? [`  ${data.renamedFrom} is its old name (deprecated; it leaves in the next major version)`] : []),
+      `  ${data.tier} token, a ${data.type}${data.components ? `, owned by ${data.components.join(", ")}` : ""}${data.visibility ? ", internal (not in the documented set)" : ""}`,
+      `  ${Object.entries(data.name).map(([k, v]) => `${k}: ${v}`).join(" · ")}`,
+      `  ${segments(data.values)}`,
+      ...(data.references ? [`  from ${segments(data.references as Record<string, string>)}`] : []),
+      ...(data.description ? [prose(data.description, "  ")] : []),
+    ].join("\n"),
+  );
+} else if (args[0] === "tokens") {
   const group = args[1];
   const groups = tokenGroups();
   if (!group) {
-    out(groups, () => [...groups.map((g) => `${g.group.padEnd(Math.max(...groups.map((x) => x.group.length)) + 2)}${g.count}`), "", `${groups.reduce((n, g) => n + g.count, 0)} tokens. pnpm describe tokens <group> for one.`].join("\n"));
+    out(groups, () => [...groups.map((g) => `${g.group.padEnd(Math.max(...groups.map((x) => x.group.length)) + 2)}${g.count}`), "", `${groups.reduce((n, g) => n + g.count, 0)} tokens${flags.has("--internal") ? "" : `, and ${leaves().filter((l) => !shown(l.path)).length} internal ones not listed (--internal)`}. pnpm describe tokens <group> for one; --find "<words>" searches.`].join("\n"));
   } else {
-    const rows = leaves().filter((l) => groupOf(l.path) === group).map(tokenData);
+    // A group, or any prefix of a path: `color`, `color.text`, `size.control`.
+    const inGroup = leaves().filter((l) => groupOf(l.path) === group || l.path.startsWith(`${group}.`));
+    const hidden = inGroup.filter((l) => !shown(l.path)).length;
+    // A group that is internal as a whole is shown when it is asked for by name.
+    const rows = (hidden === inGroup.length ? inGroup : inGroup.filter((l) => shown(l.path))).map(tokenData);
     if (!rows.length) fail(`No token group "${group}". Groups: ${groups.map((g) => g.group).join(", ")}`);
-    out({ group, tokens: rows }, () => tokenGroupText(group, rows));
+    out({ group, tokens: rows }, () => `${tokenGroupText(group, rows)}${hidden && hidden < inGroup.length ? `\n\n${hidden} internal token(s) of ${group} are not shown: add --internal.` : ""}`);
   }
 } else if (!args[0]) {
   out(listData(), listText);

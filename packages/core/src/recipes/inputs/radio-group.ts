@@ -8,52 +8,52 @@ import { defineRecipe } from "../../recipe";
  * `cards` is a third set of parts: each option is a card (`card`) with an optional picture on top (`cardPreview`), its label and tags in a row
  * (`cardHead`, `cardLabel`, `cardTags`) and its description (`cardDescription`). The chosen card takes a 2px edge in the strong ink (a hairline
  * border plus an inset ring of the same colour, so nothing shifts), never the brand: the edge is the choice, so the card draws no ring and dot.
- * Web and desktop lay the cards out in as many columns of at least `radioGroup.cardMinW` as fit (the kit's grid reads it); the phone stacks them.
+ * Web and desktop lay the cards out in as many columns of at least `radioGroup.cardMinWidth` as fit (the kit's grid reads it); the phone stacks them.
  */
 export const radioGroup = defineRecipe({
   parts: ["root", "legend", "options", "option", "ring", "dot", "label", "description", "pill", "card", "cardPreview", "cardHead", "cardLabel", "cardTags", "cardDescription"],
   styles: {
-    root: { base: { gap: "$space.xs", font: "$font.sans" }, platforms: { mobile: { base: { gap: "$space.sm" } } } }, // idiom: one step larger
+    root: { base: { gap: "$space.xs", font: "$font.family.sans" }, platforms: { mobile: { base: { gap: "$space.sm" } } } }, // idiom: one step larger
     legend: {
-      base: { size: "$text.caption", line: "$text.captionLine", weight: "$font.weightSemibold", fg: "$fg.body" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.semibold", fg: "$color.text.body" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm" } } }, // idiom: one step larger
     },
     // Only the pills' wrapper carries tokens: the list's rows sit one `space.3xs` apart (the kit's layout).
-    options: { variants: { appearance: { list: {}, pills: { gap: "$choice.pillGap", minHeight: "$control.hInput" }, cards: { gap: "$space.sm" } } } },
-    option: { base: { gap: "$choice.gap", paddingY: "$choice.padY" }, states: { disabled: { opacity: "$opacity.disabled" } } },
+    options: { variants: { appearance: { list: {}, pills: { gap: "$choice.pillGap", minHeight: "$size.control.input" }, cards: { gap: "$space.sm" } } } },
+    option: { base: { gap: "$choice.gap", paddingY: "$choice.paddingY" }, states: { disabled: { opacity: "$opacity.disabled" } } },
     ring: {
-      base: { square: "$choice.ringSize", marginTop: "$choice.ringNudge", radius: "$radius.circle", borderWidth: "$choice.ringW", borderColor: "$border.default" },
+      base: { square: "$choice.ringSize", marginTop: "$choice.ringOffsetY", radius: "$radius.circle", borderWidth: "$choice.ringWidth", borderColor: "$color.border.default" },
       // Hover darkens an empty ring's edge and deepens the coral of the chosen one; the phone has no hover.
-      states: { on: { borderColor: "$brand.default" }, hover: { borderColor: "$fg.faint" }, "hover+on": { borderColor: "$brand.hover" }, focus: { shadow: "$shadow.focus" } },
+      states: { on: { borderColor: "$color.background.brand.default" }, hover: { borderColor: "$color.text.faint" }, "hover+on": { borderColor: "$color.background.brand.hover" }, focus: { shadow: "$elevation.shadow.focus" } },
     },
-    dot: { base: { square: "$choice.dotSize", radius: "$radius.circle", bg: "$brand.default" } },
+    dot: { base: { square: "$choice.dotSize", radius: "$radius.circle", bg: "$color.background.brand.default" } },
     label: {
-      base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal", fg: "$fg.body" },
-      states: { on: { weight: "$font.weightSemibold", fg: "$fg.strong" } },
-      platforms: { mobile: { base: { size: "$text.body", line: "$text.bodyLine" } } }, // idiom: one step larger
+      base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal", fg: "$color.text.body" },
+      states: { on: { weight: "$font.weight.semibold", fg: "$color.text.strong" } },
+      platforms: { mobile: { base: { size: "$font.size.body", line: "$font.lineHeight.body" } } }, // idiom: one step larger
     },
     description: {
-      base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal" } } }, // idiom: one step larger
     },
     pill: {
       on: ["web", "desktop"],
       base: {
-        height: "$control.hInput",
+        height: "$size.control.input",
         paddingX: "$space.mdLg",
         radius: "$radius.pill",
-        borderWidth: "$border.wHairline",
-        borderColor: "$border.subtle",
-        bg: "$surface.card",
-        fg: "$fg.muted",
-        size: "$text.caption",
-        weight: "$font.weightSemibold",
+        borderWidth: "$border.width.hairline",
+        borderColor: "$color.border.subtle",
+        bg: "$color.background.card",
+        fg: "$color.text.muted",
+        size: "$font.size.caption",
+        weight: "$font.weight.semibold",
       },
       // Only an unchosen pill takes the hover fill: the kit does not turn `hover` on for the chosen one.
       states: {
-        on: { borderColor: "$border.active", bg: "$surface.inverse", fg: "$fg.onInverse" },
-        hover: { bg: "$hover.surface" },
-        focus: { shadow: "$shadow.focus" },
+        on: { borderColor: "$color.border.selected", bg: "$color.background.inverse", fg: "$color.text.onInverse" },
+        hover: { bg: "$color.background.hover" },
+        focus: { shadow: "$elevation.shadow.focus" },
         disabled: { opacity: "$opacity.disabled" },
       },
     },
@@ -62,31 +62,31 @@ export const radioGroup = defineRecipe({
         gap: "$space.sm",
         padding: "$space.md",
         radius: "$radius.card",
-        bg: "$surface.card",
-        borderWidth: "$border.wHairline",
-        borderColor: "$border.subtle",
+        bg: "$color.background.card",
+        borderWidth: "$border.width.hairline",
+        borderColor: "$color.border.subtle",
       },
       // Hover darkens the edge of an unchosen card; the chosen card's edge is the strong ink at 2px (listed after hover, so it wins).
       states: {
-        hover: { borderColor: "$border.default" },
-        on: { borderColor: "$fg.strong", ring: "$fg.strong" },
-        focus: { shadow: "$shadow.focus" },
+        hover: { borderColor: "$color.border.default" },
+        on: { borderColor: "$color.text.strong", ring: "$color.text.strong" },
+        focus: { shadow: "$elevation.shadow.focus" },
         disabled: { opacity: "$opacity.disabled" },
       },
     },
     cardPreview: { base: { radius: "$radius.control" } },
     cardHead: { base: { gap: "$space.xs" } },
     cardLabel: {
-      base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightSemibold", fg: "$fg.strong" },
-      platforms: { mobile: { base: { size: "$text.body", line: "$text.bodyLine" } } }, // idiom: one step larger
+      base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.semibold", fg: "$color.text.strong" },
+      platforms: { mobile: { base: { size: "$font.size.body", line: "$font.lineHeight.body" } } }, // idiom: one step larger
     },
     cardTags: { base: { gap: "$space.2xs" } },
     cardDescription: {
-      base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.muted" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.muted" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal" } } }, // idiom: one step larger
     },
   },
   // The phone grows the touch area to this (`hitSlopTo`); nothing is drawn with it. The web's cards are laid out in columns of at least
-  // `radioGroup.cardMinW` (a grid template, which the recipe's vocabulary cannot say).
-  reads: ["$control.hit", "$radioGroup.cardMinW"],
+  // `radioGroup.cardMinWidth` (a grid template, which the recipe's vocabulary cannot say).
+  reads: ["$size.target.min", "$radioGroup.cardMinWidth"],
 });

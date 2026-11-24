@@ -1,18 +1,18 @@
 import { Platform, type TextStyle } from "react-native";
-import { tokens, type NativeTokens } from "@antfabric/ui-core";
+import { resolveTokens, tokens, type NativeTokens } from "@antfabric/ui-core";
 
 /**
  * What a component asks `font()` for. `regular` is 400 and `book` is 450; the token behind `regular` is
- * `font.weightNormal` because the product's `font.weightRegular` is the 450.
+ * `font.weight.normal` because the product's `font.weight.regular` is the 450.
  */
 export type Weight = "regular" | "book" | "medium" | "semibold" | "bold" | "black";
 const weights = (f: NativeTokens["font"]): Record<Weight, number> => ({
-  regular: f.weightNormal,
-  book: f.weightRegular,
-  medium: f.weightMedium,
-  semibold: f.weightSemibold,
-  bold: f.weightBold,
-  black: f.weightBlack,
+  regular: f.weight.normal,
+  book: f.weight.regular,
+  medium: f.weight.medium,
+  semibold: f.weight.semibold,
+  bold: f.weight.bold,
+  black: f.weight.black,
 });
 export type Face = "sans" | "display" | "mono";
 
@@ -22,25 +22,27 @@ export type Face = "sans" | "display" | "mono";
  * component asks for `font("semibold")` instead of setting `fontWeight`.
  *
  * Body text is Figtree, headlines Satoshi. Satoshi ships no SemiBold, so semibold maps to Medium. The file names are tokens of the
- * mobile profile (`font.fileSansSemibold`), described and mapped to the phone's own `bodyFamily` / `displayFamily` like any other.
+ * mobile profile (`font.file.sans.semibold`), described and mapped to the phone's own `bodyFamily` / `displayFamily` like any other.
  * `book` (450) and `regular` (400) share the Regular file, and `black` is the heaviest file the app ships (ExtraBold for Figtree).
  *
  * Pass the theme's `t` and a theme's or brand's `fonts` take over from Figtree and Satoshi; without it the kit's own are used.
  * A file name of `""` is the system font: no `fontFamily`, and `fontWeight` is the number the weight's name stands for.
  */
-const KIT_FONTS: NativeTokens["font"] = { ...tokens.shared.font, ...tokens.profiles.mobile.font };
+// The kit's own fonts for the phone: the shared families and weights with the mobile profile's files. In a browser the families keep their CSS stacks.
+const KIT_FONTS: NativeTokens["font"] = resolveTokens("mobile", "light", { web: Platform.OS === "web" }).font;
 
 const files = (f: NativeTokens["font"], face: "sans" | "display"): Record<Weight, string> => {
-  const file = face === "sans" ? { regular: f.fileSansRegular, medium: f.fileSansMedium, semibold: f.fileSansSemibold, bold: f.fileSansBold, black: f.fileSansExtrabold } : { regular: f.fileDisplayRegular, medium: f.fileDisplayMedium, semibold: f.fileDisplaySemibold, bold: f.fileDisplayBold, black: f.fileDisplayExtrabold };
+  const of = f.file[face];
+  const file = { regular: of.regular, medium: of.medium, semibold: of.semibold, bold: of.bold, black: of.extrabold };
   return { ...file, book: file.regular };
 };
 
-const MONO = Platform.select({ ios: "Menlo", android: "monospace", default: tokens.shared.font.mono });
+const MONO = Platform.select({ ios: "Menlo", android: "monospace", default: tokens.shared.font.family.mono });
 
 export function font(weight: Weight = "regular", face: Face = "sans", t?: Pick<NativeTokens, "font">): TextStyle {
   const f = t?.font ?? KIT_FONTS;
   // In a browser (the catalogue, through React Native Web) the CSS font stack and weight are exact.
-  if (Platform.OS === "web") return { fontFamily: f[face], fontWeight: String(weights(f)[weight]) as TextStyle["fontWeight"] };
+  if (Platform.OS === "web") return { fontFamily: f.family[face], fontWeight: String(weights(f)[weight]) as TextStyle["fontWeight"] };
   if (face === "mono") return { fontFamily: MONO };
   const file = files(f, face)[weight];
   // A theme that keeps the system font names no file: the platform picks the face, so the weight is asked for by number.

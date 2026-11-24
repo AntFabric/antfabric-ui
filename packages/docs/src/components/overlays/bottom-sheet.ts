@@ -42,9 +42,9 @@ const docs: ComponentDocs = {
           el: "text",
           text: "Not in #release-train yet",
           style: {
-            fontSize: "$text.caption",
-            fontWeight: "$font.weightSemibold",
-            color: "$fg.faint",
+            fontSize: "$font.size.caption",
+            fontWeight: "$font.weight.semibold",
+            color: "$color.text.faint",
             paddingY: "$space.xs",
           },
         },
@@ -243,18 +243,18 @@ const docs: ComponentDocs = {
               direction: "row",
               align: "center",
               gap: "$space.sm",
-              height: "$control.hInput",
+              height: "$size.control.input",
               paddingX: "$space.md",
               radius: "$radius.input",
-              border: "1px solid $border.muted",
+              border: "1px solid $color.border.muted",
             },
             children: [
               {
                 el: "text",
                 text: "To:",
                 style: {
-                  fontSize: "$text.body",
-                  color: "$fg.muted",
+                  fontSize: "$font.size.body",
+                  color: "$color.text.muted",
                 },
               },
               {
@@ -265,8 +265,8 @@ const docs: ComponentDocs = {
                 },
                 style: {
                   flex: 1,
-                  fontSize: "$text.body",
-                  color: "$fg.body",
+                  fontSize: "$font.size.body",
+                  color: "$color.text.body",
                 },
               },
             ],
@@ -275,9 +275,9 @@ const docs: ComponentDocs = {
             el: "text",
             text: "Recent",
             style: {
-              fontSize: "$text.caption",
-              fontWeight: "$font.weightSemibold",
-              color: "$fg.faint",
+              fontSize: "$font.size.caption",
+              fontWeight: "$font.weight.semibold",
+              color: "$color.text.faint",
               paddingTop: "$space.md",
               paddingBottom: "$space.xs",
             },
@@ -288,7 +288,7 @@ const docs: ComponentDocs = {
               direction: "row",
               align: "center",
               gap: "$space.md",
-              minHeight: "$row.h",
+              minHeight: "$size.row.default",
             },
             children: [
               {
@@ -303,9 +303,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "Kenji Watanabe",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
             ],
@@ -316,7 +316,7 @@ const docs: ComponentDocs = {
               direction: "row",
               align: "center",
               gap: "$space.md",
-              minHeight: "$row.h",
+              minHeight: "$size.row.default",
             },
             children: [
               {
@@ -332,9 +332,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "#platform-eng",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
             ],
@@ -502,7 +502,7 @@ const docs: ComponentDocs = {
               position: "relative",
               width: 375,
               minHeight: 740,
-              paddingX: "$gutter.pane",
+              paddingX: "$space.gutter.pane",
               paddingTop: "$space.2xl",
             },
             children: [
@@ -528,7 +528,7 @@ const docs: ComponentDocs = {
               position: "relative",
               width: 375,
               minHeight: 740,
-              paddingX: "$gutter.pane",
+              paddingX: "$space.gutter.pane",
               paddingTop: "$space.2xl",
             },
             children: [
@@ -568,7 +568,7 @@ const docs: ComponentDocs = {
               position: "relative",
               width: 375,
               minHeight: 740,
-              paddingX: "$gutter.pane",
+              paddingX: "$space.gutter.pane",
               paddingTop: "$space.2xl",
             },
             children: [
@@ -607,7 +607,7 @@ const docs: ComponentDocs = {
               position: "relative",
               width: 375,
               minHeight: 740,
-              paddingX: "$gutter.pane",
+              paddingX: "$space.gutter.pane",
               paddingTop: "$space.2xl",
             },
             children: [

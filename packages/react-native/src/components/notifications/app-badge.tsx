@@ -31,7 +31,7 @@ const gradient = (css: string): ViewStyle => (Platform.OS === "web" ? { backgrou
 /** Layout no token decides; the OS's colours, sizes and type are the recipe's (`appBadge`, under `ios` and `android`). */
 const useStyles = createStyles((t) => ({
   root: { alignSelf: "flex-start" },
-  home: { alignItems: "center", ...gradient(`linear-gradient(160deg, ${t.identity.indigo}, ${t.identity.ink})`) },
+  home: { alignItems: "center", ...gradient(`linear-gradient(160deg, ${t.color.background.identity.indigo}, ${t.color.background.identity.ink})`) },
   iconWrap: { alignItems: "center", justifyContent: "center" },
   appIcon: { alignItems: "center", justifyContent: "center" },
   badge: { position: "absolute", alignItems: "center", justifyContent: "center" },

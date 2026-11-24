@@ -25,8 +25,8 @@ export type ChartWeight = "regular" | "medium" | "semibold" | "bold";
  * Web). The same job `font()` does for the theme's fonts; chart text is not in them, so it has its own.
  */
 export function chartFont(t: ChartTokens, weight: ChartWeight = "regular"): TextStyle {
-  if (Platform.OS === "web") return { fontFamily: t.chart.font, fontWeight: { regular: "400", medium: "500", semibold: "600", bold: "700" }[weight] as TextStyle["fontWeight"] };
-  return { fontFamily: { regular: t.chart.fileRegular, medium: t.chart.fileMedium, semibold: t.chart.fileSemibold, bold: t.chart.fileBold }[weight] };
+  if (Platform.OS === "web") return { fontFamily: t.chart.fontFamily, fontWeight: { regular: "400", medium: "500", semibold: "600", bold: "700" }[weight] as TextStyle["fontWeight"] };
+  return { fontFamily: { regular: t.chart.fontFileRegular, medium: t.chart.fontFileMedium, semibold: t.chart.fontFileSemibold, bold: t.chart.fontFileBold }[weight] };
 }
 
 /** Whether the person asked for less movement. False until the system answers, so a chart's first render is the still one. */
@@ -57,7 +57,7 @@ export const giftedAnimated = (animate: boolean, reduced: boolean) => animate &&
 export function giftedTheme(t: ChartTokens, reduced = false) {
   // gifted-charts' text has no `maxFontSizeMultiplier` to set, so the cap is in the size: the system multiplies it by the text size, and this holds the product at `fontScale.chrome`.
   const size = t.chart.labelSize * Math.min(1, fontScale.chrome / PixelRatio.getFontScale());
-  const text = (weight: ChartWeight = "regular", extra?: TextStyle): TextStyle => ({ color: t.chart.label, fontSize: size, ...chartFont(t, weight), ...extra });
+  const text = (weight: ChartWeight = "regular", extra?: TextStyle): TextStyle => ({ color: t.chart.labelColor, fontSize: size, ...chartFont(t, weight), ...extra });
   return {
     series: seriesColors(t),
     /** A chart text style: always its own colour, size and font file, because a `Text` inherits nothing. */
@@ -65,13 +65,13 @@ export function giftedTheme(t: ChartTokens, reduced = false) {
     /** No axis line on the value side, a hairline along the bottom, dashed rules, no background; the labels are the chart's quiet text. */
     axis: {
       yAxisThickness: 0,
-      xAxisThickness: t.border.wHairline,
-      xAxisColor: t.chart.axis,
+      xAxisThickness: t.border.width.hairline,
+      xAxisColor: t.chart.axisColor,
       yAxisTextStyle: text(),
       xAxisLabelTextStyle: text("regular", { textAlign: "center" }),
       rulesType: "dashed" as const,
-      rulesColor: t.chart.grid,
-      rulesThickness: t.border.wHairline,
+      rulesColor: t.chart.gridColor,
+      rulesThickness: t.border.width.hairline,
       dashWidth: t.chart.gridDash,
       dashGap: t.chart.gridGap,
       backgroundColor: "transparent",
@@ -79,15 +79,15 @@ export function giftedTheme(t: ChartTokens, reduced = false) {
     },
     /** A chart's draw-in: on unless the person reduces motion, and never under react-native-web. */
     motion: { isAnimated: giftedAnimated(true, reduced), animationDuration: CHART_DRAW },
-    line: { thickness: t.chart.lineW, dataPointsRadius: t.chart.pointR, curved: false, seriesDash: [t.chart.seriesDash, t.chart.seriesGap] },
+    line: { thickness: t.chart.lineWidth, dataPointsRadius: t.chart.pointRadius, curved: false, seriesDash: [t.chart.seriesDash, t.chart.seriesGap] },
     /** A target or threshold line: `referenceLine1Config={{ ...theme.reference, labelText }}`. */
-    reference: { color: t.chart.reference, thickness: t.border.wHairline, type: "dashed" as const, dashWidth: t.chart.referenceDash, dashGap: t.chart.referenceGap },
+    reference: { color: t.chart.referenceColor, thickness: t.border.width.hairline, type: "dashed" as const, dashWidth: t.chart.referenceDash, dashGap: t.chart.referenceGap },
     /** Where the finger is: a dashed strip through a point (`pointerConfig`). */
-    pointer: { pointerStripColor: t.chart.crosshair, pointerStripWidth: t.border.wHairline, strokeDashArray: [t.chart.gridDash, t.chart.gridGap], radius: t.chart.pointR },
+    pointer: { pointerStripColor: t.chart.crosshairColor, pointerStripWidth: t.border.width.hairline, strokeDashArray: [t.chart.gridDash, t.chart.gridGap], radius: t.chart.pointRadius },
     /** The room gifted-charts keeps for a tooltip card (`ChartTooltip`) before it is drawn: its width, and its height for a number of series. */
-    tooltip: { width: t.chart.tipW, heightFor: (series: number) => t.chart.tipBaseH + series * t.chart.tipRowH },
-    bar: { radius: t.chart.barRadius, width: t.chart.barMaxW, soloWidth: t.chart.barSoloW, gap: t.chart.barGap },
+    tooltip: { width: t.chart.tipWidth, heightFor: (series: number) => t.chart.tipBaseHeight + series * t.chart.tipRowHeight },
+    bar: { radius: t.chart.barRadius, width: t.chart.barMaxWidth, soloWidth: t.chart.barSoloWidth, gap: t.chart.barGap },
     /** The ring a point or a segment is cut from the card with. */
-    card: t.surface.card,
+    card: t.color.background.card,
   };
 }

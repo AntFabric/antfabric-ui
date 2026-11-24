@@ -44,7 +44,7 @@ export function Fab({ variant = "ink", icon, label, src = "", disabled = false, 
   const isGlass = glass && variant !== "tint";
   // A phone has no hover, and a press only scales the disc, so the recipe is read with no pressed fill.
   const r = useRecipe(recipes.fab, { variants: { variant }, state: { focus: press.focused, disabled: press.disabled }, styles });
-  const disc = partStyle(r, "disc", { view: s.disc, text: isGlass ? { color: t.fg.strong } : undefined });
+  const disc = partStyle(r, "disc", { view: s.disc, text: isGlass ? { color: t.color.text.strong } : undefined });
   const ink = disc.text.color;
   // The icon's size is its width and height (`size`); what else `styles.icon` sets goes on the glyph.
   const { width: iconSize, height: _h, ...iconRest } = r.icon.view;

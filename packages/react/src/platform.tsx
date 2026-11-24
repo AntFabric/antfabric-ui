@@ -187,7 +187,7 @@ export function AntFabricRoot({ platform: givenPlatform, os: givenOs, osVersion,
   // eslint-disable-next-line react-hooks/exhaustive-deps -- `drawn.id` is `drawn`'s content
   useInsertionEffect(() => (mounted && themeSheetHere ? holdThemeSheet(drawn) : undefined), [mounted, themeSheetHere, drawn.id]);
   return (
-    <div {...rootAttrs({ platform, os, scheme, theme: drawn })} dir={dir} style={{ fontFamily: t.font.sans, color: t.fg.body, ...ROOT_TEXT, ...style }}>
+    <div {...rootAttrs({ platform, os, scheme, theme: drawn })} dir={dir} style={{ fontFamily: t.font.family.sans, color: t.color.text.body, ...ROOT_TEXT, ...style }}>
       {/* One slot for both sheets: a sibling more would shift the ids `useId` gives everything inside (the tree's shape is part of them). */}
       {(css === true || (css === "theme" && drawn.id !== "")) && (
         <>

@@ -31,10 +31,10 @@ export function useAnnounce(message: string | false | null | undefined, { initia
 }
 
 /**
- * The `hitSlop` that grows a control drawn `width` × `height` to a `target` square (the profile's `control.hit`, 44pt), split evenly
+ * The `hitSlop` that grows a control drawn `width` × `height` to a `target` square (the profile's `size.target.min`, 44pt), split evenly
  * between the sides: the touch area grows, the drawing does not. Nothing on a side the control already covers.
  *
- *   <Pressable hitSlop={hitSlopTo(t.control.hit, 34, 34)} …>
+ *   <Pressable hitSlop={hitSlopTo(t.size.target.min, 34, 34)} …>
  */
 export function hitSlopTo(target: number, height: number, width = target): Insets | undefined {
   const v = Math.max(0, Math.ceil((target - height) / 2));

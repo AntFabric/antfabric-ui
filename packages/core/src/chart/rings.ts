@@ -33,7 +33,7 @@ export function keysOf(labels: readonly string[]): string[] {
 
 /**
  * The rows of a donut as its segments, in order. Up to `most` keep their own; any after that are summed into one more, named `other` (the kit's
- * word for it), which the kits draw in a neutral colour (`chart.other`) and not in a colour of the palette. The table behind "View as table" keeps every row.
+ * word for it), which the kits draw in a neutral colour (`chart.otherColor`) and not in a colour of the palette. The table behind "View as table" keeps every row.
  */
 export function segmentsOf(data: Row[], label: string, value: string, other: string, most: number = MOST_SEGMENTS): Segment[] {
   const all = data.map((r) => ({ label: String(r[label] ?? "–"), value: Number.isFinite(+(r[value] as number)) ? Math.max(0, +(r[value] as number)) : 0 }));

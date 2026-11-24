@@ -7,41 +7,41 @@ import { defineRecipe } from "../../recipe";
  * coral-soft pill. The drill-in variant lists a destination's sections in the rail: its icon takes the logo's place on the same coral
  * tile (`logo`, with `tileIcon` for the glyph) and the workspace pill becomes the "Main menu" chip.
  * The rail's right edge is the root's. The kit keeps two edges as a `border` shorthand (the workspace pill's and the search field's 1px
- * ring) so the button reset's zero border stays under them, as the render snapshot expects; it reads `$border.subtle`, `default` and
+ * ring) so the button reset's zero border stays under them, as the render snapshot expects; it reads `$color.border.subtle`, `default` and
  * `muted` for those, and the badge's corner offsets (a `Badge`'s own `style`, which carries no part).
  */
 export const navRail = defineRecipe({
   parts: ["root", "lockup", "logo", "logoGlyph", "tileIcon", "wordmark", "pill", "chevron", "search", "searchIcon", "row", "icon", "separator", "profile", "profileName", "profileEmail"],
   styles: {
     root: {
-      base: { width: "$rail.wNav", bg: "$surface.chrome", borderRightWidth: "$border.wHairline", borderRightColor: "$border.subtle", font: "$font.sans" },
-      variants: { expanded: { true: { width: "$navRail.wOpen" } } },
+      base: { width: "$size.layout.rail", bg: "$color.background.chrome", borderRightWidth: "$border.width.hairline", borderRightColor: "$color.border.subtle", font: "$font.family.sans" },
+      variants: { expanded: { true: { width: "$navRail.widthOpen" } } },
     },
-    lockup: { base: { square: "$navRail.item", radius: "$radius.control" }, states: { hover: { bg: "$hover.surface" }, focus: { shadow: "$shadow.focus" } } },
-    logo: { base: { square: "$navRail.logo", radius: "$navRail.logoRadius", bg: "$brand.default" } },
-    logoGlyph: { base: { fg: "$fg.onBrand", font: "$font.display", weight: "$font.weightBlack", size: "$navRail.logoGlyph" } },
-    tileIcon: { base: { square: "$icon.size", fg: "$fg.onBrand" } },
-    wordmark: { base: { font: "$font.display", weight: "$font.weightBold", size: "$text.lead", fg: "$fg.strong", tracking: "$tracking.tight" } },
+    lockup: { base: { square: "$navRail.itemSize", radius: "$radius.control" }, states: { hover: { bg: "$color.background.hover" }, focus: { shadow: "$elevation.shadow.focus" } } },
+    logo: { base: { square: "$navRail.logoSize", radius: "$navRail.logoRadius", bg: "$color.background.brand.default" } },
+    logoGlyph: { base: { fg: "$color.text.onBrand", font: "$font.family.display", weight: "$font.weight.black", size: "$navRail.logoFontSize" } },
+    tileIcon: { base: { square: "$size.icon.default", fg: "$color.text.onBrand" } },
+    wordmark: { base: { font: "$font.family.display", weight: "$font.weight.bold", size: "$font.size.lead", fg: "$color.text.strong", tracking: "$font.letterSpacing.tight" } },
     pill: {
-      base: { height: "$navRail.chipH", radius: "$radius.pill", bg: "$surface.card", fg: "$fg.body", size: "$text.caption", weight: "$font.weightMedium" },
-      states: { hover: { bg: "$hover.surface" }, focus: { shadow: "$shadow.focus" } },
+      base: { height: "$navRail.chipHeight", radius: "$radius.pill", bg: "$color.background.card", fg: "$color.text.body", size: "$font.size.caption", weight: "$font.weight.medium" },
+      states: { hover: { bg: "$color.background.hover" }, focus: { shadow: "$elevation.shadow.focus" } },
     },
-    chevron: { base: { square: "$icon.sizeSm" } },
+    chevron: { base: { square: "$size.icon.sm" } },
     search: {
-      base: { height: "$control.hLg", radius: "$radius.control", bg: "$surface.card", shadow: "$shadow.hairline", fg: "$fg.faint", size: "$text.bodySm" },
-      states: { focus: { shadow: "$shadow.focus" } },
+      base: { height: "$size.control.lg", radius: "$radius.control", bg: "$color.background.card", shadow: "$elevation.shadow.hairline", fg: "$color.text.faint", size: "$font.size.bodySm" },
+      states: { focus: { shadow: "$elevation.shadow.focus" } },
     },
-    searchIcon: { base: { square: "$icon.sizeMd", fg: "$fg.subtle" } },
+    searchIcon: { base: { square: "$size.icon.md", fg: "$color.text.subtle" } },
     row: {
-      base: { square: "$navRail.item", radius: "$radius.pill", fg: "$fg.faint", size: "$text.body", weight: "$font.weightSemibold" },
+      base: { square: "$navRail.itemSize", radius: "$radius.pill", fg: "$color.text.faint", size: "$font.size.body", weight: "$font.weight.semibold" },
       // `on` is the current destination: the coral-soft pill, which hovering keeps.
-      states: { on: { bg: "$brand.soft", fg: "$brand.active" }, hover: { bg: "$hover.surface" }, "hover+on": { bg: "$brand.soft" }, focus: { shadow: "$shadow.focus" } },
+      states: { on: { bg: "$color.background.brand.soft", fg: "$color.text.brand" }, hover: { bg: "$color.background.hover" }, "hover+on": { bg: "$color.background.brand.soft" }, focus: { shadow: "$elevation.shadow.focus" } },
     },
-    icon: { base: { square: "$icon.sizeLg" } },
-    separator: { base: { height: "$border.wHairline", bg: "$border.subtle" } },
-    profile: { base: { radius: "$radius.pill" }, states: { hover: { bg: "$hover.surface" }, focus: { shadow: "$shadow.focus" } } },
-    profileName: { base: { size: "$text.bodySm", weight: "$font.weightSemibold", fg: "$fg.strong" } },
-    profileEmail: { base: { size: "$text.caption", fg: "$fg.faint" } },
+    icon: { base: { square: "$size.icon.lg" } },
+    separator: { base: { height: "$border.width.hairline", bg: "$color.border.subtle" } },
+    profile: { base: { radius: "$radius.pill" }, states: { hover: { bg: "$color.background.hover" }, focus: { shadow: "$elevation.shadow.focus" } } },
+    profileName: { base: { size: "$font.size.bodySm", weight: "$font.weight.semibold", fg: "$color.text.strong" } },
+    profileEmail: { base: { size: "$font.size.caption", fg: "$color.text.faint" } },
   },
-  reads: ["$border.subtle", "$border.default", "$border.muted", "$navRail.badgeTop", "$navRail.badgeLeft"],
+  reads: ["$color.border.subtle", "$color.border.default", "$color.border.muted", "$navRail.badgeOffsetY", "$navRail.badgeOffsetX"],
 });

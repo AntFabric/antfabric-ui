@@ -33,10 +33,10 @@ const track: CSSProperties = {
   alignItems: "center",
   justifyContent: "flex-start",
   flexShrink: 0,
-  transition: `background ${t.duration.quick} ${t.ease.standard}`,
+  transition: `background ${t.motion.duration.quick} ${t.motion.easing.standard}`,
 };
 
-const thumb: CSSProperties = { flexShrink: 0, transition: `transform ${t.duration.quick} ${t.ease.out}` };
+const thumb: CSSProperties = { flexShrink: 0, transition: `transform ${t.motion.duration.quick} ${t.motion.easing.out}` };
 
 export function Switch({ checked, label: name, description: detail = "", icon = "", hideLabel = false, disabled = false, onCheckedChange, styles, style, ...rest }: SwitchProps) {
   const ui = useInteraction({ disabled });

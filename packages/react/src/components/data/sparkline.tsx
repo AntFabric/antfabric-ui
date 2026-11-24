@@ -56,20 +56,20 @@ export function Sparkline({ data, y, width = 120, height = 32, area = false, mar
   const values = data.map((row) => row[y]).filter((v): v is number => typeof v === "number" && Number.isFinite(v));
   const frame = css(partStyle(r, "root", { display: flush ? "block" : "inline-block", width, height, flexShrink: 0 }), style);
   if (!values.length) return <span data-af-part="root" {...rootProps(rest)} aria-hidden style={frame} />;
-  const color = tone === "positive" ? t.data.positive : tone === "negative" ? t.data.negative : t.chart.series1;
+  const color = tone === "positive" ? t.color.background.data.positive : tone === "negative" ? t.color.background.data.negative : t.chart.series1Color;
   const rows = values.map((v, i) => ({ i, v }));
   const [lo, hi] = valueDomain(rows, ["v"], { zero: false });
   const span = hi - lo || 1;
   const floor = lo - span * (flush ? AIR_UNDER_FLUSH : AIR);
-  const edge = flush ? 0 : t.chart.pointR;
+  const edge = flush ? 0 : t.chart.pointRadius;
   const said = label || s("trend", { from: fmt(format, values[0], formatWords, locale), to: fmt(format, values[values.length - 1], formatWords, locale) });
   // One point has no line to draw: it is a dot.
-  const dot = marker || rows.length === 1 ? (p: { index?: number; cx?: number; cy?: number }) => (p.index === rows.length - 1 ? <circle key="last" cx={p.cx} cy={p.cy} r={t.chart.pointR - 1} fill={color} stroke={t.surface.card} strokeWidth={t.border.wThick} /> : <g key={p.index} />) : false;
+  const dot = marker || rows.length === 1 ? (p: { index?: number; cx?: number; cy?: number }) => (p.index === rows.length - 1 ? <circle key="last" cx={p.cx} cy={p.cy} r={t.chart.pointRadius - 1} fill={color} stroke={t.color.background.card} strokeWidth={t.border.width.thick} /> : <g key={p.index} />) : false;
   return (
     <span data-af-part="root" role="img" aria-label={said} {...rootProps(rest)} style={frame}>
-      <AreaChart accessibilityLayer={false} width={width} height={height} data={rows} margin={{ top: t.chart.pointR, right: edge, bottom: flush ? 0 : t.chart.pointR, left: edge }} style={{ display: "block" }}>
+      <AreaChart accessibilityLayer={false} width={width} height={height} data={rows} margin={{ top: t.chart.pointRadius, right: edge, bottom: flush ? 0 : t.chart.pointRadius, left: edge }} style={{ display: "block" }}>
         <YAxis hide domain={[floor, hi + span * AIR]} />
-        <Area dataKey="v" type="monotone" stroke={color} strokeWidth={t.chart.sparkW} fill={area ? color : "none"} fillOpacity={FLAT_FILL} dot={dot} activeDot={false} tooltipType="none" {...rechartsMotion(animate, reduced)} />
+        <Area dataKey="v" type="monotone" stroke={color} strokeWidth={t.chart.sparkWidth} fill={area ? color : "none"} fillOpacity={FLAT_FILL} dot={dot} activeDot={false} tooltipType="none" {...rechartsMotion(animate, reduced)} />
       </AreaChart>
     </span>
   );

@@ -141,8 +141,8 @@ export function SwipeRow({ open, unread = false, dense = false, title, body = ""
       x.setValue(toValue);
       return settle();
     }
-    const [a, b, c, d] = (/\(([^)]+)\)/.exec(t.ease.out)?.[1] ?? ".16,1,.3,1").split(",").map(Number);
-    Animated.timing(x, { toValue, duration: t.duration.slow, easing: Easing.bezier(a!, b!, c!, d!), useNativeDriver: Platform.OS !== "web" }).start(({ finished }) => {
+    const [a, b, c, d] = (/\(([^)]+)\)/.exec(t.motion.easing.out)?.[1] ?? ".16,1,.3,1").split(",").map(Number);
+    Animated.timing(x, { toValue, duration: t.motion.duration.slow, easing: Easing.bezier(a!, b!, c!, d!), useNativeDriver: Platform.OS !== "web" }).start(({ finished }) => {
       if (finished) settle();
     });
   };

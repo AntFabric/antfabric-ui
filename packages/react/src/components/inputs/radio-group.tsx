@@ -55,10 +55,10 @@ const ring: CSSProperties = {
   flexShrink: 0,
   alignItems: "center",
   justifyContent: "center",
-  transition: `border-color ${t.duration.base}, transform ${t.duration.fast}`,
+  transition: `border-color ${t.motion.duration.base}, transform ${t.motion.duration.fast}`,
 };
 
-const dot: CSSProperties = { transition: `transform ${t.duration.quick} ${t.ease.out}, opacity ${t.duration.fast}` };
+const dot: CSSProperties = { transition: `transform ${t.motion.duration.quick} ${t.motion.easing.out}, opacity ${t.motion.duration.fast}` };
 
 const pillRoot: CSSProperties = {
   ...pressable,
@@ -66,7 +66,7 @@ const pillRoot: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   whiteSpace: "nowrap",
-  transition: `background ${t.duration.base}, color ${t.duration.base}, border-color ${t.duration.base}`,
+  transition: `background ${t.motion.duration.base}, color ${t.motion.duration.base}, border-color ${t.motion.duration.base}`,
 };
 
 /** A card: a column, its preview, then the label and its tags on one wrapping row, then the description. */
@@ -77,7 +77,7 @@ const cardRoot: CSSProperties = {
   justifyContent: "flex-start",
   textAlign: "start",
   minWidth: 0,
-  transition: `border-color ${t.duration.base}, box-shadow ${t.duration.base}`,
+  transition: `border-color ${t.motion.duration.base}, box-shadow ${t.motion.duration.base}`,
 };
 
 interface OptionProps {
@@ -212,8 +212,8 @@ export function RadioGroup({ options, value, label = "", hideLabel = false, appe
         data-af-part="options"
         style={
           card
-            ? // As many columns of at least `radioGroup.cardMinW` as fit; one, the full width, when the group is narrower than that.
-              css({ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(min(${t.radioGroup.cardMinW}, 100%), 1fr))` }, r.options)
+            ? // As many columns of at least `radioGroup.cardMinWidth` as fit; one, the full width, when the group is narrower than that.
+              css({ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(min(${t.radioGroup.cardMinWidth}, 100%), 1fr))` }, r.options)
             : pill
               ? css(row, partStyle(r, "options", { flexWrap: "wrap" }))
               : css(box, partStyle(r, "options", { gap: t.space["3xs"] }))

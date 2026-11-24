@@ -13,32 +13,32 @@ export const good: ThemeRecipes = {
   button: {
     root: {
       base: { radius: "$radius.card", font: "none" },
-      variants: { variant: { primary: { bg: "$brand.hover", states: { hover: { bg: "$brand.active" } } } }, size: { sm: { height: "$control.hSm" } } },
+      variants: { variant: { primary: { bg: "$color.background.brand.hover", states: { hover: { bg: "$color.background.brand.pressed" } } } }, size: { sm: { height: "$size.control.sm" } } },
       states: { "focus+pressed": { shadow: "none" } },
       platforms: { mobile: { base: { gap: "$space.sm" } }, android: { variants: { size: { lg: { radius: "$radius.control" } } } } },
     },
-    icon: { variants: { variant: { ink: { fg: "$fg.onInverse" } } } }, // any part may take any of the recipe's props
+    icon: { variants: { variant: { ink: { fg: "$color.text.onInverse" } } } }, // any part may take any of the recipe's props
   },
-  switch: { track: { states: { "hover+on": { bg: "$brand.active" } } } },
+  switch: { track: { states: { "hover+on": { bg: "$color.background.brand.pressed" } } } },
 };
 export const input: ThemeInput = { name: "Typed", recipes: good };
 
 // @ts-expect-error a recipe id that does not exist
 export const badId: ThemeRecipes = { buton: {} };
 // @ts-expect-error a part Button does not have
-export const badPart: Button = { label: { base: { fg: "$fg.body" } } };
+export const badPart: Button = { label: { base: { fg: "$color.text.body" } } };
 // @ts-expect-error a variant prop Button does not have
 export const badProp: Button = { root: { variants: { tone: {} } } };
 // @ts-expect-error a variant value Button does not name (new values are out of scope)
-export const badValue: Button = { root: { variants: { variant: { brand: { bg: "$brand.default" } } } } };
+export const badValue: Button = { root: { variants: { variant: { brand: { bg: "$color.background.brand.default" } } } } };
 // @ts-expect-error a variant prop on a recipe that has none
 export const badNone: RecipeOverride<(typeof recipes)["tab-bar"]> = { bar: { variants: { size: {} } } };
 // @ts-expect-error a state that does not exist
-export const badState: Button = { root: { states: { hovered: { bg: "$brand.hover" } } } };
+export const badState: Button = { root: { states: { hovered: { bg: "$color.background.brand.hover" } } } };
 // @ts-expect-error a platform key that does not exist
 export const badPlatform: Button = { root: { platforms: { tablet: {} } } };
 // @ts-expect-error a style key outside the vocabulary
-export const badKey: Button = { root: { base: { colour: "$fg.body" } } };
+export const badKey: Button = { root: { base: { colour: "$color.text.body" } } };
 // @ts-expect-error a token the tokens do not have
 export const badToken: Button = { root: { base: { radius: "$radius.nope" } } };
 // @ts-expect-error a literal, not a token

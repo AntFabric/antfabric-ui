@@ -12,3 +12,4 @@ release/
 push-notes/
 reports/drift.md
 .claude/
+reports/design-system-audit.md

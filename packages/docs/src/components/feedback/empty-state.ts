@@ -971,9 +971,9 @@ const docs: ComponentDocs = {
                           el: "text",
                           text: "Checkout revamp",
                           style: {
-                            fontSize: "$text.title",
-                            fontWeight: "$font.weightSemibold",
-                            color: "$fg.strong",
+                            fontSize: "$font.size.title",
+                            fontWeight: "$font.weight.semibold",
+                            color: "$color.text.strong",
                           },
                         },
                         {
@@ -990,8 +990,8 @@ const docs: ComponentDocs = {
                       el: "text",
                       text: "#release-train · 12 open tickets · due Nov 14",
                       style: {
-                        fontSize: "$text.caption",
-                        color: "$fg.muted",
+                        fontSize: "$font.size.caption",
+                        color: "$color.text.muted",
                       },
                     },
                   ],
@@ -1019,9 +1019,9 @@ const docs: ComponentDocs = {
                           el: "text",
                           text: "Atlas Mobile",
                           style: {
-                            fontSize: "$text.title",
-                            fontWeight: "$font.weightSemibold",
-                            color: "$fg.strong",
+                            fontSize: "$font.size.title",
+                            fontWeight: "$font.weight.semibold",
+                            color: "$color.text.strong",
                           },
                         },
                         {
@@ -1038,8 +1038,8 @@ const docs: ComponentDocs = {
                       el: "text",
                       text: "#platform-eng · 31 open tickets · due Dec 2",
                       style: {
-                        fontSize: "$text.caption",
-                        color: "$fg.muted",
+                        fontSize: "$font.size.caption",
+                        color: "$color.text.muted",
                       },
                     },
                   ],

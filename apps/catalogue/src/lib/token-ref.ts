@@ -6,7 +6,7 @@
  * grouping into sections, and `rowCount()` fails the build if a token lands in none of them.
  */
 
-import { cssVarName, descriptions, tokenValues, type TokenNote, type TokenPath } from "@antfabric/ui-core";
+import { cssVarName, descriptions, tokenMeta, tokenRegistry, tokenValues, type TokenNote, type TokenPath, type TokenSection } from "@antfabric/ui-core";
 import { tokenLeaves, type Context, type Leaf } from "../../scripts/token-leaves";
 
 export type Platform = "web" | "desktop" | "mobile";
@@ -28,9 +28,9 @@ export interface Cell {
 }
 
 export interface Row {
-  /** `fg.muted`: the name the docs and the kits use. */
+  /** `color.text.muted`: the name the docs and the kits use. */
   path: string;
-  /** `--af-fg-muted`: the CSS variable. */
+  /** `--af-color-text-muted`: the CSS variable. */
   cssVar: string;
   kind: RowKind;
   look: Look;
@@ -59,12 +59,12 @@ const kindOf = (leaf: Leaf): RowKind => (leaf.light !== undefined ? "theme" : le
 
 function lookOf(path: string, kind: RowKind, value: string): Look {
   const group = path.split(".")[0]!;
-  if (kind === "theme") return group === "shadow" ? "shadow" : COLOUR.test(value) ? "colour" : "none";
-  if (group === "space" || group === "gutter") return "bar";
+  if (kind === "theme") return group === "elevation" || /Shadow$/.test(path) ? "shadow" : COLOUR.test(value) ? "colour" : "none";
+  if (group === "space") return "bar";
   if (group === "radius") return "radius";
-  if (group === "font") return path.startsWith("font.weight") ? "weight" : path.startsWith("font.file") ? "none" : "family";
-  if (path === "chart.font") return "family";
-  if (group === "tracking") return "tracking";
+  if (path.startsWith("font.weight.")) return "weight";
+  if (path.startsWith("font.family.") || path === "chart.fontFamily") return "family";
+  if (path.startsWith("font.letterSpacing.")) return "tracking";
   return "none";
 }
 
@@ -108,7 +108,11 @@ const build = (path: string, leaf: Leaf): Row => {
   };
 };
 
-const all: Row[] = [...tokenLeaves()].map(([path, leaf]) => build(path, leaf));
+const every: Row[] = [...tokenLeaves()].map(([path, leaf]) => build(path, leaf));
+/** The documented set: what a reader picks from. An internal token (a picture of OS chrome, one component's private geometry) still resolves and is in `tokens.json`; it is not a row here. */
+const all: Row[] = every.filter((r) => tokenMeta(r.path).visibility === "public");
+/** How many tokens the page leaves out as internal. */
+export const internalCount = (): number => every.length - all.length;
 
 export interface Group {
   name: string;
@@ -117,59 +121,48 @@ export interface Group {
 
 // The data components' groups (`chart`, `data`, `table`) each mix colours, shared values and per-platform sizes, which have different columns, so each
 // kind is its own table: `chart-theme`, `chart-profile`… The phone's files (`font.file*`, `chart.file*`) have one cell, not three, so they get their own too.
-const DATA_GROUPS = ["chart", "data", "table"];
+/** The groups `token-registry.ts` puts in a section, in the order it declares them. */
+const groupsIn = (section: TokenSection): string[] => Object.entries(tokenRegistry).filter(([, g]) => g.section === section).map(([name]) => name);
+
+const DATA_GROUPS = groupsIn("data");
+/** A category's tokens are tabled by their property (`color.text`, `font.size`, `size.control`); these have no property level. */
+const FLAT = new Set(["radius", "opacity", "zIndex"]);
+/**
+ * The table a row is in. A semantic token's is its category and property (`color.text`, `font.size`; `space` and `space.gutter`), a
+ * component token's is its group. The phone's font files have one cell, not three, so they are a table of their own (`fontFiles`), and the
+ * data groups mix colours, shared values and per-platform sizes, which have different columns, so each kind is its own (`chart-theme`).
+ */
 const groupName = (r: Row) => {
+  const [g, second, third] = r.path.split(".") as [string, string?, string?];
+  if (DATA_GROUPS.includes(g)) return r.path.startsWith("chart.fontFile") ? "chart-files" : `${g}-${r.kind}`;
+  if (r.path.startsWith("font.file.")) return "fontFiles";
+  if (tokenRegistry[g]?.tier !== "semantic" || FLAT.has(g) || g === "os") return g;
+  if (g === "space") return second === "gutter" ? "space.gutter" : "space";
+  return third === undefined ? g : `${g}.${second}`;
+};
+
+/** The section a row is in: a colour is in Colour and a shadow in Elevation whatever its group; the data groups are in Data; the rest is the registry's. */
+const sectionOf = (r: Row): Section => {
   const g = r.path.split(".")[0]!;
-  if (DATA_GROUPS.includes(g)) return r.path.startsWith("chart.file") ? "chart-files" : `${g}-${r.kind}`;
-  return r.path.startsWith("font.file") ? "fontFiles" : g;
+  if (DATA_GROUPS.includes(g)) return "data";
+  if (r.kind === "theme") return g === "elevation" ? "elevation" : "colour";
+  return tokenRegistry[g]!.section;
 };
+export type Section = TokenSection;
 
-// The groups that are not colours, in the order each section shows them. Everything else with a theme value is a colour.
-const SECTIONS = {
-  type: ["text", "font", "fontFiles", "tracking"],
-  space: ["space", "gutter"],
-  radius: ["radius"],
-  size: ["control", "row", "breadcrumb", "topbar", "rail", "tabbar", "statusbar", "homeIndicator", "avatar", "icon", "border"],
-  // A component's own decisions: every group not named in another section (`switch`, `button`, `chip`, `osNotification`…), so a
-  // new component token always has a home. The colours of `switch` (and `danger.fg`) are in Colour with the rest of the theme.
-  components: [],
-  elevation: ["shadow"],
-  motion: ["duration", "ease"],
-  layers: ["z", "opacity"],
-  // `glass.blur` and `glass.saturate` are shared; the other `glass.*` are colours and sit in Colour.
-  materials: ["glass"],
-  // The data components' own: the chart palette and the data status colours (themes), then the plot's geometry, dashes and text, then the table.
-  data: ["chart-theme", "data-theme", "chart-profile", "chart-shared", "chart-files", "table-theme", "table-profile", "table-shared"],
-} as const;
-export type Section = keyof SECTIONS_T | "colour";
-type SECTIONS_T = typeof SECTIONS;
-
-const NAMED = new Set<string>(Object.values(SECTIONS).flat());
-
-const inSection = (key: Section, r: Row): boolean => {
-  const data = (SECTIONS.data as readonly string[]).includes(groupName(r));
-  if (key === "colour") return r.kind === "theme" && groupName(r) !== "shadow" && !data;
-  if (r.kind === "theme") return key === "elevation" ? groupName(r) === "shadow" : key === "data" && data;
-  if (key === "components") return !NAMED.has(groupName(r));
-  return (SECTIONS[key] as readonly string[]).includes(groupName(r));
-};
-
-/** One section's groups, in order. */
+/** One section's groups, in the order `tokens.ts` declares them (a component's own, by name). */
 export function groups(key: Section): Group[] {
-  const rows = all.filter((r) => inSection(key, r));
-  const names = key === "colour" ? [...new Set(rows.map(groupName))] : key === "components" ? [...new Set(rows.map(groupName))].sort() : [...SECTIONS[key]];
-  return names.map((name) => ({ name, rows: rows.filter((r) => groupName(r) === name) })).filter((g) => g.rows.length > 0);
+  const rows = all.filter((r) => sectionOf(r) === key);
+  const names = [...new Set(rows.map(groupName))];
+  return (key === "components" ? names.sort() : names).map((name) => ({ name, rows: rows.filter((r) => groupName(r) === name) }));
 }
 
-export const sectionKeys = ["colour", ...Object.keys(SECTIONS)] as Section[];
+export const sectionKeys: Section[] = ["colour", "type", "space", "radius", "size", "components", "elevation", "motion", "layers", "materials", "data"];
 
-/** The number of rows the page draws; throws if a token belongs to no section, or to two. */
+/** The number of rows the page draws; throws if a token belongs to no section the page shows. */
 export function rowCount(): number {
-  const seen = new Map<string, number>();
-  for (const key of sectionKeys) for (const g of groups(key)) for (const r of g.rows) seen.set(r.path, (seen.get(r.path) ?? 0) + 1);
-  const missing = all.filter((r) => !seen.has(r.path)).map((r) => r.path);
-  const twice = [...seen].filter(([, n]) => n > 1).map(([p]) => p);
-  if (missing.length || twice.length) throw new Error(`token-ref: not in exactly one section: ${[...missing, ...twice].join(", ")}`);
+  const missing = all.filter((r) => !sectionKeys.includes(sectionOf(r))).map((r) => r.path);
+  if (missing.length) throw new Error(`token-ref: in no section: ${missing.join(", ")}`);
   return all.length;
 }
 

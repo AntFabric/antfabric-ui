@@ -12,36 +12,36 @@ export const messageDivider = defineRecipe({
   parts: ["root", "rule", "pill", "stickyPill", "label", "icon", "newLabel"],
   styles: {
     root: {
-      base: { gap: "$space.md", paddingX: "$space.lgXl", font: "$font.sans" },
+      base: { gap: "$space.md", paddingX: "$space.lgXl", font: "$font.family.sans" },
       variants: { kind: { new: { gap: "$space.smMd" } } },
       platforms: {
         // The phone's band has no stacking order of its own.
-        web: { variants: { sticky: { true: { zIndex: "$z.sticky" } } } },
-        desktop: { variants: { sticky: { true: { zIndex: "$z.sticky" } } } },
-        mobile: { base: { paddingX: "$gutter.pane", paddingY: "$space.sm" } },
+        web: { variants: { sticky: { true: { zIndex: "$zIndex.sticky" } } } },
+        desktop: { variants: { sticky: { true: { zIndex: "$zIndex.sticky" } } } },
+        mobile: { base: { paddingX: "$space.gutter.pane", paddingY: "$space.sm" } },
       },
     },
     rule: {
-      base: { height: "$border.wHairline", bg: "$border.subtle" },
-      variants: { kind: { new: { bg: "$brand.default" } } },
+      base: { height: "$border.width.hairline", bg: "$color.border.subtle" },
+      variants: { kind: { new: { bg: "$color.background.brand.default" } } },
     },
     pill: {
       on: ["web", "desktop"],
-      base: { paddingX: "$space.md", radius: "$radius.pill", borderWidth: "$border.wHairline", borderColor: "$border.subtle", bg: "$surface.card" },
+      base: { paddingX: "$space.md", radius: "$radius.pill", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle", bg: "$color.background.card" },
     },
     stickyPill: {
-      base: { paddingX: "$space.md", radius: "$radius.pill", borderWidth: "$border.wHairline", borderColor: "$border.subtle", bg: "$surface.card", shadow: "$shadow.raise", fg: "$fg.muted" },
-      states: { hover: { bg: "$hover.surface" }, pressed: { bg: "$surface.selected" }, focus: { shadow: "$shadow.focus" } },
+      base: { paddingX: "$space.md", radius: "$radius.pill", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle", bg: "$color.background.card", shadow: "$elevation.shadow.raise", fg: "$color.text.muted" },
+      states: { hover: { bg: "$color.background.hover" }, pressed: { bg: "$color.background.selected" }, focus: { shadow: "$elevation.shadow.focus" } },
       // The phone's band is not a button: no states, a translucent fill over the list, the card's shadow.
-      platforms: { mobile: { base: { bg: "$surface.overlay", shadow: "$shadow.card" } } },
+      platforms: { mobile: { base: { bg: "$color.background.overlay", shadow: "$elevation.shadow.card" } } },
     },
     label: {
-      base: { size: "$text.caption", line: "$text.captionLine", weight: "$font.weightBold", fg: "$fg.muted" },
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.bold", fg: "$color.text.muted" },
     },
-    icon: { on: ["web", "desktop"], base: { square: "$icon.sizeSm" } },
+    icon: { on: ["web", "desktop"], base: { square: "$size.icon.sm" } },
     newLabel: {
-      base: { size: "$text.micro", line: "$text.captionLine", weight: "$font.weightBold", fg: "$link.default" },
-      platforms: { mobile: { base: { size: "$text.caption" } } }, // idiom: one step larger
+      base: { size: "$font.size.micro", line: "$font.lineHeight.caption", weight: "$font.weight.bold", fg: "$color.text.link" },
+      platforms: { mobile: { base: { size: "$font.size.caption" } } }, // idiom: one step larger
     },
   },
 });

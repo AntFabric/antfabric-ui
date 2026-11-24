@@ -128,9 +128,9 @@ const platform = "web", os = "browser", scheme = "light";
 `rootAttrs` returns `data-af-platform`, `data-af-theme` (the scheme), `data-af-os` and, for any theme but `themes.antfabric`, `data-af-theme-id`. Change `scheme` in both places when the user switches.
 
 `AntFabricRoot` also sets `font-family` and `color` on its element. With the attributes on `<html>`,
-set them yourself: `font-family: var(--af-font-sans); color: var(--af-fg-body)`.
+set them yourself: `font-family: var(--af-font-family-sans); color: var(--af-color-text-body)`.
 
-**Check:** the root element carries `data-af-theme-id` (unless the theme is `themes.antfabric`), the stylesheet declares `--af-brand-default` under `[data-af-theme-id="<id>"]`, and a `Button` draws that theme's primary and radius.
+**Check:** the root element carries `data-af-theme-id` (unless the theme is `themes.antfabric`), the stylesheet declares `--af-color-background-brand-default` under `[data-af-theme-id="<id>"]`, and a `Button` draws that theme's primary and radius.
 
 ## 4. Set up the phone
 
@@ -203,9 +203,9 @@ export const theme = defineTheme({
 
 - Hover, pressed, the soft tints, the link colour, the border and the unread tint derive from
   `primary`. A hand-picked tint wins over the derived one.
-- Only the brand family moves: `brand.*`, `accent.*`, `fg.onBrandSoft`, `link.default`,
-  `border.brand`, `surface.unread`, and `fg.onBrand`. Neutrals, status colours and identity colours
-  stay put, and `identity.agent` (Fabric) is never a tenant's.
+- Only the brand family moves: `brand.*`, `accent.*`, `color.text.onBrandSoft`, `color.text.link`,
+  `color.border.brand`, `color.background.unread`, and `color.text.onBrand`. Neutrals, status colours and identity colours
+  stay put, and `color.background.identity.agent` (Fabric) is never a tenant's.
 - **Text on the brand fill** follows the primary: white while white reaches 3:1
   on it, ink (`#0e1828`) on a primary too light for that. A coral or a dark teal keeps white; a
   yellow gets ink. Check your primary: white on coral is 3.4:1, which is under 4.5:1 for
@@ -217,7 +217,7 @@ export const theme = defineTheme({
 - **Phone:** register one file per weight with `useFonts`, named `<family>-Regular`, `-Medium`, `-SemiBold`, `-Bold` and `-ExtraBold` (`Inter-SemiBold`). A family whose files are named otherwise names them: `{ family: "Fraunces", files: { semibold: "Fraunces-Medium" } }`; a weight left out keeps the default name.
 - A family name is a name only: no quotes, no `;`, nothing empty (it throws).
 
-**Check:** the primary button is your primary; a `Dialog` title is your display face; body text is your sans. On the web, the root element carries `data-af-theme-id` and the theme's sheet declares `--af-brand-default` and `--af-font-sans` under it.
+**Check:** the primary button is your primary; a `Dialog` title is your display face; body text is your sans. On the web, the root element carries `data-af-theme-id` and the theme's sheet declares `--af-color-background-brand-default` and `--af-font-family-sans` under it.
 
 - Build the theme once, in a module. Both kits key a theme by its id (its content), so one built inline does not re-theme the tree on every render, but it does rebuild the theme.
 - A host that does not use `AntFabricRoot` (or passes `css={false}`) writes the attributes with `rootAttrs({ platform, os, scheme, theme })`, puts `themeCss(theme)` in its stylesheet, and passes the same `theme` to `AntFabricProvider` (section 3); the sheet holds both schemes' values.
@@ -228,13 +228,13 @@ Read a colour, a space or a radius from the tokens; do not copy the value.
 
 ```tsx
 import { t } from "@antfabric/ui-react";
-<div style={{ padding: t.space.md, background: t.surface.card, borderRadius: t.radius.control }} />
+<div style={{ padding: t.space.md, background: t.color.background.card, borderRadius: t.radius.control }} />
 // t.space.md is the string "var(--af-space-md)"; follow the theme, the density and the brand with no re-render.
 // A key that starts with a digit takes brackets: t.space["2xs"].
 
 import { createStyles, useTheme } from "@antfabric/ui-react-native";
-const { t } = useTheme();   // numbers and colour strings for this scheme, OS and theme: t.control.hMd is 44
-const useStyles = createStyles((t) => ({ row: { height: t.control.hMd, padding: t.space.md } }));
+const { t } = useTheme();   // numbers and colour strings for this scheme, OS and theme: t.size.control.md is 44
+const useStyles = createStyles((t) => ({ row: { height: t.size.control.md, padding: t.space.md } }));
 ```
 
 - **`tokens.json`:** every token in the W3C Design Tokens format, with its description and its light, dark and per-platform values.

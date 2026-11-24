@@ -9,17 +9,17 @@ import { defineRecipe } from "../../recipe";
 export const thinkingIndicator = defineRecipe({
   parts: ["root", "head", "mark", "cell", "word", "clock", "toggle", "chevron", "trace"],
   styles: {
-    root: { base: { maxWidth: "$thinking.maxW", font: "$font.sans" } },
+    root: { base: { maxWidth: "$thinkingIndicator.maxWidth", font: "$font.family.sans" } },
     head: { base: { gap: "$space.sm" } },
-    mark: { base: { width: "$thinking.markW" } },
-    cell: { base: { square: "$thinking.cell", radius: "$thinking.cellRadius", bg: "$brand.default" } },
+    mark: { base: { width: "$thinkingIndicator.markWidth" } },
+    cell: { base: { square: "$thinkingIndicator.cellSize", radius: "$thinkingIndicator.cellRadius", bg: "$color.background.brand.default" } },
     word: {
-      base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightMedium", fg: "$fg.body" },
-      states: { on: { fg: "$fg.muted" } },
+      base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.medium", fg: "$color.text.body" },
+      states: { on: { fg: "$color.text.muted" } },
     },
-    clock: { base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint", weight: "$font.weightNormal" } },
-    toggle: { base: { radius: "$radius.row" }, states: { focus: { shadow: "$shadow.focus" } } },
-    chevron: { base: { square: "$icon.size", fg: "$fg.faint" }, platforms: { mobile: { base: { square: "$icon.sizeMd" } } } },
+    clock: { base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint", weight: "$font.weight.normal" } },
+    toggle: { base: { radius: "$radius.row" }, states: { focus: { shadow: "$elevation.shadow.focus" } } },
+    chevron: { base: { square: "$size.icon.default", fg: "$color.text.faint" }, platforms: { mobile: { base: { square: "$size.icon.md" } } } },
     trace: { base: { paddingTop: "$space.sm" } },
   },
 });

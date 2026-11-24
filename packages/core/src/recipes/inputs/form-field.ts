@@ -8,34 +8,34 @@ import { defineRecipe } from "../../recipe";
 export const formField = defineRecipe({
   parts: ["root", "label", "required", "description", "error", "errorIcon", "errorText"],
   styles: {
-    root: { base: { gap: "$space.xs", font: "$font.sans" }, platforms: { mobile: { base: { gap: "$space.sm" } } } }, // idiom: one step larger
+    root: { base: { gap: "$space.xs", font: "$font.family.sans" }, platforms: { mobile: { base: { gap: "$space.sm" } } } }, // idiom: one step larger
     label: {
-      base: { size: "$text.caption", line: "$text.captionLine", weight: "$font.weightSemibold", fg: "$fg.body" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.semibold", fg: "$color.text.body" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm" } } }, // idiom: one step larger
     },
     required: {
       base: {
         paddingY: "$space.3xs",
-        paddingX: "$textField.tagPadX",
+        paddingX: "$textField.tagPaddingX",
         radius: "$radius.pill",
-        bg: "$brand.soft",
-        borderWidth: "$border.wHairline",
-        borderColor: "$brand.softHover",
-        fg: "$fg.onBrandSoft",
-        size: "$text.caption",
-        weight: "$font.weightSemibold",
-        tracking: "$tracking.caps",
+        bg: "$color.background.brand.soft",
+        borderWidth: "$border.width.hairline",
+        borderColor: "$color.background.brand.softHover",
+        fg: "$color.text.onBrandSoft",
+        size: "$font.size.caption",
+        weight: "$font.weight.semibold",
+        tracking: "$font.letterSpacing.caps",
       },
     },
     description: {
-      base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal" } } }, // idiom: one step larger
     },
-    error: { base: { gap: "$space.2xs", fg: "$danger.default" } },
-    errorIcon: { base: { square: "$icon.sizeSm" }, platforms: { mobile: { base: { square: "$icon.sizeMd" } } } },
+    error: { base: { gap: "$space.2xs", fg: "$color.text.danger" } },
+    errorIcon: { base: { square: "$size.icon.sm" }, platforms: { mobile: { base: { square: "$size.icon.md" } } } },
     errorText: {
-      base: { size: "$text.caption", line: "$text.captionLine", weight: "$font.weightMedium" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine", fg: "$danger.default" } } },
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.medium" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", fg: "$color.text.danger" } } },
     },
   },
 });

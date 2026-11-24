@@ -34,7 +34,7 @@ const root: CSSProperties = {
   borderStyle: "solid",
   borderWidth: 0,
   borderColor: "transparent",
-  transition: `background ${t.duration.base} ${t.ease.standard}, color ${t.duration.base}, transform ${t.duration.fast} ${t.ease.out}`,
+  transition: `background ${t.motion.duration.base} ${t.motion.easing.standard}, color ${t.motion.duration.base}, transform ${t.motion.duration.fast} ${t.motion.easing.out}`,
 };
 
 export function Fab({ variant = "ink", icon, label, src = "", disabled = false, onPress, styles, style, ...rest }: FabProps) {
@@ -64,9 +64,9 @@ export function Fab({ variant = "ink", icon, label, src = "", disabled = false, 
         partStyle(
           r,
           "root",
-          isGlass && css(glass("glass"), { color: t.fg.strong }),
+          isGlass && css(glass("glass"), { color: t.color.text.strong }),
           ui.pressed && isGlass && { transform: "scale(1.06)" },
-          ui.focused && isGlass && { boxShadow: `${t.shadow.glass}, ${t.shadow.focus}` },
+          ui.focused && isGlass && { boxShadow: `${t.elevation.shadow.glass}, ${t.elevation.shadow.focus}` },
           ui.disabled && { cursor: "not-allowed" },
         ),
         style,

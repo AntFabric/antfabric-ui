@@ -13,7 +13,7 @@ export interface AnatomyRow {
   when: string;
   /** The vocabulary key: `bg`, `paddingX`. */
   key: string;
-  /** The token path (`fg.body`), or the keyword (`transparent`, `none`) when the value is not a token. */
+  /** The token path (`color.text.body`), or the keyword (`transparent`, `none`) when the value is not a token. */
   value: string;
   /** Where the token's row is on Foundations; absent for a keyword. */
   href?: string;

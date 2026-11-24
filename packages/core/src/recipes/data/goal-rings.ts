@@ -4,9 +4,9 @@ import { chartCardPartsBare, chartCardStylesBare, chartReads } from "./chart-car
 /**
  * GoalRings. Up to three goals as nested rings, the overall share in the middle (MetricValue, easing to a goal's own share while one is lit) and each goal
  * listed beside the rings (below them on the phone) with what is done, the target and what is left. The rings are one recharts PieChart with a track Pie and a
- * value Pie per ring (web, desktop) or one gifted-charts donut per ring, stacked (phone), from the tokens in `reads`; each band is `chart.ringW` thick with
+ * value Pie per ring (web, desktop) or one gifted-charts donut per ring, stacked (phone), from the tokens in `reads`; each band is `chart.ringWidth` thick with
  * `chart.ringGap` between. A goal is lit while it is pointed at, focused or tapped, and the others step back (the kit sets the opacity: a ratio). The
- * swatch is the goal's series colour, which the kit hands it. The text is the chart text (Geist, `chart.font`), which the kit sets itself.
+ * swatch is the goal's series colour, which the kit hands it. The text is the chart text (Geist, `chart.fontFamily`), which the kit sets itself.
  */
 export const goalRings = defineRecipe({
   parts: [...chartCardPartsBare, "rings", "ring", "center", "centerLabel", "list", "goal", "goalHead", "swatch", "label", "done", "of", "left"],
@@ -19,19 +19,19 @@ export const goalRings = defineRecipe({
       platforms: { mobile: { base: { gap: "$space.lg" } } },
     },
     ring: { base: { width: "$chart.ringSize", height: "$chart.ringSize" } },
-    centerLabel: { base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.muted" } },
+    centerLabel: { base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.muted" } },
     list: { base: { gap: "$space.md" } },
     goal: {
       base: { gap: "$space.2xs", radius: "$radius.row" },
-      states: { focus: { shadow: "$shadow.focus" } },
+      states: { focus: { shadow: "$elevation.shadow.focus" } },
     },
     goalHead: { base: { gap: "$space.sm" } },
     swatch: { base: { square: "$space.smMd", radius: "$radius.circle" } },
     // The words are quiet and the number leads: the name is muted, what is done is the largest text in the row.
-    label: { base: { size: "$text.bodySm", line: "$text.bodySmLine", fg: "$fg.muted" } },
-    done: { base: { size: "$text.title", line: "$text.titleLine", weight: "$font.weightSemibold", fg: "$fg.strong" } },
-    of: { base: { size: "$text.caption", line: "$text.titleLine", fg: "$fg.muted" } },
-    left: { base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" } },
+    label: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", fg: "$color.text.muted" } },
+    done: { base: { size: "$font.size.title", line: "$font.lineHeight.title", weight: "$font.weight.semibold", fg: "$color.text.strong" } },
+    of: { base: { size: "$font.size.caption", line: "$font.lineHeight.title", fg: "$color.text.muted" } },
+    left: { base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint" } },
   },
-  reads: [...chartReads, "$chart.font", "$chart.series1", "$chart.series2", "$chart.series3", "$chart.ringSize", "$chart.ringW", "$chart.ringGap", "$opacity.muted"],
+  reads: [...chartReads, "$chart.fontFamily", "$chart.series1Color", "$chart.series2Color", "$chart.series3Color", "$chart.ringSize", "$chart.ringWidth", "$chart.ringGap", "$opacity.muted"],
 });

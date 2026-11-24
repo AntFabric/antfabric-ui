@@ -9,20 +9,20 @@ export const tooltip = defineRecipe({
   styles: {
     bubble: {
       base: {
-        paddingX: "$tooltip.padX",
-        maxWidth: "$tooltip.maxW",
-        zIndex: "$z.tooltip",
+        paddingX: "$tooltip.paddingX",
+        maxWidth: "$tooltip.maxWidth",
+        zIndex: "$zIndex.tooltip",
         radius: "$radius.control",
-        bg: "$surface.inverse",
-        fg: "$fg.onInverse",
-        font: "$font.sans",
-        size: "$text.micro",
-        weight: "$font.weightSemibold",
-        tracking: "$tracking.tight",
-        shadow: "$shadow.tooltip",
+        bg: "$color.background.inverse",
+        fg: "$color.text.onInverse",
+        font: "$font.family.sans",
+        size: "$font.size.micro",
+        weight: "$font.weight.semibold",
+        tracking: "$font.letterSpacing.tight",
+        shadow: "$elevation.shadow.tooltip",
       },
     },
   },
-  // $tooltip.padY is a read, not paddingY: with paddingX the reader writes one `padding` shorthand, which the render snapshot counts as a change.
-  reads: ["$tooltip.padY", "$tooltip.kbdH", "$tooltip.kbdLabel"],
+  // $tooltip.paddingY is a read, not paddingY: with paddingX the reader writes one `padding` shorthand, which the render snapshot counts as a change.
+  reads: ["$tooltip.paddingY", "$tooltip.kbdHeight", "$tooltip.kbdFontSize"],
 });

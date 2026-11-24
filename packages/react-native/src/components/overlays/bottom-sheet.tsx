@@ -96,7 +96,7 @@ export function BottomSheet({
   const drop = useRef(new Animated.Value(closed ? offscreen() : dragging ? DRAG_PREVIEW : 0)).current;
 
   const settle = (to: number, then?: () => void) =>
-    Animated.timing(drop, { toValue: to, duration: t.duration.slow, easing: Easing.bezier(0.16, 1, 0.3, 1), useNativeDriver: false }).start(({ finished }) => finished && then?.());
+    Animated.timing(drop, { toValue: to, duration: t.motion.duration.slow, easing: Easing.bezier(0.16, 1, 0.3, 1), useNativeDriver: false }).start(({ finished }) => finished && then?.());
 
   // Drawn already closed or mid-drag, the panel starts where it is; later changes move it there.
   const moved = useRef(false);
@@ -182,7 +182,7 @@ export function BottomSheet({
                 // Not dismissible, the handle is only a picture of one: nothing to press, nothing to read.
                 accessible={dismissible}
                 disabled={!dismissible}
-                hitSlop={hitSlopTo(t.control.hit, t.sheet.grabberH, t.sheet.grabberW)}
+                hitSlop={hitSlopTo(t.size.target.min, t.sheet.grabberHeight, t.sheet.grabberWidth)}
                 onPress={() => close()}
                 style={[s.handle, r.handle.view]}
               />

@@ -52,7 +52,7 @@ export function bySign(data: Row[], fields: string[], stacked: boolean): boolean
 /** The heights of the grey bars a chart shows while it loads, as shares of the plot's height: uneven, so it reads as a chart and not a stamp. */
 export const LOADING_BARS: readonly number[] = [0.45, 0.7, 0.55, 0.85, 0.6, 0.75];
 
-/** A ready-made chart draws in once over this long (ms), then tweens to new values; on the web its tooltip glides between points over `CHART_GLIDE`. One curve for both: the kit's `ease.out`. */
+/** A ready-made chart draws in once over this long (ms), then tweens to new values; on the web its tooltip glides between points over `CHART_GLIDE`. One curve for both: the kit's `motion.easing.out`. */
 export const CHART_DRAW = 600;
 export const CHART_GLIDE = 150;
 

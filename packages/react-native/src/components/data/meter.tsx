@@ -57,14 +57,14 @@ export function Meter({ value, max = 1, label, kind = "usage", format = "percent
   const tone = known ? meterTone(kind, share, thresholds) : "ok";
   const reading = meterReading(value, max, formatWords, format, locale);
   const shown = reading.kind === "unavailable" ? str("unavailable") : reading.kind === "of" ? str("valueOfMax", { value: reading.value, max: reading.max }) : reading.value;
-  const fill = tone === "warning" ? t.data.warning : tone === "danger" ? t.data.negative : null;
-  const root = partStyle(r, "root", { view: compact ? s.compactRoot : { minWidth: t.kpi.meterMinW } });
+  const fill = tone === "warning" ? t.color.background.data.warning : tone === "danger" ? t.color.background.data.negative : null;
+  const root = partStyle(r, "root", { view: compact ? s.compactRoot : { minWidth: t.kpi.meterMinWidth } });
   const value$ = partStyle(r, "value", { text: { fontVariant: ["tabular-nums"] } });
-  const track = partStyle(r, "track", { view: compact && { width: t.kpi.meterCompactW, flexShrink: 0 } });
+  const track = partStyle(r, "track", { view: compact && { width: t.kpi.meterCompactWidth, flexShrink: 0 } });
   const bar = partStyle(r, "fill", { view: [{ width: `${Math.min(1, Math.max(0, share)) * 100}%` }, fill !== null && { backgroundColor: fill }] });
   const said = tone === "warning" ? str("stateWarning", { value: shown }) : tone === "danger" ? str("stateDanger", { value: shown }) : shown;
   const icon = meterIcon(tone);
-  const mark = showState && icon ? <Icon name={icon} size={t.icon.sizeMd} color={fill ?? t.fg.body} style={s.mark} /> : null;
+  const mark = showState && icon ? <Icon name={icon} size={t.size.icon.md} color={fill ?? t.color.text.body} style={s.mark} /> : null;
   const readout = <Text testID={partId(testID, "meter", "value")} maxFontSizeMultiplier={fontScale.chrome} style={[value$.view, value$.text]}>{shown}</Text>;
   const valueText = mark ? <View style={s.valueRow}>{mark}{readout}</View> : readout;
   return (

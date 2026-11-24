@@ -70,7 +70,7 @@ function Tab({ item, id, controls, on, tabbable, full, styles, strings, onPress 
           justifyContent: "center",
           flexShrink: 0,
           whiteSpace: "nowrap",
-          transition: `color ${t.duration.base} ${t.ease.standard}`,
+          transition: `color ${t.motion.duration.base} ${t.motion.easing.standard}`,
         },
         partStyle(r, "tab", full && { flexGrow: 1 }, item.disabled && { opacity: t.opacity.disabled, cursor: "not-allowed" }),
       )}
@@ -89,7 +89,7 @@ function Tab({ item, id, controls, on, tabbable, full, styles, strings, onPress 
           pointerEvents: "none",
           transform: on ? "scaleX(1)" : "scaleX(0)",
           opacity: on ? 1 : 0,
-          transition: `transform ${t.duration.base} ${t.ease.out}, opacity ${t.duration.base}`,
+          transition: `transform ${t.motion.duration.base} ${t.motion.easing.out}, opacity ${t.motion.duration.base}`,
         })}
       />
     </button>
@@ -149,7 +149,7 @@ export function Tabs({ items, value, full = false, rule = true, label, panels = 
           scrollbarWidth: "none",
         },
         // Vocabulary gap: one inset edge, which `ring` (all four sides) cannot say.
-        partStyle(r, "root", { boxShadow: rule ? `inset 0 -1px 0 ${t.border.subtle}` : "none" }),
+        partStyle(r, "root", { boxShadow: rule ? `inset 0 -1px 0 ${t.color.border.subtle}` : "none" }),
         style,
       )}
     >

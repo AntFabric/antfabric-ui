@@ -1,7 +1,7 @@
 /**
  * The empty state's six drawings as data, read by both kits: a 160 × 116 canvas of near-white objects with a hairline edge and one
  * faint accent. This is artwork, not layout: its numbers are positions and radii on that canvas, so they live here and not in a
- * component file. Colours are not here; each kit paints a part with its own tokens (`surface.card`, `border.subtle`, `fg.faint`…).
+ * component file. Colours are not here; each kit paints a part with its own tokens (`color.background.card`, `color.border.subtle`, `color.text.faint`…).
  */
 
 export type ArtKind = "messages" | "tasks" | "notifications" | "mail" | "files" | "projects";

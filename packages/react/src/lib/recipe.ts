@@ -80,7 +80,7 @@ const CSS: Record<StyleKey, readonly (keyof CSSProperties)[]> = {
   placeholder: [],
 };
 
-/** A token reference as the kit's variable (`"$fg.body"` → `var(--af-fg-body)`). */
+/** A token reference as the kit's variable (`"$color.text.body"` → `var(--af-color-text-body)`). */
 export function tokenVar(path: string): string {
   let at: unknown = t;
   for (const key of path.split(".")) at = (at as Record<string, unknown> | undefined)?.[key];
@@ -90,7 +90,7 @@ export function tokenVar(path: string): string {
 
 const valueOf = (key: StyleKey, v: StyleValue): string | undefined => {
   const path = tokenOf(v);
-  if (path) return key === "ring" ? `inset 0 0 0 ${t.border.wHairline} ${tokenVar(path)}` : tokenVar(path);
+  if (path) return key === "ring" ? `inset 0 0 0 ${t.border.width.hairline} ${tokenVar(path)}` : tokenVar(path);
   return v === "none" ? undefined : v;
 };
 

@@ -204,12 +204,12 @@ export function HoverCard({
           box,
           { alignSelf: "stretch" },
           placement === "up" ? { paddingBottom: t.space.xs } : { paddingTop: t.space.xs },
-          floating && { position: "absolute", zIndex: t.z.popover, width: "max-content", [placement === "up" ? "bottom" : "top"]: "100%", left: 0 },
+          floating && { position: "absolute", zIndex: t.zIndex.popover, width: "max-content", [placement === "up" ? "bottom" : "top"]: "100%", left: 0 },
         )}
       >
         <div id={panel} role="group" aria-label={shown} data-af-part="panel" style={css(rtl(panelLook, dir), partStyle(r, "panel", enter("pop"), placement === "up" && { transformOrigin: "bottom center" }))}>
           <div data-af-part="header" style={css(row, r.header)}>
-            <Avatar decorative name={name} src={src} identity={ink} size="lg" agent={agent} style={{ width: t.hoverCard.avatar, height: t.hoverCard.avatar, fontSize: t.text.body, fontWeight: t.font.weightBold }} />
+            <Avatar decorative name={name} src={src} identity={ink} size="lg" agent={agent} style={{ width: t.hoverCard.avatarSize, height: t.hoverCard.avatarSize, fontSize: t.font.size.body, fontWeight: t.font.weight.bold }} />
             <div style={css(box, { flex: 1 })}>
               <div style={css(row, { gap: t.space.xs })}>
                 <h3 data-af-part="name" style={css(text, truncate(1), { flexShrink: 1 }, r.name)}>{shown}</h3>

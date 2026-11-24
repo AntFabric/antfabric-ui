@@ -8,13 +8,13 @@ import { defineRecipe } from "../../recipe";
 export const messageActions = defineRecipe({
   parts: ["root", "quick", "emoji", "rule"],
   styles: {
-    root: { on: ["web", "desktop"], base: { borderWidth: "$border.wHairline", borderColor: "$border.subtle", bg: "$surface.raised", shadow: "$shadow.raise" } },
+    root: { on: ["web", "desktop"], base: { borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle", bg: "$color.background.raised", shadow: "$elevation.shadow.raise" } },
     quick: {
       on: ["web", "desktop"],
-      base: { square: "$control.hIcon", radius: "$radius.control" },
-      states: { hover: { bg: "$hover.surface" }, pressed: { bg: "$surface.selected" }, focus: { shadow: "$shadow.focus" } },
+      base: { square: "$size.control.icon", radius: "$radius.control" },
+      states: { hover: { bg: "$color.background.hover" }, pressed: { bg: "$color.background.selected" }, focus: { shadow: "$elevation.shadow.focus" } },
     },
-    emoji: { on: ["web", "desktop"], base: { size: "$text.lead" } },
-    rule: { on: ["web", "desktop"], base: { width: "$border.wHairline", bg: "$border.subtle" } },
+    emoji: { on: ["web", "desktop"], base: { size: "$font.size.lead" } },
+    rule: { on: ["web", "desktop"], base: { width: "$border.width.hairline", bg: "$color.border.subtle" } },
   },
 });

@@ -7,14 +7,14 @@ import { composerTools, messageBar, NAV_RAIL_SAMPLE, TITLE_BAR_SAMPLE } from "@a
 const view: CSSProperties = { display: "flex", flexDirection: "column", boxSizing: "border-box", minWidth: 0, position: "relative" };
 const row: CSSProperties = { ...view, flexDirection: "row", alignItems: "center" };
 const text: CSSProperties = { display: "block", margin: 0, minWidth: 0 };
-const hairline = `1px solid ${t.border.subtle}`;
-const heading: CSSProperties = { ...text, fontWeight: t.font.weightBold, fontSize: t.text.title, color: t.fg.strong };
+const hairline = `1px solid ${t.color.border.subtle}`;
+const heading: CSSProperties = { ...text, fontWeight: t.font.weight.bold, fontSize: t.font.size.title, color: t.color.text.strong };
 
 export default function DesktopChannel() {
   // The sidebar button in the bar above opens and closes the rail.
   const [railOpen, setRailOpen] = useState(false);
   return (
-    <div style={{ ...view, height: "100%", width: "100%", overflow: "hidden", background: t.surface.page }}>
+    <div style={{ ...view, height: "100%", width: "100%", overflow: "hidden", background: t.color.background.page }}>
       <TitleBar {...TITLE_BAR_SAMPLE} canGoBack canGoForward={false} sidebarExpanded={railOpen} onSidebarExpandedChange={(next) => setRailOpen(next)} />
       <div style={{ ...view, flexDirection: "row", flex: 1, minHeight: 0 }}>
         <NavRail {...NAV_RAIL_SAMPLE} variant="drill-in" level="sections" section="channels" active="channels" expanded={railOpen} />
@@ -22,17 +22,17 @@ export default function DesktopChannel() {
         <div
           style={{
             ...view,
-            width: t.rail.wSidebar,
+            width: t.size.layout.sidebar,
             flexShrink: 0,
             gap: t.space["2xs"],
             paddingBlock: t.space.sm,
-            background: t.surface.sidebar,
+            background: t.color.background.sidebar,
             borderRight: hairline,
             overflow: "hidden",
           }}
         >
           <div style={{ ...row, justifyContent: "space-between", paddingInline: t.space.lg, paddingBottom: t.space.sm }}>
-            <span style={{ ...heading, fontFamily: t.font.display }}>GeekyAnts</span>
+            <span style={{ ...heading, fontFamily: t.font.family.display }}>GeekyAnts</span>
             <IconButton icon="square-pen" label="New message" size="sm" />
           </div>
           <SidebarSection
@@ -66,17 +66,17 @@ export default function DesktopChannel() {
           />
         </div>
 
-        <div style={{ ...view, flex: 1, background: t.surface.card }}>
+        <div style={{ ...view, flex: 1, background: t.color.background.card }}>
           <div style={{ ...row, gap: t.space.sm, height: 52, flexShrink: 0, paddingInline: t.space.xl, borderBottom: hairline }}>
-            <Icon name="hash" size={t.icon.size} color={t.fg.muted} />
+            <Icon name="hash" size={t.size.icon.default} color={t.color.text.muted} />
             <span style={heading}>platform-eng</span>
             <span
               style={{
                 ...text,
                 flex: 1,
                 marginLeft: t.space.xs,
-                fontSize: t.text.bodySm,
-                color: t.fg.faint,
+                fontSize: t.font.size.bodySm,
+                color: t.color.text.faint,
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",

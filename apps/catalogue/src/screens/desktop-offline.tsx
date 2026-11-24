@@ -12,19 +12,19 @@ const root: CSSProperties = {
   minWidth: 0,
   position: "relative",
   overflow: "hidden",
-  background: t.surface.page,
+  background: t.color.background.page,
 };
 const col: CSSProperties = { display: "flex", flexDirection: "column", minWidth: 0, boxSizing: "border-box" };
 const line: CSSProperties = { ...col, flexDirection: "row", alignItems: "center" };
 
 const sidebar: CSSProperties = {
   ...col,
-  width: t.rail.wSidebar,
+  width: t.size.layout.sidebar,
   flexShrink: 0,
   gap: t.space["2xs"],
   paddingBlock: t.space.sm,
-  background: t.surface.sidebar,
-  borderRight: `1px solid ${t.border.subtle}`,
+  background: t.color.background.sidebar,
+  borderRight: `1px solid ${t.color.border.subtle}`,
   overflow: "hidden",
 };
 const paneHead: CSSProperties = {
@@ -33,16 +33,16 @@ const paneHead: CSSProperties = {
   height: 52,
   flexShrink: 0,
   paddingInline: t.space.xl,
-  borderBottom: `1px solid ${t.border.subtle}`,
+  borderBottom: `1px solid ${t.color.border.subtle}`,
 };
-const heading: CSSProperties = { margin: 0, fontWeight: t.font.weightBold, fontSize: t.text.title, color: t.fg.strong };
+const heading: CSSProperties = { margin: 0, fontWeight: t.font.weight.bold, fontSize: t.font.size.title, color: t.color.text.strong };
 
 // Offline, other people's presence is unknown, so no row carries a presence dot.
 function Sidebar() {
   return (
     <div style={sidebar}>
       <div style={{ ...line, justifyContent: "space-between", paddingInline: t.space.lg, paddingBottom: t.space.sm }}>
-        <span style={{ ...heading, fontFamily: t.font.display }}>GeekyAnts</span>
+        <span style={{ ...heading, fontFamily: t.font.family.display }}>GeekyAnts</span>
         <IconButton icon="square-pen" label="New message" size="sm" />
       </div>
       <SidebarSection
@@ -91,17 +91,17 @@ export default function DesktopOffline() {
           <ConnectionBanner state="offline" />
           <div style={{ ...line, alignItems: "stretch", flex: 1, minHeight: 0 }}>
             <Sidebar />
-            <div style={{ ...col, flex: 1, background: t.surface.card }}>
+            <div style={{ ...col, flex: 1, background: t.color.background.card }}>
               <div style={paneHead}>
-                <Icon name="hash" size={t.icon.size} color={t.fg.muted} />
+                <Icon name="hash" size={t.size.icon.default} color={t.color.text.muted} />
                 <span style={heading}>platform-eng</span>
                 <span
                   style={{
                     flex: 1,
                     minWidth: 0,
                     marginLeft: t.space.xs,
-                    fontSize: t.text.bodySm,
-                    color: t.fg.faint,
+                    fontSize: t.font.size.bodySm,
+                    color: t.color.text.faint,
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",

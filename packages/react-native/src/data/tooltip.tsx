@@ -18,15 +18,15 @@ const useStyles = createStyles((t) => ({
     paddingVertical: t.space.sm,
     paddingHorizontal: t.space.smMd,
     borderRadius: t.radius.control,
-    backgroundColor: t.chart.tooltip,
-    borderWidth: t.border.wHairline,
-    borderColor: t.chart.tooltipRule,
-    boxShadow: t.shadow.menu,
+    backgroundColor: t.chart.tooltipColor,
+    borderWidth: t.border.width.hairline,
+    borderColor: t.chart.tooltipRuleColor,
+    boxShadow: t.elevation.shadow.menu,
   },
   row: { flexDirection: "row", alignItems: "center", gap: t.space.xs },
   swatch: { width: t.space.sm, height: t.space.sm, borderRadius: t.radius.tag },
   label: { flex: 1 },
-  total: { borderTopWidth: t.border.wHairline, borderTopColor: t.chart.tooltipRule, marginTop: t.space["3xs"], paddingTop: t.space["3xs"] },
+  total: { borderTopWidth: t.border.width.hairline, borderTopColor: t.chart.tooltipRuleColor, marginTop: t.space["3xs"], paddingTop: t.space["3xs"] },
 }));
 
 /** The tooltip every chart shows when a point or a bar is pressed: one card, fed by core's `tipRows`. The React kit draws the same card in the DOM. */
@@ -34,24 +34,24 @@ export function ChartTooltip({ tip, totalLabel, style }: ChartTooltipProps) {
   const s = useStyles();
   const t = useChartTokens();
   // A `Text` inherits nothing: each one sets its own colour, size and font file.
-  const words = (weight: "regular" | "semibold", color: string): TextStyle => ({ ...chartFont(t, weight), color, fontSize: t.text.caption });
+  const words = (weight: "regular" | "semibold", color: string): TextStyle => ({ ...chartFont(t, weight), color, fontSize: t.font.size.caption });
   return (
     <View testID="chart-tooltip" style={[s.card, style]}>
-      <Text style={words("semibold", t.chart.tooltipText)}>{tip.title}</Text>
+      <Text style={words("semibold", t.chart.tooltipTextColor)}>{tip.title}</Text>
       {tip.rows.map((r) => (
         <View key={r.key} style={s.row}>
           <View style={[s.swatch, { backgroundColor: r.color }]} />
-          <Text numberOfLines={1} style={[s.label, words("regular", t.chart.tooltipMuted)]}>
+          <Text numberOfLines={1} style={[s.label, words("regular", t.chart.tooltipMutedColor)]}>
             {r.label}
           </Text>
-          <Text style={[words("semibold", t.chart.tooltipText), { fontVariant: ["tabular-nums"] }]}>{r.value}</Text>
+          <Text style={[words("semibold", t.chart.tooltipTextColor), { fontVariant: ["tabular-nums"] }]}>{r.value}</Text>
         </View>
       ))}
       {tip.total != null ? (
         <View style={[s.row, s.total]}>
           <View style={s.swatch} />
-          <Text style={[s.label, words("regular", t.chart.tooltipMuted)]}>{totalLabel}</Text>
-          <Text style={[words("semibold", t.chart.tooltipText), { fontVariant: ["tabular-nums"] }]}>{tip.total}</Text>
+          <Text style={[s.label, words("regular", t.chart.tooltipMutedColor)]}>{totalLabel}</Text>
+          <Text style={[words("semibold", t.chart.tooltipTextColor), { fontVariant: ["tabular-nums"] }]}>{tip.total}</Text>
         </View>
       ) : null}
     </View>

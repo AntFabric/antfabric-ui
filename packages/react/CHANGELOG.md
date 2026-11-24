@@ -1,5 +1,11 @@
 # @antfabric/ui-react
 
+## 1.2.0
+
+### Changed
+
+- **`t` uses the category-first token names**: `t.color.text.muted`, `t.size.control.md`, `t.font.size.body` (see `@antfabric/ui-core`'s changelog and `MIGRATION.md`, "1.1 → 1.2"). The old keys (`t.fg.muted`) are still there, marked `@deprecated`, until 2.0; `npx af-tokens-codemod <dir>` rewrites them. Nothing a component draws changed.
+
 ## 1.1.0
 
 1.1.0 fixes the 1.0 component review (`reports/audit/2026-11-23-component-review.md`). It removes nothing, but several components change behaviour (see "Changed" below, and MIGRATION.md, "1.0 → 1.1"). Token changes (`fg.onBrand`, chart colours, `os.onFill`) are in `@antfabric/ui-core`'s changelog.

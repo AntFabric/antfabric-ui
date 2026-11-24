@@ -60,7 +60,7 @@ const useStyles = createStyles((t) => ({
   search: { flexDirection: "row", alignItems: "center", gap: t.space.sm, paddingHorizontal: t.space.md },
   input: { flex: 1, padding: 0 },
   grid: { letterSpacing: 26 * 0.22, lineHeight: 26 * 1.2 },
-  rows: { marginHorizontal: -t.gutter.pane, width: "auto" },
+  rows: { marginHorizontal: -t.space.gutter.pane, width: "auto" },
 }));
 
 /** An icon's size is its width and height (`size`); what else a part's style sets goes on the glyph. */
@@ -162,7 +162,7 @@ export function ContextMenu({ quickReactions = [], picked = [], items = [], labe
         {/* The emoji panel's search field is lifted above the keyboard. */}
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <GlassSurface testID={partId(testID, "context-menu", "sheet")} style={[s.sheet, r.sheet.view]} glassStyle={[s.glass, styles?.sheet]}>
-          <Pressable testID={partId(testID, "context-menu", "handle")} accessibilityRole="button" accessibilityLabel={str("dismiss")} ref={grabber} hitSlop={hitSlopTo(t.control.hit, t.sheet.grabberH, t.sheet.grabberW)} onPress={() => onClose?.()} style={[s.handle, r.handle.view]} />
+          <Pressable testID={partId(testID, "context-menu", "handle")} accessibilityRole="button" accessibilityLabel={str("dismiss")} ref={grabber} hitSlop={hitSlopTo(t.size.target.min, t.sheet.grabberHeight, t.sheet.grabberWidth)} onPress={() => onClose?.()} style={[s.handle, r.handle.view]} />
           <View style={s.header}>
             <Text ref={heading} testID={partId(testID, "context-menu", "title")} accessibilityRole="header" numberOfLines={1} style={[s.title, r.title.view, r.title.text]}>
               {title}

@@ -289,7 +289,7 @@ export function Composer({
         </div>
       )}
       {!locked && (
-        <div data-af-part="card" style={css(box, { transition: `border-color ${t.duration.quick}` }, r.card)}>
+        <div data-af-part="card" style={css(box, { transition: `border-color ${t.motion.duration.quick}` }, r.card)}>
           {formatting && (
             <div ref={toolbar.ref} role="toolbar" aria-label={s("formatting")} data-af-part="toolbar" onKeyDown={toolbar.onKeyDown} style={css(row, { gap: t.space["3xs"], padding: `${t.space.xs} ${t.space.sm} 0` }, r.toolbar)}>
               {formats.map((tool, i) =>

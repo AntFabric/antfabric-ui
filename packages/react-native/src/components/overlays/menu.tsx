@@ -124,7 +124,7 @@ function MenuRow({ item, checked, testID, styles, onPress }: { item: MenuItem; c
         <View testID={partId(testID, "menu", "tick")} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={[s.tickBox, r.tick.view]}>
           {checked ? (
             <Enter motion="pop">
-              <Icon testID={partId(testID, "menu", "tickIcon")} name="check" size={tickIcon.size} strokeWidth={t.icon.strokeTick} color={r.tickIcon.text.color ?? r.tick.text.color} style={tickIcon.rest} />
+              <Icon testID={partId(testID, "menu", "tickIcon")} name="check" size={tickIcon.size} strokeWidth={t.size.stroke.tick} color={r.tickIcon.text.color ?? r.tick.text.color} style={tickIcon.rest} />
             </Enter>
           ) : null}
         </View>

@@ -47,7 +47,7 @@ export function TypingIndicator({ names = [], strings, styles, style, ...rest }:
             data-af-part="dot"
             style={partStyle(r, "dot", {
               opacity: d.opacity,
-              animation: `af-bounce 1.2s ${t.ease.nudge} ${d.delay}ms infinite`,
+              animation: `af-bounce 1.2s ${t.motion.easing.nudge} ${d.delay}ms infinite`,
             })}
           />
         ))}

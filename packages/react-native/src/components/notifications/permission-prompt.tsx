@@ -41,7 +41,7 @@ const useStyles = createStyles((t) => ({
   root: { gap: t.space.md, padding: t.space.xl },
   sheet: {
     borderWidth: 0,
-    borderTopWidth: t.border.wHairline,
+    borderTopWidth: t.border.width.hairline,
     borderTopLeftRadius: t.radius.sheet,
     borderTopRightRadius: t.radius.sheet,
     borderBottomLeftRadius: 0,

@@ -34,7 +34,7 @@ export interface ProgressRingProps extends RootProps {
   style?: ViewStyle;
 }
 
-/* The stroke is this share of the ring's size, with a floor of `kpi.ringMinW`. gifted-charts' slices have no round ends. */
+/* The stroke is this share of the ring's size, with a floor of `kpi.ringMinWidth`. gifted-charts' slices have no round ends. */
 const STROKE = 0.12;
 /* A slice of nothing would not draw; this is nothing a person could see. */
 const SLIVER = 0.0001;
@@ -55,8 +55,8 @@ export function ProgressRing({ value, max = 1, size, thickness = 0, tone = "defa
   const diameter = size ?? t.kpi.ringSize;
   const known = Number.isFinite(value) && Number.isFinite(max) && max > 0;
   const share = known ? Math.min(1, Math.max(0, value / max)) : 0;
-  const color = tone === "positive" ? t.data.positive : tone === "negative" ? t.data.negative : tone === "warning" ? t.data.warning : t.chart.series1;
-  const stroke = thickness || Math.max(t.kpi.ringMinW, Math.round(diameter * STROKE));
+  const color = tone === "positive" ? t.color.background.data.positive : tone === "negative" ? t.color.background.data.negative : tone === "warning" ? t.color.background.data.warning : t.chart.series1Color;
+  const stroke = thickness || Math.max(t.kpi.ringMinWidth, Math.round(diameter * STROKE));
   const outer = diameter / 2;
   const percent = known ? fmt({ type: "percent", digits: 0 }, share, formatWords, locale) : str("unavailable");
   const root = partStyle(r, "root", { view: { width: diameter, height: diameter } });
@@ -77,9 +77,9 @@ export function ProgressRing({ value, max = 1, size, thickness = 0, tone = "defa
         donut
         radius={outer}
         innerRadius={outer - stroke}
-        innerCircleColor={t.surface.card}
+        innerCircleColor={t.color.background.card}
         strokeWidth={0}
-        data={[{ value: Math.max(share, SLIVER), color: share > 0 ? color : t.chart.track }, { value: Math.max(1 - share, SLIVER), color: t.chart.track }]}
+        data={[{ value: Math.max(share, SLIVER), color: share > 0 ? color : t.chart.trackColor }, { value: Math.max(1 - share, SLIVER), color: t.chart.trackColor }]}
         isAnimated={giftedAnimated(animate, reduced)}
       />
       <View testID={partId(testID, "progress-ring", "center")} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" pointerEvents="none" style={[s.center, mid.view]}>

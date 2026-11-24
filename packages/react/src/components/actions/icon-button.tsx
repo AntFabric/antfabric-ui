@@ -59,10 +59,10 @@ const root: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   flexShrink: 0,
-  transition: `background ${t.duration.fast}, color ${t.duration.fast}, transform ${t.duration.fast} ${t.ease.out}`,
+  transition: `background ${t.motion.duration.fast}, color ${t.motion.duration.fast}, transform ${t.motion.duration.fast} ${t.motion.easing.out}`,
 };
 
-const badgeAt: CSSProperties = { position: "absolute", top: t.iconButton.badgeTop, right: t.iconButton.badgeRight };
+const badgeAt: CSSProperties = { position: "absolute", top: t.iconButton.badgeOffsetY, right: t.iconButton.badgeOffsetX };
 
 /** The avatar part fills the button; the face inside fills the part. */
 const avatarBox: CSSProperties = { display: "flex", width: "100%", height: "100%" };
@@ -99,7 +99,7 @@ export function IconButton({
     state: { hover: ui.hovered, focus: ui.focused, pressed: ui.pressed, disabled: ui.disabled },
     styles,
   });
-  const side = size === "sm" ? tokens.profiles.mobile.control.hIconSm : tokens.profiles.mobile.control.hIcon;
+  const side = size === "sm" ? tokens.profiles.mobile.size.control.iconSm : tokens.profiles.mobile.size.control.icon;
   return (
     <button
       type="button"

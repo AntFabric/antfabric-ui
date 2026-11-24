@@ -80,7 +80,7 @@ const tile: CSSProperties = { ...box, flexShrink: 0, alignItems: "center", justi
 const bodyText: CSSProperties = { ...text, ...truncate(2) };
 const field: CSSProperties = { ...input, flex: 1 };
 // Under the text column: past the face and the gap.
-const indent = `calc(${t.avatar.md} + ${t.space.md})`;
+const indent = `calc(${t.size.avatar.md} + ${t.space.md})`;
 
 export function InAppBanner({
   title,
@@ -222,7 +222,7 @@ export function InAppBanner({
           </button>
           <IconButton icon="x" label={s("dismiss")} size="sm" onPress={() => dismiss("close")} style={rtl({ position: "absolute", top: t.space.sm, right: t.space.sm }, dir)} />
           {!open && (replyable || actions.length > 0) && (
-            <div ref={actionsRef} style={css(row, rtl({ gap: t.space["2xs"], paddingLeft: t.avatar.md, marginTop: neg(t.space["3xs"]), flexWrap: "wrap" }, dir), enter("fade"))}>
+            <div ref={actionsRef} style={css(row, rtl({ gap: t.space["2xs"], paddingLeft: t.size.avatar.md, marginTop: neg(t.space["3xs"]), flexWrap: "wrap" }, dir), enter("fade"))}>
               {replyable && <Button label={s("reply")} variant="ghost" size="sm" iconLeading="reply" onPress={() => setOpen(true)} />}
               {actions.map((a) => (
                 <Button

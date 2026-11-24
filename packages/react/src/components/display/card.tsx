@@ -36,7 +36,7 @@ export interface CardProps extends RootProps<HTMLDivElement> {
 }
 
 /** The layout and the motion no token decides; what the tokens decide (fill, edge, radius, shadow, padding) is the recipe's. */
-const root: CSSProperties = { ...box, transition: `background-color ${t.duration.fast}, color ${t.duration.fast}` };
+const root: CSSProperties = { ...box, transition: `background-color ${t.motion.duration.fast}, color ${t.motion.duration.fast}` };
 
 // The stretched press target: under the content (below it in the card's own stacking context, which `isolation` opens), so a link,
 // button or field the product nests stays its own control and the card's text can be selected. The card's surface and padding are its.

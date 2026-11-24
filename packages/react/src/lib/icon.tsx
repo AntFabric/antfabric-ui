@@ -10,7 +10,7 @@ type Glyph = ComponentType<{ "aria-hidden"?: boolean; "data-af-part"?: string; s
 
 export interface IconProps {
   name: IconName;
-  /** A length: a token (`t.icon.sizeMd`) or px. Defaults to the platform's medium icon. */
+  /** A length: a token (`t.size.icon.md`) or px. Defaults to the platform's medium icon. */
   size?: string | number;
   color?: string;
   /** Defaults to the platform's weight. Small glyphs on a fill (a tick in a box) are drawn heavier. */
@@ -25,7 +25,7 @@ export interface IconProps {
  * the kit draws itself, and whatever the app adds with `registerIcons`), so the props API is the same as the phone kit's, where the same
  * name picks the lucide-react-native icon. A name nobody registered draws an empty box of the icon's size.
  */
-export function Icon({ name, size = t.icon.size, color, strokeWidth = t.icon.stroke, part, style }: IconProps) {
+export function Icon({ name, size = t.size.icon.default, color, strokeWidth = t.size.stroke.default, part, style }: IconProps) {
   const Glyph = (typeof name === "string" ? iconFor(name) : name) as Glyph | null;
   const box: CSSProperties = { width: size, height: size, flexShrink: 0, display: "block", color, strokeWidth, ...style };
   if (!Glyph) return <span aria-hidden data-af-missing-icon={name as string} data-af-part={part} style={{ ...box, display: "inline-block" }} />;
@@ -36,7 +36,7 @@ export function Icon({ name, size = t.icon.size, color, strokeWidth = t.icon.str
  * The loading spinner: a quarter arc over a faint ring, in the current colour. A spinner inside a control that already says it is busy
  * (a loading Button, whose name and `aria-busy` carry it) is `decorative`: hidden from assistive tech, so the wait is not read twice.
  */
-export function Spinner({ size = t.icon.size, label = "Loading", decorative = false, part, style }: { size?: string | number; label?: string; decorative?: boolean; part?: string; style?: CSSProperties }) {
+export function Spinner({ size = t.size.icon.default, label = "Loading", decorative = false, part, style }: { size?: string | number; label?: string; decorative?: boolean; part?: string; style?: CSSProperties }) {
   const a11y = decorative ? { "aria-hidden": true } : { role: "progressbar", "aria-label": label };
   return (
     <span {...a11y} data-af-part={part} style={{ display: "inline-flex", width: size, height: size, flexShrink: 0, ...style }}>

@@ -361,7 +361,7 @@ const docs: ComponentDocs = {
                 style: {
                   direction: "row",
                   gap: "$space.xs",
-                  paddingX: "$gutter.pane",
+                  paddingX: "$space.gutter.pane",
                 },
                 children: [
                   {
@@ -406,7 +406,7 @@ const docs: ComponentDocs = {
                 el: "component",
                 use: "search-field",
                 style: {
-                  marginX: "$gutter.pane",
+                  marginX: "$space.gutter.pane",
                 },
                 props: {
                   placeholder: "Search Conversations",
@@ -466,7 +466,7 @@ const docs: ComponentDocs = {
                 style: {
                   direction: "row",
                   gap: "$space.xs",
-                  paddingX: "$gutter.pane",
+                  paddingX: "$space.gutter.pane",
                 },
                 children: [
                   {
@@ -511,7 +511,7 @@ const docs: ComponentDocs = {
                 el: "component",
                 use: "search-field",
                 style: {
-                  marginX: "$gutter.pane",
+                  marginX: "$space.gutter.pane",
                 },
                 props: {
                   placeholder: "Search Conversations",
@@ -571,7 +571,7 @@ const docs: ComponentDocs = {
                 style: {
                   direction: "row",
                   gap: "$space.xs",
-                  paddingX: "$gutter.pane",
+                  paddingX: "$space.gutter.pane",
                 },
                 children: [
                   {
@@ -616,7 +616,7 @@ const docs: ComponentDocs = {
                 el: "component",
                 use: "search-field",
                 style: {
-                  marginX: "$gutter.pane",
+                  marginX: "$space.gutter.pane",
                 },
                 props: {
                   placeholder: "Search Conversations",
@@ -676,7 +676,7 @@ const docs: ComponentDocs = {
                 style: {
                   direction: "row",
                   gap: "$space.xs",
-                  paddingX: "$gutter.pane",
+                  paddingX: "$space.gutter.pane",
                 },
                 children: [
                   {
@@ -721,7 +721,7 @@ const docs: ComponentDocs = {
                 el: "component",
                 use: "search-field",
                 style: {
-                  marginX: "$gutter.pane",
+                  marginX: "$space.gutter.pane",
                 },
                 props: {
                   placeholder: "Search Channels",
@@ -769,7 +769,7 @@ const docs: ComponentDocs = {
                 style: {
                   direction: "row",
                   gap: "$space.xs",
-                  paddingX: "$gutter.pane",
+                  paddingX: "$space.gutter.pane",
                 },
                 children: [
                   {
@@ -814,7 +814,7 @@ const docs: ComponentDocs = {
                 el: "component",
                 use: "search-field",
                 style: {
-                  marginX: "$gutter.pane",
+                  marginX: "$space.gutter.pane",
                 },
                 props: {
                   placeholder: "Search Channels",

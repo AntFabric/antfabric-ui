@@ -38,7 +38,7 @@ const MARK_FILL = 0.92;
 function Mark({ mark, name, size, style }: { mark?: AppMark; name: string; size: number; style: CSSProperties }) {
   if (!mark) {
     return (
-      <span data-af-part="mark" aria-hidden="true" style={css({ display: "block", flexShrink: 0, fontSize: Math.round(size * MARK_FILL), lineHeight: 1, fontWeight: t.font.weightBold }, style)}>
+      <span data-af-part="mark" aria-hidden="true" style={css({ display: "block", flexShrink: 0, fontSize: Math.round(size * MARK_FILL), lineHeight: 1, fontWeight: t.font.weight.bold }, style)}>
         {Array.from(name)[0] ?? ""}
       </span>
     );
@@ -56,7 +56,7 @@ function Mark({ mark, name, size, style }: { mark?: AppMark; name: string; size:
 const digits: CSSProperties = { ...text, lineHeight: 1, fontVariantNumeric: "tabular-nums" };
 const dock: CSSProperties = { ...row, alignItems: "flex-end", paddingTop: t.space.sm, paddingBottom: t.space["2xs"], backdropFilter: "blur(30px)", WebkitBackdropFilter: "blur(30px)" };
 const appIcon: CSSProperties = { ...box, ...center, flexShrink: 0 };
-const runDot: CSSProperties = { position: "absolute", bottom: t.border.wHairline, left: "calc(50% - 2px)", borderRadius: "50%" };
+const runDot: CSSProperties = { position: "absolute", bottom: t.border.width.hairline, left: "calc(50% - 2px)", borderRadius: "50%" };
 const pill: CSSProperties = { ...box, ...center, position: "absolute" };
 const taskButton: CSSProperties = { ...box, ...center, flexShrink: 0 };
 const tab: CSSProperties = { ...row };
@@ -111,7 +111,7 @@ export function AppBadge({ appName, mark, otherTab = "", count: n = 0, dot = fal
                 </span>
               )}
             </span>
-            <span data-af-part="taskBar" style={{ position: "absolute", bottom: t.border.wHairline, ...r.taskBar }} />
+            <span data-af-part="taskBar" style={{ position: "absolute", bottom: t.border.width.hairline, ...r.taskBar }} />
           </span>
           <span data-af-part="glyphButton" style={css(taskButton, r.glyphButton)}>
             <Icon name="folder" size={20} />

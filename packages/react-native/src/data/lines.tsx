@@ -22,7 +22,7 @@ export interface GiftedLinesProps {
   area?: boolean;
   target?: number;
   targetLabel?: string;
-  /** The series drawn dashed and thinner (`chart.previousW`): the last period, in PeriodCompare. */
+  /** The series drawn dashed and thinner (`chart.previousWidth`): the last period, in PeriodCompare. */
   dashed?: string[];
   /** Each series gets its own dash and marker (`seriesMark`) besides its colour. */
   marks?: boolean;

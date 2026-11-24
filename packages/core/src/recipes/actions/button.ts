@@ -1,44 +1,44 @@
 import { defineRecipe } from "../../recipe";
 
 /**
- * Button. Written from the React kit's table; the phone reads the same tokens (its ink button is pressed in `brand.active`, as the web's is).
+ * Button. Written from the React kit's table; the phone reads the same tokens (its ink button is pressed in `color.background.brand.pressed`, as the web's is).
  * The label's type is on `root`: the web draws the label as the button's own text, and the phone's reader hands it to the `Text`.
  */
 export const button = defineRecipe({
   parts: ["root", "icon", "spinner", "shortcut"],
   styles: {
     root: {
-      base: { radius: "$radius.pill", font: "$font.sans", weight: "$font.weightSemibold" },
+      base: { radius: "$radius.pill", font: "$font.family.sans", weight: "$font.weight.semibold" },
       variants: {
         size: {
-          sm: { height: "$control.hXs", paddingX: "$space.md", size: "$button.labelSm", gap: "$space.2xs" },
-          md: { height: "$control.hMd", paddingX: "$space.lg", size: "$button.labelMd", gap: "$space.xs" },
-          lg: { height: "$control.hXl", paddingX: "$space.xl", size: "$button.labelLg", gap: "$space.xs" },
+          sm: { height: "$size.control.xs", paddingX: "$space.md", size: "$button.labelFontSizeSm", gap: "$space.2xs" },
+          md: { height: "$size.control.md", paddingX: "$space.lg", size: "$button.labelFontSizeMd", gap: "$space.xs" },
+          lg: { height: "$size.control.xl", paddingX: "$space.xl", size: "$button.labelFontSizeLg", gap: "$space.xs" },
         },
         variant: {
-          primary: { bg: "$brand.default", fg: "$fg.onBrand", states: { hover: { bg: "$brand.hover" }, pressed: { bg: "$brand.active" } } },
+          primary: { bg: "$color.background.brand.default", fg: "$color.text.onBrand", states: { hover: { bg: "$color.background.brand.hover" }, pressed: { bg: "$color.background.brand.pressed" } } },
           secondary: {
-            bg: "$surface.card",
-            fg: "$fg.strong",
-            borderWidth: "$border.wHairline",
-            borderColor: "$border.muted",
-            states: { hover: { bg: "$hover.surface" }, pressed: { bg: "$surface.selected" } },
+            bg: "$color.background.card",
+            fg: "$color.text.strong",
+            borderWidth: "$border.width.hairline",
+            borderColor: "$color.border.muted",
+            states: { hover: { bg: "$color.background.hover" }, pressed: { bg: "$color.background.selected" } },
           },
-          ghost: { bg: "transparent", fg: "$fg.body", states: { hover: { bg: "$hover.surface" }, pressed: { bg: "$surface.selected" } } },
-          soft: { bg: "$brand.soft", fg: "$fg.onBrandSoft", states: { hover: { bg: "$brand.softHover" }, pressed: { bg: "$brand.softHover" } } },
+          ghost: { bg: "transparent", fg: "$color.text.body", states: { hover: { bg: "$color.background.hover" }, pressed: { bg: "$color.background.selected" } } },
+          soft: { bg: "$color.background.brand.soft", fg: "$color.text.onBrandSoft", states: { hover: { bg: "$color.background.brand.softHover" }, pressed: { bg: "$color.background.brand.softHover" } } },
           // Ink turns coral on hover and one step deeper (brand.active) while pressed, like primary (owner decision, 2026-11-03).
-          ink: { bg: "$surface.inverse", fg: "$fg.onInverse", states: { hover: { bg: "$brand.default", fg: "$fg.onBrand" }, pressed: { bg: "$brand.active" } } },
-          danger: { bg: "$danger.solid", fg: "$danger.fg", states: { hover: { bg: "$danger.solidHover" }, pressed: { bg: "$danger.solidHover" } } },
+          ink: { bg: "$color.background.inverse", fg: "$color.text.onInverse", states: { hover: { bg: "$color.background.brand.default", fg: "$color.text.onBrand" }, pressed: { bg: "$color.background.brand.pressed", fg: "$color.text.onBrand" } } },
+          danger: { bg: "$color.background.danger.default", fg: "$color.text.onDanger", states: { hover: { bg: "$color.background.danger.hover" }, pressed: { bg: "$color.background.danger.hover" } } },
         },
       },
-      states: { focus: { shadow: "$shadow.focus" }, disabled: { opacity: "$opacity.disabled" } },
+      states: { focus: { shadow: "$elevation.shadow.focus" }, disabled: { opacity: "$opacity.disabled" } },
     },
     icon: {
-      variants: { size: { sm: { square: "$button.iconSm" }, md: { square: "$button.iconMd" }, lg: { square: "$button.iconLg" } } },
+      variants: { size: { sm: { square: "$button.iconSizeSm" }, md: { square: "$button.iconSizeMd" }, lg: { square: "$button.iconSizeLg" } } },
     },
-    spinner: { base: { square: "$icon.sizeMd" } },
-    shortcut: { on: ["web", "desktop"], base: { size: "$text.caption", weight: "$font.weightMedium", opacity: "$opacity.secondary" } },
+    spinner: { base: { square: "$size.icon.md" } },
+    shortcut: { on: ["web", "desktop"], base: { size: "$font.size.caption", weight: "$font.weight.medium", opacity: "$opacity.secondary" } },
   },
   // The phone grows the touch area to this (`hitSlopTo`); nothing is drawn with it.
-  reads: ["$control.hit"],
+  reads: ["$size.target.min"],
 });

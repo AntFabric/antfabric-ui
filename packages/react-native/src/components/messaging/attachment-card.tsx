@@ -269,7 +269,7 @@ function ImageCard(p: Card & { onBroken: () => void }) {
         disabled={press.disabled}
         onPress={p.open}
         {...press.handlers}
-        style={[{ width: "100%" }, press.pressed && { opacity: 0.85 }, press.focused && { boxShadow: `inset 0 0 0 3px ${t.focus.ring}` }]}
+        style={[{ width: "100%" }, press.pressed && { opacity: 0.85 }, press.focused && { boxShadow: `inset 0 0 0 3px ${t.color.border.focus}` }]}
       >
         <Image source={{ uri: p.src }} accessibilityIgnoresInvertColors resizeMode="cover" onError={p.onBroken} style={s.image} />
       </Pressable>

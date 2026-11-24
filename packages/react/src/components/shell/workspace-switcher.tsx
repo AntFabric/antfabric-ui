@@ -55,16 +55,16 @@ const indicator: CSSProperties = {
   position: "absolute",
   left: 0,
   transform: "translateY(-50%)",
-  transition: `height ${t.duration.base} ${t.ease.out}`,
+  transition: `height ${t.motion.duration.base} ${t.motion.easing.out}`,
 };
 
 const tileBadge: CSSProperties = {
   position: "absolute",
-  top: t.workspace.badgeTop,
-  right: t.workspace.badgeRight,
+  top: t.workspaceSwitcher.badgeOffsetY,
+  right: t.workspaceSwitcher.badgeOffsetX,
   borderWidth: "2px",
   borderStyle: "solid",
-  borderColor: t.surface.chrome,
+  borderColor: t.color.background.chrome,
   whiteSpace: "nowrap",
 };
 
@@ -103,9 +103,9 @@ function Tile({ ws, index, on, showShortcut, onPress, styles, strings }: Shared 
             flexShrink: 0,
             borderWidth: "2px",
             borderStyle: "solid",
-            borderColor: on ? t.fg.strong : "transparent",
+            borderColor: on ? t.color.text.strong : "transparent",
             opacity: live ? 1 : 0.5,
-            transition: `border-color ${t.duration.fast}, transform ${t.duration.fast}`,
+            transition: `border-color ${t.motion.duration.fast}, transform ${t.motion.duration.fast}`,
           },
           partStyle(r, "tile", ui.hovered && { transform: "scale(1.04)" }, ui.pressed && { transform: "scale(.97)" }),
         )}
@@ -132,7 +132,7 @@ function AddTile({ label, onPress, styles }: Shared & { label: string; onPress: 
       {...ui.handlers}
       style={css(
         pressable,
-        { flexShrink: 0, alignItems: "center", justifyContent: "center", borderWidth: "1.5px", borderStyle: "dashed", borderColor: t.border.default },
+        { flexShrink: 0, alignItems: "center", justifyContent: "center", borderWidth: "1.5px", borderStyle: "dashed", borderColor: t.color.border.default },
         r.addTile,
       )}
     >

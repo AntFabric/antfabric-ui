@@ -48,7 +48,7 @@ function StickyPill({ label, expanded, onJump, strings, styles }: { label: strin
       {...ui.handlers}
       style={css(
         pressable,
-        partStyle(r, "stickyPill", { flexDirection: "row", alignItems: "center", gap: 5, height: 26, pointerEvents: "auto", transition: `background ${t.duration.fast}` }),
+        partStyle(r, "stickyPill", { flexDirection: "row", alignItems: "center", gap: 5, height: 26, pointerEvents: "auto", transition: `background ${t.motion.duration.fast}` }),
       )}
     >
       <span data-af-part="label" style={css(chipText, r.label)}>

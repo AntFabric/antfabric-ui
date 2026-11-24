@@ -33,7 +33,7 @@ const useStyles = createStyles((t) => ({
   card: { flexDirection: "row", alignItems: "flex-start" },
   body: { flex: 1, minWidth: 0 },
   pill: { flexDirection: "row", alignItems: "center", alignSelf: "flex-start" },
-  icon: { marginTop: t.border.wHairline },
+  icon: { marginTop: t.border.width.hairline },
 }));
 
 /** An icon's size is its width and height (`size`); what else a part's style sets goes on the glyph. */

@@ -42,7 +42,7 @@ function useBounce(typing: boolean) {
   useEffect(() => {
     if (!moving) return;
     const native = Platform.OS !== "web";
-    const [a, b, c, d] = (/\(([^)]+)\)/.exec(t.ease.nudge)?.[1] ?? ".22,.61,.36,1").split(",").map(Number);
+    const [a, b, c, d] = (/\(([^)]+)\)/.exec(t.motion.easing.nudge)?.[1] ?? ".22,.61,.36,1").split(",").map(Number);
     const easing = Easing.bezier(a!, b!, c!, d!);
     const step = (v: Animated.Value, toValue: number) => Animated.timing(v, { toValue, duration: 360, easing, useNativeDriver: native });
     const runs = values.map((v, i) =>

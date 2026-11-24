@@ -54,7 +54,7 @@ const bubble: CSSProperties = {
   ...row,
   gap: t.space.xs,
   lineHeight: 1.35,
-  paddingBlock: t.tooltip.padY,
+  paddingBlock: t.tooltip.paddingY,
   ...enter("fade"),
 };
 
@@ -135,7 +135,7 @@ export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = t
       style={css(bubble, { pointerEvents: floating ? "auto" : "none" }, r.bubble)}
     >
       <span aria-hidden={same || undefined} style={css(text, { whiteSpace: "normal", overflowWrap: "normal" })}>{label}</span>
-      {shortcut && <Kbd keys={shortcut} tone="inverse" style={{ height: t.tooltip.kbdH, paddingInline: t.space["2xs"], fontSize: t.tooltip.kbdLabel, flexShrink: 0 }} />}
+      {shortcut && <Kbd keys={shortcut} tone="inverse" style={{ height: t.tooltip.kbdHeight, paddingInline: t.space["2xs"], fontSize: t.tooltip.kbdFontSize, flexShrink: 0 }} />}
     </div>
   );
 
@@ -157,7 +157,7 @@ export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = t
       style={css(box, { alignSelf: "flex-start", alignItems: "center", gap: t.space.sm }, partStyle(r, "root", floating ? undefined : { flexDirection: DIRECTION[side] }), style)}
     >
       {floating ? children : showTrigger && <IconButton icon={triggerIcon} label={label} variant="soft" />}
-      {shown && (floating ? <div style={css({ position: "absolute", zIndex: t.z.tooltip, width: "max-content" }, FLOAT[side])}>{body}</div> : body)}
+      {shown && (floating ? <div style={css({ position: "absolute", zIndex: t.zIndex.tooltip, width: "max-content" }, FLOAT[side])}>{body}</div> : body)}
     </div>
   );
 }

@@ -373,9 +373,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "# design-crit",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -419,9 +419,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "Messages",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -465,9 +465,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "# design-crit",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -511,9 +511,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "# design-crit",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -557,9 +557,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "Messages",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -603,9 +603,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "# design-crit",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -648,9 +648,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "Messages",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {

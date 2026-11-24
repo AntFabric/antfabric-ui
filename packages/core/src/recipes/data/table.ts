@@ -15,62 +15,62 @@ import { defineRecipe } from "../../recipe";
  * `table.headRadius` rounds the header row's two ends (the first header cell's start corners, the last's end corners); at 0 nothing is drawn
  * for it.
  *
- * With `narrow="cards"`, web and desktop draw the phone's cards too while the table's own box is narrower than `table.cardsBelow`: the same
+ * With `narrow="cards"`, web and desktop draw the phone's cards too while the table's own box is narrower than `table.cardsBreakpoint`: the same
  * parts, a step smaller (13px lines, a 12 by 10 inset, the card corner), a fill under the pointer, and the sort bar above them. The phone's
  * cards are unchanged.
  */
 export const table = defineRecipe({
   parts: ["root", "scroll", "headCell", "checkHead", "sortButton", "sortIcon", "cell", "emphasis", "checkCell", "empty", "person", "personName", "bar", "barSort", "cards", "card", "cardHead", "cardTitle", "cardLines", "cardLine", "cardLabel", "cardValue"],
   styles: {
-    root: { base: { gap: "$space.smMd", font: "$font.sans", fg: "$fg.body", size: "$text.bodySm" } },
+    root: { base: { gap: "$space.smMd", font: "$font.family.sans", fg: "$color.text.body", size: "$font.size.bodySm" } },
     scroll: {
       on: ["web", "desktop"],
-      base: { borderWidth: "$border.wHairline", borderColor: "$border.subtle", radius: "$radius.input" },
-      states: { focus: { borderColor: "$data.accent", ring: "$data.accent" } },
+      base: { borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle", radius: "$radius.input" },
+      states: { focus: { borderColor: "$color.background.data.accent", ring: "$color.background.data.accent" } },
     },
     headCell: {
       on: ["web", "desktop"],
       base: {
-        height: "$table.headH",
-        paddingX: "$table.cellX",
-        bg: "$table.header",
-        fg: "$fg.muted",
-        size: "$text.caption",
-        weight: "$font.weightSemibold",
-        borderBottomWidth: "$border.wHairline",
-        borderBottomColor: "$table.divider",
+        height: "$table.headHeight",
+        paddingX: "$table.cellPaddingX",
+        bg: "$table.headerColor",
+        fg: "$color.text.muted",
+        size: "$font.size.caption",
+        weight: "$font.weight.semibold",
+        borderBottomWidth: "$border.width.hairline",
+        borderBottomColor: "$table.dividerColor",
       },
     },
-    checkHead: { on: ["web", "desktop"], base: { width: "$table.checkW", paddingRight: "$space.none" } },
+    checkHead: { on: ["web", "desktop"], base: { width: "$table.checkWidth", paddingRight: "$space.none" } },
     sortButton: {
       on: ["web", "desktop"],
       base: { gap: "$space.2xs", paddingX: "$space.xs", paddingY: "$space.2xs", radius: "$radius.row" },
-      states: { hover: { bg: "$hover.surface", fg: "$fg.strong" }, on: { fg: "$fg.strong" }, focus: { ring: "$data.accent" } },
+      states: { hover: { bg: "$color.background.hover", fg: "$color.text.strong" }, on: { fg: "$color.text.strong" }, focus: { ring: "$color.background.data.accent" } },
     },
-    sortIcon: { on: ["web", "desktop"], base: { square: "$icon.sizeSm" } },
+    sortIcon: { on: ["web", "desktop"], base: { square: "$size.icon.sm" } },
     cell: {
       on: ["web", "desktop"],
-      base: { height: "$table.rowH", paddingX: "$table.cellX", borderBottomWidth: "$border.wHairline", borderBottomColor: "$table.divider" },
-      variants: { dense: { true: { height: "$table.denseRowH" } } },
-      states: { hover: { bg: "$table.rowHover" }, on: { bg: "$table.rowSelected" } },
+      base: { height: "$table.rowHeight", paddingX: "$table.cellPaddingX", borderBottomWidth: "$border.width.hairline", borderBottomColor: "$table.dividerColor" },
+      variants: { dense: { true: { height: "$table.denseRowHeight" } } },
+      states: { hover: { bg: "$table.rowHoverColor" }, on: { bg: "$table.rowSelectedColor" } },
     },
-    emphasis: { on: ["web", "desktop"], base: { fg: "$fg.strong", weight: "$font.weightMedium" } },
+    emphasis: { on: ["web", "desktop"], base: { fg: "$color.text.strong", weight: "$font.weight.medium" } },
     checkCell: {
       on: ["web", "desktop"],
-      base: { width: "$table.checkW", height: "$table.rowH", paddingRight: "$space.none", paddingLeft: "$table.cellX", borderBottomWidth: "$border.wHairline", borderBottomColor: "$table.divider" },
-      variants: { dense: { true: { height: "$table.denseRowH" } } },
-      states: { hover: { bg: "$table.rowHover" }, on: { bg: "$table.rowSelected" } },
+      base: { width: "$table.checkWidth", height: "$table.rowHeight", paddingRight: "$space.none", paddingLeft: "$table.cellPaddingX", borderBottomWidth: "$border.width.hairline", borderBottomColor: "$table.dividerColor" },
+      variants: { dense: { true: { height: "$table.denseRowHeight" } } },
+      states: { hover: { bg: "$table.rowHoverColor" }, on: { bg: "$table.rowSelectedColor" } },
     },
-    empty: { base: { paddingY: "$space.lg", fg: "$fg.muted" } },
+    empty: { base: { paddingY: "$space.lg", fg: "$color.text.muted" } },
     person: { base: { gap: "$space.sm" } },
-    personName: { base: { size: "$text.bodySm", weight: "$font.weightRegular", fg: "$fg.body" } },
+    personName: { base: { size: "$font.size.bodySm", weight: "$font.weight.regular", fg: "$color.text.body" } },
     bar: { base: { gap: "$space.sm" } },
     barSort: { base: { minWidth: "$space.none" } },
     cards: { base: { gap: "$space.sm" } },
     card: {
-      base: { padding: "$space.md", gap: "$space.sm", bg: "$surface.card", borderWidth: "$border.wHairline", borderColor: "$border.subtle", radius: "$radius.input" },
+      base: { padding: "$space.md", gap: "$space.sm", bg: "$color.background.card", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle", radius: "$radius.input" },
       // Hover is the web's and the desktop's only: the phone has none.
-      states: { hover: { bg: "$table.rowHover" }, on: { bg: "$table.rowSelected", borderColor: "$data.accent" } },
+      states: { hover: { bg: "$table.rowHoverColor" }, on: { bg: "$table.rowSelectedColor", borderColor: "$color.background.data.accent" } },
       platforms: {
         web: { base: { paddingX: "$space.md", paddingY: "$space.smMd", gap: "$space.xs", radius: "$radius.card" } },
         desktop: { base: { paddingX: "$space.md", paddingY: "$space.smMd", gap: "$space.xs", radius: "$radius.card" } },
@@ -78,20 +78,20 @@ export const table = defineRecipe({
     },
     cardHead: { base: { gap: "$space.smMd" } },
     cardTitle: {
-      base: { size: "$text.body", weight: "$font.weightSemibold", fg: "$fg.strong" },
+      base: { size: "$font.size.body", weight: "$font.weight.semibold", fg: "$color.text.strong" },
       // The web's title is the grid's `emphasis` cell: the strong ink at medium weight, in the lines' size.
       platforms: {
-        web: { base: { size: "$text.bodySm", weight: "$font.weightMedium" } },
-        desktop: { base: { size: "$text.bodySm", weight: "$font.weightMedium" } },
+        web: { base: { size: "$font.size.bodySm", weight: "$font.weight.medium" } },
+        desktop: { base: { size: "$font.size.bodySm", weight: "$font.weight.medium" } },
       },
     },
     cardLines: { base: { gap: "$space.2xs" } },
-    cardLine: { base: { gap: "$space.md", minHeight: "$control.hXxs" } },
+    cardLine: { base: { gap: "$space.md", minHeight: "$size.control.xxs" } },
     cardLabel: {
-      base: { size: "$text.caption", weight: "$font.weightRegular", fg: "$fg.muted" },
-      platforms: { web: { base: { size: "$text.bodySm" } }, desktop: { base: { size: "$text.bodySm" } } },
+      base: { size: "$font.size.caption", weight: "$font.weight.regular", fg: "$color.text.muted" },
+      platforms: { web: { base: { size: "$font.size.bodySm" } }, desktop: { base: { size: "$font.size.bodySm" } } },
     },
-    cardValue: { base: { size: "$text.bodySm", weight: "$font.weightRegular", fg: "$fg.body" } },
+    cardValue: { base: { size: "$font.size.bodySm", weight: "$font.weight.regular", fg: "$color.text.body" } },
   },
-  reads: ["$shadow.focus", "$radius.row", "$table.headRadius","$table.sparkW", "$table.sparkH", "$table.loadS", "$table.loadM", "$table.loadL", "$table.loadH", "$table.loadCardS", "$table.loadCardL", "$table.cardsBelow"],
+  reads: ["$elevation.shadow.focus", "$radius.row", "$table.headRadius","$table.sparkWidth", "$table.sparkHeight", "$table.loadWidthSm", "$table.loadWidthMd", "$table.loadWidthLg", "$table.loadHeight", "$table.loadCardWidthSm", "$table.loadCardWidthLg", "$table.cardsBreakpoint"],
 });

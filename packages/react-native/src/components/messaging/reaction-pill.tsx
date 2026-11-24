@@ -43,7 +43,7 @@ export interface ReactionPillProps extends RootProps {
 const useStyles = createStyles((t) => ({
   root: { alignSelf: "flex-start", alignItems: "flex-start" },
   // A minimum, so a larger Dynamic Type size grows the pill instead of clipping its emoji.
-  pill: { flexDirection: "row", alignItems: "center", minHeight: t.control.hIconSm },
+  pill: { flexDirection: "row", alignItems: "center", minHeight: t.size.control.iconSm },
   count: { fontVariant: ["tabular-nums"] },
 }));
 
@@ -86,7 +86,7 @@ export function ReactionPill({ emoji, count = 1, mine: mineProp, variant = "reac
         <Enter motion="pop">
           <Pressable
             testID={partId(testID, "reaction-pill", "pill")}
-            hitSlop={hitSlopTo(t.control.hit, t.control.hIconSm, 0)}
+            hitSlop={hitSlopTo(t.size.target.min, t.size.control.iconSm, 0)}
             accessibilityRole="button"
             accessibilityLabel={str("labelPhone", { emoji, count: n, mine: on ? str("youReacted") : "" })}
             accessibilityState={{ disabled: press.disabled, selected: on, busy: pending }}
@@ -108,7 +108,7 @@ export function ReactionPill({ emoji, count = 1, mine: mineProp, variant = "reac
       {add ? (
         <Pressable
           testID={partId(testID, "reaction-pill", "pill")}
-          hitSlop={hitSlopTo(t.control.hit, t.control.hIconSm, t.control.hIconSm)}
+          hitSlop={hitSlopTo(t.size.target.min, t.size.control.iconSm, t.size.control.iconSm)}
           accessibilityRole="button"
           accessibilityLabel={str("add")}
           accessibilityState={{ disabled: press.disabled }}

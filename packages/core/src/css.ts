@@ -7,8 +7,9 @@
  *   [data-af-os="android"]               what that OS changes inside its platform's profile (after the profiles, so it wins)
  *   [data-af-theme="dark"]               that theme's colours and shadows
  *
- * A token that is a reference is `--af-fg-body:var(--af-p-color-neutral-900)`; one that is not is its value. Components read
- * `var(--af-fg-body)` either way, so a reference changes nothing they draw.
+ * A token that is a reference is `--af-color-text-body:var(--af-p-color-neutral-900)`, one that is an alias of another token is that token's
+ * variable (`--af-chart-grid-color:var(--af-color-border-subtle)`), and one that is neither is its value. Components read `var(--af-color-text-body)`
+ * either way, so a reference changes nothing they draw.
  *
  * Put both attributes on <html> (or any container) and every React component under it draws at that
  * density and theme. A switch is an attribute change; nothing re-renders. A theme other than AntFabric adds its own sheet,
@@ -16,7 +17,9 @@
  */
 
 import { primitiveMeta } from "./primitives";
-import { isReference, primitiveValue, primitiveVar, referencePath } from "./refs";
+import { followAliases } from "./alias";
+import { renames } from "./deprecated";
+import { isReference, isTokenReference, primitiveValue, primitiveVar, referencePath, tokenReferencePath } from "./refs";
 import type { Theme } from "./theme";
 import { assertBuilt } from "./theme-built";
 import { tokens, tokenSource } from "./tokens";
@@ -25,8 +28,8 @@ import { cssVarName, kebab } from "./vars";
 
 export type Tree = { readonly [k: string]: string | number | Tree };
 
-// Matched on the variable's name (the path as hyphens, after kebab-casing), so `font.weightBold` is `font-weight-bold`.
-const UNITLESS_GROUPS = ["font-weight", "opacity", "z", "icon-stroke"];
+// Matched on the variable's name (the path as hyphens, after kebab-casing), so `font.weight.bold` is `font-weight-bold`.
+const UNITLESS_GROUPS = ["font-weight", "opacity", "z-index", "size-stroke"];
 
 /** A literal as the sheet writes it, by its variable's name without `--af-`: a number is pixels unless its group has no unit. */
 export function cssValue(css: string, v: string | number): string {
@@ -52,6 +55,11 @@ export function flatten(tree: Tree, prefix: string, out: [string, string][], ref
         out.push([`--af-${css}`, `var(${primitiveVar(path)})`]);
         continue;
       }
+      // An alias of another token is that token's variable, so whatever sets the target (a theme, a brand) reaches the alias too.
+      if (refs && isTokenReference(v)) {
+        out.push([`--af-${css}`, `var(${cssVarName(tokenReferencePath(v))})`]);
+        continue;
+      }
       out.push([`--af-${css}`, cssValue(css, v)]);
     }
   }
@@ -65,7 +73,7 @@ const block = (selector: string, vars: [string, string][]) => `${selector}{${var
  * emitted on any element that carries either attribute, because a `var()` is substituted where the property is declared,
  * so a primitive must be visible there.
  */
-export function tokensCss(): string {
+export function tokensCss(options: { deprecated?: boolean } = {}): string {
   const used = new Set<string>();
   const parts: string[] = [];
   parts.push(block("[data-af-platform]", flatten(tokenSource.shared, "", [], used)));
@@ -87,7 +95,19 @@ export function tokensCss(): string {
       const v = primitiveValue(path);
       return [primitiveVar(path), typeof v === "number" ? String(v) : v];
     });
-  return [block("[data-af-platform],[data-af-theme],[data-af-os]", primitives), ...parts].join("\n");
+  const old = options.deprecated === false ? "" : deprecatedCss();
+  return [block("[data-af-platform],[data-af-theme],[data-af-os]", primitives), ...parts, ...(old ? [old] : [])].join("\n");
+}
+
+/**
+ * The renamed tokens' old variables, each the new one's: `--af-color-text-muted:var(--af-color-text-muted)`. On every element that carries one
+ * of the attributes, as the primitives are, so it follows the theme and the platform there. `tokensCss()` ends with it unless told
+ * `{ deprecated: false }`; `""` when nothing is renamed. It leaves in the next major version.
+ */
+export function deprecatedCss(): string {
+  // A rename that only moved a dot (`font.weightBold` to `font.weight.bold`) is the same variable: there is nothing to declare.
+  const vars = Object.entries(renames as Record<string, string>).flatMap(([old, now]): [string, string][] => (cssVarName(old) === cssVarName(now) ? [] : [[cssVarName(old), `var(${cssVarName(now)})`]]));
+  return vars.length ? block("[data-af-platform],[data-af-theme],[data-af-os]", vars) : "";
 }
 
 /** The primitives some token points at, by dotted path: the ones `tokensCss()` emits. */
@@ -136,6 +156,8 @@ export function tokenValues(platform: keyof typeof tokens.profiles, scheme: Sche
       out[name] = cssValue(name.slice(5), v);
     }
   }
+  // An alias the theme left alone follows its target, as `var(--af-target)` does in the sheet: a theme that sets the target moves both.
+  followAliases({ platform, scheme, os }, sets, (path) => out[cssVarName(path)], (path, v) => void (out[cssVarName(path)] = v as string));
   return out;
 }
 
@@ -171,7 +193,7 @@ export const kitCss = `
 @keyframes af-in-slide-left{from{opacity:0;transform:translateX(24px)}}
 @keyframes af-in-slide-right{from{opacity:0;transform:translateX(-24px)}}
 @keyframes af-in-grow-x{from{opacity:0;transform:scaleX(.4)}}
-[data-af-input]::placeholder{color:var(--af-fg-placeholder);opacity:1}
+[data-af-input]::placeholder{color:var(--af-color-text-placeholder);opacity:1}
 [data-af-input]:focus{outline:none}
 [data-af-press]{-webkit-tap-highlight-color:transparent}
 [data-af-press]:focus{outline:none}

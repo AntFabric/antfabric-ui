@@ -111,7 +111,7 @@ export function SidebarSection({
   // The chevron turns rather than swapping glyphs.
   const turn = useRef(new Animated.Value(shut ? 1 : 0)).current;
   useEffect(() => {
-    const run = Animated.timing(turn, { toValue: shut ? 1 : 0, duration: reduceMotion ? 0 : t.duration.fast, easing: bezier(t.ease.standard), useNativeDriver: Platform.OS !== "web" });
+    const run = Animated.timing(turn, { toValue: shut ? 1 : 0, duration: reduceMotion ? 0 : t.motion.duration.fast, easing: bezier(t.motion.easing.standard), useNativeDriver: Platform.OS !== "web" });
     run.start();
     return () => run.stop();
   }, [shut, turn, t.duration, t.ease, reduceMotion]);

@@ -315,7 +315,7 @@ const docs: ComponentDocs = {
                 style: {
                   position: "absolute",
                   inset: 0,
-                  bg: "$scrim.default",
+                  bg: "$color.background.scrim.default",
                   align: "center",
                   justify: "center",
                 },
@@ -334,17 +334,17 @@ const docs: ComponentDocs = {
                           el: "text",
                           text: "What Fabric can do",
                           style: {
-                            fontSize: "$text.title",
-                            fontWeight: "$font.weightSemibold",
-                            color: "$fg.strong",
+                            fontSize: "$font.size.title",
+                            fontWeight: "$font.weight.semibold",
+                            color: "$color.text.strong",
                           },
                         },
                         {
                           el: "text",
                           text: "Ask in plain words. Fabric works only with what you can already see, and tells you what it did.",
                           style: {
-                            fontSize: "$text.bodySm",
-                            color: "$fg.muted",
+                            fontSize: "$font.size.bodySm",
+                            color: "$color.text.muted",
                           },
                         },
                         {
@@ -619,18 +619,18 @@ const docs: ComponentDocs = {
                         direction: "row",
                         align: "center",
                         gap: "$space.sm",
-                        height: "$control.hInput",
+                        height: "$size.control.input",
                         paddingX: "$space.md",
                         radius: "$radius.input",
-                        border: "1px solid $border.muted",
+                        border: "1px solid $color.border.muted",
                       },
                       children: [
                         {
                           el: "icon",
                           icon: "search",
                           style: {
-                            size: "$icon.size",
-                            color: "$fg.faint",
+                            size: "$size.icon.default",
+                            color: "$color.text.faint",
                           },
                         },
                         {
@@ -641,8 +641,8 @@ const docs: ComponentDocs = {
                           },
                           style: {
                             flex: 1,
-                            fontSize: "$text.body",
-                            color: "$fg.body",
+                            fontSize: "$font.size.body",
+                            color: "$color.text.body",
                           },
                         },
                       ],
@@ -651,9 +651,9 @@ const docs: ComponentDocs = {
                       el: "text",
                       text: "People",
                       style: {
-                        fontSize: "$text.caption",
-                        fontWeight: "$font.weightSemibold",
-                        color: "$fg.faint",
+                        fontSize: "$font.size.caption",
+                        fontWeight: "$font.weight.semibold",
+                        color: "$color.text.faint",
                         paddingTop: "$space.md",
                         paddingBottom: "$space.xs",
                       },
@@ -664,7 +664,7 @@ const docs: ComponentDocs = {
                         direction: "row",
                         align: "center",
                         gap: "$space.md",
-                        minHeight: "$row.h",
+                        minHeight: "$size.row.default",
                       },
                       children: [
                         {
@@ -679,9 +679,9 @@ const docs: ComponentDocs = {
                           el: "text",
                           text: "Kenji Watanabe",
                           style: {
-                            fontSize: "$text.body",
-                            fontWeight: "$font.weightSemibold",
-                            color: "$fg.strong",
+                            fontSize: "$font.size.body",
+                            fontWeight: "$font.weight.semibold",
+                            color: "$color.text.strong",
                           },
                         },
                       ],
@@ -692,7 +692,7 @@ const docs: ComponentDocs = {
                         direction: "row",
                         align: "center",
                         gap: "$space.md",
-                        minHeight: "$row.h",
+                        minHeight: "$size.row.default",
                       },
                       children: [
                         {
@@ -707,9 +707,9 @@ const docs: ComponentDocs = {
                           el: "text",
                           text: "Amara Okafor",
                           style: {
-                            fontSize: "$text.body",
-                            fontWeight: "$font.weightSemibold",
-                            color: "$fg.strong",
+                            fontSize: "$font.size.body",
+                            fontWeight: "$font.weight.semibold",
+                            color: "$color.text.strong",
                           },
                         },
                       ],

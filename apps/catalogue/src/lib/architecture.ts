@@ -253,8 +253,8 @@ export interface Step {
 const REACT_STEPS: StepSpec[] = [
   { title: "tokens", text: "One object: shared, themes, profiles, its references to the product's primitives replaced by their values.", at: { file: "packages/core/src/tokens.ts", at: /^export const tokens/ } },
   { title: "tokenVars()", text: "Walks the merged token object and returns the same shape with every leaf replaced by a var(--af-…) string.", at: { file: "packages/core/src/native.ts", at: /^export function tokenVars/ } },
-  { title: "t", text: "The kit's one export of it. A component writes t.control.hMd and gets the string var(--af-control-h-md), not a number.", at: { file: "packages/react/src/tokens.ts", at: /^export const t = / } },
-  { title: "A component's style", text: "Button's recipe names it for its height (\"$control.hMd\"); the kit's reader turns that into the variable. The value is decided later, in the browser.", at: { file: "packages/core/src/recipes/actions/button.ts", at: /md: \{ height: "\$control\.hMd"/ } },
+  { title: "t", text: "The kit's one export of it. A component writes t.size.control.md and gets the string var(--af-size-control-md), not a number.", at: { file: "packages/react/src/tokens.ts", at: /^export const t = / } },
+  { title: "A component's style", text: "Button's recipe names it for its height (\"$size.control.md\"); the kit's reader turns that into the variable. The value is decided later, in the browser.", at: { file: "packages/core/src/recipes/actions/button.ts", at: /md: \{ height: "\$size\.control\.md"/ } },
   { title: "tokensCss()", text: "Writes each leaf as a custom property, in blocks scoped by attribute: [data-af-platform], [data-af-platform=\"desktop\"], [data-af-theme=\"dark\"].", at: { file: "packages/core/src/css.ts", at: /^export function tokensCss/ } },
   { title: "AntFabricRoot", text: "Sets data-af-platform, data-af-theme and data-af-os on a wrapper and injects the stylesheet once. Whichever attributes are nearest decide the value, and changing them re-themes without a re-render.", at: { file: "packages/react/src/platform.tsx", at: /"data-af-platform": platform/ } },
 ];
@@ -265,13 +265,13 @@ const NATIVE_STEPS: StepSpec[] = [
   { title: "tokensFor()", text: "resolveTokens() for the mobile profile, memoised per theme, OS and brand (a tenant's colours), so every component in the tree reads the same object.", at: { file: "packages/react-native/src/theme.tsx", at: /^const tokensFor/ } },
   { title: "ThemeProvider and useTheme()", text: "ThemeProvider puts the scheme's object in context; useTheme() returns it as t, with the OS and the glass flag.", at: { file: "packages/react-native/src/theme.tsx", at: /^export function ThemeProvider/ } },
   { title: "createStyles((t) => …)", text: "Builds a StyleSheet from t once per token object and caches it, so a component's static styles are not rebuilt on render.", at: { file: "packages/react-native/src/theme.tsx", at: /^export function createStyles/ } },
-  { title: "A component's style", text: "The same recipe line; the phone's reader looks \"$control.hMd\" up in t and gets the number 44.", at: { file: "packages/core/src/recipes/actions/button.ts", at: /md: \{ height: "\$control\.hMd"/ } },
+  { title: "A component's style", text: "The same recipe line; the phone's reader looks \"$size.control.md\" up in t and gets the number 44.", at: { file: "packages/core/src/recipes/actions/button.ts", at: /md: \{ height: "\$size\.control\.md"/ } },
 ];
 
 export interface TokenPath {
   react: Step[];
   native: Step[];
-  /** What `t.control.hMd` is at each stop, computed by calling the real functions. */
+  /** What `t.size.control.md` is at each stop, computed by calling the real functions. */
   example: { path: string; react: string; css: Record<string, string>; native: string };
 }
 
@@ -281,7 +281,7 @@ export function tokenPath(root: string): TokenPath {
   const vars = tokenVars() as unknown as Tree;
   const native = resolveTokens("mobile", "light") as unknown as Tree;
   const get = (tree: Tree, path: string) => leaves(tree).get(path);
-  const path = "control.hMd";
+  const path = "size.control.md";
   return {
     react: steps(REACT_STEPS),
     native: steps(NATIVE_STEPS),
@@ -480,7 +480,7 @@ export interface Compare {
   rows: { group: string; tokens: { path: string; react: boolean; native: boolean }[] }[];
 }
 
-/** `fg.strong` is in `fg`; `control.hMd` is in `control`. */
+/** `color.text.strong` is in `fg`; `size.control.md` is in `control`. */
 const groupOf = (path: string) => path.split(".")[0]!;
 
 const side = (f: FileScan | undefined): CompareSide | null => {
@@ -527,22 +527,22 @@ const BUTTON_DIFFERENCES: DifferenceSpec[] = [
   },
   {
     what: "Label size",
-    react: { at: { file: BUTTON_RECIPE, at: /md: \{ height/ }, says: () => `sm and md read t.button.labelSm and labelMd (${acrossProfiles("button.labelMd")}); lg reads t.button.labelLg (${acrossProfiles("button.labelLg")}).` },
-    native: { at: { file: BUTTON_RECIPE, at: /md: \{ height/ }, says: () => `The same recipe line, read through the phone's profile: three tokens that are all the phone's body size (${acrossProfiles("button.labelMd")}).` },
+    react: { at: { file: BUTTON_RECIPE, at: /md: \{ height/ }, says: () => `sm and md read t.button.labelFontSizeSm and labelMd (${acrossProfiles("button.labelFontSizeMd")}); lg reads t.button.labelFontSizeLg (${acrossProfiles("button.labelFontSizeLg")}).` },
+    native: { at: { file: BUTTON_RECIPE, at: /md: \{ height/ }, says: () => `The same recipe line, read through the phone's profile: three tokens that are all the phone's body size (${acrossProfiles("button.labelFontSizeMd")}).` },
   },
   {
     what: "Icon size",
-    react: { at: { file: BUTTON_RECIPE, at: /variants: \{ size: \{ sm: \{ square: "\$button\.iconSm"/ }, says: () => `sm reads t.button.iconSm (${acrossProfiles("button.iconSm")}); md and lg read iconMd and iconLg (${acrossProfiles("button.iconMd")}).` },
-    native: { at: { file: BUTTON_NATIVE, at: /<Icon testID=\{partId\(testID, "button", "icon"\)\} name=\{iconLeading\}/ }, says: () => `The same three tokens, read from the recipe and passed as the icon's size (${acrossProfiles("button.iconMd")}).` },
+    react: { at: { file: BUTTON_RECIPE, at: /variants: \{ size: \{ sm: \{ square: "\$button\.iconSizeSm"/ }, says: () => `sm reads t.button.iconSizeSm (${acrossProfiles("button.iconSizeSm")}); md and lg read iconMd and iconLg (${acrossProfiles("button.iconSizeMd")}).` },
+    native: { at: { file: BUTTON_NATIVE, at: /<Icon testID=\{partId\(testID, "button", "icon"\)\} name=\{iconLeading\}/ }, says: () => `The same three tokens, read from the recipe and passed as the icon's size (${acrossProfiles("button.iconSizeMd")}).` },
   },
   {
     what: "Hover",
-    react: { at: { file: BUTTON_RECIPE, at: /primary: \{ bg: "\$brand\.default".*hover: \{ bg: "\$brand\.hover"/ }, says: () => "Every variant has a hover look." },
+    react: { at: { file: BUTTON_RECIPE, at: /primary: \{ bg: "\$color\.background\.brand\.default".*hover: \{ bg: "\$color\.background\.brand\.hover"/ }, says: () => "Every variant has a hover look." },
     native: { at: { file: BUTTON_NATIVE, at: /A phone has no hover/ }, says: () => "None, by design." },
   },
   {
     what: "Press feedback",
-    react: { at: { file: BUTTON_RECIPE, at: /pressed: \{ bg: "\$brand\.active" \}/ }, says: () => "Changes the background only." },
+    react: { at: { file: BUTTON_RECIPE, at: /pressed: \{ bg: "\$color\.background\.brand\.pressed" \}/ }, says: () => "Changes the background only." },
     native: { at: { file: BUTTON_NATIVE, at: /scale: 0\.97/ }, says: () => "Changes the background and scales the button to the literal 0.97." },
   },
   {
@@ -650,7 +650,7 @@ export function ecosystemSvg(f: EcosystemFacts): string {
   const nodes: Record<string, N> = {
     desktopApp: { x: 12, y: 16, w: 250, h: 70, cls: "ext", t: "AntFabric desktop app", s: "Tauri · other repository", m: "its own component layer" },
     productTokens: { x: 287, y: 16, w: 250, h: 70, cls: "ext", t: "@antfabric/design-tokens", s: "the product's token layer", m: "generated/tokens.json" },
-    webApp: { x: 562, y: 16, w: 250, h: 70, cls: "ext", t: "AI Console / web app", s: "no app exists yet", m: "web profile is a proposal" },
+    webApp: { x: 562, y: 16, w: 250, h: 70, cls: "ext", t: "AI Console / web app", s: "no app exists yet", m: "web profile is our own, confirmed" },
     mobileApp: { x: 837, y: 16, w: 250, h: 70, cls: "ext", t: "AntFabric mobile app", s: "Expo · other repository", m: "theme/tokens.ts" },
     core: { x: 330, y: 170, w: 440, h: 86, cls: "core", href: "#tokens", t: "@antfabric/ui-core", s: "tokens.ts · css.ts · native.ts · motion.ts", m: `${f.tokenLeaves} token leaves · ${f.themes} themes · ${f.profiles} profiles` },
     react: { x: 20, y: 340, w: 390, h: 86, cls: "react", href: "#packages", t: "@antfabric/ui-react", s: "web + desktop · inline styles over t", m: `${f.react.components} components · ${f.react.refs} token reads` },
@@ -662,7 +662,7 @@ export function ecosystemSvg(f: EcosystemFacts): string {
   const edges: [string, string, string, boolean, number, number][] = [
     ["desktopApp", "core", "values copied by hand", true, 0.5, 0.1],
     ["productTokens", "core", "mirrored by hand", true, 0.5, 0.35],
-    ["webApp", "core", "no source: proposal", true, 0.5, 0.65],
+    ["webApp", "core", "no source: our own values", true, 0.5, 0.65],
     ["mobileApp", "core", "values copied by hand", true, 0.5, 0.9],
     ["desktopApp", "react", "no import yet", true, 0.2, 0.2],
     ["mobileApp", "native", "no import yet", true, 0.8, 0.8],

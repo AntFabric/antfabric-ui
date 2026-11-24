@@ -8,16 +8,16 @@ export const badge = defineRecipe({
   parts: ["root"],
   styles: {
     root: {
-      base: { paddingX: "$space.xs", radius: "$radius.pill", font: "$font.sans", weight: "$font.weightBold", size: "$text.micro" },
+      base: { paddingX: "$space.xs", radius: "$radius.pill", font: "$font.family.sans", weight: "$font.weight.bold", size: "$font.size.micro" },
       variants: {
         tone: {
-          brand: { bg: "$brand.default", fg: "$fg.onBrand" },
-          neutral: { bg: "$surface.muted", fg: "$fg.muted" },
-          inverse: { bg: "$surface.inverse", fg: "$fg.onInverse" },
+          brand: { bg: "$color.background.brand.default", fg: "$color.text.onBrand" },
+          neutral: { bg: "$color.background.muted", fg: "$color.text.muted" },
+          inverse: { bg: "$color.background.inverse", fg: "$color.text.onInverse" },
         },
-        dot: { true: { square: "$dot.size" } },
+        dot: { true: { square: "$size.dot.default" } },
       },
-      platforms: { mobile: { base: { size: "$text.caption" } } },
+      platforms: { mobile: { base: { size: "$font.size.caption" } } },
     },
   },
 });

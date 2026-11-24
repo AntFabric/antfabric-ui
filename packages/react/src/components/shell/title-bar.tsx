@@ -71,7 +71,7 @@ const root: CSSProperties = {
   // Three columns, the sides equal: the search field is centred in the window however wide the controls on one side are. A side is never
   // narrower than its controls, so in a narrow window the field gives way first.
   display: "grid",
-  gridTemplateColumns: `minmax(max-content, 1fr) minmax(${t.topbar.searchMinW}, ${t.topbar.searchMaxW}) minmax(max-content, 1fr)`,
+  gridTemplateColumns: `minmax(max-content, 1fr) minmax(${t.size.layout.topBarSearchMin}, ${t.size.layout.topBarSearchMax}) minmax(max-content, 1fr)`,
   width: "100%",
   flexShrink: 0,
   paddingLeft: t.space.lg,
@@ -91,7 +91,7 @@ const search: CSSProperties = {
   width: "100%",
   paddingLeft: t.space.md,
   paddingRight: t.space["2xs"],
-  transition: `border-color ${t.duration.fast}, background ${t.duration.fast}`,
+  transition: `border-color ${t.motion.duration.fast}, background ${t.motion.duration.fast}`,
 };
 
 function Search({ placeholder, keys, label, hint, onPress, styles }: { placeholder: string; keys: string; label: string; hint: string; onPress: () => void; styles?: PartStyles<"title-bar"> }) {
@@ -116,7 +116,7 @@ function Search({ placeholder, keys, label, hint, onPress, styles }: { placehold
           "search",
           // macOS 26: a Liquid Glass capsule floating over the content.
           isGlass && css(glass(), { borderRadius: t.radius.pill, borderWidth: 0 }),
-          isGlass && ui.focused && { boxShadow: t.shadow.focus },
+          isGlass && ui.focused && { boxShadow: t.elevation.shadow.focus },
         ),
       )}
     >
@@ -131,8 +131,8 @@ type Caption = "windows" | "linux";
 
 const CAPTION: Record<Caption, { rest: CSSProperties; glyph: CSSProperties }> = {
   // Windows 11's caption buttons: the full height of the bar. GNOME (Adwaita): small round buttons on a grey disc.
-  windows: { rest: { alignSelf: "stretch", transition: `background ${t.duration.fast}, color ${t.duration.fast}` }, glyph: { strokeWidth: t.icon.strokeThin } },
-  linux: { rest: { transition: `background ${t.duration.fast}` }, glyph: { strokeWidth: t.icon.strokeBold } },
+  windows: { rest: { alignSelf: "stretch", transition: `background ${t.motion.duration.fast}, color ${t.motion.duration.fast}` }, glyph: { strokeWidth: t.size.stroke.thin } },
+  linux: { rest: { transition: `background ${t.motion.duration.fast}` }, glyph: { strokeWidth: t.size.stroke.bold } },
 };
 
 function CaptionButton({ kind, label, icon, close = false, onPress, styles }: { kind: Caption; label: string; icon: IconName; close?: boolean; onPress: () => void; styles?: PartStyles<"title-bar"> }) {

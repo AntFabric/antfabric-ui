@@ -177,7 +177,7 @@ export function Message({
   // The coral bar down the leading edge: an inset 3px (the row you were brought to) or 2px (it mentions you) shadow.
   // The leading edge is the right one in a right-to-left layout.
   const end = I18nManager.isRTL ? "-" : "";
-  const bar: ViewStyle | null = highlighted ? { boxShadow: `inset ${end}3px 0 0 0 ${t.brand.default}` } : mentionsYou ? { boxShadow: `inset ${end}2px 0 0 0 ${t.border.brand}` } : null;
+  const bar: ViewStyle | null = highlighted ? { boxShadow: `inset ${end}3px 0 0 0 ${t.color.background.brand.default}` } : mentionsYou ? { boxShadow: `inset ${end}2px 0 0 0 ${t.color.border.brand}` } : null;
   const root = partStyle(r, "root", { view: [{ paddingTop: compact ? 0 : 8 }, bar] });
   const authorStyle = partStyle(r, "author", { view: s.author, text: { lineHeight: Math.round((r.author.text.fontSize as number) * 1.25) } });
   const aiText = partStyle(r, "aiText", { text: s.aiText });

@@ -15,7 +15,7 @@ export interface ThemeInfo {
   glass: boolean;
   /** The theme the tokens were resolved with: `neutral` unless a provider above passed another. */
   theme: Theme;
-  /** The tokens for the phone profile, this scheme and this OS: `t.control.hMd` is 44, `t.brand.default` a hex, `t.switch.trackW` 51 on iOS and 36 on Android. */
+  /** The tokens for the phone profile, this scheme and this OS: `t.size.control.md` is 44, `t.color.background.brand.default` a hex, `t.switch.trackWidth` 51 on iOS and 36 on Android. */
   t: NativeTokens;
 }
 
@@ -90,7 +90,7 @@ export function ThemeProvider({ scheme: givenScheme, os: givenOs, osVersion, the
 /**
  * A component's StyleSheet, built from the tokens once per scheme:
  *
- *   const useStyles = createStyles((t) => ({ root: { height: t.control.hMd } }));
+ *   const useStyles = createStyles((t) => ({ root: { height: t.size.control.md } }));
  *   const s = useStyles();
  *
  * Anything that depends on a prop or on press state is added inline over these. The sheets are held weakly by the token object they

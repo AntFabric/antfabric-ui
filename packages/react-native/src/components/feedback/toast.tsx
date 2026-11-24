@@ -56,8 +56,8 @@ const useStyles = createStyles((t) => ({
   root: { alignSelf: "stretch", maxWidth: "100%" },
   pill: { flexDirection: "row", alignItems: "center", borderRadius: 8 },
   message: { flex: 1, minWidth: 0 },
-  action: { flexShrink: 0, paddingVertical: 5, borderRadius: 8, backgroundColor: mix(t.fg.onInverse, 0.12) },
-  actionPressed: { backgroundColor: mix(t.fg.onInverse, 0.2) },
+  action: { flexShrink: 0, paddingVertical: 5, borderRadius: 8, backgroundColor: mix(t.color.text.onInverse, 0.12) },
+  actionPressed: { backgroundColor: mix(t.color.text.onInverse, 0.2) },
 }));
 
 /** Undo: its own tap, so the toast does not dismiss-then-act twice. */
@@ -73,7 +73,7 @@ function Action({ label, onPress, styles, testID }: { label: string; onPress: ()
       testID={partId(testID, "toast", "action")}
       accessibilityRole="button"
       accessibilityLabel={label}
-      hitSlop={box ? hitSlopTo(t.control.hit, box.h, box.w) : undefined}
+      hitSlop={box ? hitSlopTo(t.size.target.min, box.h, box.w) : undefined}
       onLayout={(e) => setBox({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
       onPress={() => onPress()}
       {...press.handlers}
@@ -98,10 +98,10 @@ export function Toast({ message, tone = "success", actionLabel = "", dismissed =
   const iconStyle = Object.keys(iconRest).length ? iconRest : undefined;
   const out = useRef(new Animated.Value(gone ? 0 : 1)).current;
   useEffect(() => {
-    const run = Animated.timing(out, { toValue: gone ? 0 : 1, duration: t.duration.base, useNativeDriver: Platform.OS !== "web" });
+    const run = Animated.timing(out, { toValue: gone ? 0 : 1, duration: t.motion.duration.base, useNativeDriver: Platform.OS !== "web" });
     run.start();
     return () => run.stop();
-  }, [gone, out, t.duration.base]);
+  }, [gone, out, t.motion.duration.base]);
   // The action puts the toast away too: it is reported as a dismissal, so the app unmounts it and frees its slot.
   const act = () => {
     setGone(true);

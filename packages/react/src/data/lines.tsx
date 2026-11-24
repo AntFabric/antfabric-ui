@@ -27,7 +27,7 @@ export interface RechartsLinesProps {
   area?: boolean;
   target?: number;
   targetLabel?: string;
-  /** The series drawn dashed and thinner (`chart.previousW`): the last period, in PeriodCompare. */
+  /** The series drawn dashed and thinner (`chart.previousWidth`): the last period, in PeriodCompare. */
   dashed?: string[];
   /** Each series gets its own dash and marker (`seriesMark`) besides its colour: WCAG 1.4.1, for people who cannot tell the hues apart. The legend draws the same (`Legend marks`). */
   marks?: boolean;

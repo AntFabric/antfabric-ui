@@ -195,7 +195,7 @@ const macBar: CSSProperties = {
   gap: t.space["3xs"],
   backdropFilter: "blur(30px)",
   WebkitBackdropFilter: "blur(30px)",
-  borderBottom: `0.5px solid ${t.border.subtle}`,
+  borderBottom: `0.5px solid ${t.color.border.subtle}`,
 };
 
 // macOS 26 draws the bar transparent over the wallpaper.
@@ -209,7 +209,7 @@ const macDropdown: CSSProperties = {
   left: 0,
   backdropFilter: "blur(40px)",
   WebkitBackdropFilter: "blur(40px)",
-  border: `0.5px solid ${t.border.default}`,
+  border: `0.5px solid ${t.color.border.default}`,
   ...enter("fade"),
   ...scrolls,
 };
@@ -628,7 +628,7 @@ function Segment({ label, icon, checked, onPress, styles }: { label: string; ico
           flexShrink: 0,
           alignItems: "center",
           justifyContent: "center",
-          transition: `background ${t.duration.fast}, color ${t.duration.fast}, box-shadow ${t.duration.fast}`,
+          transition: `background ${t.motion.duration.fast}, color ${t.motion.duration.fast}, box-shadow ${t.motion.duration.fast}`,
         },
         r.segment,
       )}

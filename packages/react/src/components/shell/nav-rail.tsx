@@ -80,7 +80,7 @@ const rowBase: CSSProperties = {
   justifyContent: "center",
   gap: t.space.smMd,
   flexShrink: 0,
-  transition: `background ${t.duration.base} ${t.ease.out}, color ${t.duration.fast}`,
+  transition: `background ${t.motion.duration.base} ${t.motion.easing.out}, color ${t.motion.duration.fast}`,
 };
 
 const rowExpanded: CSSProperties = { width: "100%", justifyContent: "flex-start", paddingInline: t.space.md };
@@ -88,7 +88,7 @@ const rowLabel: CSSProperties = { ...text, ...truncate(1), flex: 1, textAlign: "
 
 /** The destination list and the workspace column scroll when they do not fit, so the utilities and the profile stay in view. */
 const scrolling: CSSProperties = { minHeight: 0, flexShrink: 1, overflowY: "auto" };
-const cornerBadge: CSSProperties = { position: "absolute", top: t.navRail.badgeTop, left: t.navRail.badgeLeft, whiteSpace: "nowrap" };
+const cornerBadge: CSSProperties = { position: "absolute", top: t.navRail.badgeOffsetY, left: t.navRail.badgeOffsetX, whiteSpace: "nowrap" };
 const centred: CSSProperties = { flexShrink: 0, alignItems: "center", justifyContent: "center" };
 const chip: CSSProperties = {
   ...pressable,
@@ -101,7 +101,7 @@ const chip: CSSProperties = {
   paddingInline: t.space.sm,
   borderWidth: "1px",
   borderStyle: "solid",
-  borderColor: t.border.default,
+  borderColor: t.color.border.default,
 };
 
 interface RowProps {
@@ -296,7 +296,7 @@ export function NavRail({
           alignItems: "center",
           gap: t.space.mdLg,
           paddingBlock: t.space.lg,
-          transition: `width ${t.duration.base} ${t.ease.standard}`,
+          transition: `width ${t.motion.duration.base} ${t.motion.easing.standard}`,
         },
         partStyle(r, "root", open && { alignItems: "stretch", paddingInline: t.space.md }),
         style,
@@ -417,7 +417,7 @@ export function NavRail({
                 ...rtl({ paddingLeft: t.space.md, paddingRight: t.space["2xs"] }, dir),
                 borderWidth: "1px",
                 borderStyle: "solid",
-                borderColor: search.hovered ? t.border.muted : t.border.subtle,
+                borderColor: search.hovered ? t.color.border.muted : t.color.border.subtle,
               },
               partStyle(rSearch, "search", fade),
             )}

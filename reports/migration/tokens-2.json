@@ -1,0 +1,4692 @@
+{
+ "radius.none": {
+  "new": "radius.none",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radius.tag": {
+  "new": "radius.tag",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radius.row": {
+  "new": "radius.row",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radius.control": {
+  "new": "radius.control",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radius.input": {
+  "new": "radius.input",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radius.card": {
+  "new": "radius.card",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radius.rail": {
+  "new": "radius.rail",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radius.panel": {
+  "new": "radius.panel",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radius.sheet": {
+  "new": "radius.sheet",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radius.tray": {
+  "new": "radius.tray",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radius.pill": {
+  "new": "radius.pill",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radius.circle": {
+  "new": "radius.circle",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "border.wHairline": {
+  "new": "border.width.hairline",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "border.wThick": {
+  "new": "border.width.thick",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "border.subtle": {
+  "new": "color.border.subtle",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "border.muted": {
+  "new": "color.border.muted",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "border.default": {
+  "new": "color.border.default",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "border.strong": {
+  "new": "color.border.strong",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "border.active": {
+  "new": "color.border.selected",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "\"active\" is the focused, selected or filtered edge: the standard word is selected",
+  "problems": []
+ },
+ "border.brand": {
+  "new": "color.border.brand",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "border.inverse": {
+  "new": "color.border.inverse",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "space.none": {
+  "new": "space.none",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.3xs": {
+  "new": "space.3xs",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.2xs": {
+  "new": "space.2xs",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.xs": {
+  "new": "space.xs",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.sm": {
+  "new": "space.sm",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.smMd": {
+  "new": "space.smMd",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.md": {
+  "new": "space.md",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.mdLg": {
+  "new": "space.mdLg",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.lg": {
+  "new": "space.lg",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.lgXl": {
+  "new": "space.lgXl",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.xl": {
+  "new": "space.xl",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.2xl": {
+  "new": "space.2xl",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.3xl": {
+  "new": "space.3xl",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.4xl": {
+  "new": "space.4xl",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "space.5xl": {
+  "new": "space.5xl",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "dot.sizeSm": {
+  "new": "size.dot.sm",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "dot.size": {
+  "new": "size.dot.default",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "sheet.grabberW": {
+  "new": "sheet.grabberWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "sheet.grabberH": {
+  "new": "sheet.grabberHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "sheet.glassRadius": {
+  "new": "sheet.glassRadius",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "sheet.contentMin": {
+  "new": "sheet.contentMinHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "sheet.titleLine": {
+  "new": "sheet.titleLineHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "sheet.w": {
+  "new": "sheet.width",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "fab.markSize": {
+  "new": "fab.markSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "fab.size": {
+  "new": "fab.size",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "iconButton.badgeTop": {
+  "new": "iconButton.badgeOffsetY",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "iconButton.badgeRight": {
+  "new": "iconButton.badgeOffsetX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "segmentedControl.countSize": {
+  "new": "segmentedControl.countSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "segmentedControl.cardInset": {
+  "new": "segmentedControl.cardInset",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "segmentedControl.h": {
+  "new": "segmentedControl.height",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "segmentedControl.padX": {
+  "new": "segmentedControl.paddingX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "choice.pillGap": {
+  "new": "choice.pillGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "choice.ringW": {
+  "new": "choice.ringWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "choice.ringNudge": {
+  "new": "choice.ringOffsetY",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "choice.gap": {
+  "new": "choice.gap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "choice.padY": {
+  "new": "choice.paddingY",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "choice.ringSize": {
+  "new": "choice.ringSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "choice.dotSize": {
+  "new": "choice.dotSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "radioGroup.cardMinW": {
+  "new": "radioGroup.cardMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chip.maxW": {
+  "new": "chip.maxWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chip.h": {
+  "new": "chip.height",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chip.padX": {
+  "new": "chip.paddingX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chip.removeSize": {
+  "new": "chip.removeSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "select.padLeftSm": {
+  "new": "select.paddingLeftSm",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "select.chipH": {
+  "new": "select.chipHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "select.chipPadLeft": {
+  "new": "select.chipPaddingLeft",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "select.triggerGap": {
+  "new": "select.triggerGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "select.linkH": {
+  "new": "select.linkHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "select.linkPadX": {
+  "new": "select.linkPaddingX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "select.panelMaxH": {
+  "new": "select.panelMaxHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "select.panelMinW": {
+  "new": "select.panelMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "select.panelPad": {
+  "new": "select.panelPadding",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "select.dotGap": {
+  "new": "select.dotGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "textField.tagPadX": {
+  "new": "textField.tagPaddingX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "textField.trailingPull": {
+  "new": "textField.trailingOffsetX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "textField.prefixPull": {
+  "new": "textField.prefixOffsetX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.sans": {
+  "new": "font.family.sans",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.display": {
+  "new": "font.family.display",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.accent": {
+  "new": "font.family.accent",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.mono": {
+  "new": "font.family.mono",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.weightNormal": {
+  "new": "font.weight.normal",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.weightRegular": {
+  "new": "font.weight.regular",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.weightMedium": {
+  "new": "font.weight.medium",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.weightSemibold": {
+  "new": "font.weight.semibold",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.weightBold": {
+  "new": "font.weight.bold",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.weightBlack": {
+  "new": "font.weight.black",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.fileSansRegular": {
+  "new": "font.file.sans.regular",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.fileSansMedium": {
+  "new": "font.file.sans.medium",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.fileSansSemibold": {
+  "new": "font.file.sans.semibold",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.fileSansBold": {
+  "new": "font.file.sans.bold",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.fileSansExtrabold": {
+  "new": "font.file.sans.extrabold",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.fileDisplayRegular": {
+  "new": "font.file.display.regular",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.fileDisplayMedium": {
+  "new": "font.file.display.medium",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.fileDisplaySemibold": {
+  "new": "font.file.display.semibold",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.fileDisplayBold": {
+  "new": "font.file.display.bold",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "font.fileDisplayExtrabold": {
+  "new": "font.file.display.extrabold",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tracking.tight": {
+  "new": "font.letterSpacing.tight",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tracking.normal": {
+  "new": "font.letterSpacing.normal",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tracking.caps": {
+  "new": "font.letterSpacing.caps",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "duration.fast": {
+  "new": "motion.duration.fast",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "duration.base": {
+  "new": "motion.duration.base",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "duration.quick": {
+  "new": "motion.duration.quick",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "duration.slow": {
+  "new": "motion.duration.slow",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "ease.standard": {
+  "new": "motion.easing.standard",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "ease.out": {
+  "new": "motion.easing.out",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "ease.nudge": {
+  "new": "motion.easing.nudge",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "z.sticky": {
+  "new": "zIndex.sticky",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "z.rail": {
+  "new": "zIndex.rail",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "z.menu": {
+  "new": "zIndex.menu",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "z.popover": {
+  "new": "zIndex.popover",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "z.modal": {
+  "new": "zIndex.modal",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "z.toast": {
+  "new": "zIndex.toast",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "z.tooltip": {
+  "new": "zIndex.tooltip",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "opacity.disabled": {
+  "new": "opacity.disabled",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "opacity.muted": {
+  "new": "opacity.muted",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "opacity.secondary": {
+  "new": "opacity.secondary",
+  "tier": "semantic",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "glass.blur": {
+  "new": "effect.glass.blur",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "glass.saturate": {
+  "new": "effect.glass.saturate",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "glass.bg": {
+  "new": "color.background.glass.default",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "glass.clear": {
+  "new": "color.background.glass.clear",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "glass.tinted": {
+  "new": "color.background.glass.tinted",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "glass.solid": {
+  "new": "color.background.glass.solid",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "glass.edge": {
+  "new": "color.border.glass",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "osBadge.macDockRadius": {
+  "new": "osBadge.macDockRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.macIconSize": {
+  "new": "osBadge.macIconSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.macIconRadius": {
+  "new": "osBadge.macIconRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.macRunDot": {
+  "new": "osBadge.macRunDot",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.macHangY": {
+  "new": "osBadge.macHangY",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.macHangX": {
+  "new": "osBadge.macHangX",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.macSize": {
+  "new": "osBadge.macSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.winButtonSize": {
+  "new": "osBadge.winButtonSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.winButtonRadius": {
+  "new": "osBadge.winButtonRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.winTaskbarH": {
+  "new": "osBadge.winTaskbarH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.winHangY": {
+  "new": "osBadge.winHangY",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.winHangX": {
+  "new": "osBadge.winHangX",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.winSize": {
+  "new": "osBadge.winSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.winPadX": {
+  "new": "osBadge.winPadX",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.winDot": {
+  "new": "osBadge.winDot",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.winLabel": {
+  "new": "osBadge.winLabel",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.winBarW": {
+  "new": "osBadge.winBarW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.winBarH": {
+  "new": "osBadge.winBarH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.linuxDockRadius": {
+  "new": "osBadge.linuxDockRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.linuxHangY": {
+  "new": "osBadge.linuxHangY",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.linuxHangX": {
+  "new": "osBadge.linuxHangX",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.linuxMinW": {
+  "new": "osBadge.linuxMinW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.linuxH": {
+  "new": "osBadge.linuxH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.linuxPadX": {
+  "new": "osBadge.linuxPadX",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.linuxLabel": {
+  "new": "osBadge.linuxLabel",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.browserStripW": {
+  "new": "osBadge.browserStripW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.browserStripRadius": {
+  "new": "osBadge.browserStripRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.browserTabW": {
+  "new": "osBadge.browserTabW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.browserTabH": {
+  "new": "osBadge.browserTabH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.browserTabRadius": {
+  "new": "osBadge.browserTabRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.browserFavicon": {
+  "new": "osBadge.browserFavicon",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.browserFaviconRadius": {
+  "new": "osBadge.browserFaviconRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.browserFaviconLabel": {
+  "new": "osBadge.browserFaviconLabel",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.browserHang": {
+  "new": "osBadge.browserHang",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.iosTilePadX": {
+  "new": "osBadge.iosTilePadX",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.iosTilePadY": {
+  "new": "osBadge.iosTilePadY",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.iosTileRadius": {
+  "new": "osBadge.iosTileRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.iosHangY": {
+  "new": "osBadge.iosHangY",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.iosHangX": {
+  "new": "osBadge.iosHangX",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.iosSize": {
+  "new": "osBadge.iosSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.iosPadX": {
+  "new": "osBadge.iosPadX",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.iosLabel": {
+  "new": "osBadge.iosLabel",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.androidDotInset": {
+  "new": "osBadge.androidDotInset",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osBadge.androidDot": {
+  "new": "osBadge.androidDot",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "inAppBanner.dismissInset": {
+  "new": "inAppBanner.dismissInset",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "inAppBanner.w": {
+  "new": "inAppBanner.width",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "notificationItem.kindBadge": {
+  "new": "notificationItem.kindBadgeSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "notificationItem.kindBadgeRadius": {
+  "new": "notificationItem.kindBadgeRadius",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "notificationItem.tile": {
+  "new": "notificationItem.tileSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "notificationItem.textGap": {
+  "new": "notificationItem.textGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "notificationItem.metaGap": {
+  "new": "notificationItem.metaGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "icon.strokeBold": {
+  "new": "size.stroke.bold",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "an icon's line weight",
+  "problems": []
+ },
+ "icon.strokeThin": {
+  "new": "size.stroke.thin",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "an icon's line weight",
+  "problems": []
+ },
+ "icon.sizeSm": {
+  "new": "size.icon.sm",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "icon.sizeMd": {
+  "new": "size.icon.md",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "icon.size": {
+  "new": "size.icon.default",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "icon.sizeLg": {
+  "new": "size.icon.lg",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "icon.stroke": {
+  "new": "size.stroke.default",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "an icon's line weight",
+  "problems": []
+ },
+ "icon.strokeTick": {
+  "new": "size.stroke.tick",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "an icon's line weight",
+  "problems": []
+ },
+ "notificationSchedule.noteMaxW": {
+  "new": "notificationSchedule.noteMaxWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "notificationSchedule.w": {
+  "new": "notificationSchedule.width",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "osNotification.macRadius": {
+  "new": "osNotification.macRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.winRadius": {
+  "new": "osNotification.winRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.linuxRadius": {
+  "new": "osNotification.linuxRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.browserRadius": {
+  "new": "osNotification.browserRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.macActionH": {
+  "new": "osNotification.macActionH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.macActionRadius": {
+  "new": "osNotification.macActionRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.linuxActionH": {
+  "new": "osNotification.linuxActionH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.linuxActionRadius": {
+  "new": "osNotification.linuxActionRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.browserActionH": {
+  "new": "osNotification.browserActionH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.controlRadius": {
+  "new": "osNotification.controlRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iconSize": {
+  "new": "osNotification.iconSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iconLabel": {
+  "new": "osNotification.iconLabel",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.closeHang": {
+  "new": "osNotification.closeHang",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.fieldH": {
+  "new": "osNotification.fieldH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.sendSize": {
+  "new": "osNotification.sendSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.winSendSize": {
+  "new": "osNotification.winSendSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.badgeSize": {
+  "new": "osNotification.badgeSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.badgeRadius": {
+  "new": "osNotification.badgeRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.macIconSize": {
+  "new": "osNotification.macIconSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.macIconLabel": {
+  "new": "osNotification.macIconLabel",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.appIconRadius": {
+  "new": "osNotification.appIconRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.w": {
+  "new": "osNotification.w",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosRadius": {
+  "new": "osNotification.iosRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.androidRadius": {
+  "new": "osNotification.androidRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosIconSize": {
+  "new": "osNotification.iosIconSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.androidIconSize": {
+  "new": "osNotification.androidIconSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosControlH": {
+  "new": "osNotification.iosControlH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosFieldRadius": {
+  "new": "osNotification.iosFieldRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.androidFieldH": {
+  "new": "osNotification.androidFieldH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.androidFieldRadius": {
+  "new": "osNotification.androidFieldRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosActionRadius": {
+  "new": "osNotification.iosActionRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosMenuW": {
+  "new": "osNotification.iosMenuW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosMenuRadius": {
+  "new": "osNotification.iosMenuRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosHairline": {
+  "new": "osNotification.iosHairline",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosBody": {
+  "new": "osNotification.iosBody",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosLine": {
+  "new": "osNotification.iosLine",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosHeader": {
+  "new": "osNotification.iosHeader",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.iosTime": {
+  "new": "osNotification.iosTime",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.sliverH": {
+  "new": "osNotification.sliverH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.sliverRadius": {
+  "new": "osNotification.sliverRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.sliverFarH": {
+  "new": "osNotification.sliverFarH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.sliverFarRadius": {
+  "new": "osNotification.sliverFarRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osNotification.badgeEdge": {
+  "new": "osNotification.badgeEdge",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "permissionPrompt.addressH": {
+  "new": "permissionPrompt.addressHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "permissionPrompt.lock": {
+  "new": "permissionPrompt.lockSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "permissionPrompt.w": {
+  "new": "permissionPrompt.width",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "permissionPrompt.tile": {
+  "new": "permissionPrompt.tileSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "osTray.winRadius": {
+  "new": "osTray.winRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.macRadius": {
+  "new": "osTray.macRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.linuxRadius": {
+  "new": "osTray.linuxRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.liquidRadius": {
+  "new": "osTray.liquidRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.winRowH": {
+  "new": "osTray.winRowH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.winRowRadius": {
+  "new": "osTray.winRowRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.macRowH": {
+  "new": "osTray.macRowH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.macRowRadius": {
+  "new": "osTray.macRowRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.linuxRowH": {
+  "new": "osTray.linuxRowH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.linuxRowRadius": {
+  "new": "osTray.linuxRowRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.statusBarH": {
+  "new": "osTray.statusBarH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.statusBarRadius": {
+  "new": "osTray.statusBarRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.statusGap": {
+  "new": "osTray.statusGap",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.statusItemH": {
+  "new": "osTray.statusItemH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.statusItemRadius": {
+  "new": "osTray.statusItemRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.statusItemLiquidRadius": {
+  "new": "osTray.statusItemLiquidRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.submenuTop": {
+  "new": "osTray.submenuTop",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.sheetW": {
+  "new": "osTray.sheetW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.winTaskbarH": {
+  "new": "osTray.winTaskbarH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.winTaskbarRadius": {
+  "new": "osTray.winTaskbarRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.linuxBarH": {
+  "new": "osTray.linuxBarH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.glyph": {
+  "new": "osTray.glyph",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osTray.glyphRadius": {
+  "new": "osTray.glyphRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "breadcrumbs.recordingGap": {
+  "new": "breadcrumbs.recordingGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "breadcrumbs.recordingDot": {
+  "new": "breadcrumbs.recordingDotSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "breadcrumbs.crumbMaxW": {
+  "new": "breadcrumbs.crumbMaxWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "osWindow.macLight": {
+  "new": "osWindow.macLight",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osWindow.macLightsInset": {
+  "new": "osWindow.macLightsInset",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osWindow.macLightsW": {
+  "new": "osWindow.macLightsW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osWindow.winCaptionW": {
+  "new": "osWindow.winCaptionW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osWindow.linuxCaption": {
+  "new": "osWindow.linuxCaption",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "tab.indicatorRadius": {
+  "new": "tabs.indicatorRadius",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tab.countSize": {
+  "new": "tabs.countSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "osMenu.macItemH": {
+  "new": "osMenu.macItemH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.linuxItemH": {
+  "new": "osMenu.linuxItemH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.macBarH": {
+  "new": "osMenu.macBarH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.macTitleH": {
+  "new": "osMenu.macTitleH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.macTitlePadX": {
+  "new": "osMenu.macTitlePadX",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.macDropTop": {
+  "new": "osMenu.macDropTop",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.macDropW": {
+  "new": "osMenu.macDropW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.macDropPad": {
+  "new": "osMenu.macDropPad",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.macDropRadius": {
+  "new": "osMenu.macDropRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.macGlassRadius": {
+  "new": "osMenu.macGlassRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.winDropW": {
+  "new": "osMenu.winDropW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.winRadius": {
+  "new": "osMenu.winRadius",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.linuxDropW": {
+  "new": "osMenu.linuxDropW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.winFlyoutTop": {
+  "new": "osMenu.winFlyoutTop",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.winFlyoutLeft": {
+  "new": "osMenu.winFlyoutLeft",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.winFlyoutW": {
+  "new": "osMenu.winFlyoutW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osMenu.browserMenuW": {
+  "new": "osMenu.browserMenuW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "navRail.item": {
+  "new": "navRail.itemSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "navRail.badgeTop": {
+  "new": "navRail.badgeOffsetY",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "navRail.badgeLeft": {
+  "new": "navRail.badgeOffsetX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "navRail.wOpen": {
+  "new": "navRail.widthOpen",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "navRail.logo": {
+  "new": "navRail.logoSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "navRail.logoRadius": {
+  "new": "navRail.logoRadius",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "navRail.logoGlyph": {
+  "new": "navRail.logoFontSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "navRail.chipH": {
+  "new": "navRail.chipHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "sidebar.hashW": {
+  "new": "sidebarSection.hashWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "sidebar.sectionPadTop": {
+  "new": "sidebarSection.sectionPaddingTop",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "sidebar.sectionGap": {
+  "new": "sidebarSection.sectionGap",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "sidebar.sectionHeaderH": {
+  "new": "sidebarSection.sectionHeaderHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "topbar.searchMaxW": {
+  "new": "size.layout.topBarSearchMax",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "topbar.h": {
+  "new": "size.layout.topBar",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "topbar.searchMinW": {
+  "new": "size.layout.topBarSearchMin",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "workspace.markerTop": {
+  "new": "workspaceSwitcher.markerOffsetY",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "workspace.markerW": {
+  "new": "workspaceSwitcher.markerWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "workspace.markerRadius": {
+  "new": "workspaceSwitcher.markerRadius",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "workspace.badgeTop": {
+  "new": "workspaceSwitcher.badgeOffsetY",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "workspace.badgeRight": {
+  "new": "workspaceSwitcher.badgeOffsetX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "workspace.tileRadius": {
+  "new": "workspaceSwitcher.tileRadius",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "workspace.menuW": {
+  "new": "workspaceSwitcher.menuWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "workspace.tileEdge": {
+  "new": "workspaceSwitcher.tileRingWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "workspace.menuRowH": {
+  "new": "workspaceSwitcher.menuRowHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "osHeader.islandTop": {
+  "new": "osHeader.islandTop",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osHeader.islandW": {
+  "new": "osHeader.islandW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osHeader.islandH": {
+  "new": "osHeader.islandH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osHeader.punchTop": {
+  "new": "osHeader.punchTop",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osHeader.punchSize": {
+  "new": "osHeader.punchSize",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osHeader.androidNavH": {
+  "new": "osHeader.androidNavH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osHeader.iosHomeBarW": {
+  "new": "osHeader.iosHomeBarW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osHeader.iosHomeBarH": {
+  "new": "osHeader.iosHomeBarH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osHeader.androidHomeBarW": {
+  "new": "osHeader.androidHomeBarW",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "osHeader.androidHomeBarH": {
+  "new": "osHeader.androidHomeBarH",
+  "tier": "component",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "mobileHeader.rowMinH": {
+  "new": "mobileHeader.rowMinHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "mobileHeader.largeTitleLine": {
+  "new": "mobileHeader.largeTitleLineHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "mobileHeader.titleInset": {
+  "new": "mobileHeader.titleInset",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "tabBar.itemH": {
+  "new": "tabBar.itemHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tabBar.badgeX": {
+  "new": "tabBar.badgeOffsetX",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "tabBar.labelLine": {
+  "new": "tabBar.labelLineHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tabBar.labelMaxW": {
+  "new": "tabBar.labelMaxWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tabBar.itemSqueezed": {
+  "new": "tabBar.itemSizeSqueezed",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "palette.optionPadX": {
+  "new": "commandPalette.optionPaddingX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "palette.slot": {
+  "new": "commandPalette.slotSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "palette.w": {
+  "new": "commandPalette.width",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "palette.fieldPadY": {
+  "new": "commandPalette.fieldPaddingY",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "palette.listMaxH": {
+  "new": "commandPalette.listMaxHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "menu.wContext": {
+  "new": "menu.widthContext",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "menu.w": {
+  "new": "menu.width",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "menu.rowHCoarse": {
+  "new": "menu.rowHeightCoarse",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "row.textGap": {
+  "new": "space.rowText",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "a gap, so it is a space",
+  "problems": []
+ },
+ "row.h": {
+  "new": "size.row.default",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "row.hLg": {
+  "new": "size.row.lg",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "emoji.size": {
+  "new": "contextMenu.emojiFontSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "emoji.grid": {
+  "new": "contextMenu.emojiGridFontSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "contextMenu.sceneOffset": {
+  "new": "contextMenu.sceneOffsetX",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "dialog.w": {
+  "new": "dialog.width",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "dialog.wForm": {
+  "new": "dialog.widthForm",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "dialog.icon": {
+  "new": "dialog.iconSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "dialog.bodyMaxH": {
+  "new": "dialog.bodyMaxHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "dialog.actionMinW": {
+  "new": "dialog.actionMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "dialog.bodyGap": {
+  "new": "dialog.bodyGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "hoverCard.w": {
+  "new": "hoverCard.width",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "hoverCard.headGap": {
+  "new": "hoverCard.headGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "hoverCard.avatar": {
+  "new": "hoverCard.avatarSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "hoverCard.guestH": {
+  "new": "hoverCard.guestHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "hoverCard.guestPadX": {
+  "new": "hoverCard.guestPaddingX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "hoverCard.presenceDot": {
+  "new": "hoverCard.presenceDotSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "tooltip.maxW": {
+  "new": "tooltip.maxWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tooltip.padY": {
+  "new": "tooltip.paddingY",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tooltip.padX": {
+  "new": "tooltip.paddingX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tooltip.kbdH": {
+  "new": "tooltip.kbdHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tooltip.kbdLabel": {
+  "new": "tooltip.kbdFontSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "connectionBanner.actionH": {
+  "new": "connectionBanner.actionHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "connectionBanner.padY": {
+  "new": "connectionBanner.paddingY",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "sessionState.proseMaxW": {
+  "new": "sessionState.proseMaxWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "sessionState.w": {
+  "new": "sessionState.width",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "sessionState.tile": {
+  "new": "sessionState.tileSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "updateBanner.cardPadY": {
+  "new": "updateBanner.cardPaddingY",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "updateBanner.cardPadX": {
+  "new": "updateBanner.cardPaddingX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "updateBanner.button": {
+  "new": "updateBanner.buttonSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "updateBanner.dotInset": {
+  "new": "updateBanner.dotInset",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "updateBanner.bannerW": {
+  "new": "updateBanner.bannerWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "updateBanner.cardW": {
+  "new": "updateBanner.cardWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "updateBanner.versionTile": {
+  "new": "updateBanner.versionTileSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "questionPanel.maxW": {
+  "new": "questionPanel.maxWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "questionPanel.keySize": {
+  "new": "questionPanel.keySize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "questionPanel.detailsMaxH": {
+  "new": "questionPanel.detailsMaxHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "questionPanel.elbowW": {
+  "new": "questionPanel.elbowWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "questionPanel.elbowH": {
+  "new": "questionPanel.elbowHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "questionPanel.elbowRadius": {
+  "new": "questionPanel.elbowRadius",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "questionPanel.confirmInset": {
+  "new": "questionPanel.confirmInset",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "questionPanel.argsMaxH": {
+  "new": "questionPanel.argsMaxHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "questionPanel.argKeyMinW": {
+  "new": "questionPanel.argKeyMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "thinking.cell": {
+  "new": "thinkingIndicator.cellSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "thinking.cellRadius": {
+  "new": "thinkingIndicator.cellRadius",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "thinking.maxW": {
+  "new": "thinkingIndicator.maxWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "thinking.markW": {
+  "new": "thinkingIndicator.markWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "agentSteps.marker": {
+  "new": "agentSteps.markerSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "agentSteps.icon": {
+  "new": "agentSteps.iconSize",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "phone.cardW": {
+  "new": "size.layout.phoneCard",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.font": {
+  "new": "chart.fontFamily",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.gridDash": {
+  "new": "chart.gridDash",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.gridGap": {
+  "new": "chart.gridGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.referenceDash": {
+  "new": "chart.referenceDash",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.referenceGap": {
+  "new": "chart.referenceGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.seriesDash": {
+  "new": "chart.seriesDash",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.seriesGap": {
+  "new": "chart.seriesGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.axisH": {
+  "new": "chart.axisHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.endLabelRoom": {
+  "new": "chart.endLabelWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "chart.activeRing": {
+  "new": "chart.activeRingWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "chart.stackGap": {
+  "new": "chart.stackGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.signedRadius": {
+  "new": "chart.signedRadius",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.edge": {
+  "new": "chart.edgeInset",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "chart.plotMinW": {
+  "new": "chart.plotMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.barMinW": {
+  "new": "chart.barMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.labelBand": {
+  "new": "chart.labelBandHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "chart.tipW": {
+  "new": "chart.tipWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.tipBaseH": {
+  "new": "chart.tipBaseHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.tipRowH": {
+  "new": "chart.tipRowHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.donutSize": {
+  "new": "chart.donutSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.sliceGap": {
+  "new": "chart.sliceGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.sliceRadius": {
+  "new": "chart.sliceRadius",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.sliceLift": {
+  "new": "chart.sliceInset",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "chart.gaugeCap": {
+  "new": "chart.gaugeCapRadius",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "chart.tickW": {
+  "new": "chart.tickWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.tickOver": {
+  "new": "chart.tickOverhang",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "chart.listMinW": {
+  "new": "chart.listMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.ringGap": {
+  "new": "chart.ringGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.splitH": {
+  "new": "chart.splitHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.splitGap": {
+  "new": "chart.splitGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.splitMinW": {
+  "new": "chart.splitMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.tabMinW": {
+  "new": "chart.tabMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.ruleH": {
+  "new": "chart.ruleHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.sideW": {
+  "new": "chart.sideWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.keyW": {
+  "new": "chart.keyWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.partMinW": {
+  "new": "chart.partMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.series1": {
+  "new": "chart.series1Color",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.series2": {
+  "new": "chart.series2Color",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.series3": {
+  "new": "chart.series3Color",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.series4": {
+  "new": "chart.series4Color",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.series5": {
+  "new": "chart.series5Color",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.series6": {
+  "new": "chart.series6Color",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.series7": {
+  "new": "chart.series7Color",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.series8": {
+  "new": "chart.series8Color",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.previous": {
+  "new": "chart.previousColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.other": {
+  "new": "chart.otherColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.grid": {
+  "new": "chart.gridColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.axis": {
+  "new": "chart.axisColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.label": {
+  "new": "chart.labelColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.crosshair": {
+  "new": "chart.crosshairColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.reference": {
+  "new": "chart.referenceColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.tooltip": {
+  "new": "chart.tooltipColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.tooltipText": {
+  "new": "chart.tooltipTextColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.tooltipMuted": {
+  "new": "chart.tooltipMutedColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.tooltipRule": {
+  "new": "chart.tooltipRuleColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.track": {
+  "new": "chart.trackColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.labelSize": {
+  "new": "chart.labelSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.lineW": {
+  "new": "chart.lineWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.sparkW": {
+  "new": "chart.sparkWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.pointR": {
+  "new": "chart.pointRadius",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "chart.barMaxW": {
+  "new": "chart.barMaxWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.barSoloW": {
+  "new": "chart.barSoloWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.barH": {
+  "new": "chart.barHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.barRadius": {
+  "new": "chart.barRadius",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.barGap": {
+  "new": "chart.barGap",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.gaugeW": {
+  "new": "chart.gaugeWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.ringSize": {
+  "new": "chart.ringSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "chart.ringW": {
+  "new": "chart.ringWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.previousW": {
+  "new": "chart.previousWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.fileRegular": {
+  "new": "chart.fontFileRegular",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.fileMedium": {
+  "new": "chart.fontFileMedium",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.fileSemibold": {
+  "new": "chart.fontFileSemibold",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "chart.fileBold": {
+  "new": "chart.fontFileBold",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "kpi.sparkBarRadius": {
+  "new": "kpi.sparkBarRadius",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "kpi.meterH": {
+  "new": "kpi.meterHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "kpi.meterCompactW": {
+  "new": "kpi.meterCompactWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "kpi.meterMinW": {
+  "new": "kpi.meterMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "kpi.chipSize": {
+  "new": "kpi.chipSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "kpi.ringMinW": {
+  "new": "kpi.ringMinWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "kpi.cardTrendH": {
+  "new": "kpi.cardTrendHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "kpi.tileTrendW": {
+  "new": "kpi.tileTrendWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "kpi.tileBarsW": {
+  "new": "kpi.tileBarsWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "kpi.loadS": {
+  "new": "kpi.loadWidthSm",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "kpi.loadM": {
+  "new": "kpi.loadWidthMd",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "kpi.loadL": {
+  "new": "kpi.loadWidthLg",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "kpi.loadXl": {
+  "new": "kpi.loadWidthXl",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "kpi.loadLineH": {
+  "new": "kpi.loadLineHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "kpi.loadValueH": {
+  "new": "kpi.loadValueHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "kpi.sparkBarMaxW": {
+  "new": "kpi.sparkBarMaxWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "kpi.ringSize": {
+  "new": "kpi.ringSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "kpi.tileTrendH": {
+  "new": "kpi.tileTrendHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.cellX": {
+  "new": "table.cellPaddingX",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.headH": {
+  "new": "table.headHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.headRadius": {
+  "new": "table.headRadius",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "table.denseRowH": {
+  "new": "table.denseRowHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.checkW": {
+  "new": "table.checkWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.sparkW": {
+  "new": "table.sparkWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.sparkH": {
+  "new": "table.sparkHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.loadS": {
+  "new": "table.loadWidthSm",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "table.loadM": {
+  "new": "table.loadWidthMd",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "table.loadL": {
+  "new": "table.loadWidthLg",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "table.loadH": {
+  "new": "table.loadHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.loadCardS": {
+  "new": "table.loadCardWidthSm",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "table.loadCardL": {
+  "new": "table.loadCardWidthLg",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "table.cardsBelow": {
+  "new": "table.cardsBreakpoint",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "table.header": {
+  "new": "table.headerColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.rowHover": {
+  "new": "table.rowHoverColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.rowSelected": {
+  "new": "table.rowSelectedColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.divider": {
+  "new": "table.dividerColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "table.rowH": {
+  "new": "table.rowHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.page": {
+  "new": "color.background.page",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.card": {
+  "new": "color.background.card",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.raised": {
+  "new": "color.background.raised",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.chrome": {
+  "new": "color.background.chrome",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.sidebar": {
+  "new": "color.background.sidebar",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.recessed": {
+  "new": "color.background.recessed",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.muted": {
+  "new": "color.background.muted",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.selected": {
+  "new": "color.background.selected",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.unread": {
+  "new": "color.background.unread",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.inverse": {
+  "new": "color.background.inverse",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.inverseHover": {
+  "new": "color.background.inverseHover",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.inverseWash": {
+  "new": "color.background.inverseWash",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.app": {
+  "new": "color.background.app",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "surface.overlay": {
+  "new": "color.background.overlay",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "brand.tint": {
+  "new": "color.background.brand.tint",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "brand.default": {
+  "new": "color.background.brand.default",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "brand.hover": {
+  "new": "color.background.brand.hover",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "brand.active": {
+  "new": "color.background.brand.pressed",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "\"active\" is the pressed fill",
+  "problems": []
+ },
+ "brand.soft": {
+  "new": "color.background.brand.soft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "brand.softHover": {
+  "new": "color.background.brand.softHover",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "accent.default": {
+  "new": "color.background.accent.default",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "accent.soft": {
+  "new": "color.background.accent.soft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "presence.active": {
+  "new": "color.background.presence.active",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "presence.away": {
+  "new": "color.background.presence.away",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "presence.offline": {
+  "new": "color.background.presence.offline",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "presence.dnd": {
+  "new": "color.background.presence.dnd",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "switch.trackOff": {
+  "new": "switch.trackOffColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "switch.thumb": {
+  "new": "switch.thumbColor",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "switch.trackW": {
+  "new": "switch.trackWidth",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "switch.trackH": {
+  "new": "switch.trackHeight",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "switch.trackPad": {
+  "new": "switch.trackPadding",
+  "tier": "component",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "switch.thumbSize": {
+  "new": "switch.thumbSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "switch.thumbTravel": {
+  "new": "switch.thumbTravel",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "switch.thumbShadow": {
+  "new": "switch.thumbShadow",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "os.macClose": {
+  "new": "os.macClose",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.macMin": {
+  "new": "os.macMin",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.macMax": {
+  "new": "os.macMax",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.notificationBg": {
+  "new": "os.notificationBg",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.notificationFg": {
+  "new": "os.notificationFg",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.browserChrome": {
+  "new": "os.browserChrome",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.winClose": {
+  "new": "os.winClose",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.badge": {
+  "new": "os.badge",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.macAccent": {
+  "new": "os.macAccent",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.island": {
+  "new": "os.island",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.browserTab": {
+  "new": "os.browserTab",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.statusFg": {
+  "new": "os.statusFg",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.wallpaper": {
+  "new": "os.wallpaper",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.iosLabelShadow": {
+  "new": "os.iosLabelShadow",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.macLightEdge": {
+  "new": "os.macLightEdge",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.winClosePressed": {
+  "new": "os.winClosePressed",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "os.onFill": {
+  "new": "os.onFill",
+  "tier": "semantic",
+  "status": "internal",
+  "note": "internal: left as it is in this pass",
+  "problems": []
+ },
+ "success.default": {
+  "new": "color.text.success",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "the role is text, icons and progress",
+  "problems": []
+ },
+ "success.soft": {
+  "new": "color.background.success.soft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "warning.default": {
+  "new": "color.text.warning",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "the role is text, icons and progress",
+  "problems": []
+ },
+ "warning.soft": {
+  "new": "color.background.warning.soft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "banner.warningBorder": {
+  "new": "color.border.warning",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "danger.default": {
+  "new": "color.text.danger",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "danger.soft": {
+  "new": "color.background.danger.soft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "danger.hover": {
+  "new": "color.text.dangerHover",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "danger.solid": {
+  "new": "color.background.danger.default",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "danger.solidHover": {
+  "new": "color.background.danger.hover",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "danger.fg": {
+  "new": "color.text.onDanger",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "info.default": {
+  "new": "color.text.info",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "the role is text, icons and progress",
+  "problems": []
+ },
+ "info.soft": {
+  "new": "color.background.info.soft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.neutralBg": {
+  "new": "color.background.tag.neutral",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.neutralFg": {
+  "new": "color.text.tag.neutral",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.brandBg": {
+  "new": "color.background.tag.brand",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.brandFg": {
+  "new": "color.text.tag.brand",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.successBg": {
+  "new": "color.background.tag.success",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.successFg": {
+  "new": "color.text.tag.success",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.warningBg": {
+  "new": "color.background.tag.warning",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.warningFg": {
+  "new": "color.text.tag.warning",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.dangerBg": {
+  "new": "color.background.tag.danger",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.dangerFg": {
+  "new": "color.text.tag.danger",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.infoBg": {
+  "new": "color.background.tag.info",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tag.infoFg": {
+  "new": "color.text.tag.info",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "identity.ink": {
+  "new": "color.background.identity.ink",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "identity.indigo": {
+  "new": "color.background.identity.indigo",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "identity.green": {
+  "new": "color.background.identity.green",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "identity.ochre": {
+  "new": "color.background.identity.ochre",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "identity.red": {
+  "new": "color.background.identity.red",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "identity.agent": {
+  "new": "color.background.identity.agent",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "hover.surface": {
+  "new": "color.background.hover",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "fg.strong": {
+  "new": "color.text.strong",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "fg.body": {
+  "new": "color.text.body",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "fg.muted": {
+  "new": "color.text.muted",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "fg.subtle": {
+  "new": "color.text.subtle",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "fg.faint": {
+  "new": "color.text.faint",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "fg.placeholder": {
+  "new": "color.text.placeholder",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "fg.onBrand": {
+  "new": "color.text.onBrand",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "fg.onInverse": {
+  "new": "color.text.onInverse",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "fg.onBrandSoft": {
+  "new": "color.text.onBrandSoft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "link.default": {
+  "new": "color.text.link",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "focus.ring": {
+  "new": "color.border.focus",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "scrim.light": {
+  "new": "color.background.scrim.light",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "scrim.default": {
+  "new": "color.background.scrim.default",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "scrim.strong": {
+  "new": "color.background.scrim.strong",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "skeleton.fill": {
+  "new": "color.background.skeleton.fill",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "skeleton.sheen": {
+  "new": "color.background.skeleton.sheen",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tabs.track": {
+  "new": "color.background.track",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "not a tabs token: the recessed track of a segmented control",
+  "problems": []
+ },
+ "shadow.none": {
+  "new": "elevation.shadow.none",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "shadow.hairline": {
+  "new": "elevation.shadow.hairline",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "shadow.card": {
+  "new": "elevation.shadow.card",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "shadow.raise": {
+  "new": "elevation.shadow.raise",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "shadow.float": {
+  "new": "elevation.shadow.float",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "shadow.pill": {
+  "new": "elevation.shadow.pill",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "shadow.menu": {
+  "new": "elevation.shadow.menu",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "shadow.modal": {
+  "new": "elevation.shadow.modal",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "shadow.tooltip": {
+  "new": "elevation.shadow.tooltip",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "shadow.focus": {
+  "new": "elevation.shadow.focus",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "shadow.glass": {
+  "new": "elevation.shadow.glass",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "shadow.glassContrast": {
+  "new": "elevation.shadow.glassContrast",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.accent": {
+  "new": "color.background.data.accent",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.accentSoft": {
+  "new": "color.background.data.accentSoft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.onAccentSoft": {
+  "new": "color.text.data.onAccentSoft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.positive": {
+  "new": "color.background.data.positive",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.positiveSoft": {
+  "new": "color.background.data.positiveSoft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.onPositive": {
+  "new": "color.text.data.onPositive",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.negative": {
+  "new": "color.background.data.negative",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.negativeSoft": {
+  "new": "color.background.data.negativeSoft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.onNegative": {
+  "new": "color.text.data.onNegative",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.warning": {
+  "new": "color.background.data.warning",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.warningSoft": {
+  "new": "color.background.data.warningSoft",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "data.onWarning": {
+  "new": "color.text.data.onWarning",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "control.hXxs": {
+  "new": "size.control.xxs",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "control.hXs": {
+  "new": "size.control.xs",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "control.hMd": {
+  "new": "size.control.md",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "control.hXl": {
+  "new": "size.control.xl",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "control.hInput": {
+  "new": "size.control.input",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "control.hSm": {
+  "new": "size.control.sm",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "control.hLg": {
+  "new": "size.control.lg",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "control.hIcon": {
+  "new": "size.control.icon",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "control.hIconSm": {
+  "new": "size.control.iconSm",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "control.hit": {
+  "new": "size.target.min",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "breadcrumb.h": {
+  "new": "size.layout.breadcrumbs",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "rail.wNav": {
+  "new": "size.layout.rail",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "rail.wSidebar": {
+  "new": "size.layout.sidebar",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "tabbar.h": {
+  "new": "size.layout.tabBar",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "statusbar.h": {
+  "new": "size.layout.statusBar",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "statusbar.hAndroid": {
+  "new": "size.layout.statusBarAndroid",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "a platform in a name: should become the Android value of size.layout.statusBar (a value change, so later)",
+  "problems": []
+ },
+ "homeIndicator.h": {
+  "new": "size.layout.homeIndicator",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "avatar.xs": {
+  "new": "size.avatar.xs",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "avatar.sm": {
+  "new": "size.avatar.sm",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "avatar.md": {
+  "new": "size.avatar.md",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "avatar.lg": {
+  "new": "size.avatar.lg",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "avatar.xl": {
+  "new": "size.avatar.xl",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.micro": {
+  "new": "font.size.micro",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.caption": {
+  "new": "font.size.caption",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.captionLine": {
+  "new": "font.lineHeight.caption",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.bodySm": {
+  "new": "font.size.bodySm",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.bodySmLine": {
+  "new": "font.lineHeight.bodySm",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.body": {
+  "new": "font.size.body",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.bodyLine": {
+  "new": "font.lineHeight.body",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.title": {
+  "new": "font.size.title",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.titleLine": {
+  "new": "font.lineHeight.title",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.lead": {
+  "new": "font.size.lead",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.leadLine": {
+  "new": "font.lineHeight.lead",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.h3": {
+  "new": "font.size.h3",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.h3Line": {
+  "new": "font.lineHeight.h3",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.h2": {
+  "new": "font.size.h2",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.h2Line": {
+  "new": "font.lineHeight.h2",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.h1": {
+  "new": "font.size.h1",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.h1Line": {
+  "new": "font.lineHeight.h1",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.display": {
+  "new": "font.size.display",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.displayLine": {
+  "new": "font.lineHeight.display",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "text.largeTitle": {
+  "new": "font.size.largeTitle",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "gutter.pane": {
+  "new": "space.gutter.pane",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "gutter.page": {
+  "new": "space.gutter.page",
+  "tier": "semantic",
+  "status": "rename",
+  "note": "",
+  "problems": []
+ },
+ "checkbox.size": {
+  "new": "checkbox.size",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "checkbox.radius": {
+  "new": "checkbox.radius",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "checkbox.tickSize": {
+  "new": "checkbox.tickSize",
+  "tier": "component",
+  "status": "same",
+  "note": "",
+  "problems": []
+ },
+ "button.labelSm": {
+  "new": "button.labelFontSizeSm",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "button.labelMd": {
+  "new": "button.labelFontSizeMd",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "button.labelLg": {
+  "new": "button.labelFontSizeLg",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "button.iconSm": {
+  "new": "button.iconSizeSm",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "button.iconMd": {
+  "new": "button.iconSizeMd",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ },
+ "button.iconLg": {
+  "new": "button.iconSizeLg",
+  "tier": "component",
+  "status": "rename",
+  "note": "chosen by hand: the old name had no property word",
+  "problems": []
+ }
+}

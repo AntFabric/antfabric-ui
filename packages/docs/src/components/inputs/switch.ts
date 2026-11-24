@@ -340,7 +340,7 @@ const docs: ComponentDocs = {
           kind: "result",
           title: "The rail's ⚙ stays loud while it's off",
           detail: "While either notification setting is off, the ⚙ keeps a muted fill, so a mute is never invisible.",
-          code: "style={allOn || open ? undefined : { background: t.surface.muted, color: t.fg.body }}",
+          code: "style={allOn || open ? undefined : { background: t.color.background.muted, color: t.color.text.body }}",
         },
       ],
       replay: [

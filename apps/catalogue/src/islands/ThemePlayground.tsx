@@ -61,8 +61,8 @@ function build(primary: string, radius: Radius, font: Font) {
     lines.push("    // The phone has its own card radius, so the shared one alone would not reach it.", `    profiles: { mobile: { radius: { card: ${card} } } },`);
   }
   if (font === "system") {
-    tokens.shared = { ...tokens.shared, font: { sans: SYSTEM_STACK, display: SYSTEM_STACK } };
-    shared.push("font: { sans: SYSTEM_STACK, display: SYSTEM_STACK },");
+    tokens.shared = { ...tokens.shared, font: { family: { sans: SYSTEM_STACK, display: SYSTEM_STACK } } };
+    shared.push("font: { family: { sans: SYSTEM_STACK, display: SYSTEM_STACK } },");
   }
   if (shared.length) lines.unshift("    shared: {", ...shared.map((l) => (l.startsWith(" ") || l === "}," ? l : `      ${l}`)), "    },");
   if (lines.length) {
@@ -80,11 +80,11 @@ const CARD: Scene[] = [
     el: "view",
     style: { direction: "row", align: "center", justify: "space-between", gap: 8 },
     children: [
-      { el: "text", text: "Checkout revamp", style: { fontSize: "$text.title", fontWeight: "$font.weightSemibold", color: "$fg.strong" } },
+      { el: "text", text: "Checkout revamp", style: { fontSize: "$font.size.title", fontWeight: "$font.weight.semibold", color: "$color.text.strong" } },
       { el: "component", use: "tag", props: { label: "On track", tone: "success" } },
     ],
   },
-  { el: "text", text: "Priya shipped the payment sheet. Two reviews left before Friday.", style: { fontSize: "$text.bodySm", color: "$fg.muted" } },
+  { el: "text", text: "Priya shipped the payment sheet. Two reviews left before Friday.", style: { fontSize: "$font.size.bodySm", color: "$color.text.muted" } },
 ];
 
 /** The same small set on both kits: the playground's whole point is that one theme restyles them together. */

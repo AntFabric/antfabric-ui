@@ -113,7 +113,7 @@ function Option({ option, chosen, disabled, pick, styles, testID }: { option: Ra
   // The dot grows from the ring's centre as the old one shrinks away.
   const grow = useRef(new Animated.Value(chosen ? 1 : 0)).current;
   useEffect(() => {
-    const run = Animated.timing(grow, { toValue: chosen ? 1 : 0, duration: t.duration.quick, easing: bezier(t.ease.out), useNativeDriver: Platform.OS !== "web" });
+    const run = Animated.timing(grow, { toValue: chosen ? 1 : 0, duration: t.motion.duration.quick, easing: bezier(t.motion.easing.out), useNativeDriver: Platform.OS !== "web" });
     run.start();
     return () => run.stop();
   }, [chosen, grow, t.duration, t.ease]);
@@ -123,7 +123,7 @@ function Option({ option, chosen, disabled, pick, styles, testID }: { option: Ra
       accessibilityRole="radio"
       accessibilityLabel={option.label}
       accessibilityHint={option.description}
-      hitSlop={hitSlopTo(t.control.hit, t.choice.ringSize + 2 * t.choice.padY, t.control.hit)}
+      hitSlop={hitSlopTo(t.size.target.min, t.choice.ringSize + 2 * t.choice.paddingY, t.size.target.min)}
       accessibilityState={{ checked: chosen, disabled: press.disabled }}
       disabled={press.disabled}
       onPress={pick}

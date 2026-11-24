@@ -12,15 +12,15 @@ export const skeleton = defineRecipe({
   parts: ["root", "shape", "row", "lead", "titleBox", "subBox", "bar"],
   styles: {
     shape: {
-      base: { bg: "$skeleton.fill", fg: "$skeleton.sheen" },
+      base: { bg: "$color.background.skeleton.fill", fg: "$color.background.skeleton.sheen" },
       variants: {
         shape: { line: { radius: "$radius.pill" }, block: { radius: "$radius.control" }, circle: { radius: "$radius.circle" }, tag: { radius: "$radius.tag" }, panel: { radius: "$radius.card" } },
       },
     },
-    row: { base: { gap: "$space.sm", minHeight: "$row.h" }, platforms: { mobile: { base: { gap: "$space.md" } } } },
-    lead: { base: { bg: "$skeleton.fill", fg: "$skeleton.sheen" }, variants: { lead: { face: { radius: "$radius.circle" } } } },
-    titleBox: { base: { height: "$text.bodySmLine" }, platforms: { mobile: { base: { height: "$text.bodyLine" } } } },
-    subBox: { base: { height: "$text.captionLine" }, platforms: { mobile: { base: { height: "$text.bodySmLine" } } } },
-    bar: { base: { bg: "$skeleton.fill", fg: "$skeleton.sheen", radius: "$radius.pill" } },
+    row: { base: { gap: "$space.sm", minHeight: "$size.row.default" }, platforms: { mobile: { base: { gap: "$space.md" } } } },
+    lead: { base: { bg: "$color.background.skeleton.fill", fg: "$color.background.skeleton.sheen" }, variants: { lead: { face: { radius: "$radius.circle" } } } },
+    titleBox: { base: { height: "$font.lineHeight.bodySm" }, platforms: { mobile: { base: { height: "$font.lineHeight.body" } } } },
+    subBox: { base: { height: "$font.lineHeight.caption" }, platforms: { mobile: { base: { height: "$font.lineHeight.bodySm" } } } },
+    bar: { base: { bg: "$color.background.skeleton.fill", fg: "$color.background.skeleton.sheen", radius: "$radius.pill" } },
   },
 });

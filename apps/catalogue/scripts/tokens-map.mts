@@ -145,7 +145,7 @@ export async function loadMobile(): Promise<{ tokens: Map<string, MobileToken>; 
 
 /**
  * The product's role groups (generate.ts `ROLE_GROUPS`). Since G2 our paths are the product's names under
- * the same nesting (`fg.onBrand` is `--fg-on-brand`, `control.hMd` is `--control-h-md`, `brand.default` is
+ * the same nesting (`color.text.onBrand` is `--fg-on-brand`, `size.control.md` is `--control-h-md`, `color.background.brand.default` is
  * `--brand`), so a path's product name is the path read back the way the product's generator split it.
  */
 const ROLE_GROUPS = new Set([
@@ -166,7 +166,7 @@ export function productName(path: string): string | undefined {
 
 /** Values that are a composite of two product tokens, so no single token holds them. */
 const DERIVED: Record<string, (p: (name: string) => string | undefined) => string | undefined> = {
-  "shadow.focus": (p) => `0 0 0 ${p("--focus-ring-w")} ${p("--focus-ring")}`,
+  "elevation.shadow.focus": (p) => `0 0 0 ${p("--focus-ring-w")} ${p("--focus-ring")}`,
 };
 
 type Diff = { context: Context; ours: Value; theirs: Value; where: string; note?: string };

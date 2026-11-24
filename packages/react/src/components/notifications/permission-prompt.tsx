@@ -117,7 +117,7 @@ export function PermissionPrompt({ permission = "default", origin = "", onAllow,
       {blockedTab && (
         <div aria-hidden data-af-part="hint" style={css(row, r.hint)}>
           <div data-af-part="addressChip" style={css(chip, { flex: 1 }, r.addressChip)}>
-            <div data-af-part="lock" style={css(box, { flexShrink: 0, alignItems: "center", justifyContent: "center", boxShadow: `0 0 0 2px ${t.brand.default}` }, r.lock)}>
+            <div data-af-part="lock" style={css(box, { flexShrink: 0, alignItems: "center", justifyContent: "center", boxShadow: `0 0 0 2px ${t.color.background.brand.default}` }, r.lock)}>
               <Icon name="lock" size={13} />
             </div>
             {origin && (

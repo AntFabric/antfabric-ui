@@ -50,7 +50,7 @@ const reactionLook: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   flexShrink: 0,
-  transition: `background ${t.duration.fast}, transform ${t.duration.fast}`,
+  transition: `background ${t.motion.duration.fast}, transform ${t.motion.duration.fast}`,
 };
 
 function Reaction({ label, mine, more, title, styles, onPress, children }: { label: string; mine?: boolean; more?: boolean; title?: string; styles?: PartStyles<"context-menu">; onPress?: () => void; children: ReactNode }) {

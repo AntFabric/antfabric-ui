@@ -216,7 +216,7 @@ export function Message({
   const r = useRecipe(recipes.message, { variants: { hovered: hot, unread, mentionsYou, highlighted, status: state, agent }, state: { hover: hot }, styles });
   // The coral bar down the leading edge: an inset 3px (the row you were brought to) or 2px (it mentions you) shadow.
   const end = dir === "rtl" ? "-" : "";
-  const bar = highlighted ? { boxShadow: `inset ${end}3px 0 0 0 ${t.brand.default}` } : mentionsYou ? { boxShadow: `inset ${end}2px 0 0 0 ${t.border.brand}` } : null;
+  const bar = highlighted ? { boxShadow: `inset ${end}3px 0 0 0 ${t.color.background.brand.default}` } : mentionsYou ? { boxShadow: `inset ${end}2px 0 0 0 ${t.color.border.brand}` } : null;
   // What a screen reader hears of the row's state, after who and when.
   const said = state === "sending" ? s("saidSending") : state === "failed" ? s("saidFailed") : state === "queued" ? s("saidQueued") : "";
   // A send that fails, or waits for the connection, is said when it happens (the status line is plain text): not for a message that came
@@ -309,7 +309,7 @@ export function Message({
       style={css(
         row,
         // The 18px gutter is `space.lgXl` on both sides, so it needs no mirroring; the compact row's 1px is an optical nudge.
-        { alignItems: "flex-start", width: "100%", paddingTop: compact ? 1 /* structural: the compact row's optical nudge */ : t.space.sm, paddingRight: t.space.lgXl, paddingBottom: t.space["3xs"], paddingLeft: t.space.lgXl, transition: `background ${t.duration.base} ${t.ease.standard}` },
+        { alignItems: "flex-start", width: "100%", paddingTop: compact ? 1 /* structural: the compact row's optical nudge */ : t.space.sm, paddingRight: t.space.lgXl, paddingBottom: t.space["3xs"], paddingLeft: t.space.lgXl, transition: `background ${t.motion.duration.base} ${t.motion.easing.standard}` },
         partStyle(r, "root", bar),
         style,
       )}

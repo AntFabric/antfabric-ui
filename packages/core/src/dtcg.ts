@@ -6,7 +6,7 @@
  * Import it as `@antfabric/ui-core/dtcg`, not from the package index: it reads `tokens.map.json`, which
  * the kits (one of them bundled by Metro) have no reason to carry.
  *
- * One token per leaf path, groups nested by path (`fg.muted` is `fg` → `muted`).
+ * One token per leaf path, groups nested by path (`color.text.muted` is `fg` → `muted`).
  * A token is `{ $type, $value, $description, $extensions }`; `$type` moves up to the group when every
  * token in it shares one. `$value` is the light theme's colour or shadow and the desktop profile's size
  * and type (a shared token has one value). A token that varies by mode lists every mode under
@@ -29,16 +29,18 @@
 
 import { referencedPrimitives } from "./css";
 import { primitiveMeta, primitivesFrom } from "./primitives";
-import { isReference, primitiveValue, resolveValue } from "./refs";
-import { platformOf, tokenSource as tokens } from "./tokens";
+import { isReference, isTokenReference, primitiveValue } from "./refs";
+import { platformOf, tokenSource, tokens as resolvedTokens } from "./tokens";
 import { descriptions, type TokenNote, type TokenPath } from "./descriptions";
+import { tokenMeta, type DtcgType } from "./token-registry";
+import { DEPRECATED_SINCE, renames } from "./deprecated";
 import tokenMap from "../tokens.map.json";
 
 type Raw = string | number;
 type Tree = { readonly [k: string]: Raw | Tree };
 type Mode = "light" | "dark" | "web" | "desktop" | "mobile" | "android";
 
-export type DtcgType = "color" | "dimension" | "duration" | "cubicBezier" | "fontFamily" | "fontWeight" | "number" | "shadow" | "gradient";
+export type { DtcgType } from "./token-registry";
 
 /** The key under `$extensions` that holds everything that is ours. */
 export const EXTENSION = "com.antfabric";
@@ -192,60 +194,23 @@ const CONVERT: Record<DtcgType, (raw: Raw, path: string) => Converted> = {
   gradient,
 };
 
-const COLOUR_GROUPS = new Set([
-  "surface", "fg", "border", "brand", "focus", "hover", "link", "success", "warning", "danger", "info", "identity", "scrim",
-  "skeleton", "tag", "banner", "tabs", "accent", "presence", "os", "data",
-]);
-const DIMENSION_GROUPS = new Set(["radius", "space", "text", "control", "avatar", "row", "rail", "gutter", "breadcrumb", "topbar", "tabbar", "statusbar", "homeIndicator", "button", "dot", "sheet", "fab", "iconButton", "segmentedControl", "choice", "radioGroup", "checkbox", "chip", "select", "textField", "icon", "inAppBanner", "notificationItem", "notificationSchedule", "osBadge", "osNotification", "osTray", "permissionPrompt", "breadcrumbs", "mobileHeader", "navRail", "osHeader", "osMenu", "osWindow", "sidebar", "tabBar", "tab", "workspace", "connectionBanner", "contextMenu", "dialog", "emoji", "hoverCard", "menu", "palette", "phone", "sessionState", "tooltip", "updateBanner", "questionPanel", "thinking", "agentSteps", "kpi"]);
+/** What a token is, from the group it lives in (`token-registry.ts`). A token of a group nobody declared fails the build instead of being guessed. */
+export const typeOf = (path: string): DtcgType => tokenMeta(path).type;
 
-/** What a token is, from where it lives. A token this does not know fails the build instead of being guessed. */
-export function typeOf(path: string): DtcgType {
-  const [group, ...rest] = path.split(".");
-  switch (group) {
-    case "tracking":
-    case "z":
-    case "opacity":
-      return "number";
-    case "icon":
-      return rest[0]?.startsWith("stroke") ? "number" : "dimension";
-    case "font":
-      // A font file is a family name: the phone loads one file per weight.
-      return rest[0]?.startsWith("weight") ? "fontWeight" : "fontFamily";
-    case "duration":
-      return "duration";
-    case "ease":
-      return "cubicBezier";
-    case "glass":
-      return rest[0] === "blur" ? "dimension" : rest[0] === "saturate" ? "number" : "color";
-    case "border":
-      // `border.wHairline` is a width; every other `border.*` is a colour.
-      return /^w[A-Z]/.test(rest[0] ?? "") ? "dimension" : "color";
-    case "switch":
-      return rest[0] === "thumbShadow" ? "shadow" : rest[0] === "trackOff" || rest[0] === "thumb" ? "color" : "dimension";
-    case "shadow":
-      return "shadow";
-    case "chart":
-      // Text and its phone files are families; a colour has one of these names; everything else is a size (a dash is a length).
-      return /^(font|file)/.test(rest[0] ?? "") ? "fontFamily" : /^(series\d|previous|other|grid|axis|label|crosshair|reference|tooltip|tooltipText|tooltipMuted|tooltipRule|track)$/.test(rest[0] ?? "") ? "color" : "dimension";
-    case "table":
-      return /^(header|rowHover|rowSelected|divider)$/.test(rest[0] ?? "") ? "color" : "dimension";
-    default:
-      if (path === "os.wallpaper") return "gradient";
-      if (DIMENSION_GROUPS.has(group!)) return "dimension";
-      if (COLOUR_GROUPS.has(group!)) return "color";
-      throw new Error(`tokens.json: no DTCG type for "${path}"`);
-  }
-}
-
-/** A value in DTCG: itself converted, or a reference as it is (its target is converted where it is declared, and here only to prove it can be). */
-function convert(type: DtcgType, raw: Raw, path: string): Converted & { resolved: unknown } {
-  const resolved = CONVERT[type](resolveValue(raw), path);
-  return { value: isReference(raw) ? raw : resolved.value, resolved: resolved.value, ...(resolved.lossy ? { lossy: true as const } : {}) };
+/**
+ * A value in DTCG: itself converted, or a reference as it is (a primitive's, or an alias of another token: its target is converted where it is
+ * declared, and here only to prove it can be). `resolved` is what the value is once every reference is followed.
+ */
+function convert(type: DtcgType, raw: Raw, resolved: Raw, path: string): Converted & { resolved: unknown } {
+  const to = CONVERT[type](resolved, path);
+  return { value: isReference(raw) || isTokenReference(raw) ? raw : to.value, resolved: to.value, ...(to.lossy ? { lossy: true as const } : {}) };
 }
 
 /* ---------- leaves ---------- */
 
-type Leaf = { path: string; type: DtcgType; kind: "shared" | "theme" | "profile"; modes: Partial<Record<Mode, Raw>> };
+/** `modes` is each mode's value as `tokens.ts` writes it (a reference stays one); `resolved` is the same with every reference followed. */
+type Leaf = { path: string; type: DtcgType; kind: "shared" | "theme" | "profile"; modes: Partial<Record<Mode, Raw>>; resolved: Partial<Record<Mode, Raw>> };
+type Document = typeof tokenSource;
 
 function leavesOf(tree: Tree, prefix = "", out = new Map<string, Raw>()) {
   for (const [key, value] of Object.entries(tree)) {
@@ -258,8 +223,14 @@ function leavesOf(tree: Tree, prefix = "", out = new Map<string, Raw>()) {
   return out;
 }
 
-/** Every leaf once, in the order `tokens.ts` declares it, with its value in each mode it has. */
+/** Every leaf once, in the order `tokens.ts` declares it, with its value in each mode it has, as written and as resolved. */
 function leaves(): Leaf[] {
+  const written = leavesIn(tokenSource);
+  const values = new Map(leavesIn(resolvedTokens as unknown as Document).map((l) => [l.path, l.modes]));
+  return written.map((l) => ({ ...l, resolved: values.get(l.path)! }));
+}
+
+function leavesIn(tokens: Document): Omit<Leaf, "resolved">[] {
   const shared = leavesOf(tokens.shared);
   const theme = { light: leavesOf(tokens.themes.light), dark: leavesOf(tokens.themes.dark) };
   const profile = { web: leavesOf(tokens.profiles.web), desktop: leavesOf(tokens.profiles.desktop), mobile: leavesOf(tokens.profiles.mobile) };
@@ -270,7 +241,7 @@ function leaves(): Leaf[] {
   // A profile leaf that shared also defines (`radius.card`) is still a profile leaf: shared is its default.
   for (const p of [...profile.desktop.keys(), ...profile.web.keys(), ...profile.mobile.keys()]) order.set(p, "profile");
 
-  const out: Leaf[] = [];
+  const out: Omit<Leaf, "resolved">[] = [];
   for (const [path, kind] of order) {
     const modes: Leaf["modes"] = {};
     if (kind === "theme") {
@@ -312,12 +283,17 @@ function tokenOf(leaf: Leaf): Node {
   if (!text) throw new Error(`tokens.json: ${path} has no description`);
 
   const entries = Object.entries(leaf.modes) as [Mode, Raw][];
-  const main = leaf.kind === "theme" ? leaf.modes.light! : (leaf.modes.desktop ?? leaf.modes.web ?? leaf.modes.mobile)!;
-  const converted = new Map(entries.map(([m, raw]) => [m, convert(type, raw, path)] as const));
+  const mainMode: Mode = leaf.kind === "theme" ? "light" : leaf.modes.desktop !== undefined ? "desktop" : leaf.modes.web !== undefined ? "web" : "mobile";
+  const main = leaf.modes[mainMode]!;
+  const converted = new Map(entries.map(([m, raw]) => [m, convert(type, raw, leaf.resolved[m]!, path)] as const));
   const varies = new Set([...converted.values()].map((c) => JSON.stringify(c.resolved))).size > 1;
-  const value = convert(type, main, path);
+  const value = convert(type, main, leaf.resolved[mainMode]!, path);
 
-  const ext: Node = {};
+  // What the token is, first: its tier, the components a component token belongs to, and `internal` where it is left out of the documented set.
+  const meta = tokenMeta(path);
+  const ext: Node = { tier: meta.tier };
+  if (meta.owners.length) ext.component = [...meta.owners];
+  if (meta.visibility !== "public") ext.visibility = meta.visibility;
   if (varies) ext.modes = Object.fromEntries(entries.map(([m]) => [m, converted.get(m)!.value]));
   const profiles = entries.map(([m]) => m).filter((m) => m === "web" || m === "desktop" || m === "mobile");
   if (kind === "profile" && profiles.length < 3) ext.onlyIn = profiles;
@@ -334,11 +310,11 @@ function tokenOf(leaf: Leaf): Node {
   }
   if (typeof note === "object" && (note.mobile || note.web)) ext.notes = { ...(note.mobile ? { mobile: note.mobile } : {}), ...(note.web ? { web: note.web } : {}) };
   if (value.lossy || [...converted.values()].some((c) => c.lossy)) {
-    ext.css = resolveValue(main);
-    if (varies) ext.cssModes = Object.fromEntries(entries.map(([m, raw]) => [m, resolveValue(raw)]));
+    ext.css = leaf.resolved[mainMode]!;
+    if (varies) ext.cssModes = Object.fromEntries(entries.map(([m]) => [m, leaf.resolved[m]!]));
   }
 
-  return { $type: type, $value: value.value, $description: text, ...(Object.keys(ext).length ? { $extensions: { [EXTENSION]: ext } } : {}) };
+  return { $type: type, $value: value.value, $description: text, $extensions: { [EXTENSION]: ext } };
 }
 
 const isToken = (n: unknown): n is Node => typeof n === "object" && n !== null && "$value" in n;
@@ -377,7 +353,9 @@ const DESCRIPTION =
   "Dimensions are px; the phone reads px as pt. Where the format cannot say a value exactly (a percentage, em, a gradient angle, no shadow), $value is the closest it can say and " +
   "$extensions[\"com.antfabric\"].css keeps the string the kits use. " +
   "A $value in braces, \"{primitives.color.neutral.900}\", points at a primitive of the product's Tier 1 in the `primitives` group at the end of this file, " +
-  "which holds the primitives some token points at (the whole mirror is packages/core/src/primitives.ts); a token that has drifted from the product, has no product token or has no primitive of its own holds its value.";
+  "which holds the primitives some token points at (the whole mirror is packages/core/src/primitives.ts); a token that has drifted from the product, has no product token or has no primitive of its own holds its value. " +
+  "A $value that names another token, \"{border.subtle}\", is an alias: the token is that one, in every mode, and follows it when a theme changes it. " +
+  "Each token's $extensions[\"com.antfabric\"] says its tier (semantic: a role any component reads; component: owned by the components listed in `component`) and `visibility: internal` where it is left out of the documented set.";
 
 /** The primitives some token points at, nested the way the mirror nests them: a token each, typed and described. */
 function primitivesGroup(): Node {
@@ -416,8 +394,30 @@ export function tokensDtcg(): object {
     if (last in at) throw new Error(`tokens.json: ${leaf.path} is defined twice`);
     at[last] = tokenOf(leaf);
   }
-  const profiles = Object.fromEntries(Object.entries(tokens.profiles).map(([name, p]) => [name, (p as { $description: string }).$description]));
-  const os = Object.fromEntries(Object.entries(tokens.os).map(([name, set]) => [name, { extends: platformOf(name as never), $description: (set as { $description: string }).$description }]));
+  // A renamed token's old path stays, an alias of the new one in every mode it has, marked deprecated (the format's own `$deprecated`).
+  for (const [old, now] of Object.entries(renames as Record<string, string>)) {
+    const target = now.split(".").reduce<Node | undefined>((at, k) => at?.[k] as Node | undefined, root);
+    if (!target || !isToken(target)) throw new Error(`tokens.json: ${old} was renamed to ${now}, which is not a token`);
+    const keys = old.split(".");
+    let at = root;
+    for (const k of keys.slice(0, -1)) {
+      const next = (at[k] ??= {}) as Node;
+      if (isToken(next)) throw new Error(`tokens.json: the old name ${old} sits under the token ${k}`);
+      at = next;
+    }
+    const last = keys[keys.length - 1]!;
+    if (last in at) throw new Error(`tokens.json: the old name ${old} is still a token or a group`);
+    const ext = (target.$extensions as Record<string, Node>)[EXTENSION]!;
+    at[last] = {
+      $type: target.$type,
+      $value: `{${now}}`,
+      $description: `Renamed to ${now} in ${DEPRECATED_SINCE}. ${target.$description as string}`,
+      $deprecated: `Use ${now}. The old name leaves in the next major version.`,
+      $extensions: { [EXTENSION]: { tier: ext.tier, renamedTo: now, since: DEPRECATED_SINCE, ...(ext.modes ? { modes: Object.fromEntries(Object.keys(ext.modes as object).map((m) => [m, `{${now}}`])) } : {}) } },
+    };
+  }
+  const profiles = Object.fromEntries(Object.entries(tokenSource.profiles).map(([name, p]) => [name, (p as { $description: string }).$description]));
+  const os = Object.fromEntries(Object.entries(tokenSource.os).map(([name, set]) => [name, { extends: platformOf(name as never), $description: (set as { $description: string }).$description }]));
   return {
     $description: DESCRIPTION,
     $extensions: {

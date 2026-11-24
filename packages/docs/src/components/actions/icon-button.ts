@@ -412,9 +412,9 @@ const docs: ComponentDocs = {
                   right: 0,
                   bottom: 0,
                   width: 320,
-                  bg: "$surface.card",
-                  borderLeft: "1px solid $border.subtle",
-                  shadow: "$shadow.float",
+                  bg: "$color.background.card",
+                  borderLeft: "1px solid $color.border.subtle",
+                  shadow: "$elevation.shadow.float",
                   padding: "$space.sm",
                   gap: "$space.2xs",
                 },
@@ -423,9 +423,9 @@ const docs: ComponentDocs = {
                     el: "text",
                     text: "Notifications",
                     style: {
-                      fontSize: "$text.body",
-                      fontWeight: "$font.weightSemibold",
-                      color: "$fg.strong",
+                      fontSize: "$font.size.body",
+                      fontWeight: "$font.weight.semibold",
+                      color: "$color.text.strong",
                       paddingX: "$space.xs",
                       paddingY: "$space.xs",
                     },
@@ -525,7 +525,7 @@ const docs: ComponentDocs = {
                   direction: "row",
                   align: "center",
                   justify: "space-between",
-                  paddingX: "$gutter.pane",
+                  paddingX: "$space.gutter.pane",
                   paddingY: "$space.sm",
                 },
                 children: [
@@ -533,9 +533,9 @@ const docs: ComponentDocs = {
                     el: "text",
                     text: "Meetings",
                     style: {
-                      fontSize: "$text.h3",
-                      fontWeight: "$font.weightSemibold",
-                      color: "$fg.strong",
+                      fontSize: "$font.size.h3",
+                      fontWeight: "$font.weight.semibold",
+                      color: "$color.text.strong",
                     },
                   },
                   {
@@ -569,7 +569,7 @@ const docs: ComponentDocs = {
                   direction: "row",
                   align: "center",
                   justify: "space-between",
-                  paddingX: "$gutter.pane",
+                  paddingX: "$space.gutter.pane",
                   paddingY: "$space.sm",
                 },
                 children: [
@@ -577,9 +577,9 @@ const docs: ComponentDocs = {
                     el: "text",
                     text: "Meetings",
                     style: {
-                      fontSize: "$text.h3",
-                      fontWeight: "$font.weightSemibold",
-                      color: "$fg.strong",
+                      fontSize: "$font.size.h3",
+                      fontWeight: "$font.weight.semibold",
+                      color: "$color.text.strong",
                     },
                   },
                   {
@@ -612,7 +612,7 @@ const docs: ComponentDocs = {
                   direction: "row",
                   align: "center",
                   justify: "space-between",
-                  paddingX: "$gutter.pane",
+                  paddingX: "$space.gutter.pane",
                   paddingY: "$space.sm",
                 },
                 children: [
@@ -620,9 +620,9 @@ const docs: ComponentDocs = {
                     el: "text",
                     text: "Meetings",
                     style: {
-                      fontSize: "$text.h3",
-                      fontWeight: "$font.weightSemibold",
-                      color: "$fg.strong",
+                      fontSize: "$font.size.h3",
+                      fontWeight: "$font.weight.semibold",
+                      color: "$color.text.strong",
                     },
                   },
                   {
@@ -722,7 +722,7 @@ const docs: ComponentDocs = {
                   direction: "row",
                   align: "center",
                   justify: "space-between",
-                  paddingX: "$gutter.pane",
+                  paddingX: "$space.gutter.pane",
                   paddingY: "$space.sm",
                 },
                 children: [
@@ -730,9 +730,9 @@ const docs: ComponentDocs = {
                     el: "text",
                     text: "Meetings",
                     style: {
-                      fontSize: "$text.h3",
-                      fontWeight: "$font.weightSemibold",
-                      color: "$fg.strong",
+                      fontSize: "$font.size.h3",
+                      fontWeight: "$font.weight.semibold",
+                      color: "$color.text.strong",
                     },
                   },
                   {
@@ -831,7 +831,7 @@ const docs: ComponentDocs = {
                   direction: "row",
                   align: "center",
                   justify: "space-between",
-                  paddingX: "$gutter.pane",
+                  paddingX: "$space.gutter.pane",
                   paddingY: "$space.sm",
                 },
                 children: [
@@ -839,9 +839,9 @@ const docs: ComponentDocs = {
                     el: "text",
                     text: "Meetings",
                     style: {
-                      fontSize: "$text.h3",
-                      fontWeight: "$font.weightSemibold",
-                      color: "$fg.strong",
+                      fontSize: "$font.size.h3",
+                      fontWeight: "$font.weight.semibold",
+                      color: "$color.text.strong",
                     },
                   },
                   {

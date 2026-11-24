@@ -63,7 +63,7 @@ const row: CSSProperties = {
   paddingInline: t.space.smMd,
   paddingBlock: t.space.xs,
   textAlign: "left",
-  transition: `background ${t.duration.fast}, color ${t.duration.fast}`,
+  transition: `background ${t.motion.duration.fast}, color ${t.motion.duration.fast}`,
 };
 
 const hash: CSSProperties = { ...text, flexShrink: 0, textAlign: "center", lineHeight: 1.2 };

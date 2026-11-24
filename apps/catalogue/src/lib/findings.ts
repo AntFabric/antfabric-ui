@@ -77,7 +77,7 @@ export const FINDINGS: Finding[] = [
     id: "desktop-web-one-kit",
     topic: "kits",
     tag: "verified",
-    text: "Desktop and web share one kit, @antfabric/ui-react. The data-af-platform attribute picks profiles.desktop or profiles.web, and the web profile's own description calls its values a proposal.",
+    text: "Desktop and web share one kit, @antfabric/ui-react. The data-af-platform attribute picks profiles.desktop or profiles.web, and the web profile's own description says its values are the library's own, confirmed by design, with no web app to copy from.",
     refs: ["packages/react/src/platform.tsx:20", "packages/core/src/tokens.ts:427"],
   },
   {
@@ -224,9 +224,9 @@ export const FINDINGS: Finding[] = [
     id: "tokens-unused",
     topic: "tokens",
     tag: "verified",
-    text: "24 tokens are read by no file in either kit. The 24th is accent.default: the scan used to count it as read through Card's computed t.color[accent], which no longer names a group once the colours are top-level.",
+    text: "21 tokens are read by no file in either kit. Each is kept on purpose: a step that completes a scale (radius.none, size.row.lg, zIndex.rail), a role a product's own screens use (color.background.page, color.text.dangerHover), or a material state no component draws yet (the glass tints). They are part of the public set, so removing one waits for a major version. The chart palette, the phone's font files and glass under Increase Contrast are read outside a t. chain and are not counted.",
     refs: ["packages/core/src/tokens.ts", "reports/baseline.json"],
-    count: { key: "tokens.unread", claimed: 24 },
+    count: { key: "tokens.unread", claimed: 21 },
   },
   {
     id: "same-light-dark",

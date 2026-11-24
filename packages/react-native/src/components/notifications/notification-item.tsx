@@ -65,7 +65,7 @@ const NATIVE = Platform.OS !== "web";
 /** Layout no token decides; the colours, sizes and type are the recipe's (`notificationItem`). */
 const useStyles = createStyles((t) => {
   // Under the text column: past the gutter, the face and the gap.
-  const indent = { paddingLeft: t.gutter.pane + t.avatar.md + t.space.md, paddingRight: t.space.lg, paddingBottom: t.space.mdLg };
+  const indent = { paddingLeft: t.space.gutter.pane + t.size.avatar.md + t.space.md, paddingRight: t.space.lg, paddingBottom: t.space.mdLg };
   return {
     root: { overflow: "hidden" },
     hit: { flexDirection: "row", alignItems: "center", paddingVertical: t.space.md },
@@ -126,7 +126,7 @@ export function NotificationItem({
   const outcome = decision === "approved" || decision === "declined" || decision === "expired" ? decision : null;
   const where = decidedOn ? str("on", { device: decidedOn }) : "";
   const r = useRecipe(recipes["notification-item"], { variants: { read: isRead, approval: outcome }, state: { pressed: press.pressed }, styles });
-  const hit = partStyle(r, "hit", { view: press.focused ? { boxShadow: `inset 0 0 0 2px ${t.focus.ring}` } : undefined });
+  const hit = partStyle(r, "hit", { view: press.focused ? { boxShadow: `inset 0 0 0 2px ${t.color.border.focus}` } : undefined });
   const decidedText = partStyle(r, "decidedText", { text: { color: r.decided.text.color } });
   // An icon's size is its width and height; what else `styles` sets on it goes on the glyph.
   const { width: tileIconSize, height: _tileIconHeight, ...tileIconRest } = r.tileIcon.view;
@@ -145,7 +145,7 @@ export function NotificationItem({
   const target = open ? -reach : 0;
   const x = useRef(new Animated.Value(target)).current;
   useEffect(() => {
-    const run = Animated.timing(x, { toValue: target, duration: t.duration.slow, easing: bezier(t.ease.out), useNativeDriver: NATIVE });
+    const run = Animated.timing(x, { toValue: target, duration: t.motion.duration.slow, easing: bezier(t.motion.easing.out), useNativeDriver: NATIVE });
     run.start();
     return () => run.stop();
   }, [target, x, t.duration, t.ease]);
@@ -164,12 +164,12 @@ export function NotificationItem({
           // A full swipe clears it; past half the actions opens, short of that closes.
           if (at < -reach - 80) onClear?.();
           const next = at < -reach / 2 && at >= -reach - 80;
-          if (next === open) Animated.timing(x, { toValue: target, duration: t.duration.slow, useNativeDriver: NATIVE }).start();
+          if (next === open) Animated.timing(x, { toValue: target, duration: t.motion.duration.slow, useNativeDriver: NATIVE }).start();
           else setOpen(next);
         },
         onPanResponderTerminate: () => x.setValue(target),
       }),
-    [x, reach, target, open, setOpen, onClear, t.duration.slow],
+    [x, reach, target, open, setOpen, onClear, t.motion.duration.slow],
   );
 
   return (

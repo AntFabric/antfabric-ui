@@ -46,7 +46,7 @@ const quick: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   flexShrink: 0,
-  transition: `background ${t.duration.fast}, transform ${t.duration.fast}`,
+  transition: `background ${t.motion.duration.fast}, transform ${t.motion.duration.fast}`,
 };
 
 function QuickReaction({ emoji, onPress, strings, styles }: Pick<MessageActionsProps, "strings" | "styles"> & { emoji: string; onPress: () => void }) {

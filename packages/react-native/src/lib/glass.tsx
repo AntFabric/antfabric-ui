@@ -22,10 +22,10 @@ if (Platform.OS === "ios") {
 /** The look of glass where the system material is not available: in the catalogue, and on iOS without expo-glass-effect. */
 export function glassFallback(t: NativeTokens, clear = false): ViewStyle {
   return {
-    backgroundColor: clear ? t.glass.clear : t.glass.bg,
+    backgroundColor: clear ? t.color.background.glass.clear : t.color.background.glass.default,
     borderColor: "transparent",
-    boxShadow: t.shadow.glass,
-    ...(Platform.OS === "web" ? ({ backdropFilter: `blur(${t.glass.blur}px) saturate(${t.glass.saturate})` } as ViewStyle) : null),
+    boxShadow: t.elevation.shadow.glass,
+    ...(Platform.OS === "web" ? ({ backdropFilter: `blur(${t.effect.glass.blur}px) saturate(${t.effect.glass.saturate})` } as ViewStyle) : null),
   };
 }
 

@@ -73,7 +73,7 @@ function toNative(style: TokenStyle, t: NativeTokens): PartStyle {
   // The shadow stack, top first: `halo`, `ring`, `shadow`.
   const stack = (["halo", "ring", "shadow"] as const).flatMap((k) => {
     const x = style[k] === undefined ? undefined : value(style[k]!);
-    return x === undefined ? [] : [k === "ring" ? `inset 0 0 0 ${t.border.wHairline}px ${x}` : String(x)];
+    return x === undefined ? [] : [k === "ring" ? `inset 0 0 0 ${t.border.width.hairline}px ${x}` : String(x)];
   });
   if (stack.length) view.boxShadow = stack.join(", ");
   // `none` leaves a key unset, and that includes the weight: only a weight or a family the recipe names picks a font file.

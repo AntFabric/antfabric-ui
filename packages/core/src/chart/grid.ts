@@ -49,7 +49,7 @@ export interface TableColumn {
   maxWidth?: number;
   /** Web and desktop: let a long value wrap onto more lines (inside `maxWidth`) instead of being cut. */
   wrap?: boolean;
-  /** Web and desktop: the column that names the row, drawn stronger than the rest (`fg.strong` at medium weight, the `emphasis` part). On the phone the row's name is already its card's title. */
+  /** Web and desktop: the column that names the row, drawn stronger than the rest (`color.text.strong` at medium weight, the `emphasis` part). On the phone the row's name is already its card's title. */
   emphasis?: boolean;
 }
 

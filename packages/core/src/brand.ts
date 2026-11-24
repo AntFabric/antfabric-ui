@@ -8,8 +8,8 @@
  * (`theme.ts`), which expands it per scheme with `brandValues` into the theme's sets; both kits then draw the theme
  * (`AntFabricRoot theme`, `ThemeProvider theme`).
  *
- * Only the brand family is overridable. Neutrals, status colours and identity colours (`identity.agent`
- * is Fabric, never a tenant) stay put. `fg.onBrand` is picked by contrast (`onBrandFor`): white while white reaches 4.5:1 on the
+ * Only the brand family is overridable. Neutrals, status colours and identity colours (`color.background.identity.agent`
+ * is Fabric, never a tenant) stay put. `color.text.onBrand` is picked by contrast (`onBrandFor`): white while white reaches 4.5:1 on the
  * primary, otherwise ink. AntFabric's own coral takes ink (white on #fe4632 is 3.42:1).
  */
 
@@ -34,19 +34,19 @@ export interface BrandFont {
  * everything that follows from it is derived; give a hand-picked tint and it wins over the derived one.
  */
 export interface BrandTokens {
-  /** The brand colour, `#rgb` or `#rrggbb`: `brand.default` (tenants.ts:16, `primary`). Hover, pressed, the soft tints, the link and the unread tint derive from it. */
+  /** The brand colour, `#rgb` or `#rrggbb`: `color.background.brand.default` (tenants.ts:16, `primary`). Hover, pressed, the soft tints, the link and the unread tint derive from it. */
   primary: string;
-  /** The second colour, `#rgb` or `#rrggbb`: `accent.default` (tenants.ts:17); `accent.soft` derives from it. */
+  /** The second colour, `#rgb` or `#rrggbb`: `color.background.accent.default` (tenants.ts:17); `color.background.accent.soft` derives from it. */
   accent: string;
-  /** `brand.soft` per theme, opaque or not, where the brand has a designed one (tenants.ts:24-27, `primarySoft`). */
+  /** `color.background.brand.soft` per theme, opaque or not, where the brand has a designed one (tenants.ts:24-27, `primarySoft`). */
   soft: Record<Scheme, string>;
-  /** `brand.softHover` per theme: one step deeper than `soft` (tenants.ts:28-33, `primarySoftDeep`). */
+  /** `color.background.brand.softHover` per theme: one step deeper than `soft` (tenants.ts:28-33, `primarySoftDeep`). */
   softHover: Record<Scheme, string>;
-  /** `fg.onBrandSoft` per theme: ink on a `soft` surface (tenants.ts:34-39, `primarySoftFg`). */
+  /** `color.text.onBrandSoft` per theme: ink on a `soft` surface (tenants.ts:34-39, `primarySoftFg`). */
   onSoft: Record<Scheme, string>;
-  /** `brand.tint` per theme: the tab bar's chosen capsule (tenants.ts:40-45, `barTint`). */
+  /** `color.background.brand.tint` per theme: the tab bar's chosen capsule (tenants.ts:40-45, `barTint`). */
   tint: Record<Scheme, string>;
-  /** The body (`sans`) and headline (`display`) families: `font.sans` and `font.display`, and on the phone the `font.file*` names. Colours and fonts are all a brand changes. */
+  /** The body (`sans`) and headline (`display`) families: `font.family.sans` and `font.family.display`, and on the phone the `font.file*` names. Colours and fonts are all a brand changes. */
   fonts: { sans?: string | BrandFont; display?: string | BrandFont };
 }
 
@@ -55,38 +55,39 @@ export type BrandValues = Partial<Record<(typeof BRAND_PATHS)[number] | (typeof 
 
 /** The only tokens a brand ever changes, so a check can say that nothing else moved. */
 export const BRAND_PATHS = [
-  "brand.default",
-  "brand.hover",
-  "brand.active",
-  "brand.soft",
-  "brand.softHover",
-  "brand.tint",
-  "accent.default",
-  "accent.soft",
-  "fg.onBrandSoft",
-  "fg.onBrand",
-  "link.default",
-  "border.brand",
-  "surface.unread",
+  "color.background.brand.default",
+  "color.background.brand.hover",
+  "color.background.brand.pressed",
+  "color.background.brand.soft",
+  "color.background.brand.softHover",
+  "color.background.brand.tint",
+  "color.background.accent.default",
+  "color.background.accent.soft",
+  "color.text.onBrandSoft",
+  "color.text.onBrand",
+  "color.text.brand",
+  "color.text.link",
+  "color.border.brand",
+  "color.background.unread",
 ] as const;
 
 /** The font tokens a brand's `fonts` changes. The `file*` ones are the phone's own (the mobile profile's) and are set only where it is drawn. */
 export const BRAND_FONT_PATHS = [
-  "font.sans",
-  "font.display",
-  "font.fileSansRegular",
-  "font.fileSansMedium",
-  "font.fileSansSemibold",
-  "font.fileSansBold",
-  "font.fileSansExtrabold",
-  "font.fileDisplayRegular",
-  "font.fileDisplayMedium",
-  "font.fileDisplaySemibold",
-  "font.fileDisplayBold",
-  "font.fileDisplayExtrabold",
+  "font.family.sans",
+  "font.family.display",
+  "font.file.sans.regular",
+  "font.file.sans.medium",
+  "font.file.sans.semibold",
+  "font.file.sans.bold",
+  "font.file.sans.extrabold",
+  "font.file.display.regular",
+  "font.file.display.medium",
+  "font.file.display.semibold",
+  "font.file.display.bold",
+  "font.file.display.extrabold",
 ] as const;
 
-/** Per weight: the token's suffix (`font.fileSansSemibold`) and the file's default suffix (`Inter-SemiBold`, as Figtree's files are named). */
+/** Per weight: the token's suffix (`font.file.sans.semibold`) and the file's default suffix (`Inter-SemiBold`, as Figtree's files are named). */
 const FILE_SUFFIX: Record<FontFileWeight, [token: string, file: string]> = {
   regular: ["Regular", "Regular"],
   medium: ["Medium", "Medium"],
@@ -108,11 +109,10 @@ function fontValues(face: "sans" | "display", input: string | BrandFont, { stack
   const font = typeof input === "string" ? { family: input } : input;
   const family = font.family.trim();
   if (!family || /["';{}]/.test(family)) throw new Error(`brand.fonts.${face} must be a font family name, got "${font.family}"`);
-  out[`font.${face}`] = stack ? `"${family}", ${tokens.shared.font[face]}` : family;
+  out[`font.family.${face}`] = stack ? `"${family}", ${tokens.shared.font.family[face]}` : family;
   if (!files) return;
-  const key = face === "sans" ? "Sans" : "Display";
   for (const [weight, [token, file]] of Object.entries(FILE_SUFFIX) as [FontFileWeight, [string, string]][])
-    out[`font.file${key}${token}` as (typeof BRAND_FONT_PATHS)[number]] = font.files?.[weight] ?? `${family}-${file}`;
+    out[`font.file.${face}.${token.toLowerCase()}` as (typeof BRAND_FONT_PATHS)[number]] = font.files?.[weight] ?? `${family}-${file}`;
 }
 
 /** A colour as 0..255 sRGB channels. */
@@ -146,8 +146,8 @@ function alpha(c: RGB, a: number): string {
 const mix = (c: RGB, to: RGB, amount: number): RGB => c.map((v, i) => v + (to[i]! - v) * amount) as RGB;
 const BLACK: RGB = [0, 0, 0];
 const WHITE: RGB = [255, 255, 255];
-/** `fg.strong` in the light theme: the ink a light brand fill takes instead of white. */
-const INK: RGB = parse(tokens.themes.light.fg.strong, "ink");
+/** `color.text.strong` in the light theme: the ink a light brand fill takes instead of white. */
+const INK: RGB = parse(tokens.themes.light.color.text.strong, "ink");
 
 const luminance = (c: RGB) => {
   const [r, g, b] = c.map((v) => v / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)) as RGB;
@@ -189,22 +189,22 @@ export function onBrandFor(fill: RGB): string {
  * The tokens a brand sets for one theme.
  *
  * Derived from `primary`, the product's rules where it has one (ThemeProvider.tsx):
- *  - `brand.soft`        12% (light) / 22% (dark) of `primary`          :187
- *  - `brand.softHover`   20% / 32%                                      :188
- *  - `fg.onBrandSoft`    `primary` itself                               :189
- *  - `surface.unread`    2.5% / 5%                                      :190
- *  - `brand.tint`        the hand-picked `soft`, else the same tint as `brand.soft`  :191
- *  - `accent.soft`       14% / 22% of `accent`                          :193
- *  - `fg.onBrand`        white or ink by contrast on `primary` (`onBrandFor`); the product's is always white
+ *  - `color.background.brand.soft`        12% (light) / 22% (dark) of `primary`          :187
+ *  - `color.background.brand.softHover`   20% / 32%                                      :188
+ *  - `color.text.onBrandSoft`    `primary` itself                               :189
+ *  - `color.background.unread`    2.5% / 5%                                      :190
+ *  - `color.background.brand.tint`        the hand-picked `soft`, else the same tint as `color.background.brand.soft`  :191
+ *  - `color.background.accent.soft`       14% / 22% of `accent`                          :193
+ *  - `color.text.onBrand`        white or ink by contrast on `primary` (`onBrandFor`); the product's is always white
  * The product has no hover, pressed, link or brand-border token (its phone presses with opacity), so
- * those are this repository's: `brand.hover` is `primary` 10% toward black, `brand.active` 25% toward
- * black on light and 60% toward white on dark (the default coral goes the same way: #c02616 and
- * #ffb8ab), `link.default` is the pressed colour on light and 35% toward white on dark, and
- * `border.brand` is 60% toward white on light and 40% toward black on dark.
+ * those are this repository's: `color.background.brand.hover` and `color.background.brand.pressed` move away from the text drawn on them (10% and
+ * 25% toward black under white text, 15% and 35% toward white under ink), `color.text.brand` is `primary` 25% toward black on light and
+ * 60% toward white on dark (the default coral's are #c02616 and #ffb8ab), `color.text.link` is that colour on light and 35% toward white on dark, and
+ * `color.border.brand` is 60% toward white on light and 40% toward black on dark.
  *
  * A hand-picked `soft`, `softHover`, `onSoft` or `tint` replaces its derived value.
  *
- * `fonts` sets `font.sans` and `font.display` (a CSS stack unless `target.stack` is false) and, with `target.files`, the phone's file
+ * `fonts` sets `font.family.sans` and `font.family.display` (a CSS stack unless `target.stack` is false) and, with `target.files`, the phone's file
  * names. `target` is the default, the web's; `defineTheme` asks for the stack and the files, as both kits read the theme's sets.
  */
 export function brandValues(brand: Partial<BrandTokens>, theme: Scheme, target: BrandTarget = {}): BrandValues {
@@ -213,30 +213,34 @@ export function brandValues(brand: Partial<BrandTokens>, theme: Scheme, target: 
   if (brand.primary !== undefined) {
     const p = parse(brand.primary, "primary");
     const active = dark ? mix(p, WHITE, 0.6) : mix(p, BLACK, 0.25);
-    out["brand.default"] = hex(p);
-    out["brand.hover"] = hex(mix(p, BLACK, 0.1));
-    out["brand.active"] = hex(active);
-    out["brand.soft"] = alpha(p, dark ? 0.22 : 0.12);
-    out["brand.softHover"] = alpha(p, dark ? 0.32 : 0.2);
-    out["fg.onBrandSoft"] = hex(p);
-    out["fg.onBrand"] = onBrandFor(p);
-    out["link.default"] = hex(dark ? mix(p, WHITE, 0.35) : active);
-    out["border.brand"] = hex(dark ? mix(p, BLACK, 0.4) : mix(p, WHITE, 0.6));
-    out["surface.unread"] = alpha(p, dark ? 0.05 : 0.025);
-    out["brand.tint"] = out["brand.soft"];
+    out["color.background.brand.default"] = hex(p);
+    // The hover and pressed fills move away from the text drawn on them (`color.text.onBrand`), so that text keeps its contrast: darker
+    // under white text, lighter under ink. The brand as text (`color.text.brand`) is the colour the pressed fill used to be.
+    const white = onBrandFor(p) === "#ffffff";
+    out["color.background.brand.hover"] = hex(white ? mix(p, BLACK, 0.1) : mix(p, WHITE, 0.15));
+    out["color.background.brand.pressed"] = hex(white ? mix(p, BLACK, 0.25) : mix(p, WHITE, 0.35));
+    out["color.text.brand"] = hex(active);
+    out["color.background.brand.soft"] = alpha(p, dark ? 0.22 : 0.12);
+    out["color.background.brand.softHover"] = alpha(p, dark ? 0.32 : 0.2);
+    out["color.text.onBrandSoft"] = hex(p);
+    out["color.text.onBrand"] = onBrandFor(p);
+    out["color.text.link"] = hex(dark ? mix(p, WHITE, 0.35) : active);
+    out["color.border.brand"] = hex(dark ? mix(p, BLACK, 0.4) : mix(p, WHITE, 0.6));
+    out["color.background.unread"] = alpha(p, dark ? 0.05 : 0.025);
+    out["color.background.brand.tint"] = out["color.background.brand.soft"];
   }
   if (brand.accent !== undefined) {
     const a = parse(brand.accent, "accent");
-    out["accent.default"] = hex(a);
-    out["accent.soft"] = alpha(a, dark ? 0.22 : 0.14);
+    out["color.background.accent.default"] = hex(a);
+    out["color.background.accent.soft"] = alpha(a, dark ? 0.22 : 0.14);
   }
   if (brand.soft) {
-    out["brand.soft"] = colour(brand.soft[theme], `soft.${theme}`);
-    out["brand.tint"] = brand.soft[theme];
+    out["color.background.brand.soft"] = colour(brand.soft[theme], `soft.${theme}`);
+    out["color.background.brand.tint"] = brand.soft[theme];
   }
-  if (brand.softHover) out["brand.softHover"] = colour(brand.softHover[theme], `softHover.${theme}`);
-  if (brand.onSoft) out["fg.onBrandSoft"] = colour(brand.onSoft[theme], `onSoft.${theme}`);
-  if (brand.tint) out["brand.tint"] = colour(brand.tint[theme], `tint.${theme}`);
+  if (brand.softHover) out["color.background.brand.softHover"] = colour(brand.softHover[theme], `softHover.${theme}`);
+  if (brand.onSoft) out["color.text.onBrandSoft"] = colour(brand.onSoft[theme], `onSoft.${theme}`);
+  if (brand.tint) out["color.background.brand.tint"] = colour(brand.tint[theme], `tint.${theme}`);
   if (brand.fonts?.sans !== undefined) fontValues("sans", brand.fonts.sans, target, out);
   if (brand.fonts?.display !== undefined) fontValues("display", brand.fonts.display, target, out);
   return out;

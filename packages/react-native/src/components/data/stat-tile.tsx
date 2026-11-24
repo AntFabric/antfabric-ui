@@ -70,7 +70,7 @@ function Visual({ rows, y, kind, label }: { rows: Row[]; y: string; kind: StatTi
   const t = useChartTokens();
   return (
     <View onLayout={onLayout} style={{ alignSelf: "stretch" }}>
-      {kind === "bars" ? <SparkBars data={rows} y={y} width={width} height={t.kpi.tileTrendH} animate label={label} /> : <Sparkline data={rows} y={y} width={width} height={t.kpi.tileTrendH} area marker animate label={label} />}
+      {kind === "bars" ? <SparkBars data={rows} y={y} width={width} height={t.kpi.tileTrendHeight} animate label={label} /> : <Sparkline data={rows} y={y} width={width} height={t.kpi.tileTrendHeight} area marker animate label={label} />}
     </View>
   );
 }
@@ -84,7 +84,7 @@ export function StatTile({ label, icon = "", aside = "", value, format = "intege
   const id = (part: string) => partId(testID, "stat-tile", part);
   const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   if (loading) {
-    const lines = [{ width: `${t.kpi.loadM}px`, height: `${t.kpi.loadLineH}px` }, { width: `${t.kpi.loadS}px`, height: `${t.kpi.loadValueH}px` }, { width: `${t.kpi.loadL}px`, height: `${t.kpi.loadLineH}px` }];
+    const lines = [{ width: `${t.kpi.loadWidthMd}px`, height: `${t.kpi.loadLineHeight}px` }, { width: `${t.kpi.loadWidthSm}px`, height: `${t.kpi.loadValueHeight}px` }, { width: `${t.kpi.loadWidthLg}px`, height: `${t.kpi.loadLineHeight}px` }];
     return <Card pad="none" elevate="card" style={StyleSheet.flatten([s.card, style])} children={<View testID={id("root")} accessible accessibilityLabel={str("loading", { label })} accessibilityState={{ busy: true }} {...rootProps(rest)} style={r.root.view}><LoadingLines lines={lines} label={str("loadingLines", { label })} /></View>} />;
   }
   // A ring takes the place of a trend; no rows or no y is no visual.

@@ -653,7 +653,7 @@ const docs: ComponentDocs = {
             style: {
               width: 375,
               gap: "$space.sm",
-              paddingX: "$gutter.pane",
+              paddingX: "$space.gutter.pane",
             },
             children: [
               {
@@ -710,7 +710,7 @@ const docs: ComponentDocs = {
             style: {
               width: 375,
               gap: "$space.sm",
-              paddingX: "$gutter.pane",
+              paddingX: "$space.gutter.pane",
             },
             children: [
               {
@@ -752,7 +752,7 @@ const docs: ComponentDocs = {
             style: {
               width: 375,
               gap: "$space.sm",
-              paddingX: "$gutter.pane",
+              paddingX: "$space.gutter.pane",
             },
             children: [
               {
@@ -793,7 +793,7 @@ const docs: ComponentDocs = {
             style: {
               width: 375,
               gap: "$space.sm",
-              paddingX: "$gutter.pane",
+              paddingX: "$space.gutter.pane",
             },
             children: [
               {

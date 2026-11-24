@@ -33,7 +33,7 @@ function Step({ step, strings, styles }: { step: AgentStep; strings: AgentStepsP
   return (
     <div role="listitem" data-af-part="row" style={css(row, { minWidth: 0 }, partStyle(r, "row", enter("rise")))}>
       <span role="img" aria-label={s(step.state === "running" ? "running" : step.state === "done" ? "done" : "failed")} data-af-part="marker" style={css(row, { flex: "none", justifyContent: "center", overflow: "visible" }, r.marker)}>
-        {running && <span data-af-part="dot" style={partStyle(r, "dot", { animation: `af-step-pulse 1.6s ${t.ease.standard} infinite` })} />}
+        {running && <span data-af-part="dot" style={partStyle(r, "dot", { animation: `af-step-pulse 1.6s ${t.motion.easing.standard} infinite` })} />}
         {step.state === "done" && <Icon part="done" name="check" size={r.done.width} color={r.done.color} style={r.done} />}
         {step.state === "failed" && <Icon part="failed" name="x" size={r.failed.width} color={r.failed.color} style={r.failed} />}
       </span>
