@@ -257,7 +257,7 @@ function scanTokens(read: Set<string>, dynamic: Set<string>, reached: Set<string
     inProfiles: new Set(Object.values(profiles).flatMap((m) => [...m.keys()])).size,
     descriptions: byKey(desc),
     withoutDescription: sorted([...all].filter((p) => !(p in noted))),
-    unread: sorted([...all].filter((p) => !read.has(p) && !reached.has(p) && !underDynamic(p, dynamic))),
+    unread: sorted([...all].filter((p) => !read.has(p) && !reached.has(p) && !underDynamic(p, dynamic) && !READ_ELSEWHERE.some((r) => r.test(p)))),
     readOnlyDynamically: sorted([...all].filter((p) => !read.has(p) && (reached.has(p) || underDynamic(p, dynamic)))),
     sameLightDark: sorted(identical.filter((p) => !byDesign(p))),
     sameInDarkByDesign: sorted(identical.filter(byDesign)),
@@ -511,6 +511,15 @@ function walk(dir: string): string[] {
 }
 
 /** Scan both kits' component files under `root` (the repository root) and the tokens. */
+/**
+ * Tokens that are read, but not as a `t.<path>` chain or a recipe's `$path`, which is all the scan follows. Listed with who reads them, so
+ * "read by no component" means it:
+ *   - the chart palette: `seriesColors()` in `packages/core/src/chart/series.ts` takes the eight series colours off the resolved tokens;
+ *   - the phone's font files: `font()` in `packages/react-native/src/lib/type.ts` picks `f.file[face][weight]`;
+ *   - glass under Increase Contrast: the glass surface reads `elevation.shadow.glassContrast` through a computed key.
+ */
+const READ_ELSEWHERE = [/^chart\.series\dColor$/, /^font\.file\./, /^elevation\.shadow\.glassContrast$/];
+
 export function scan(root: string): Scan {
   const read = new Set<string>();
   const dynamic = new Set<string>();
