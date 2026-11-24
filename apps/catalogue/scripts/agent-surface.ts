@@ -12,7 +12,7 @@
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { pascal, tokenOf, type Recipe } from "@antfabric/ui-core";
+import { pascal, tokenMeta, tokenOf, type Recipe } from "@antfabric/ui-core";
 import { categories, components, levels, recipes, screens, type ComponentDocs, type EdgeCase, type Example, type PropDoc } from "@antfabric/ui-docs";
 import { repoRoot } from "../src/lib/scan";
 import { tokenPaths } from "./token-leaves";
@@ -194,7 +194,7 @@ export function llmsTxt(): string {
     "",
     "## The data",
     "",
-    `- \`/tokens.json\` (\`packages/core/tokens.json\`): the ${tokenPaths().length} design tokens in the W3C Design Tokens format. Each has \`$type\`, \`$value\` (light theme, desktop profile), \`$description\` (when to use it), and every mode under \`$extensions["com.antfabric"].modes\` (\`{ light, dark }\` or \`{ web, desktop, mobile }\`). A token's path is its name in recipes (\`$color.text.muted\`) and its CSS variable is \`--af-color-text-muted\`. ${groups.size} groups: the foundations (\`fg\`, \`surface\`, \`brand\`, \`border\`, \`space\`, \`radius\`, \`text\`, \`font\`, \`control\`, \`shadow\`, \`duration\`) and one group per component's own decisions (\`button\`, \`switch\`, \`dialog\`...).`,
+    `- \`/tokens.json\` (\`packages/core/tokens.json\`): the ${tokenPaths().length} design tokens in the W3C Design Tokens format (${tokenPaths().filter((p) => tokenMeta(p).visibility === "internal").length} of them \`visibility: internal\` under \`$extensions\`: one component's private geometry and the pictures of OS chrome, which resolve and are not for new work). Each has \`$type\`, \`$value\` (light theme, desktop profile), \`$description\` (when to use it), and every mode under \`$extensions["com.antfabric"].modes\` (\`{ light, dark }\` or \`{ web, desktop, mobile }\`). A token's path is its name in recipes (\`$color.text.muted\`) and its CSS variable is \`--af-color-text-muted\`. ${groups.size} groups: the foundations (\`fg\`, \`surface\`, \`brand\`, \`border\`, \`space\`, \`radius\`, \`text\`, \`font\`, \`control\`, \`shadow\`, \`duration\`) and one group per component's own decisions (\`button\`, \`switch\`, \`dialog\`...).`,
     "- `/naming.json` (`packages/core/naming.json`): how tokens are named, as data: the grammar, each category's properties, the words a component token's key ends in, the glossary, and every group with its tier and the components that own it. " +
       "A semantic token is `category.property.role` (`color.text.muted`, `size.control.md`, `font.lineHeight.body`); a component token is `componentId.key`, one camelCase key that ends in what the value is (`chip.removeSize`, `select.panelMaxHeight`, `chart.gridColor`). " +
       "A mode (light, dark; web, desktop, mobile) is never in a name. A token renamed in 1.2 is still in `tokens.json` under its old path with `$deprecated` and `renamedTo`; write the new one. `pnpm check names` holds the grammar.",

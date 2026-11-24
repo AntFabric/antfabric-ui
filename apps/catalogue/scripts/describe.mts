@@ -282,9 +282,12 @@ function tokenGroupText(group: string, rows: ReturnType<typeof tokenData>[]): st
   return L.join("\n");
 }
 
+/** `--internal` lists the internal tokens too: without it a listing is the documented set. */
+const shown = (path: string) => flags.has("--internal") || tokenMeta(path).visibility === "public";
+
 function tokenGroups() {
   const counts = new Map<string, number>();
-  for (const l of leaves()) counts.set(groupOf(l.path), (counts.get(groupOf(l.path)) ?? 0) + 1);
+  for (const l of leaves()) if (shown(l.path)) counts.set(groupOf(l.path), (counts.get(groupOf(l.path)) ?? 0) + 1);
   return [...counts].map(([group, count]) => ({ group, count }));
 }
 
@@ -374,12 +377,15 @@ if (args[0] === "tokens" && flags.has("--grammar")) {
   const group = args[1];
   const groups = tokenGroups();
   if (!group) {
-    out(groups, () => [...groups.map((g) => `${g.group.padEnd(Math.max(...groups.map((x) => x.group.length)) + 2)}${g.count}`), "", `${groups.reduce((n, g) => n + g.count, 0)} tokens. pnpm describe tokens <group> for one.`].join("\n"));
+    out(groups, () => [...groups.map((g) => `${g.group.padEnd(Math.max(...groups.map((x) => x.group.length)) + 2)}${g.count}`), "", `${groups.reduce((n, g) => n + g.count, 0)} tokens${flags.has("--internal") ? "" : `, and ${leaves().filter((l) => !shown(l.path)).length} internal ones not listed (--internal)`}. pnpm describe tokens <group> for one; --find "<words>" searches.`].join("\n"));
   } else {
     // A group, or any prefix of a path: `color`, `color.text`, `size.control`.
-    const rows = leaves().filter((l) => groupOf(l.path) === group || l.path.startsWith(`${group}.`)).map(tokenData);
+    const inGroup = leaves().filter((l) => groupOf(l.path) === group || l.path.startsWith(`${group}.`));
+    const hidden = inGroup.filter((l) => !shown(l.path)).length;
+    // A group that is internal as a whole is shown when it is asked for by name.
+    const rows = (hidden === inGroup.length ? inGroup : inGroup.filter((l) => shown(l.path))).map(tokenData);
     if (!rows.length) fail(`No token group "${group}". Groups: ${groups.map((g) => g.group).join(", ")}`);
-    out({ group, tokens: rows }, () => tokenGroupText(group, rows));
+    out({ group, tokens: rows }, () => `${tokenGroupText(group, rows)}${hidden && hidden < inGroup.length ? `\n\n${hidden} internal token(s) of ${group} are not shown: add --internal.` : ""}`);
   }
 } else if (!args[0]) {
   out(listData(), listText);

@@ -6,7 +6,7 @@
  * grouping into sections, and `rowCount()` fails the build if a token lands in none of them.
  */
 
-import { cssVarName, descriptions, tokenRegistry, tokenValues, type TokenNote, type TokenPath, type TokenSection } from "@antfabric/ui-core";
+import { cssVarName, descriptions, tokenMeta, tokenRegistry, tokenValues, type TokenNote, type TokenPath, type TokenSection } from "@antfabric/ui-core";
 import { tokenLeaves, type Context, type Leaf } from "../../scripts/token-leaves";
 
 export type Platform = "web" | "desktop" | "mobile";
@@ -108,7 +108,11 @@ const build = (path: string, leaf: Leaf): Row => {
   };
 };
 
-const all: Row[] = [...tokenLeaves()].map(([path, leaf]) => build(path, leaf));
+const every: Row[] = [...tokenLeaves()].map(([path, leaf]) => build(path, leaf));
+/** The documented set: what a reader picks from. An internal token (a picture of OS chrome, one component's private geometry) still resolves and is in `tokens.json`; it is not a row here. */
+const all: Row[] = every.filter((r) => tokenMeta(r.path).visibility === "public");
+/** How many tokens the page leaves out as internal. */
+export const internalCount = (): number => every.length - all.length;
 
 export interface Group {
   name: string;

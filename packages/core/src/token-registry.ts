@@ -26,6 +26,11 @@ export interface TokenGroup {
   /** The docs ids of the components a component group belongs to. */
   owners?: readonly string[];
   visibility?: TokenVisibility;
+  /**
+   * The keys of the group that are internal while the group is public: one component's private geometry (an offset, an inset, a least or
+   * most size, a loading placeholder's width, a breakpoint). A theme can still set one; it is left out of what a reader picks from.
+   */
+  internal?: readonly string[];
   /** A kit file may read it with no recipe entry: the gaps that lay parts out and how things move. */
   structural?: true;
 }
@@ -72,48 +77,48 @@ export const tokenRegistry: Record<string, TokenGroup> = {
   os: semantic((_key, path) => (path === "os.wallpaper" ? "gradient" : "color"), "colour", { visibility: "internal" }),
 
   // Data: the charts' own palette and geometry, and the table
-  chart: component(byKey, CHARTS, { section: "data" }),
-  table: component(byKey, ["table"], { section: "data" }),
+  chart: component(byKey, CHARTS, { section: "data", internal: ["gridDash", "referenceDash", "seriesDash", "endLabelWidth", "activeRingWidth", "stackGap", "signedRadius", "edgeInset", "plotMinWidth", "barMinWidth", "labelBandHeight", "tipWidth", "tipBaseHeight", "tipRowHeight", "sliceGap", "sliceRadius", "sliceInset", "gaugeCapRadius", "tickWidth", "tickOverhang", "listMinWidth", "splitHeight", "splitGap", "splitMinWidth", "tabMinWidth", "ruleHeight", "sideWidth", "keyWidth", "partMinWidth", "sparkWidth", "barMaxWidth", "previousWidth"] }),
+  table: component(byKey, ["table"], { section: "data", internal: ["checkWidth", "sparkWidth", "sparkHeight", "loadWidthSm", "loadWidthMd", "loadWidthLg", "loadHeight", "loadCardWidthSm", "loadCardWidthLg", "cardsBreakpoint"] }),
 
   // Components: families several components share
-  sheet: component(byKey, ["bottom-sheet", "context-menu", "dialog", "in-app-banner", "notification-schedule", "permission-prompt", "select", "sheet", "tab-bar", "update-banner", "workspace-switcher"]),
-  choice: component(byKey, ["checkbox", "radio-group", "select", "switch"]),
-  checkbox: component(byKey, ["checkbox", "composer", "list-item", "menu"]),
-  textField: component(byKey, ["form-field", "text-area", "text-field"]),
+  sheet: component(byKey, ["bottom-sheet", "context-menu", "dialog", "in-app-banner", "notification-schedule", "permission-prompt", "select", "sheet", "tab-bar", "update-banner", "workspace-switcher"], { internal: ["grabberWidth", "grabberHeight", "contentMinHeight", "titleLineHeight"] }),
+  choice: component(byKey, ["checkbox", "radio-group", "select", "switch"], { internal: ["pillGap", "ringOffsetY"] }),
+  checkbox: component(byKey, ["checkbox", "composer", "list-item", "menu"], { internal: ["tickSize"] }),
+  textField: component(byKey, ["form-field", "text-area", "text-field"], { internal: ["tagPaddingX", "trailingOffsetX", "prefixOffsetX"] }),
   menu: component(byKey, ["context-menu", "menu"]),
-  kpi: component(byKey, ["kpi-card", "meter", "metric-tabs", "period-compare", "progress-ring", "spark-bars", "stat-tile"]),
-  navRail: component(byKey, ["nav-rail", "workspace-switcher"]),
-  sidebarSection: component(byKey, ["sidebar-item", "sidebar-section"]),
+  kpi: component(byKey, ["kpi-card", "meter", "metric-tabs", "period-compare", "progress-ring", "spark-bars", "stat-tile"], { internal: ["sparkBarRadius", "meterMinWidth", "ringMinWidth", "cardTrendHeight", "tileTrendWidth", "tileBarsWidth", "loadWidthSm", "loadWidthMd", "loadWidthLg", "loadWidthXl", "loadLineHeight", "loadValueHeight", "sparkBarMaxWidth", "tileTrendHeight"] }),
+  navRail: component(byKey, ["nav-rail", "workspace-switcher"], { internal: ["badgeOffsetY", "badgeOffsetX", "logoFontSize", "chipHeight"] }),
+  sidebarSection: component(byKey, ["sidebar-item", "sidebar-section"], { internal: ["hashWidth", "sectionPaddingTop", "sectionGap", "sectionHeaderHeight"] }),
 
   // Components: one component's own
   button: component(byKey, ["button"]),
   fab: component(byKey, ["fab"]),
-  iconButton: component(byKey, ["icon-button"]),
-  segmentedControl: component(byKey, ["segmented-control"]),
-  radioGroup: component(byKey, ["radio-group"]),
+  iconButton: component(byKey, ["icon-button"], { internal: ["badgeOffsetY", "badgeOffsetX"] }),
+  segmentedControl: component(byKey, ["segmented-control"], { internal: ["countSize", "cardInset"] }),
+  radioGroup: component(byKey, ["radio-group"], { internal: ["cardMinWidth"] }),
   chip: component(byKey, ["chip"]),
-  select: component(byKey, ["select"]),
-  switch: component(byKey, ["switch"]),
-  inAppBanner: component(byKey, ["in-app-banner"]),
-  notificationItem: component(byKey, ["notification-item"]),
-  notificationSchedule: component(byKey, ["notification-schedule"]),
-  permissionPrompt: component(byKey, ["permission-prompt"]),
-  breadcrumbs: component(byKey, ["breadcrumbs"]),
-  tabs: component(byKey, ["tabs"]),
-  workspaceSwitcher: component(byKey, ["workspace-switcher"]),
-  mobileHeader: component(byKey, ["mobile-header"]),
-  tabBar: component(byKey, ["tab-bar"]),
-  commandPalette: component(byKey, ["command-palette"]),
-  contextMenu: component(byKey, ["context-menu"]),
-  dialog: component(byKey, ["dialog"]),
-  hoverCard: component(byKey, ["hover-card"]),
-  tooltip: component(byKey, ["tooltip"]),
+  select: component(byKey, ["select"], { internal: ["chipHeight", "triggerGap", "panelMaxHeight", "panelMinWidth", "dotGap"] }),
+  switch: component(byKey, ["switch"], { internal: ["thumbTravel"] }),
+  inAppBanner: component(byKey, ["in-app-banner"], { internal: ["dismissInset"] }),
+  notificationItem: component(byKey, ["notification-item"], { internal: ["kindBadgeSize", "kindBadgeRadius", "textGap", "metaGap"] }),
+  notificationSchedule: component(byKey, ["notification-schedule"], { internal: ["noteMaxWidth"] }),
+  permissionPrompt: component(byKey, ["permission-prompt"], { internal: ["addressHeight", "lockSize"] }),
+  breadcrumbs: component(byKey, ["breadcrumbs"], { internal: ["recordingGap", "recordingDotSize", "crumbMaxWidth"] }),
+  tabs: component(byKey, ["tabs"], { internal: ["countSize"] }),
+  workspaceSwitcher: component(byKey, ["workspace-switcher"], { internal: ["markerOffsetY", "markerWidth", "markerRadius", "badgeOffsetY", "badgeOffsetX"] }),
+  mobileHeader: component(byKey, ["mobile-header"], { internal: ["rowMinHeight", "largeTitleLineHeight", "titleInset"] }),
+  tabBar: component(byKey, ["tab-bar"], { internal: ["badgeOffsetX", "labelLineHeight", "labelMaxWidth", "itemSizeSqueezed"] }),
+  commandPalette: component(byKey, ["command-palette"], { internal: ["slotSize", "listMaxHeight"] }),
+  contextMenu: component(byKey, ["context-menu"], { internal: ["emojiFontSize", "emojiGridFontSize", "sceneOffsetX"] }),
+  dialog: component(byKey, ["dialog"], { internal: ["bodyMaxHeight", "actionMinWidth", "bodyGap"] }),
+  hoverCard: component(byKey, ["hover-card"], { internal: ["headGap", "guestHeight", "guestPaddingX", "presenceDotSize"] }),
+  tooltip: component(byKey, ["tooltip"], { internal: ["kbdHeight", "kbdFontSize"] }),
   connectionBanner: component(byKey, ["connection-banner"]),
-  sessionState: component(byKey, ["session-state"]),
-  updateBanner: component(byKey, ["update-banner"]),
-  questionPanel: component(byKey, ["question-panel"]),
-  thinkingIndicator: component(byKey, ["thinking-indicator"]),
-  agentSteps: component(byKey, ["agent-steps"]),
+  sessionState: component(byKey, ["session-state"], { internal: ["proseMaxWidth"] }),
+  updateBanner: component(byKey, ["update-banner"], { internal: ["dotInset", "versionTileSize"] }),
+  questionPanel: component(byKey, ["question-panel"], { internal: ["keySize", "detailsMaxHeight", "elbowWidth", "elbowHeight", "elbowRadius", "confirmInset", "argsMaxHeight", "argKeyMinWidth"] }),
+  thinkingIndicator: component(byKey, ["thinking-indicator"], { internal: ["cellSize", "cellRadius", "markWidth"] }),
+  agentSteps: component(byKey, ["agent-steps"], { internal: ["markerSize"] }),
 
   // Components: pictures of what an operating system draws
   osBadge: picture("dimension", ["app-badge"]),
@@ -145,7 +150,7 @@ export function tokenMeta(path: string): TokenMeta {
     type: typeof entry.type === "function" ? entry.type(rest[0] ?? "", path) : entry.type,
     section: entry.section,
     owners: entry.owners ?? [],
-    visibility: entry.visibility ?? "public",
+    visibility: entry.visibility ?? (entry.internal?.includes(rest.join(".")) ? "internal" : "public"),
     structural: entry.structural === true,
   };
 }

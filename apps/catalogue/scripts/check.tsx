@@ -266,6 +266,9 @@ function checkRegistry() {
     if (g.tier === "semantic" && g.owners?.length) err(at, `"${name}" is semantic and names owners: a role belongs to no component`);
     for (const o of g.owners ?? []) if (!ids.has(o)) err(at, `"${name}" is owned by "${o}", which is not a component id`);
     if (g.owners && [...g.owners].sort().join() !== g.owners.join()) err(at, `"${name}": owners are not in alphabetical order`);
+    for (const key of g.internal ?? []) if (!TOKENS.has(`${name}.${key}`)) err(at, `"${name}" lists "${key}" as internal and ${name}.${key} is not a token`);
+    if (g.internal && new Set(g.internal).size !== g.internal.length) err(at, `"${name}" lists an internal key twice`);
+    if (g.internal && g.visibility === "internal") err(at, `"${name}" is internal as a whole and also lists internal keys`);
   }
   for (const p of tokenPaths()) if (p.split(".")[0]! in tokenRegistry) tokenMeta(p);
   for (const [id, recipe] of Object.entries(recipes)) {
@@ -3855,7 +3858,8 @@ if (!only.length || only.includes("chart")) checkChart();
 if (!only.length || only.includes("tokens")) {
   try {
     const rows = rowCount();
-    if (rows !== TOKENS.size) err("foundations", `the page draws ${rows} token rows; tokens.ts has ${TOKENS.size}`);
+    const documented = [...TOKENS].filter((p) => tokenMeta(p).visibility === "public").length;
+    if (rows !== documented) err("foundations", `the page draws ${rows} token rows; tokens.ts has ${documented} that are not internal`);
   } catch (e) {
     err("foundations", e instanceof Error ? e.message : String(e));
   }

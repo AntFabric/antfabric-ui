@@ -5,7 +5,7 @@ import BrandPreview from "../islands/BrandPreview";
 import TokenTable from "../components/TokenTable.astro";
 import { defaultsFor, OS_VERSIONS, PLATFORM_META, PLATFORMS, registry, usedIds, type OS, type Platform } from "../lib/library";
 import { slug } from "../lib/search";
-import { groups, refCount, rowCount, valueOf } from "../lib/token-ref";
+import { groups, internalCount, refCount, rowCount, valueOf } from "../lib/token-ref";
 import { BRAND_PATHS, kebab, MOTION, tokens } from "@antfabric/ui-core";
 import { BRAND_SAMPLE, SAMPLE_TENANT } from "../lib/brand";
 
@@ -64,6 +64,7 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
     <h1>Foundations</h1>
     <p class="lede">
       The {count} design tokens every component reads, one row each: its name, its CSS variable, its value in each mode, and what it is for.
+      {internalCount()} more are internal and not listed: one component's private geometry (an offset, a loading placeholder's width) and the pictures of OS chrome. They resolve and can be themed like any other; <code class="mono">pnpm describe tokens --internal</code> lists them.
       The same tokens are a W3C Design Tokens file at <a href="/tokens.json"><code class="mono">/tokens.json</code></a>.
       The values live in <code class="mono">packages/core/src/tokens.ts</code> and each row's description in <code class="mono">packages/core/src/descriptions.ts</code>.
     </p>
