@@ -91,7 +91,7 @@ function guard() {
   if (!newest || !tagged(newest)) return;
   let before;
   try {
-    before = surface(git("show", `v${newest}:reports/api.lock.json`));
+    before = surface(execFileSync("git", ["show", `v${newest}:reports/api.lock.json`], { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }));
   } catch {
     return; // the newest release predates the lock
   }
