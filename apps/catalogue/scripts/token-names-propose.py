@@ -1,6 +1,7 @@
 """Proposes the category-first name of every token, for review. Reads packages/core/tokens.json; writes reports/migration/tokens-2.{md,json}."""
 import json, re, collections, sys
-ROOT = '/Users/bittasingha/antfabric-ui-public/'
+import os
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')) + '/'
 d = json.load(open(ROOT + 'packages/core/tokens.json'))
 EXT = 'com.antfabric'
 
