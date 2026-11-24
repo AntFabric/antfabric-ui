@@ -1,11 +1,13 @@
-import { memo, useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties, type KeyboardEvent } from "react";
+import { memo, useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties, type KeyboardEvent, type Ref } from "react";
 import { cssVarName, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { useAutoFocus, usePlatform } from "../../platform";
 import { t } from "../../tokens";
+import { announce } from "../../lib/announce";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { box, css, enter, pressable, row, text, truncate } from "../../lib/style";
 import { Avatar, type AvatarIdentity } from "../display/avatar";
 import { joinIds, useFormField } from "./form-field";
@@ -30,7 +32,8 @@ export interface SelectItem {
   disabled?: boolean;
 }
 
-export interface SelectProps extends RootProps<HTMLDivElement> {
+/** `id`, `aria-*` and `ref` name the trigger (the native `<select>` in a phone browser); `className` and `data-*` go on the root (`splitRootProps`). */
+export interface SelectProps extends RootProps<HTMLButtonElement | HTMLSelectElement> {
   items: SelectItem[];
   /** The chosen item's key. */
   value?: string;
@@ -96,7 +99,10 @@ const panel: CSSProperties = {
 
 /* A phone-sized browser gets the phone's own picker: the custom listbox is a desktop-pointer answer. */
 const PHONE = "(pointer: coarse) and (max-width: 599px)";
+// A test DOM (jsdom) has no matchMedia: no phone there, and nothing to listen to.
+const canMatch = () => typeof matchMedia === "function";
 const onPhoneChange = (notify: () => void) => {
+  if (!canMatch()) return () => {};
   const query = matchMedia(PHONE);
   query.addEventListener("change", notify);
   return () => query.removeEventListener("change", notify);
@@ -104,7 +110,7 @@ const onPhoneChange = (notify: () => void) => {
 const usePhoneBrowser = () =>
   useSyncExternalStore(
     onPhoneChange,
-    () => matchMedia(PHONE).matches,
+    () => canMatch() && matchMedia(PHONE).matches,
     () => false,
   );
 
@@ -160,17 +166,17 @@ const OptionRow = memo(function OptionRow({ item, id, on, chosen, size, variant,
 
 export function Select({
   items,
-  value = "",
+  value,
   label = "",
   placeholder = "",
   name: fieldName,
   size = "md",
   variant = "field",
-  open = false,
+  open,
   placement = "below",
   activeKey = "",
   searchable = false,
-  query = "",
+  query,
   searchPlaceholder,
   invalid = false,
   disabled = false,
@@ -186,15 +192,25 @@ export function Select({
   const s = useStrings("select", strings);
   const own = useId();
   const form = useFormField();
-  const id = form?.id ?? own;
+  const pass = splitRootProps(rest);
+  const { ref, ...control } = pass.control as { ref?: Ref<HTMLButtonElement | HTMLSelectElement> } & Record<string, unknown>;
+  // A FormField's label points at its own id; outside one, a passed `id` replaces the kit's, so the label and the list still line up.
+  const id = form?.id ?? (control.id as string | undefined) ?? own;
+  const describedBy = joinIds(form?.describedBy, control["aria-describedby"] as string | undefined);
   const { platform } = usePlatform();
   const allowFocus = useAutoFocus();
   const phone = usePhoneBrowser() && platform === "web";
   const ui = useInteraction({ disabled });
-  const [current, setCurrent] = useControllable(value, onValueChange);
-  const [isOpen, setOpen] = useControllable(open, onOpenChange);
+  const [current = "", setCurrent] = useControllable(value, onValueChange);
+  const [isOpen = false, setOpen] = useControllable(open, onOpenChange);
   const [active, setActive] = useControllable(activeKey);
-  const [filter, setFilter] = useControllable(query, onQueryChange);
+  const [filter = "", setFilter] = useControllable(query, onQueryChange);
+  // A filter that leaves no rows is said once, when the list empties (not on each further keystroke).
+  const none = isOpen && filter !== "" && !items.length;
+  useEffect(() => {
+    if (none) announce(s("emptyFiltered", { filter }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [none]);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -208,18 +224,25 @@ export function Select({
   });
 
   const chosen = items.find((i) => i.key === current);
-  const cursor = active || current;
   const enabled = items.filter((i) => !i.disabled);
+  // The row Enter takes: the one the arrows or the pointer reached, else the chosen one. A filter that left neither in the list falls to
+  // its first enabled row, so Enter never takes a row that is not there.
+  const reached = active || current;
+  const cursor = filter && !enabled.some((i) => i.key === reached) ? (enabled[0]?.key ?? "") : reached;
   const name = label || placeholder;
   // Inside a FormField, with no label of its own, the field's label names the select.
   const labelled = label ? { "aria-label": name } : form ? { "aria-labelledby": form.labelId } : { "aria-label": name };
   const optionId = (i: number) => `${id}-option-${i}`;
 
+  // Opening or closing puts the cursor back on the chosen row: one hovered or arrowed to last time is not where Enter lands.
+  const show = (next: boolean) => {
+    setActive("");
+    setOpen(next);
+  };
   const choose = (item: SelectItem) => {
     if (item.disabled) return;
     setCurrent(item.key);
-    setOpen(false);
-    setActive("");
+    show(false);
     // The row that was clicked or entered is about to unmount: focus goes back to the trigger, not to the page.
     triggerRef.current?.focus({ preventScroll: true });
   };
@@ -236,11 +259,14 @@ export function Select({
     const tall = panelRef.current?.offsetHeight ?? 0;
     if (at && at.top >= 0 && at.bottom <= innerHeight) setFlip(placement === "below" && at.bottom + tall > innerHeight && at.top - tall >= 0);
     const away = (e: PointerEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+      if (!rootRef.current?.contains(e.target as Node)) {
+        setActive("");
+        setOpen(false);
+      }
     };
     document.addEventListener("pointerdown", away);
     return () => document.removeEventListener("pointerdown", away);
-  }, [isOpen, placement, setOpen]);
+  }, [isOpen, placement, setOpen, setActive]);
   // A searchable select is typed into: focus moves to the filter when the panel opens (never under a host that draws overlays as pictures),
   // and the filter is the combobox, so it names the list it drives and the row the cursor is on.
   useEffect(() => {
@@ -268,10 +294,12 @@ export function Select({
 
   /** The listbox's keys, from the trigger and (when searchable) from the filter, which keeps its own Space, Home, End and caret. */
   const keys = (e: KeyboardEvent<HTMLElement>, fromFilter = false) => {
+    // An IME's Enter commits its candidate and its Escape cancels it; Enter on the filter's clear button presses the button.
+    if (isComposing(e) || (fromFilter && e.key === "Enter" && (e.target as HTMLElement).tagName !== "INPUT")) return;
     if (!isOpen) {
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
-        setOpen(true);
+        show(true);
       }
       return;
     }
@@ -290,21 +318,21 @@ export function Select({
       const item = items.find((i) => i.key === cursor);
       if (item) choose(item);
       else {
-        setOpen(false);
+        show(false);
         triggerRef.current?.focus({ preventScroll: true });
       }
     } else if (e.key === "Escape") {
-      // Typed text is cleared first (the filter does that); a second Escape closes. Captured, so it does not also close the pane behind.
+      // Typed text is cleared first (the filter does that); a second Escape closes. Prevented and stopped, so the overlay behind stays.
       if (fromFilter && filter) return;
       e.preventDefault();
       e.stopPropagation();
-      setOpen(false);
+      show(false);
       triggerRef.current?.focus({ preventScroll: true });
     } else if (e.key === "Tab") {
       // From the trigger, Tab closes. From the filter it moves on, and focus leaving the select closes it.
-      if (!fromFilter) setOpen(false);
-    } else if (!fromFilter && e.key.length === 1 && !searchable) {
-      // Type-ahead: the next enabled row whose label starts with the letter.
+      if (!fromFilter) show(false);
+    } else if (!fromFilter && e.key.length === 1 && !searchable && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      // Type-ahead: the next enabled row whose label starts with the letter. A shortcut (Cmd+C, Ctrl+F, an Alt letter) is not typing.
       const k = e.key.toLowerCase();
       const order = [...enabled.slice(at + 1), ...enabled.slice(0, at + 1)];
       const hit = order.find((i) => i.label.toLowerCase().startsWith(k));
@@ -316,23 +344,25 @@ export function Select({
 
   if (phone) {
     return (
-      <div data-af-part="root" {...rootProps(rest)} style={css(box, { width: "100%" }, r.root, style)}>
+      <div data-af-part="root" {...pass.root} style={css(box, { width: "100%" }, r.root, style)}>
         {label && variant === "field" && (
           <label htmlFor={id} data-af-part="label" style={css(text, r.label)}>
             {label}
           </label>
         )}
         <select
-          id={id}
           {...labelled}
           aria-invalid={invalid || form?.invalid || undefined}
           aria-required={form?.required || undefined}
-          aria-describedby={joinIds(form?.describedBy)}
           title={title || undefined}
           disabled={disabled}
           name={fieldName}
           value={current}
           onChange={(e) => setCurrent(e.target.value)}
+          {...control}
+          ref={(el) => setRef(ref, el)}
+          id={id}
+          aria-describedby={describedBy}
           data-af-part="trigger"
           style={css(trigger, partStyle(r, "trigger", variant === "link" && linkWidth))}
         >
@@ -355,9 +385,9 @@ export function Select({
       onBlur={(e) => {
         // Focus moved to something outside the select (Tab from the filter): the panel closes. A blur to nowhere (the window) keeps it.
         const to = e.relatedTarget as Node | null;
-        if (isOpen && to && !rootRef.current?.contains(to)) setOpen(false);
+        if (isOpen && to && !rootRef.current?.contains(to)) show(false);
       }}
-      {...rootProps(rest)}
+      {...pass.root}
       style={css(box, { width: "100%" }, r.root, style)}
     >
       {label && variant === "field" && (
@@ -367,8 +397,6 @@ export function Select({
       )}
       <div style={css(box, { gap: t.space.xs }, above && { flexDirection: "column-reverse" })}>
         <button
-          ref={triggerRef}
-          id={id}
           type="button"
           data-af-press
           role="combobox"
@@ -377,14 +405,20 @@ export function Select({
           aria-controls={isOpen ? `${id}-list` : undefined}
           aria-activedescendant={isOpen && !searchable && activeIndex >= 0 ? optionId(activeIndex) : undefined}
           {...labelled}
-          aria-describedby={joinIds(form?.describedBy)}
           aria-invalid={invalid || form?.invalid || undefined}
           aria-required={form?.required || undefined}
           title={title || undefined}
           disabled={ui.disabled}
-          onClick={() => setOpen(!isOpen)}
+          onClick={() => show(!isOpen)}
           onKeyDown={(e) => keys(e)}
           {...ui.handlers}
+          {...control}
+          ref={(el) => {
+            triggerRef.current = el;
+            setRef(ref, el);
+          }}
+          id={id}
+          aria-describedby={describedBy}
           data-af-part="trigger"
           style={css(trigger, partStyle(r, "trigger", variant === "link" && linkWidth, ui.disabled && { cursor: "not-allowed" }))}
         >
@@ -417,7 +451,16 @@ export function Select({
           >
             {searchable && (
               <div data-af-part="search" onKeyDown={(e) => keys(e, true)} style={partStyle(r, "search", { paddingBottom: t.space["2xs"] })}>
-                <SearchField placeholder={searchPlaceholder ?? s("searchPlaceholder")} value={filter} focused onValueChange={(next) => setFilter(next)} />
+                <SearchField
+                  placeholder={searchPlaceholder ?? s("searchPlaceholder")}
+                  value={filter}
+                  focused
+                  onValueChange={(next) => {
+                    // A new filter is a new list: the cursor goes back to the chosen row, or the first one left.
+                    setFilter(next);
+                    setActive("");
+                  }}
+                />
               </div>
             )}
             <div id={`${id}-list`} role="listbox" aria-label={name} style={box}>

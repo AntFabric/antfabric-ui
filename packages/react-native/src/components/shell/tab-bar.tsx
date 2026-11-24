@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { recipes, useControllable, useStrings, type ActionItem, type KitStrings, type NavItem } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
+import { hitSlopTo } from "../../lib/a11y";
 import { GlassSurface } from "../../lib/glass";
 import { Icon } from "../../lib/icon";
 import { Enter, useReducedMotion } from "../../lib/motion";
@@ -29,7 +30,7 @@ export interface TabBarProps extends RootProps {
   tabs?: NavItem[];
   /** The key of the open tab. A key no tab has (a pushed screen is on top) draws no capsule: the tabs share the width evenly. */
   active?: string;
-  /** The tabs are shown. Left (false) is the bar squeezed by scrolling down: a 42pt circle with the current tab's icon. */
+  /** The tabs are shown. Left (false) is the bar squeezed by scrolling down: a 42pt circle with the current tab's icon (a chevron when no tab is open). */
   expanded?: boolean;
   /** The bar is not drawn while the keyboard is up. */
   keyboardUp?: boolean;
@@ -83,6 +84,7 @@ const useStyles = createStyles((t) => ({
   disc: { flex: 1, alignItems: "center", justifyContent: "center" },
   grow: { flex: 1 },
   action: { alignItems: "center", justifyContent: "center" },
+  actionBadge: { position: "absolute", top: -t.space["2xs"], right: -t.space["2xs"], borderWidth: t.border.wThick, borderColor: t.surface.card },
   lens: { position: "absolute", left: 0, top: 0, borderRadius: t.radius.pill, pointerEvents: "none" },
   lensGlass: { ...StyleSheet.absoluteFillObject, borderRadius: t.radius.pill },
   safeArea: { alignItems: "center", justifyContent: "flex-end", paddingBottom: t.space.sm },
@@ -168,7 +170,9 @@ function Tab({ tab, on, under, labelled, testID, onPress, onPressIn, onPressOut,
   );
 }
 
-function Squeezed({ tab, testID, onPress, styles, strings }: { tab: NavItem; testID?: string; onPress: () => void; styles?: PartStyles<"tab-bar">; strings?: Partial<KitStrings["tab-bar"]> }) {
+/** The squeezed bar's disc: the open tab's icon, or with no tab open (a pushed screen is on top), a chevron that brings the tabs back all the same. */
+function Squeezed({ tab, testID, onPress, styles, strings }: { tab?: NavItem; testID?: string; onPress: () => void; styles?: PartStyles<"tab-bar">; strings?: Partial<KitStrings["tab-bar"]> }) {
+  const { t } = useTheme();
   const s = useStyles();
   const str = useStrings("tab-bar", strings);
   const press = usePress();
@@ -178,35 +182,43 @@ function Squeezed({ tab, testID, onPress, styles, strings }: { tab: NavItem; tes
     <Pressable
       testID={partId(testID, "tab-bar", "squeezed")}
       accessibilityRole="button"
-      accessibilityLabel={str("showTabs", { label: tab.label })}
+      accessibilityLabel={tab ? str("showTabs", { label: tab.label }) : str("show")}
+      // The disc is drawn under the 44pt touch size: its touch area grows to it.
+      hitSlop={hitSlopTo(t.control.hit, t.tabBar.itemSqueezed, t.tabBar.itemSqueezed)}
       onPress={() => onPress()}
       {...press.handlers}
       style={squeezed.view}
     >
       <GlassSurface testID={partId(testID, "tab-bar", "squeezedSurface")} style={[s.squeezedSurface, r.squeezedSurface.view]} glassStyle={[s.bare, styles?.squeezedSurface]}>
         <View testID={partId(testID, "tab-bar", "disc")} style={[s.disc, r.disc.view]}>
-          <Icon testID={partId(testID, "tab-bar", "discIcon")} name={tab.icon} {...glyphOf(r.discIcon)} />
+          <Icon testID={partId(testID, "tab-bar", "discIcon")} name={tab?.icon ?? "chevron-up"} {...glyphOf(r.discIcon)} />
         </View>
       </GlassSurface>
     </Pressable>
   );
 }
 
-function Action({ action, testID, onPress, styles }: { action: ActionItem; testID?: string; onPress: () => void; styles?: PartStyles<"tab-bar"> }) {
+function Action({ action, testID, onPress, styles, strings }: { action: ActionItem; testID?: string; onPress: () => void; styles?: PartStyles<"tab-bar">; strings?: Partial<KitStrings["tab-bar"]> }) {
   const s = useStyles();
-  const press = usePress();
-  const r = useRecipe(recipes["tab-bar"], { state: { focus: press.focused }, styles });
+  const str = useStrings("tab-bar", strings);
+  const press = usePress({ disabled: action.disabled });
+  const r = useRecipe(recipes["tab-bar"], { state: { focus: press.focused, disabled: press.disabled }, styles });
+  const badge = action.badge ?? 0;
   const root = partStyle(r, "action", { view: [s.action, press.pressed && s.pressed] });
   return (
     <Pressable
       testID={partId(testID, "tab-bar", "action")}
       accessibilityRole="button"
-      accessibilityLabel={action.label}
+      // A count on the button is read with its name, as a tab's is.
+      accessibilityLabel={badge > 0 ? str("tab", { label: action.label, count: badge, what: str("new") }) : action.label}
+      accessibilityState={press.disabled ? { disabled: true } : undefined}
+      disabled={press.disabled}
       onPress={() => onPress()}
       {...press.handlers}
       style={root.view}
     >
       {action.icon ? <Icon testID={partId(testID, "tab-bar", "actionIcon")} name={action.icon} {...glyphOf(r.actionIcon, 28)} /> : null}
+      {badge > 0 ? <Badge count={badge} label={str("new")} style={s.actionBadge} /> : null}
     </Pressable>
   );
 }
@@ -353,13 +365,13 @@ function useLens(glass: boolean, select: (key: string) => void, current: string,
   };
 }
 
-export function TabBar({ tabs = [], active = "", expanded = true, keyboardUp = false, safeArea = false, action, onActiveChange, onExpandedChange, onAction, styles, strings, style, testID, ...rest }: TabBarProps) {
+export function TabBar({ tabs = [], active, expanded, keyboardUp = false, safeArea = false, action, onActiveChange, onExpandedChange, onAction, styles, strings, style, testID, ...rest }: TabBarProps) {
   const { os, glass } = useTheme();
   const s = useStyles();
   const str = useStrings("tab-bar", strings);
   const r = useRecipe(recipes["tab-bar"], { styles });
-  const [current, setCurrent] = useControllable(active, onActiveChange);
-  const [shown, setExpanded] = useControllable(expanded, onExpandedChange);
+  const [current = "", setCurrent] = useControllable(active, onActiveChange);
+  const [shown = true, setExpanded] = useControllable(expanded, onExpandedChange);
   const squeezed = !shown;
   const reduceMotion = useReducedMotion();
   const lens = useLens(glass, setCurrent, current, reduceMotion);
@@ -418,7 +430,7 @@ export function TabBar({ tabs = [], active = "", expanded = true, keyboardUp = f
               </GlassSurface>
             </View>
           )}
-          {squeezed && open ? (
+          {squeezed ? (
             <Squeezed
               tab={open}
               testID={testID}
@@ -428,7 +440,7 @@ export function TabBar({ tabs = [], active = "", expanded = true, keyboardUp = f
             />
           ) : null}
           {squeezed ? <View style={s.grow} /> : null}
-          {squeezed || !action ? null : <Action action={action} testID={testID} onPress={() => onAction?.(action)} styles={styles} />}
+          {squeezed || !action ? null : <Action action={action} testID={testID} onPress={() => onAction?.(action)} styles={styles} strings={strings} />}
         </View>
       )}
       {safeArea ? (

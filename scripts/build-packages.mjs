@@ -14,11 +14,16 @@
  * gifted-charts, which are dependencies, so they stay external there and nowhere else; its `shell` entry (the app frame and the
  * pictures of native surfaces) is the only one that reaches the shell components, and its `chat` entry (the conversation idiom) the only one
  * that reaches Message and the rest of the chat components.
+ *
+ * The kits' files (every entry and every chunk) start with `"use client"`, so a React Server Component can import them; core's do not,
+ * so a server file can reach what of core does not touch React's client API (`./dtcg`, `./antfabric`). Each `.js` has a source map. tsc
+ * writes the `.d.ts` with the sources' extensionless relative imports, which `moduleResolution: nodenext` cannot follow; `fixDeclarations`
+ * then gives each one the `.js` (or `/index.js`) of the file beside it, and fails on one that names no file.
  */
 import { build } from "esbuild";
 import { execFileSync } from "node:child_process";
-import { readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -26,9 +31,29 @@ const tsc = join(root, "node_modules/.bin/tsc");
 
 const PACKAGES = {
   core: { entries: ["src/index.ts", "src/dtcg.ts", "src/chart/index.ts", "src/antfabric.ts"], splitting: true },
-  react: { entries: ["src/index.ts", "src/data/index.ts", "src/shell/index.ts", "src/chat/index.ts"], splitting: true },
-  "react-native": { entries: ["src/index.ts", "src/data/index.ts", "src/shell/index.ts", "src/chat/index.ts"], splitting: true, keepRequire: ["expo-glass-effect"] },
+  react: { entries: ["src/index.ts", "src/data/index.ts", "src/shell/index.ts", "src/chat/index.ts"], splitting: true, useClient: true },
+  "react-native": { entries: ["src/index.ts", "src/data/index.ts", "src/shell/index.ts", "src/chat/index.ts"], splitting: true, useClient: true, keepRequire: ["expo-glass-effect"] },
 };
+
+// `from "./x"`, `import("./x")` and `import "./x"` in a .d.ts, relative only: "./x" becomes "./x.js" or "./x/index.js", ".." "../index.js".
+const RELATIVE = /(\bfrom\s*|\bimport\s*\(\s*|^\s*import\s*)(["'])(\.\.?(?:\/[^"']*)?)\2/gm;
+function fixDeclarations(dist, name) {
+  let count = 0;
+  for (const f of readdirSync(dist, { recursive: true }).filter((f) => f.endsWith(".d.ts"))) {
+    const file = join(dist, f);
+    const code = readFileSync(file, "utf8");
+    const fixed = code.replace(RELATIVE, (all, head, q, spec) => {
+      if (/\.(?:js|json)$/.test(spec)) return all;
+      const at = join(dirname(file), spec);
+      const to = existsSync(`${at}.d.ts`) ? `${spec}.js` : existsSync(join(at, "index.d.ts")) ? `${spec.replace(/\/$/, "")}/index.js` : null;
+      if (!to) throw new Error(`${name}: dist/${relative(dist, file)} imports "${spec}", which is no .d.ts in dist`);
+      count++;
+      return `${head}${q}${to}${q}`;
+    });
+    if (fixed !== code) writeFileSync(file, fixed);
+  }
+  return count;
+}
 
 const wanted = process.argv.slice(2);
 for (const name of wanted) if (!PACKAGES[name]) throw new Error(`unknown package "${name}" (core, react, react-native)`);
@@ -50,6 +75,10 @@ for (const [name, opts] of Object.entries(PACKAGES)) {
     jsx: "automatic",
     splitting: opts.splitting ?? false,
     chunkNames: "chunks/[name]-[hash]",
+    sourcemap: true,
+    banner: opts.useClient ? { js: '"use client";' } : undefined,
+    // The version release-version.mjs wrote: the web kit names its stylesheet with it, so two versions on one page keep two sheets.
+    define: { __ANTFABRIC_UI_VERSION__: JSON.stringify(JSON.parse(readFileSync(join(dir, "package.json"), "utf8")).version) },
     logLevel: "warning",
   });
 
@@ -68,6 +97,7 @@ for (const [name, opts] of Object.entries(PACKAGES)) {
   }
 
   execFileSync(tsc, ["-p", join(dir, "tsconfig.build.json")], { stdio: "inherit" });
+  const fixed = fixDeclarations(join(dir, "dist"), name);
   const files = readdirSync(join(dir, "dist"), { recursive: true }).filter((f) => /\.(js|d\.ts)$/.test(f));
-  console.log(`@antfabric/ui-${name}: dist/ ${files.length} files`);
+  console.log(`@antfabric/ui-${name}: dist/ ${files.length} files, ${fixed} relative .d.ts imports given their .js`);
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { I18nManager, Image, Linking, Pressable, StyleSheet, Text, View, type ImageStyle, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type Attachment, type KitStrings } from "@antfabric/ui-core";
+import { recipes, useControllable, usePending, useStrings, type Attachment, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon, type IconName } from "../../lib/icon";
 import { usePress } from "../../lib/press";
@@ -47,18 +47,21 @@ export interface AttachmentCardProps extends RootProps {
   waveform?: number[];
   /** How many waveform bars have played; those are coral. */
   played?: number;
+  /** The voice note is playing. Play and Pause report it through `onPlayingChange`; the app starts and stops the audio. */
   playing?: boolean;
   /** The staged chip in the composer tray. */
   compact?: boolean;
-  /** Link preview only: the sender can remove the preview (web and desktop draw the button). */
+  /** Link preview only: the sender can remove the preview and keep the link. */
   removable?: boolean;
-  /** MediaViewer for images, video and previewable files; Share or Save to device for the rest. */
+  /** MediaViewer for images, video and previewable files; Share or Save to device for the rest. A link's card reports its press here too. */
   onOpen?: () => void;
-  /** Called with `status` as Retry leaves it (uploading). */
+  /** Reports the request Retry makes (uploading). The card waits for the app to pass the new `status`; it never moves it. */
   onStatusChange?: (status: AttachmentCardStatus) => void;
-  /** Retry was tapped on a failed upload: the app starts it again. */
-  onRetry?: () => void;
-  /** Cancels an upload in progress, or removes a staged file. */
+  /** Retry was tapped on a failed upload: the app starts it again. Retry spins until the app answers with `status`, `error` or `progress`, or the promise settles. */
+  onRetry?: () => void | Promise<unknown>;
+  /** Called with `playing` as Play or Pause leaves it: the app starts or stops the voice note. */
+  onPlayingChange?: (playing: boolean) => void;
+  /** Cancels an upload in progress, removes a staged file, or removes a link's preview. */
   onCancel?: () => void;
   /** This card's built-in text (its accessible names, "Uploading…", "Paused", the error) over the tree's and the English defaults. */
   strings?: Partial<KitStrings["attachment-card"]>;
@@ -69,6 +72,9 @@ export interface AttachmentCardProps extends RootProps {
 
 /** What every piece of the card is drawn with: the card's `strings` and `styles`, so a part reaches `styles` wherever it is drawn. */
 type Shared = Pick<AttachmentCardProps, "strings" | "styles">;
+
+/** The schemes a link card opens itself: the web and mail. Anything else is the app's to open from `onOpen`, or not at all. */
+const OPENABLE = /^(?:https?|mailto):/i;
 
 const GLYPH: Record<AttachmentCardFileType, IconName> = {
   pdf: "file-text",
@@ -88,6 +94,7 @@ const useStyles = createStyles((t) => ({
   root: { alignSelf: "flex-start", maxWidth: "100%" },
   fileCard: { flexDirection: "row", alignItems: "center", width: 300, maxWidth: "100%", padding: t.space.sm, paddingRight: t.space.md },
   fileOpen: { flexDirection: "row", alignItems: "center", flex: 1, minWidth: 0 },
+  chipOpen: { flexDirection: "row", alignItems: "center", flex: 1, minWidth: 0 },
   badge: { alignItems: "center", justifyContent: "center" },
   fileText: { flex: 1, minWidth: 0, gap: t.space["3xs"] },
   meta: { fontVariant: ["tabular-nums"] },
@@ -112,10 +119,12 @@ const useStyles = createStyles((t) => ({
   chipThumb: { width: 36, height: 36, borderRadius: 8 },
 }));
 
-type Card = Required<Omit<AttachmentCardProps, "ref" | "testID" | "nativeID" | "accessibilityLabel" | "accessibilityHint" | "style" | "strings" | "styles" | "onOpen" | "onRetry" | "onStatusChange" | "onCancel" | "playing">> &
+type Card = Required<Omit<AttachmentCardProps, "ref" | "testID" | "nativeID" | "accessibilityLabel" | "accessibilityHint" | "style" | "strings" | "styles" | "onOpen" | "onRetry" | "onStatusChange" | "onCancel" | "playing" | "onPlayingChange">> &
   Shared & {
     open: () => void;
     retry: () => void;
+    /** Retry was tapped and the app has not answered yet. */
+    retrying: boolean;
     cancel: () => void;
   };
 
@@ -184,7 +193,7 @@ function Meta({ p, compact }: { p: Card; compact: boolean }) {
         </Text>
       ) : null}
       {p.status === "uploading" ? (
-        <Text testID="attachment-card.meta" numberOfLines={1} accessibilityLiveRegion="polite" style={[meta.view, meta.text]}>
+        <Text testID="attachment-card.meta" numberOfLines={1} style={[meta.view, meta.text]}>
           {compact ? str("ofSize", { percent: pct, size: p.size }) : str("uploading", { percent: pct, size: p.size })}
         </Text>
       ) : null}
@@ -234,7 +243,7 @@ function FileCard(p: Card) {
         <Meta p={p} compact={false} />
       </Pressable>
       {p.status === "uploading" || p.status === "paused" ? <IconButton icon="x" label={str("cancelUpload", { name: p.name })} size="sm" onPress={p.cancel} /> : null}
-      {p.status === "failed" ? <Button label={str("retry")} variant="secondary" size="sm" iconLeading="rotate-ccw" onPress={p.retry} /> : null}
+      {p.status === "failed" ? <Button label={str("retry")} variant="secondary" size="sm" iconLeading="rotate-ccw" loading={p.retrying} onPress={p.retry} /> : null}
     </View>
   );
 }
@@ -275,7 +284,7 @@ function ImageCard(p: Card & { onBroken: () => void }) {
           <Text testID="attachment-card.failedTitle" numberOfLines={2} style={[failedTitle.view, failedTitle.text]}>
             {str.parts("failedUpload", { name: p.name })}
           </Text>
-          <Button label={str("retry")} variant="secondary" size="sm" iconLeading="rotate-ccw" onPress={p.retry} />
+          <Button label={str("retry")} variant="secondary" size="sm" iconLeading="rotate-ccw" loading={p.retrying} onPress={p.retry} />
         </View>
       ) : null}
     </View>
@@ -303,7 +312,9 @@ function LinkCard(p: Card) {
         accessibilityRole="link"
         accessibilityLabel={str("link", { title: p.title, domain: p.domain })}
         onPress={() => {
-          if (p.url) void Linking.openURL(p.url).catch(() => {});
+          // The app hears the press; the card opens only a web or mail link itself, never another scheme a message carried.
+          p.open();
+          if (OPENABLE.test(p.url)) void Linking.openURL(p.url).catch(() => {});
         }}
         {...press.handlers}
         style={[s.linkOpen, linkOpen.view]}
@@ -326,6 +337,7 @@ function LinkCard(p: Card) {
         </View>
         {p.src ? <Image testID="attachment-card.linkThumb" source={{ uri: p.src }} accessibilityIgnoresInvertColors resizeMode="cover" style={[s.linkThumb, r.linkThumb.view as ImageStyle]} /> : null}
       </Pressable>
+      {p.removable ? <IconButton icon="x" label={str("removePreview")} size="sm" onPress={p.cancel} /> : null}
     </View>
   );
 }
@@ -363,17 +375,38 @@ function Chip(p: Card) {
   const s = useStyles();
   const { strings } = p;
   const str = useStrings("attachment-card", strings);
-  const r = useRecipe(recipes["attachment-card"], { styles: p.styles });
+  const press = usePress();
+  const r = useRecipe(recipes["attachment-card"], { state: { focus: press.focused }, styles: p.styles });
   const shared = { strings: p.strings, styles: p.styles };
   const moving = p.status === "uploading" || p.status === "paused";
-  return (
-    <View testID="attachment-card.chip" style={[s.chip, r.chip.view]}>
+  const body = (
+    <>
       {p.kind === "image" && p.src ? (
         <Image testID="attachment-card.chipThumb" source={{ uri: p.src }} accessibilityIgnoresInvertColors resizeMode="cover" style={[s.chipThumb, r.chipThumb.view as ImageStyle]} />
       ) : null}
       {p.kind !== "image" ? <FileBadge fileType={p.fileType} side={36} radius={8} {...shared} /> : null}
       <Meta p={p} compact />
-      {p.status === "failed" ? <IconButton icon="rotate-ccw" label={str("retryName", { name: p.name })} size="sm" onPress={p.retry} /> : null}
+    </>
+  );
+  const chipOpen = partStyle(r, "chipOpen", { view: press.pressed ? { opacity: 0.7 } : undefined });
+  return (
+    <View testID="attachment-card.chip" style={[s.chip, r.chip.view]}>
+      {p.status === "ready" ? (
+        // A staged file that has arrived opens its preview, as it will once sent.
+        <Pressable
+          testID="attachment-card.chipOpen"
+          accessibilityRole="button"
+          accessibilityLabel={str("fileOpenPhone", { name: p.name, size: p.size, badge: p.badge })}
+          onPress={p.open}
+          {...press.handlers}
+          style={[s.chipOpen, chipOpen.view]}
+        >
+          {body}
+        </Pressable>
+      ) : (
+        body
+      )}
+      {p.status === "failed" ? <IconButton icon="rotate-ccw" label={str("retryName", { name: p.name })} size="sm" disabled={p.retrying} onPress={p.retry} /> : null}
       <IconButton icon="x" label={moving ? str("cancelUpload", { name: p.name }) : str("remove", { name: p.name })} size="sm" onPress={p.cancel} />
     </View>
   );
@@ -386,7 +419,7 @@ export function AttachmentCard({
   badge = "",
   typeLabel = "",
   size = "",
-  status = "ready",
+  status: state = "ready",
   progress = 0,
   error = "",
   src = "",
@@ -397,12 +430,13 @@ export function AttachmentCard({
   duration = "",
   waveform = [],
   played = 0,
-  playing = false,
+  playing,
   compact = false,
   removable = false,
   onOpen,
   onStatusChange,
   onRetry,
+  onPlayingChange,
   onCancel,
   strings,
   styles,
@@ -413,8 +447,10 @@ export function AttachmentCard({
   const s = useStyles();
   const str = useStrings("attachment-card", strings);
   const r = useRecipe(recipes["attachment-card"], { styles });
-  const [state, setState] = useControllable(status, onStatusChange);
-  const [on, setOn] = useControllable(playing);
+  // Retry reports the request and spins until the app answers: the upload's status is the app's, never moved here.
+  const { pending: retrying, run } = usePending([state, error, progress]);
+  // Playing is the card's own toggle, reported so the app can start or stop the audio.
+  const [on = false, setOn] = useControllable(playing, onPlayingChange);
   // A thumbnail that will not load falls back to the file card with the image glyph, so the file can still be opened.
   const [broken, setBroken] = useState<string | null>(null);
   const asFile = kind === "image" && !compact && src !== "" && broken === src;
@@ -447,10 +483,16 @@ export function AttachmentCard({
     compact,
     removable,
     open: () => onOpen?.(),
-    retry: () => {
-      setState("uploading");
-      onRetry?.();
-    },
+    retry: () =>
+      run(
+        onStatusChange || onRetry
+          ? () => {
+              onStatusChange?.("uploading");
+              return onRetry?.();
+            }
+          : undefined,
+      ),
+    retrying,
     cancel: () => onCancel?.(),
     strings,
     styles,

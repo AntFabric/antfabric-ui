@@ -174,6 +174,12 @@ function MenuRow({ ws, on, tab, onPress, styles, strings }: Shared & { ws: Works
         e.preventDefault();
         onPress();
       }}
+      // A menu item takes Space as Enter; on a link Space would scroll the page.
+      onKeyDown={(e) => {
+        if (e.key !== " ") return;
+        e.preventDefault();
+        onPress();
+      }}
       {...ui.handlers}
       style={css(rtl(menuRow, dir), r.row)}
     >
@@ -187,7 +193,7 @@ function MenuRow({ ws, on, tab, onPress, styles, strings }: Shared & { ws: Works
   );
 }
 
-function AddRow({ label, onPress, styles }: Shared & { label: string; onPress: () => void }) {
+function AddRow({ label, tab = false, onPress, styles }: Shared & { label: string; tab?: boolean; onPress: () => void }) {
   const ui = useInteraction();
   const dir = useDirection();
   const r = useRecipe(recipes["workspace-switcher"], { state: { hover: ui.hovered, focus: ui.focused }, styles });
@@ -197,7 +203,8 @@ function AddRow({ label, onPress, styles }: Shared & { label: string; onPress: (
       data-af-part="row"
       data-af-press
       role="menuitem"
-      tabIndex={-1}
+      // The menu's tab stop when it has no workspace rows, so it can still be entered.
+      tabIndex={tab ? 0 : -1}
       aria-label={label}
       onClick={() => onPress()}
       {...ui.handlers}
@@ -211,14 +218,14 @@ function AddRow({ label, onPress, styles }: Shared & { label: string; onPress: (
   );
 }
 
-export function WorkspaceSwitcher({ workspaces = [], current = "", showShortcuts = false, addLabel = "", onCurrentChange, onAdd, styles, strings, style, ...rest }: WorkspaceSwitcherProps) {
+export function WorkspaceSwitcher({ workspaces = [], current, showShortcuts = false, addLabel = "", onCurrentChange, onAdd, styles, strings, style, ...rest }: WorkspaceSwitcherProps) {
   const s = useStrings("workspace-switcher", strings);
   const { platform } = usePlatform();
   const r = useRecipe(recipes["workspace-switcher"], { styles });
   const titleId = useId();
   const keys = useRovingKeys<HTMLDivElement>({ items: '[role="menuitem"], [role="menuitemradio"]', orientation: "vertical", typeahead: true });
   // Controlled when the app passes both: it confirms the switch first, then moves `current` itself.
-  const [active, setCurrent] = useControllable(current, onCurrentChange);
+  const [active = "", setCurrent] = useControllable(current, onCurrentChange);
   const isCurrent = (ws: WorkspaceSwitcherWorkspace) => (active ? ws.key === active : !!ws.current);
   const pick = (ws: WorkspaceSwitcherWorkspace) => {
     // A signed-out workspace starts sign-in instead: the app hears of it, and nothing changes here.
@@ -238,7 +245,7 @@ export function WorkspaceSwitcher({ workspaces = [], current = "", showShortcuts
               <MenuRow key={ws.key} ws={ws} on={isCurrent(ws)} tab={i === tabAt} onPress={() => pick(ws)} styles={styles} strings={strings} />
             ))}
             <div role="separator" data-af-part="divider" style={css({ flexShrink: 0, marginBlock: t.space.xs, marginInline: t.space["2xs"] }, r.divider)} />
-            <AddRow label={addLabel || s("addMenu")} onPress={() => onAdd?.()} styles={styles} />
+            <AddRow label={addLabel || s("addMenu")} tab={workspaces.length === 0} onPress={() => onAdd?.()} styles={styles} />
           </div>
         </div>
       </div>

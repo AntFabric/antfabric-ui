@@ -206,10 +206,10 @@ function Submenu({
   );
 }
 
-export function TrayMenu({ appName, items = [], tone = "idle", statusText = "", date = "", clock = "", openMenu = "", onSelect, onOpenMenuChange, styles, strings, style, ...rest }: TrayMenuProps) {
+export function TrayMenu({ appName, items = [], tone = "idle", statusText = "", date = "", clock = "", openMenu, onSelect, onOpenMenuChange, styles, strings, style, ...rest }: TrayMenuProps) {
   const { os, glass: liquid } = usePlatform();
   // A submenu opens and closes on its own; the app's next `openMenu` takes over when it comes.
-  const [openKey, setOpen] = useControllable(openMenu, onOpenMenuChange);
+  const [openKey = "", setOpen] = useControllable(openMenu, onOpenMenuChange);
   const mac = os === "mac";
   const linux = os === "linux";
   const idle = tone === "idle";
@@ -226,7 +226,8 @@ export function TrayMenu({ appName, items = [], tone = "idle", statusText = "", 
   });
   const closeSub = (key: string) => {
     setOpen("");
-    keys.ref.current?.querySelector<HTMLElement>(`[data-af-key="${key}"]`)?.focus();
+    // Compared as a value, so a key holding `"` or `\` is not a selector.
+    Array.from(keys.ref.current?.querySelectorAll<HTMLElement>("[data-af-key]") ?? []).find((el) => el.dataset.afKey === key)?.focus();
   };
   const trayIcon = <Icon part="trayIcon" name={idle ? "circle-dot" : "circle"} size={14} style={css(idle ? undefined : filled, r.trayIcon)} />;
   const glyph = (item: TrayMenuItem) =>

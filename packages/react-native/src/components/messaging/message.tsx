@@ -1,6 +1,7 @@
 import { I18nManager, Pressable, Text, View, type AccessibilityActionEvent, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric/ui-core";
+import { recipes, usePending, useStrings, type Attachment, type KitStrings, type Person, type Reaction } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
+import { useAnnounce } from "../../lib/a11y";
 import { Icon } from "../../lib/icon";
 import { usePress } from "../../lib/press";
 import { rootProps, partId, type RootProps } from "../../lib/root-props";
@@ -54,14 +55,14 @@ export interface MessageProps extends RootProps {
   attachments?: Attachment[];
   /** The add pill after the reactions. */
   addReaction?: boolean;
-  /** Called with `status` as Retry leaves it (sending). */
+  /** Reports the request Retry makes (sending). The row waits for the app to pass the new `status`; it never moves it. */
   onStatusChange?: (status: MessageStatus) => void;
-  /** Retry was tapped on a failed message: the app posts it again. */
-  onRetry?: () => void;
+  /** Retry was tapped on a failed message: the app posts it again. Retry spins until the app answers with `status`, or the promise settles. */
+  onRetry?: () => void | Promise<unknown>;
   onDelete?: () => void;
   onOpenThread?: () => void;
-  /** A reaction pill was pressed: toggle yours with this emoji. The server owns the counts. */
-  onReact?: (emoji: string) => void;
+  /** A reaction pill was pressed: toggle yours with this emoji. The server owns the counts: the pill is busy until the app passes the new `reactions`, or the promise settles. */
+  onReact?: (emoji: string) => void | Promise<unknown>;
   /** The add pill was pressed: open the emoji picker. */
   onAddReaction?: () => void;
   /** Opens the message actions sheet. A message still sending ignores it. */
@@ -106,13 +107,13 @@ const iconOf = (view: ViewStyle) => {
   return { size: width as number, style: Object.keys(rest).length ? rest : undefined };
 };
 
-function StatusAction({ label, children, color, onPress, styles }: Pick<MessageProps, "styles"> & { label: string; children: string; color: string | undefined; onPress: () => void }) {
+function StatusAction({ label, children, color, busy = false, onPress, styles }: Pick<MessageProps, "styles"> & { label: string; children: string; color: string | undefined; busy?: boolean; onPress: () => void }) {
   const s = useStyles();
   const press = usePress();
   const r = useRecipe(recipes.message, { state: { focus: press.focused }, styles });
   const action = partStyle(r, "action", { view: press.pressed ? { opacity: 0.6 } : undefined });
   return (
-    <Pressable testID="message.action" accessibilityRole="button" accessibilityLabel={label} onPress={() => onPress()} {...press.handlers} style={[s.action, action.view]}>
+    <Pressable testID="message.action" accessibilityRole="button" accessibilityLabel={label} accessibilityState={busy ? { busy, disabled: busy } : undefined} disabled={busy} onPress={() => onPress()} {...press.handlers} style={[s.action, action.view]}>
       <Text testID="message.actionText" style={[s.actionText, { color }, r.actionText.view, r.actionText.text]}>
         {children}
       </Text>
@@ -127,7 +128,7 @@ export function Message({
   time = "",
   body = "",
   edited = false,
-  status = "sent",
+  status: state = "sent",
   agent = false,
   compact = false,
   unread = false,
@@ -157,11 +158,17 @@ export function Message({
   const { t } = useTheme();
   const s = useStyles();
   const str = useStrings("message", strings);
-  const [state, setState] = useControllable(status, onStatusChange);
-  const retry = () => {
-    setState("sending");
-    onRetry?.();
-  };
+  // Retry reports the request and goes busy until the app answers: the status is the app's, never moved here.
+  const { pending: retrying, run } = usePending([state]);
+  const retry = () =>
+    run(
+      onStatusChange || onRetry
+        ? () => {
+            onStatusChange?.("sending");
+            return onRetry?.();
+          }
+        : undefined,
+    );
   const deleted = state === "deleted";
   const sent = state === "sent";
   const r = useRecipe(recipes.message, { variants: { unread, mentionsYou, highlighted, status: state, agent }, styles });
@@ -182,6 +189,8 @@ export function Message({
 
   // What a screen reader hears of the row's state, after who and when.
   const said = state === "sending" ? str("saidSending") : state === "failed" ? str("saidFailed") : state === "queued" ? str("saidQueued") : "";
+  // A send that fails, or waits for the connection, is said when it happens (iOS has no live regions): not for a message that came that way.
+  useAnnounce(state === "failed" ? str("failed") : state === "queued" ? str("queued") : "");
   // The message's own words are one stop for a screen reader: who, when, what state, the words, edited, and a summary of what hangs off
   // it. Its reactions, attachments and thread are stops of their own after it, so each can be reached and used.
   const named = attachments.map((a) => a.name || a.title || a.domain || "").filter(Boolean).join(", ");
@@ -286,8 +295,6 @@ export function Message({
                 onOpen={() => onAttachmentOpen?.(a)}
                 onCancel={() => onAttachmentCancel?.(a)}
                 onRetry={onAttachmentRetry ? () => onAttachmentRetry(a) : undefined}
-                // The attachment's own `status` is the truth: the card does not move to uploading before the app says so.
-                onStatusChange={onAttachmentRetry ? () => {} : undefined}
               />
             ))}
           </View>
@@ -295,7 +302,7 @@ export function Message({
         {reactions.length > 0 && !deleted ? (
           <View style={s.reactions}>
             {reactions.map((x) => (
-              <ReactionPill key={x.emoji} emoji={x.emoji} count={x.count} mine={x.mine ?? false} reactors={x.reactors ?? ""} disabled={!sent} onPress={onReact ? () => onReact(x.emoji) : undefined} />
+              <ReactionPill key={x.emoji} emoji={x.emoji} count={x.count} mine={x.mine ?? false} reactors={x.reactors ?? ""} disabled={!sent} onMineChange={onReact ? () => onReact(x.emoji) : undefined} />
             ))}
             {addReaction && sent ? <ReactionPill emoji="" variant="add" onPress={() => onAddReaction?.()} /> : null}
           </View>
@@ -311,19 +318,19 @@ export function Message({
           />
         ) : null}
         {state === "sending" ? (
-          <View testID={partId(testID, "message", "statusLine")} accessibilityLiveRegion="polite" style={[s.statusLine, r.statusLine.view]}>
+          <View testID={partId(testID, "message", "statusLine")} style={[s.statusLine, r.statusLine.view]}>
             <Icon testID={partId(testID, "message", "statusIcon")} name="clock" {...statusIcon} color={ink} />
             <Text maxFontSizeMultiplier={fontScale.content} style={r.statusLine.text}>{str("sending")}</Text>
           </View>
         ) : null}
         {state === "failed" ? (
-          <View testID={partId(testID, "message", "statusLine")} accessibilityRole="alert" style={[s.statusLine, r.statusLine.view]}>
+          <View testID={partId(testID, "message", "statusLine")} style={[s.statusLine, r.statusLine.view]}>
             <Icon testID={partId(testID, "message", "statusIcon")} name="circle-alert" {...statusIcon} color={ink} />
             <Text maxFontSizeMultiplier={fontScale.content} style={r.statusLine.text}>{str("failed")}</Text>
             <Text testID={partId(testID, "message", "statusSep")} style={[r.statusLine.text, r.statusSep.view, r.statusSep.text]}>
               ·
             </Text>
-            <StatusAction label={str("retryLabel")} color={ink} onPress={retry} styles={styles}>
+            <StatusAction label={str("retryLabel")} color={ink} busy={retrying} onPress={retry} styles={styles}>
               {str("retry")}
             </StatusAction>
             <Text testID={partId(testID, "message", "statusSep")} style={[r.statusLine.text, r.statusSep.view, r.statusSep.text]}>
@@ -335,7 +342,7 @@ export function Message({
           </View>
         ) : null}
         {state === "queued" ? (
-          <View testID={partId(testID, "message", "statusLine")} accessibilityLiveRegion="polite" style={[s.statusLine, r.statusLine.view]}>
+          <View testID={partId(testID, "message", "statusLine")} style={[s.statusLine, r.statusLine.view]}>
             <Icon testID={partId(testID, "message", "statusIcon")} name="cloud-off" {...statusIcon} color={ink} />
             <Text maxFontSizeMultiplier={fontScale.content} style={r.statusLine.text}>{str("queued")}</Text>
             <Text testID={partId(testID, "message", "statusSep")} style={[r.statusLine.text, r.statusSep.view, r.statusSep.text]}>

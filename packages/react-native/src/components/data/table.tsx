@@ -14,6 +14,7 @@ import {
   isSortable,
   pageCountOf,
   pickState,
+  rowIds,
   sortRows,
   sparkRows,
   togglePage,
@@ -51,7 +52,7 @@ export interface TableProps extends RootProps<View> {
   columns: TableColumn[];
   /** One object per row. The same rows can feed a chart, a stat and a table. */
   rows: Row[];
-  /** The field of each row that names it, for selection and for React's keys. Default `key`; the keys `selected` holds are its values as text. */
+  /** The field of each row that names it, for selection and for React's keys. Default `key`; the keys `selected` holds are its values as text. A row without the field is named by its index in `rows`. */
   rowKey?: string;
   /** The column the rows are ordered by and which way, or `null` for the order they came in. */
   sort?: TableSort | null;
@@ -179,7 +180,7 @@ export function Table({ columns, rows, rowKey = "key", sort, onSortChange, selec
   const count = pageCountOf(rowTotal, pageSize);
   const current = clampPage(at ?? 1, count);
   const shown = pageSize > 0 && !manual ? sorted.slice((current - 1) * pageSize, current * pageSize) : sorted;
-  const ids = shown.map((x) => String(x[rowKey]));
+  const ids = rowIds(shown, rows, rowKey);
   const { all, some } = pickState(ids, picked);
   const layout = cardLayout(columns);
   const sortable = columns.filter(isSortable);
@@ -214,32 +215,37 @@ export function Table({ columns, rows, rowKey = "key", sort, onSortChange, selec
     return cellText(c, v, formatWords, locale, currency);
   };
 
-  const bar = (
+  // The bar holds the select-all box and the sort: with neither (no column sorts, rows that are not picked), there is no bar.
+  const bar = !selectable && sortable.length === 0 ? null : (
     <View testID={id("bar")} style={[s.bar, r.bar.view]}>
       {selectable ? <Checkbox label={str("selectAll")} hideLabel checked={all} indeterminate={some} onCheckedChange={() => setTicked(togglePage(ids, picked))} /> : null}
-      <View testID={id("barSort")} style={[s.barSort, r.barSort.view]}>
-        <Select
-          label=""
-          title={str("sortBy")}
-          placeholder={str("sortBy")}
-          value={order$?.column ?? ""}
-          items={[{ key: "", label: str("asListed") }, ...sortable.map((c) => ({ key: c.key, label: c.label }))]}
-          onValueChange={(key) => {
-            const c = columns.find((x) => x.key === key);
-            change(c ? { column: c.key, direction: firstDirection(c) } : null);
-          }}
-        />
-      </View>
-      {order$ ? (
-        <IconButton
-          icon={order$.direction === "asc" ? "arrow-up" : "arrow-down"}
-          label={order$.direction === "asc" ? str("sortedAscending") : str("sortedDescending")}
-          variant="outline"
-          shape="square"
-          size="sm"
-          onPress={() => change({ ...order$, direction: order$.direction === "asc" ? "desc" : "asc" })}
-        />
-      ) : null}
+      {sortable.length === 0 ? null : (
+        <>
+          <View testID={id("barSort")} style={[s.barSort, r.barSort.view]}>
+            <Select
+              label=""
+              title={str("sortBy")}
+              placeholder={str("sortBy")}
+              value={order$?.column ?? ""}
+              items={[{ key: "", label: str("asListed") }, ...sortable.map((c) => ({ key: c.key, label: c.label }))]}
+              onValueChange={(key) => {
+                const c = columns.find((x) => x.key === key);
+                change(c ? { column: c.key, direction: firstDirection(c) } : null);
+              }}
+            />
+          </View>
+          {order$ ? (
+            <IconButton
+              icon={order$.direction === "asc" ? "arrow-up" : "arrow-down"}
+              label={order$.direction === "asc" ? str("sortedAscending") : str("sortedDescending")}
+              variant="outline"
+              shape="square"
+              size="sm"
+              onPress={() => change({ ...order$, direction: order$.direction === "asc" ? "desc" : "asc" })}
+            />
+          ) : null}
+        </>
+      )}
     </View>
   );
 

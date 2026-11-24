@@ -1,18 +1,20 @@
-import { useId, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode, type Ref } from "react";
+import { recipes, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, row, text, truncate } from "../../lib/style";
-import { useOverlayFocus } from "../../lib/focus";
+import { useAnnounce } from "../../lib/announce";
+import { focusables, useOverlayFocus } from "../../lib/focus";
 import { OverlayLayer, useLayerHost, useLayerStack } from "../../lib/layer";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { Button } from "../actions/button";
 import { IconButton } from "../actions/icon-button";
 
 export type DialogKind = "confirm" | "form";
 export type DialogTone = "danger" | "primary";
 
+/** `id`, `aria-*` and `ref` name the dialog (the panel); `className` and `data-*` go on the root, the backdrop (`splitRootProps`). */
 export interface DialogProps extends RootProps<HTMLDivElement> {
   /** confirm: a decision about something already chosen, 440 wide with a glyph tile. form: fields to fill, 540 wide with a header strip and a close button. */
   kind?: DialogKind;
@@ -30,7 +32,7 @@ export interface DialogProps extends RootProps<HTMLDivElement> {
   cancelLabel?: string;
   /** Fields or anything else between the body and the actions. */
   children?: ReactNode;
-  /** The confirm is in flight: its button spins; Cancel, Close and Esc do nothing until it settles. Pressing the CTA sets it. */
+  /** The confirm is in flight: its button spins and cannot be pressed again. Cancel, Close and Esc still cancel. A press shows it until the app answers. */
   loading?: boolean;
   /** Why the last attempt failed. The dialog stays open; pressing the CTA again retries. */
   error?: string;
@@ -45,7 +47,8 @@ export interface DialogProps extends RootProps<HTMLDivElement> {
   modal?: boolean;
   /** Esc, a press on the scrim and Android's back cancel it. Off for a step that must be answered with a button. */
   dismissible?: boolean;
-  onConfirm?: () => void;
+  /** Reports the request. Return a promise, or answer with `error` or by closing; until then the CTA spins. */
+  onConfirm?: () => void | Promise<unknown>;
   onCancel?: () => void;
   /** Per-part styles over the theme: `{ panel: {…}, title: {…}, actions: {…} }`. */
   styles?: PartStyles<"dialog">;
@@ -132,29 +135,27 @@ function DialogView({
   const s = useStrings("dialog", strings);
   const r = useRecipe(recipes.dialog, { variants: { kind }, styles });
   const actions = useRef<HTMLDivElement>(null);
-  const [busy, setBusy] = useControllable(loading);
-  // A failure settles the request: the CTA is pressable again, to retry.
-  const [failed, setFailed] = useState(error);
-  if (failed !== error) {
-    setFailed(error);
-    if (error) setBusy(loading);
-  }
+  // A press waits for the app's answer: a new `error` or `loading`, or the promise `onConfirm` returns settling. Then the CTA can retry.
+  const { pending, run } = usePending([error, loading]);
+  const busy = loading || pending;
   const form = kind === "form";
-  const cancel = () => !busy && onCancel?.();
+  // Cancelling stays live while the request is in flight: the app may abandon it.
+  const cancel = () => onCancel?.();
   const confirm = () => {
-    if (busy) return;
-    setBusy(true);
-    onConfirm?.();
+    if (!loading) run(onConfirm);
   };
 
   // The focus contract: focus moves in when the dialog mounts (a form to its first field, a confirm to Cancel, so a reflexive Enter never
-  // deletes), Tab stays inside, Esc cancels, and focus goes back to the opener when it unmounts.
+  // deletes), Tab stays inside, Esc cancels, and focus goes back to the opener when it unmounts. In the layer, Esc is the stack's: it comes
+  // after the controls inside (an open Select keeps its own) and reaches the top overlay only.
   const focus = useOverlayFocus<HTMLDivElement>({
     trap: true,
-    onEscape: dismissible ? cancel : undefined,
-    initial: (panel) => (form ? panel.querySelector<HTMLElement>("input, textarea, select") : actions.current?.querySelector<HTMLElement>("button")) ?? panel,
+    onEscape: dismissible && !floating ? cancel : undefined,
+    initial: (panel) => (form ? focusables(panel).find((el) => el.matches("input, textarea, select")) : actions.current?.querySelector<HTMLElement>("button")) ?? panel,
   });
   const panel = focus.ref;
+  const pass = splitRootProps(rest);
+  const { ref, ...named } = pass.control as { ref?: Ref<HTMLDivElement> } & Record<string, unknown>;
   // Only the top overlay takes Esc and a press on the scrim; a dialog that must be answered takes them and does nothing.
   useLayerStack(floating, () => [panel.current], { onEscape: () => dismissible && cancel(), onOutside: () => dismissible && cancel() });
 
@@ -166,9 +167,10 @@ function DialogView({
     }
   };
 
+  // An error that arrives is said at once, through the page's announcer (which a modal leaves reachable), not by a region mounted with it.
+  useAnnounce(error, "assertive", { initial: true });
   const errorBox = error && (
     <div
-      role="alert"
       data-af-part="error"
       style={css(
         row,
@@ -184,7 +186,7 @@ function DialogView({
   const drawn = (
     <div
       data-af-part="root"
-      {...rootProps(rest)}
+      {...pass.root}
       style={css(
         box,
         {
@@ -213,13 +215,18 @@ function DialogView({
         </>
       )}
       <div
-        ref={panel}
+        ref={(el) => {
+          panel.current = el;
+          setRef(ref, el);
+        }}
         role={kind === "confirm" ? "alertdialog" : "dialog"}
         aria-modal
         aria-labelledby={`${id}-title`}
-        aria-describedby={body ? `${id}-body` : undefined}
         tabIndex={-1}
         onKeyDown={keyboard}
+        {...named}
+        // A product's description is read after the body.
+        aria-describedby={[body ? `${id}-body` : "", (named["aria-describedby"] as string | undefined) ?? ""].filter(Boolean).join(" ") || undefined}
         data-af-part="panel"
         style={css(panelLook, partStyle(r, "panel", form && formLook))}
       >
@@ -241,7 +248,7 @@ function DialogView({
               </h2>
               {subtitle && <span data-af-part="subtitle" style={css(text, truncate(1), r.subtitle)}>{subtitle}</span>}
             </div>
-            <IconButton part="close" icon="x" label={s("close")} disabled={busy} onPress={() => cancel()} style={r.close} />
+            <IconButton part="close" icon="x" label={s("close")} onPress={() => cancel()} style={r.close} />
           </div>
         )}
         <div data-af-scroll data-af-part="scroll" style={css(box, { gap: t.space.md, overflowY: "auto" }, partStyle(r, "scroll", form && { padding: t.space.lg }))}>
@@ -262,7 +269,7 @@ function DialogView({
             partStyle(r, "actions", { marginTop: form ? 0 : t.space.xl }, form && { paddingInline: t.space.lg, paddingBlock: t.space.mdLg }),
           )}
         >
-          <Button label={cancelLabel ?? s("cancel")} variant="secondary" size="lg" disabled={busy} onPress={() => cancel()} style={{ minWidth: t.dialog.actionMinW }} />
+          <Button label={cancelLabel ?? s("cancel")} variant="secondary" size="lg" onPress={() => cancel()} style={{ minWidth: t.dialog.actionMinW }} />
           <Button
             label={confirmLabel ?? s("confirm")}
             variant={tone === "danger" ? "danger" : "primary"}

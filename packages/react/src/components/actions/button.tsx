@@ -65,7 +65,7 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const s = useStrings("button", strings);
-  const { os } = usePlatform();
+  const { shortcutOs } = usePlatform();
   const dir = useDirection();
   const ui = useInteraction({ disabled: disabled || loading });
   // A loading button is blocked but not greyed: the spinner already says why.
@@ -101,7 +101,7 @@ export function Button({
       {iconTrailing && <Icon part="icon" name={iconTrailing} style={r.icon} />}
       {shortcut && (
         <span data-af-part="shortcut" style={css(text, partStyle(r, "shortcut", rtl({ marginLeft: t.space["3xs"], letterSpacing: "0.02em" }, dir)))}>
-          {formatShortcut(shortcut, os)}
+          {formatShortcut(shortcut, shortcutOs)}
         </span>
       )}
     </button>

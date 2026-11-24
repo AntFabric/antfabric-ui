@@ -1,6 +1,5 @@
-import { Pressable, Text, View, type ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text, View, type ViewStyle } from "react-native";
 import { type RootProps, partId, rootProps } from "../../lib/root-props";
-import { hitSlopTo } from "../../lib/a11y";
 import { fontScale } from "../../lib/type";
 import { PieChart } from "react-native-gifted-charts";
 import { recipes, useControllable, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
@@ -66,7 +65,9 @@ const useStyles = createStyles((t) => ({
   center: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, alignItems: "center", justifyContent: "center" },
   hit: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0 },
   list: { alignSelf: "stretch" },
+  row: { alignSelf: "stretch" },
   item: { flexDirection: "row", alignItems: "center", alignSelf: "stretch" },
+  toggle: { position: "absolute", top: 0, bottom: 0 },
   label: { flex: 1 },
   share: { textAlign: "right" },
 }));
@@ -100,30 +101,35 @@ function Item({ label, value, share, color, shareW, on, active, onPick, onToggle
   const name = partStyle(r, "label", { text: [chartFont(tk), { textDecorationLine: on ? "none" : "line-through" }] });
   const amount = partStyle(r, "value", { text: [chartFont(tk, "semibold"), { fontVariant: ["tabular-nums"] }] });
   const part = partStyle(r, "share", { view: { minWidth: shareW }, text: [chartFont(tk), { fontVariant: ["tabular-nums"] }] });
+  // The switch sits beside the row's button, not inside it: a control nested in an accessible Pressable is folded into it, so a screen reader
+  // never reaches it. It is drawn over the swatch, `control.hit` wide and the row's height, the swatch's centre on its centre.
+  const inset = StyleSheet.flatten(r.item.view);
+  const left = Number(inset.paddingLeft ?? inset.paddingHorizontal ?? inset.padding ?? 0) + (tk.space.smMd - tk.control.hit) / 2;
   return (
-    <Pressable
-      testID="donut-chart.item"
-      accessibilityRole="button"
-      accessibilityLabel={str("segmentLabel", { label, value, share })}
-      accessibilityState={{ selected: active, disabled: !on }}
-      onPress={() => onPick()}
-      {...press.handlers}
-      style={[s.item, r.item.view]}
-    >
+    <View style={s.row}>
+      <Pressable
+        testID="donut-chart.item"
+        accessibilityRole="button"
+        accessibilityLabel={str("segmentLabel", { label, value, share })}
+        accessibilityState={{ selected: active, disabled: !on }}
+        onPress={() => onPick()}
+        {...press.handlers}
+        style={[s.item, r.item.view]}
+      >
+        <View testID="donut-chart.swatch" style={swatch.view} />
+        <Text testID="donut-chart.label" numberOfLines={1} maxFontSizeMultiplier={fontScale.chrome} style={[s.label, name.view, name.text]}>{label}</Text>
+        <Text testID="donut-chart.value" maxFontSizeMultiplier={fontScale.chrome} style={[amount.view, amount.text]}>{value}</Text>
+        <Text testID="donut-chart.share" maxFontSizeMultiplier={fontScale.chrome} style={[s.share, part.view, part.text]}>{share}</Text>
+      </Pressable>
       <Pressable
         testID="donut-chart.toggle"
         accessibilityRole="switch"
         accessibilityLabel={str("toggleSegment", { label })}
         accessibilityState={{ checked: on }}
-        hitSlop={hitSlopTo(tk.control.hit, tk.space.smMd, tk.space.smMd)}
         onPress={() => onToggle()}
-      >
-        <View testID="donut-chart.swatch" style={swatch.view} />
-      </Pressable>
-      <Text testID="donut-chart.label" numberOfLines={1} maxFontSizeMultiplier={fontScale.chrome} style={[s.label, name.view, name.text]}>{label}</Text>
-      <Text testID="donut-chart.value" maxFontSizeMultiplier={fontScale.chrome} style={[amount.view, amount.text]}>{value}</Text>
-      <Text testID="donut-chart.share" maxFontSizeMultiplier={fontScale.chrome} style={[s.share, part.view, part.text]}>{share}</Text>
-    </Pressable>
+        style={[s.toggle, { left, width: tk.control.hit }]}
+      />
+    </View>
   );
 }
 
@@ -139,11 +145,11 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
   const all = segmentsOf(data, name, value, str("other"));
   const palette = seriesColors(tk);
   const colors = all.map((x, i) => (x.folded ? tk.chart.other : palette[i % palette.length]!));
-  const series = useSeries(all.map((x) => x.label), colors, { hidden, onHiddenChange });
-  const shown = all.filter((x) => series.visible.includes(x.label));
+  const series = useSeries(all.map((x) => x.key), colors, { hidden, onHiddenChange });
+  const shown = all.filter((x) => series.visible.includes(x.key));
   const total = totalOf(shown);
   const [picked, setPicked] = useControllable(selected, onSelectedChange);
-  const focus = shown.find((x) => x.label === picked) ?? null;
+  const focus = shown.find((x) => x.key === picked) ?? null;
   const summary = summarizeSegments({ label: title, segments: shown, format, formatWords, locale }, {
     noData: (v) => str("noData", v),
     allZero: (v) => str("summaryAllZero", v),
@@ -186,7 +192,7 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
                 // Every value is 0: the whole is nothing, so the ring is its track.
                 data={
                   total > 0
-                    ? shown.map((x) => ({ value: x.value, color: focus === null || focus.label === x.label ? series.colorOf(x.label) : withAlpha(series.colorOf(x.label), DIMMED) }))
+                    ? shown.map((x) => ({ value: x.value, color: focus === null || focus.key === x.key ? series.colorOf(x.key) : withAlpha(series.colorOf(x.key), DIMMED) }))
                     : [{ value: 1, color: tk.chart.track }]
                 }
               />
@@ -197,7 +203,7 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
                 onStartShouldSetResponder={() => total > 0}
                 onResponderRelease={(e) => {
                   const hit = segmentAt(e.nativeEvent.locationX, e.nativeEvent.locationY, diameter, inner, outer, shown.map((x) => x.value));
-                  const next = shown[hit]?.label;
+                  const next = shown[hit]?.key;
                   if (next !== undefined) setPicked(picked === next ? null : next);
                 }}
               />
@@ -210,8 +216,8 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
             </Enter>
             <View testID="donut-chart.list" accessibilityRole="list" accessibilityLabel={str("segments")} style={[s.list, r.list.view]}>
               {all.map((x) => {
-                const on = series.visible.includes(x.label);
-                return <Item key={x.label} label={x.label} value={fmt(format, x.value, formatWords, locale)} share={on ? fmt("percent", shareOf(x.value, total), formatWords, locale) : str("unavailable")} color={series.colorOf(x.label)} shareW={shareW} on={on} active={focus?.label === x.label} onPick={() => setPicked(picked === x.label ? null : x.label)} onToggle={() => series.toggle(x.label)} styles={styles} strings={strings} />;
+                const on = series.visible.includes(x.key);
+                return <Item key={x.key} label={x.label} value={fmt(format, x.value, formatWords, locale)} share={on ? fmt("percent", shareOf(x.value, total), formatWords, locale) : str("unavailable")} color={series.colorOf(x.key)} shareW={shareW} on={on} active={focus?.key === x.key} onPick={() => setPicked(picked === x.key ? null : x.key)} onToggle={() => series.toggle(x.key)} styles={styles} strings={strings} />;
               })}
             </View>
           </View>

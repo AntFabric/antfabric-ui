@@ -43,7 +43,7 @@ const docs: ComponentDocs = {
     actionsVisible: {
       type: "boolean",
       default: true,
-      description: "Draws + and ⋯. On web and desktop the kit reveals them on header hover or focus-within (opacity, so revealing never reflows); on a phone they are always there.",
+      description: "Draws + (when there is an `onAdd`) and ⋯ (when there is an `onMenu`; the phone has no ⋯, a long press on the header instead). On web and desktop the kit reveals them on header hover or focus-within (opacity, so revealing never reflows); on a phone + is always there. A button with nothing to fire is never drawn.",
     },
     divided: {
       type: "boolean",
@@ -71,17 +71,25 @@ const docs: ComponentDocs = {
       args: "selected: string",
       changes: "selected",
     },
+    onItemMenu: {
+      type: "event",
+      args: "key: string",
+      platforms: ["web", "desktop"],
+      description: "A row's options were asked for: its ⋮ (drawn on each row while this is given, shown on hover or focus), the context menu on it, or Shift+F10 or the Menu key. Its key; the app opens the row's menu (Mark as read, Mute, Star, Move to…, Leave) from it. The phone's is `onItemLongPress`.",
+    },
     onItemLongPress: {
       type: "event",
       args: "key: string",
       platforms: ["mobile"],
-      description: "A row was long-pressed: its key. The app opens the row's action sheet (Mark as read, Mute, Star, Move to…, Leave) from it.",
+      description: "A row was long-pressed: its key. The app opens the row's action sheet (Mark as read, Mute, Star, Move to…, Leave) from it. Left out, a hold is a press and the rows offer no options action. The web's is `onItemMenu`.",
     },
     onAdd: {
       type: "event",
+      description: "+ was pressed. Left out, no + is drawn.",
     },
     onMenu: {
       type: "event",
+      description: "The section's options were asked for: ⋯ on web and desktop, a long press on the header (and its accessibility action) on the phone. Left out, no ⋯ is drawn and the header takes no long press.",
     },
   },
   platforms: {
@@ -157,7 +165,8 @@ const docs: ComponentDocs = {
       "The header toggle carries aria-expanded; collapsed with unread, its name is 'Channels, 12 unread'.",
       "The badge's own number is hidden; the toggle's name already says it.",
       "Phone: `onMenu` (the long press on the header) is also an accessibility action, 'Channels options', and `onItemLongPress` is one on each row.",
-      "The + and ⋯ buttons are revealed while the header has hover or focus-within, by opacity, so they stay in the tab order. The list is a role=list of the rows.",
+      "The + and ⋯ buttons are revealed while the header has hover or focus-within, by opacity, so they stay in the tab order. Each is drawn only with its handler (`onAdd`, `onMenu`). The list is a role=list of the rows.",
+      "Web and desktop: with `onItemMenu` each row has the SidebarItem ⋮, its context menu and Shift+F10 or the Menu key, all reporting the row's key, as `onItemLongPress` does on the phone.",
     ],
   },
   examples: [
@@ -428,6 +437,11 @@ const docs: ComponentDocs = {
         width: 248,
         platforms: ["web", "desktop"],
       },
+    },
+    {
+      title: "A row's own menu",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "Each row offers its options the platform's way, reporting the same thing, the row's key: on web and desktop `onItemMenu` (its ⋮ on hover or focus, a right-click, Shift+F10 or the Menu key), on the phone `onItemLongPress` (a long press, and an accessibility action). The app opens one menu from either. Without the handler no row offers options.",
     },
     {
       title: "Reordering",

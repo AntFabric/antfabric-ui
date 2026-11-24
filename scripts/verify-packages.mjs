@@ -3,7 +3,9 @@
  * a throwaway project outside the repository, then
  *   (a) server-renders `<AntFabricRoot><Button/></AntFabricRoot>` from `@antfabric/ui-react`,
  *   (b) loads `@antfabric/ui-core`, `@antfabric/ui-core/dtcg`, `@antfabric/ui-core/chart`, `@antfabric/ui-core/tokens.json` and the fonts `fonts.css` names,
- *   (c) type-checks a small consumer file against each package's published `.d.ts`,
+ *   (c) type-checks a small consumer file against each package's published `.d.ts`, under `moduleResolution` bundler and nodenext; checks
+ *       that every file of the kits starts with `"use client"` and none of core's does, that every `.js` has its source map, and which of
+ *       core's entries load in Node under the `react-server` condition (those that do not are listed in `SERVER_TODO`),
  *   (d) proves the data subpaths are the only way to reach the chart libraries: a consumer that imports only the kits' root entries,
  *       bundled by esbuild, holds no recharts, react-native-gifted-charts, gifted-charts-core or d3 module (and one that imports a
  *       `/data` entry does, so the proof is not an empty one), and the published `exports` carry `./data`,
@@ -18,7 +20,9 @@
  *   (g) proves AntFabric's copy is opt-in: core's published `exports` carry `./antfabric` with its types; the subpath resolves in Node and
  *       type-checks (`antfabricStrings` as `strings` with `antfabric` as the theme, `antfabric` being `themes.antfabric`); everything the
  *       roots of core, react and react-native export, bundled, holds none of its files and none of its words (a sentence only AntFabric's
- *       copy has), and a consumer of `./antfabric` does bundle them, so the proof is not an empty one.
+ *       copy has), and a consumer of `./antfabric` does bundle them, so the proof is not an empty one,
+ *   (h) proves an app pays for the kit's icons, not lucide's: `import { Button }` from `@antfabric/ui-react`, bundled minified with
+ *       lucide-react inside (only react external), holds at most `ICON_CEILING` lucide icons and stays under `BUTTON_CEILING` bytes.
  *
  *   pnpm verify:packages
  *
@@ -121,6 +125,9 @@ if (!html.includes("<button")) throw new Error("no <button> in: " + html.slice(0
 if (!html.includes("Send")) throw new Error("no label in: " + html.slice(0, 400));
 if (!html.includes("data-af-part=")) throw new Error("no data-af-part in: " + html.slice(0, 400));
 if (!html.includes('data-af-platform="web"') || !html.includes("--af-")) throw new Error("no root attributes or token variables in: " + html.slice(0, 400));
+// The kit's sheet is named with the published version, so a host and a plugin on two versions do not share the first one's.
+const kitVersion = JSON.parse(readFileSync("node_modules/@antfabric/ui-react/package.json", "utf8")).version;
+if (!html.includes("antfabric-ui@" + kitVersion)) throw new Error("the kit's <style> is not named antfabric-ui@" + kitVersion + ": " + (html.match(/<style[^>]*>/) ?? [""])[0]);
 
 // A theme is a theme object: "dark" is a scheme, and a plain-JS consumer who passes it as a theme is told so. A host without the root writes the root's attributes with rootAttrs.
 for (const bad of [() => renderToStaticMarkup(createElement(AntFabricRoot, { theme: "dark" }, null)), () => renderToStaticMarkup(createElement(AntFabricProvider, { theme: "dark" }, null))]) {
@@ -200,7 +207,7 @@ import { defineTheme, themeCss, themes, tokensCss, tokenVars, type Scheme, type 
 import { antfabric, antfabricStrings } from "@antfabric/ui-core/antfabric";
 import { tokensDtcg } from "@antfabric/ui-core/dtcg";
 import { fmt, niceScale, type FormatSpec, type Scale } from "@antfabric/ui-core/chart";
-import tokens from "@antfabric/ui-core/tokens.json";
+import tokens from "@antfabric/ui-core/tokens.json" with { type: "json" };
 
 const props: ButtonProps = { label: "Send", variant: "primary", onPress: () => {} };
 // @ts-expect-error variant is a closed union
@@ -323,8 +330,35 @@ export { bad };
 const base = { target: "ES2022", module: "ESNext", moduleResolution: "Bundler", jsx: "react-jsx", strict: true, noEmit: true, skipLibCheck: true, resolveJsonModule: true, noUncheckedIndexedAccess: true, verbatimModuleSyntax: true };
 writeFileSync(join(app, "tsconfig.web.json"), JSON.stringify({ compilerOptions: { ...base, lib: ["ES2022", "DOM", "DOM.Iterable"] }, files: ["web.tsx"] }));
 writeFileSync(join(app, "tsconfig.native.json"), JSON.stringify({ compilerOptions: { ...base, lib: ["ES2022"], types: ["react-native"] }, files: ["native.tsx"] }));
-for (const cfg of ["web", "native"]) run(join(app, "node_modules/.bin/tsc"), ["-p", `tsconfig.${cfg}.json`], app, `tsc against the ${cfg} consumer file`);
-console.log("  tsc: web.tsx (react with its item types, react/data, react/shell, react/chat, core, core/dtcg, tokens.json) and native.tsx (react-native, react-native/data, react-native/shell, react-native/chat, core) type-check against the published .d.ts");
+// The same two files under Node's own resolution (`nodenext`), which follows only relative imports that name their file.
+const nodenext = { ...base, module: "NodeNext", moduleResolution: "NodeNext" };
+writeFileSync(join(app, "tsconfig.web-nodenext.json"), JSON.stringify({ compilerOptions: { ...nodenext, lib: ["ES2022", "DOM", "DOM.Iterable"] }, files: ["web.tsx"] }));
+writeFileSync(join(app, "tsconfig.native-nodenext.json"), JSON.stringify({ compilerOptions: { ...nodenext, lib: ["ES2022"], types: ["react-native"] }, files: ["native.tsx"] }));
+for (const cfg of ["web", "native", "web-nodenext", "native-nodenext"]) run(join(app, "node_modules/.bin/tsc"), ["-p", `tsconfig.${cfg}.json`], app, `tsc against the ${cfg} consumer file`);
+console.log("  tsc: web.tsx (react with its item types, react/data, react/shell, react/chat, core, core/dtcg, tokens.json) and native.tsx (react-native, react-native/data, react-native/shell, react-native/chat, core) type-check against the published .d.ts, under moduleResolution bundler and nodenext");
+
+// Server components: every file of the kits starts with "use client" (a server file that imports one gets a client boundary, not
+// a crash), core's do not, and each core entry either loads in Node under the `react-server` condition (React's server build, which
+// has no createContext or useState) or is listed below as one that does not yet. A listed one that loads must come off the list.
+const SERVER_TODO = { ".": "state.ts and strings/react.ts call createContext at module scope", "./chart": "tween.ts imports useState, and its chunk holds state.ts" };
+for (const name of NAMES) {
+  const dist = join(app, "node_modules/@antfabric", `ui-${name}`, "dist");
+  for (const f of readdirSync(dist, { recursive: true }).filter((f) => f.endsWith(".js"))) {
+    const code = readFileSync(join(dist, f), "utf8");
+    const client = code.startsWith('"use client";');
+    if (name === "core" ? client : !client) fail(`${name}: dist/${f} ${client ? "starts" : "does not start"} with "use client"`);
+    if (!code.includes(`//# sourceMappingURL=${f.split("/").pop()}.map`) || !statSync(join(dist, `${f}.map`), { throwIfNoEntry: false })) fail(`${name}: dist/${f} has no source map`);
+  }
+}
+const serverLoads = {};
+for (const sub of Object.keys(read(join(app, "node_modules/@antfabric/ui-core/package.json")).exports).filter((s) => !/json|css|\*/.test(s))) {
+  const spec = sub === "." ? "@antfabric/ui-core" : `@antfabric/ui-core/${sub.slice(2)}`;
+  const r = spawnSync("node", ["--conditions=react-server", "--input-type=module", "-e", `await import(${JSON.stringify(spec)});`], { cwd: app, encoding: "utf8" });
+  serverLoads[sub] = r.status === 0;
+  if (r.status !== 0 && !SERVER_TODO[sub]) fail(`core: ${spec} does not load under the react-server condition\n${r.stderr.split("\n").slice(0, 6).join("\n")}`);
+  if (r.status === 0 && SERVER_TODO[sub]) fail(`core: ${spec} now loads under the react-server condition; take "${sub}" off SERVER_TODO in scripts/verify-packages.mjs`);
+}
+console.log(`  server: every react and react-native dist file starts with "use client", none of core's do, every .js has its .map; under react-server core ${Object.entries(serverLoads).map(([s, ok]) => `${s} ${ok ? "loads" : "does not (listed)"}`).join(", ")}`);
 
 // The published .d.ts files reference only the package itself, its dependency and its peers.
 const allowed = {
@@ -418,6 +452,18 @@ for (const name of NAMES) {
 const plainApp = await bundledText("plain-app", 'import { AntFabricRoot, Button } from "@antfabric/ui-react";\nimport { ThemeProvider } from "@antfabric/ui-react-native";\nimport { themes } from "@antfabric/ui-core";\nexport { AntFabricRoot, Button, ThemeProvider, themes };\n');
 for (const w of COPY_WORDS) if (plainApp.text.includes(w)) fail(`a consumer of the roots holds "${w}"`);
 console.log("  bundle: AntFabric's copy ships from core/antfabric only: its bundle holds " + COPY_WORDS.map((w) => `"${w}"`).join(" and ") + "; the roots of core, react and react-native, bundled, hold neither");
+
+// (h) A consumer pays for the icons the kit draws, not for lucide. `import { Button }`, bundled for production with lucide-react inside
+// (only react is external), holds the kit's registry of lucide icons and no more, and stays under a ceiling. Before the registry, the
+// kit looked icons up in `import * as lucide`, and the same consumer held every one of lucide's 1859 icons in 1,205 KB (284 KB gzip).
+const BUTTON_CEILING = 500 * 1024; // measured 398 KB minified (94 KB gzip) with 88 icons; about 1.25×
+const ICON_CEILING = 120; // the React kit registers 88
+const button = await build({ absWorkingDir: app, stdin: { contents: 'export { Button } from "@antfabric/ui-react";\n', resolveDir: app, loader: "js" }, bundle: true, write: false, metafile: true, minify: true, format: "esm", platform: "browser", conditions: ["import"], external: ["react", "react-dom", "react/jsx-runtime"], define: { "process.env.NODE_ENV": '"production"' }, logLevel: "silent" });
+const buttonBytes = button.outputFiles[0].contents.length;
+const buttonIcons = Object.entries(Object.values(button.metafile.outputs)[0].inputs).filter(([f, v]) => /lucide-react\/dist\/esm\/icons\//.test(f) && v.bytesInOutput > 0).length;
+if (buttonIcons > ICON_CEILING) fail(`a consumer of Button bundles ${buttonIcons} lucide icons (ceiling ${ICON_CEILING}): something imports lucide as a whole again`);
+if (buttonBytes > BUTTON_CEILING) fail(`a consumer of Button bundles ${(buttonBytes / 1024).toFixed(0)} KB minified, over the ${BUTTON_CEILING / 1024} KB ceiling`);
+console.log(`  bundle: Button alone, minified with lucide-react inside, is ${(buttonBytes / 1024).toFixed(0)} KB (ceiling ${BUTTON_CEILING / 1024} KB) with ${buttonIcons} lucide icons (ceiling ${ICON_CEILING})`);
 
 rmSync(scratch, { recursive: true, force: true });
 console.log("verify:packages: ok");

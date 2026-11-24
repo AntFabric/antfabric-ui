@@ -94,7 +94,7 @@ export function ChartCard({ id, r, title, subtitle = "", headline, table, legend
               ) : null}
             </View>
           ) : null}
-          {showing ? <Table columns={rows.columns} rows={rows.rows as Row[]} label={title} /> : <>{legend}{children}</>}
+          {showing ? <Table columns={rows.columns} rows={rows.rows as Row[]} rowKey={rows.rowKey} label={title} /> : <>{legend}{children}</>}
         </View>
       }
     />

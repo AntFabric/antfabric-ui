@@ -1,12 +1,13 @@
-import { Dimensions, Pressable, ScrollView, Text, View, type ViewStyle } from "react-native";
+import { useEffect, useRef } from "react";
+import { AccessibilityInfo, Dimensions, findNodeHandle, Platform, Pressable, ScrollView, Text, TextInput, View, type ViewStyle } from "react-native";
 import { recipes, type NativeTokens, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
-import { useBackHandler } from "../../lib/a11y";
+import { announce, useBackHandler } from "../../lib/a11y";
 import { Icon, type IconName } from "../../lib/icon";
 import { Enter } from "../../lib/motion";
 import { usePress } from "../../lib/press";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { partId, rootProps, type RootProps } from "../../lib/root-props";
+import { partId, rootProps, setRef, type RootProps } from "../../lib/root-props";
 import { fontScale } from "../../lib/type";
 import { Avatar, type AvatarIdentity } from "../display/avatar";
 import { IconButton } from "../actions/icon-button";
@@ -28,6 +29,7 @@ export interface SelectItem {
   disabled?: boolean;
 }
 
+/** `nativeID`, the accessibility label and hint, and `ref` name the trigger; `testID` and `style` stay on the root. */
 export interface SelectProps extends RootProps {
   items: SelectItem[];
   /** The chosen item's key. */
@@ -126,13 +128,13 @@ function Row({ item, chosen, active, pick, styles, testID }: { item: SelectItem;
 
 export function Select({
   items,
-  value = "",
+  value,
   label = "",
   placeholder = "",
-  open = false,
+  open,
   activeKey = "",
   searchable = false,
-  query = "",
+  query,
   searchPlaceholder,
   invalid = false,
   disabled = false,
@@ -151,11 +153,34 @@ export function Select({
   const s = useStyles();
   const str = useStrings("select", strings);
   const press = usePress({ disabled });
-  const [current, setCurrent] = useControllable(value, onValueChange);
-  const [isOpen, setOpen] = useControllable(open, onOpenChange);
+  const [current = "", setCurrent] = useControllable(value, onValueChange);
+  const [isOpen = false, setOpen] = useControllable(open, onOpenChange);
   // Android's back button closes the sheet.
   useBackHandler(() => setOpen(false), isOpen);
-  const [filter, setFilter] = useControllable(query, onQueryChange);
+  const [filter = "", setFilter] = useControllable(query, onQueryChange);
+  // A filter that leaves no rows is said once, when the list empties (iOS has no live regions).
+  const none = isOpen && filter !== "" && !items.length;
+  useEffect(() => {
+    if (none) announce(str("emptyFiltered", { filter }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [none]);
+  // Opening puts the keyboard in the search field (searchable) or the screen reader on the title; closing, by a choice or a way out,
+  // puts the screen reader back on the trigger. Only on a change: a select drawn open moves nothing.
+  const trigger = useRef<View | null>(null);
+  const heading = useRef<Text>(null);
+  const search = useRef<TextInput>(null);
+  const wasOpen = useRef(isOpen);
+  useEffect(() => {
+    if (wasOpen.current === isOpen) return;
+    wasOpen.current = isOpen;
+    if (isOpen && searchable) {
+      search.current?.focus();
+      return;
+    }
+    const target = isOpen ? heading.current : trigger.current;
+    const node = Platform.OS !== "web" && target ? findNodeHandle(target) : null;
+    if (node) AccessibilityInfo.setAccessibilityFocus(node);
+  }, [isOpen, searchable]);
   // A phone has no hover; the trigger takes the wash while pressed (the recipe's `pressed`).
   const r = useRecipe(recipes.select, { state: { pressed: press.pressed, focus: press.focused, invalid: invalid || !!form?.invalid, disabled: press.disabled }, styles });
   const chosen = items.find((i) => i.key === current);
@@ -163,9 +188,10 @@ export function Select({
   const icon = partStyle(r, "icon", { text: { color: tint(t, chosen?.color) } });
   const { width: iconSize, height: _ih, ...iconRest } = icon.view;
   const { width: caretSize, height: _ch, ...caretRest } = r.caret.view;
-  const name = label || placeholder || form?.label || "";
+  // Inside a FormField its visible label beats the placeholder (WCAG 2.5.3).
+  const name = label || form?.label || placeholder || "";
   return (
-    <View testID={partId(testID, "select", "root")} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
+    <View testID={partId(testID, "select", "root")} style={[s.root, r.root.view, style]}>
       {label ? (
         <Text testID={partId(testID, "select", "label")} maxFontSizeMultiplier={fontScale.content} style={[r.label.view, r.label.text]}>
           {label}
@@ -176,11 +202,16 @@ export function Select({
           testID={partId(testID, "select", "trigger")}
           accessibilityRole="button"
           accessibilityLabel={chosen ? `${name}, ${chosen.label}` : name}
-          accessibilityHint={[title, form?.hint].filter(Boolean).join(". ") || undefined}
           accessibilityState={{ disabled: press.disabled, expanded: isOpen }}
           disabled={press.disabled}
           onPress={() => setOpen(!isOpen)}
           {...press.handlers}
+          {...rootProps(rest)}
+          ref={(el) => {
+            trigger.current = el;
+            setRef(rest.ref, el);
+          }}
+          accessibilityHint={[title, form?.hint, rest.accessibilityHint].filter(Boolean).join(". ") || undefined}
           style={[s.trigger, r.trigger.view]}
         >
           {chosen?.icon ? <Icon testID={partId(testID, "select", "icon")} name={chosen.icon} size={iconSize as number} color={icon.text.color} style={Object.keys(iconRest).length ? iconRest : undefined} /> : null}
@@ -194,12 +225,12 @@ export function Select({
             <View testID={partId(testID, "select", "grabber")} style={[s.grabber, r.grabber.view]} />
             {/* The way out that is not a choice: a screen reader that opened the sheet by mistake can close it. */}
             <IconButton testID={partId(testID, "select", "close")} icon="x" label={str("close")} size="sm" onPress={() => setOpen(false)} style={{ position: "absolute", top: t.space.sm, end: t.space.sm, zIndex: 1 }} />
-            <Text testID={partId(testID, "select", "title")} maxFontSizeMultiplier={fontScale.content} style={[s.title, r.title.text, r.title.view]}>
+            <Text ref={heading} testID={partId(testID, "select", "title")} maxFontSizeMultiplier={fontScale.content} style={[s.title, r.title.text, r.title.view]}>
               {name}
             </Text>
             {searchable ? (
               <View testID={partId(testID, "select", "search")} style={r.search.view}>
-                <SearchField placeholder={searchPlaceholder ?? str("searchPlaceholder")} value={filter} onValueChange={(next) => setFilter(next)} />
+                <SearchField ref={search} placeholder={searchPlaceholder ?? str("searchPlaceholder")} value={filter} onValueChange={(next) => setFilter(next)} />
               </View>
             ) : null}
             {items.length ? null : (

@@ -13,7 +13,7 @@ const caption = (closeHover: boolean): PartRecipe => ({
     windows: {
       base: { width: "$osWindow.winCaptionW", fg: "$fg.body" },
       states: closeHover
-        ? { hover: { bg: "$os.winClose", fg: "$fg.onBrand" }, pressed: { bg: "$os.winClosePressed", fg: "$fg.onBrand" }, focus: { shadow: "$shadow.focus" } }
+        ? { hover: { bg: "$os.winClose", fg: "$os.onFill" }, pressed: { bg: "$os.winClosePressed", fg: "$os.onFill" }, focus: { shadow: "$shadow.focus" } }
         : { hover: { bg: "$hover.surface" }, pressed: { bg: "$surface.selected" }, focus: { shadow: "$shadow.focus" } },
     },
     linux: {

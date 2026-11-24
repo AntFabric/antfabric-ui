@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { recipes, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
 import { announce } from "../../lib/a11y";
 import { Icon, Spinner } from "../../lib/icon";
@@ -24,9 +24,11 @@ export interface SessionStateProps extends RootProps {
   error?: string;
   /** No backend answering: Sign in would do nothing, so the card says so. */
   offline?: boolean;
-  onSignIn?: () => void;
+  /** Reports the request; Sign in spins until the app answers with `state` (waiting), `error` or `offline`, or the returned promise settles. */
+  onSignIn?: () => void | Promise<unknown>;
   onCancel?: () => void;
-  onUnlock?: () => void;
+  /** Reports the request; Unlock spins until the app answers with `unlocked` (or `error`), or the returned promise settles. */
+  onUnlock?: () => void | Promise<unknown>;
   onSignOut?: () => void;
   /** Per-part styles over the theme: `{ root: {…}, tile: {…}, title: {…}, actions: {…} }`. */
   styles?: PartStyles<"session-state">;
@@ -53,10 +55,10 @@ const glyphBox = (view: ViewStyle) => {
 };
 
 export function SessionState({
-  state: stateProp = "expired",
+  state = "expired",
   biometric = "Face ID",
   biometricAvailable = true,
-  unlocked: unlockedProp = false,
+  unlocked = false,
   error = "",
   offline = false,
   onSignIn,
@@ -71,9 +73,9 @@ export function SessionState({
 }: SessionStateProps) {
   const s = useStyles();
   const str = useStrings("session-state", strings);
-  // Signing in hands over to the sign-in sheet, and unlocking opens the lock: what the card shows next.
-  const [state, setState] = useControllable(stateProp);
-  const [unlocked, setUnlocked] = useControllable(unlockedProp);
+  // Sign in and Unlock report the request and spin until the app answers with a new `state`, `unlocked`, `error` or `offline` (or the
+  // promise settles): the card never shows waiting, or the open lock, before the app says so.
+  const { pending, run } = usePending([state, unlocked, error, offline]);
   const open = state === "locked" && unlocked;
   const title = {
     expired: str("titleExpired"),
@@ -100,10 +102,7 @@ export function SessionState({
   const titleStyle = partStyle(r, "title", { text: { letterSpacing: (r.title.text.fontSize as number) * -0.02 } });
   const waitText = partStyle(r, "waitText", { text: { color: r.wait.text.color } });
   const spinner = glyphBox(r.spinner.view);
-  const signIn = () => {
-    setState("waiting");
-    onSignIn?.();
-  };
+  const signIn = () => run(onSignIn);
   // iOS has no live regions: a change of state is spoken (the new title), and the reason or error as it arrives.
   const was = useRef(state);
   useEffect(() => {
@@ -116,7 +115,7 @@ export function SessionState({
     if (note) announce(note);
   }, [note]);
   return (
-    <Enter {...rootProps(rest)} testID={partId(testID, "session-state", "root")} motion="pop" role="region" accessibilityLabel={title} style={[s.root, r.root.view, style]}>
+    <Enter testID={partId(testID, "session-state", "root")} motion="pop" role="region" accessibilityLabel={title} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
       <View testID={partId(testID, "session-state", "tile")} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden style={[s.tile, r.tile.view]}>
         <Icon name={icon} size={40} color={r.tile.text.color} />
       </View>
@@ -129,7 +128,7 @@ export function SessionState({
         </Text>
       )}
       {state === "waiting" ? (
-        <View testID={partId(testID, "session-state", "wait")} role="status" accessibilityState={{ busy: true }} style={[s.wait, r.wait.view]}>
+        <View testID={partId(testID, "session-state", "wait")} accessibilityState={{ busy: true }} style={[s.wait, r.wait.view]}>
           <Spinner testID={partId(testID, "session-state", "spinner")} decorative size={spinner.size} color={r.wait.text.color} style={spinner.rest} />
           <Text testID={partId(testID, "session-state", "waitText")} maxFontSizeMultiplier={fontScale.content} style={[waitText.view, waitText.text]}>
             {str("waitingBrowser")}
@@ -137,12 +136,12 @@ export function SessionState({
         </View>
       ) : null}
       {offline || (error && !open) ? (
-        <Text testID={partId(testID, "session-state", "note")} role="status" maxFontSizeMultiplier={fontScale.content} style={[s.note, r.note.view, r.note.text]}>
+        <Text testID={partId(testID, "session-state", "note")} maxFontSizeMultiplier={fontScale.content} style={[s.note, r.note.view, r.note.text]}>
           {offline ? str("offline") : error}
         </Text>
       ) : null}
       <View testID={partId(testID, "session-state", "actions")} style={[s.actions, r.actions.view]}>
-        {state === "expired" || state === "signed-out" ? <Button label={str("signIn")} size="lg" full disabled={offline} onPress={signIn} /> : null}
+        {state === "expired" || state === "signed-out" ? <Button label={str("signIn")} size="lg" full disabled={offline} loading={pending} onPress={signIn} /> : null}
         {state === "waiting" ? <Button label={str("cancel")} variant="ghost" size="lg" full onPress={() => onCancel?.()} /> : null}
         {state === "locked" && !unlocked ? (
           <Button
@@ -150,10 +149,8 @@ export function SessionState({
             size="lg"
             full
             iconLeading={biometricAvailable ? "scan-face" : "keyboard"}
-            onPress={() => {
-              setUnlocked(true);
-              onUnlock?.();
-            }}
+            loading={pending}
+            onPress={() => run(onUnlock)}
           />
         ) : null}
         {state === "locked" && !unlocked ? <Button label={str("signOut")} variant="ghost" size="lg" full onPress={() => onSignOut?.()} /> : null}

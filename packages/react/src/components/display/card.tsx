@@ -38,8 +38,15 @@ export interface CardProps extends RootProps<HTMLDivElement> {
 /** The layout and the motion no token decides; what the tokens decide (fill, edge, radius, shadow, padding) is the recipe's. */
 const root: CSSProperties = { ...box, transition: `background-color ${t.duration.fast}, color ${t.duration.fast}` };
 
-// The stretched press target: under the content, so a nested button stays its own control.
-const hit: CSSProperties = { ...pressable, position: "absolute", inset: 0, borderRadius: "inherit", zIndex: 0 };
+// The stretched press target: under the content (below it in the card's own stacking context, which `isolation` opens), so a link,
+// button or field the product nests stays its own control and the card's text can be selected. The card's surface and padding are its.
+const hit: CSSProperties = { ...pressable, position: "absolute", inset: 0, borderRadius: "inherit", zIndex: -1 };
+
+/** A press that ended a text selection inside the card selects, and does not open it. */
+const selecting = (host: HTMLElement | null) => {
+  const sel = typeof window === "undefined" ? null : window.getSelection();
+  return !!sel && !sel.isCollapsed && !!host && host.contains(sel.anchorNode);
+};
 
 const placeholder: CSSProperties = { ...text, minHeight: 64, alignSelf: "stretch" };
 
@@ -92,8 +99,17 @@ export function Card({
       data-af-part="root"
       {...rootProps(rest)}
       {...(interactive ? pointer : null)}
-      onClick={interactive ? (e) => onSurface(e) && onPress?.() : undefined}
-      style={css(root, partStyle(r, "root", pad === "none" && { padding: 0 }, interactive && { cursor: "pointer" }), style)}
+      onClick={
+        interactive
+          ? (e) => {
+              if (!onSurface(e) || selecting(host.current)) return;
+              // A press on the card's text: with `href` it is the link's (⌘-click still opens a tab), otherwise the card's.
+              if (href) target.current?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, button: e.button, metaKey: e.metaKey, ctrlKey: e.ctrlKey, shiftKey: e.shiftKey, altKey: e.altKey }));
+              else onPress?.();
+            }
+          : undefined
+      }
+      style={css(root, partStyle(r, "root", pad === "none" && { padding: 0 }, interactive && { cursor: "pointer", isolation: "isolate" }), style)}
     >
       {interactive && href ? (
         <a

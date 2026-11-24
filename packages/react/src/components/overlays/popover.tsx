@@ -96,7 +96,7 @@ function placePopover(trigger: DOMRect, panel: { width: number; height: number }
  */
 export function Popover({
   content = null,
-  open = false,
+  open,
   onOpenChange,
   side = "bottom",
   align = "start",
@@ -114,7 +114,7 @@ export function Popover({
   ...rest
 }: PopoverProps) {
   const r = useRecipe(recipes.popover, { variants: { bare }, styles });
-  const [shown, setShown] = useControllable(open, onOpenChange);
+  const [shown = false, setShown] = useControllable(open, onOpenChange);
   const id = useId();
   const host = useRef<HTMLDivElement | null>(null);
   const panel = useRef<HTMLDivElement | null>(null);
@@ -133,7 +133,10 @@ export function Popover({
 
   const close = () => setShown(false);
   const press = (e: MouseEvent) => {
-    if (panel.current?.contains(e.target as Node)) return;
+    // Only a press on the trigger toggles. A click in the panel, or in a layer portalled from it (an inner Dialog or Popover, which React
+    // bubbles here through the component tree, not the DOM), is not one.
+    const target = e.target as Node;
+    if (!host.current?.contains(target) || panel.current?.contains(target)) return;
     setShown(!shown);
   };
 
@@ -196,7 +199,8 @@ interface PanelProps {
 
 /** The panel: mounted while open, so focus moves in when it opens and back to the trigger when it closes. */
 function PopoverPanel({ id, panelRef, trigger, r, label, bare, modal, floating, positioned, side, align, width, matchTrigger, onClose, children }: PanelProps) {
-  const focus = useOverlayFocus<HTMLDivElement>({ trap: modal, onEscape: onClose });
+  // Floating, Esc is the stack's (after the controls inside, to the top overlay only); drawn in place, the panel's own.
+  const focus = useOverlayFocus<HTMLDivElement>({ trap: modal, onEscape: floating ? undefined : onClose });
   const [place, setPlace] = useState<Place | null>(null);
   const [triggerWidth, setTriggerWidth] = useState(0);
   useLayerStack(floating, () => [panelRef.current, trigger.current], { onEscape: onClose, onOutside: onClose });

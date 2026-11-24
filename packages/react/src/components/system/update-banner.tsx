@@ -1,9 +1,10 @@
 import { useEffect, useId, type CSSProperties, type ReactNode } from "react";
 import { usePlatform } from "../../platform";
-import { ART_UPDATE, recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { ART_UPDATE, recipes, useDirection, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
+import { useFocusHandoff } from "../../lib/focus";
 import { announce } from "../../lib/announce";
-import { Icon } from "../../lib/icon";
+import { Icon, Spinner } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";
@@ -22,10 +23,10 @@ export interface UpdateBannerProps extends RootProps<HTMLDivElement> {
   error?: string;
   /** Desktop: the notice is the card. Left (false) is the nav rail collapsed to 64 px, so the notice is an icon with a dot. */
   expanded?: boolean;
-  /** Called with `stage` as Install or Retry leaves it (downloading). */
+  /** Reports the request Install or Retry makes (downloading). The banner waits for the app to pass the new `stage`; it never moves it. */
   onStageChange?: (stage: UpdateBannerStage) => void;
-  /** Install the waiting release, or retry a failed one. */
-  onApply?: () => void;
+  /** Install the waiting release, or retry a failed one. The card waits until the app answers with `stage` or `error`, or the promise settles. */
+  onApply?: () => void | Promise<unknown>;
   /** Restart (desktop) or reload (web) onto the new version. */
   onRestart?: () => void;
   /** Per-part styles over the theme: `{ root: {…}, card: {…}, banner: {…}, railIcon: {…} }`. */
@@ -103,6 +104,7 @@ const card: CSSProperties = {
 
 function Card({
   stage,
+  pending,
   version,
   progress,
   error,
@@ -111,6 +113,7 @@ function Card({
   onPress,
 }: {
   stage: UpdateBannerStage;
+  pending: boolean;
   version: string;
   progress: number;
   error: string;
@@ -127,11 +130,8 @@ function Card({
   const title = stage === "downloading" ? s("downloading") : stage === "installing" ? s("installing") : stage === "ready" ? s("ready") : stage === "failed" ? s("failed") : s("available");
   const detail = stage === "downloading" ? (progress >= 0 ? s("downloadingPercent", { percent: progress }) : s("downloadingUnknown")) : stage === "failed" ? error : s("versionTag", { version });
   const action = stage === "available" ? s("installLabel", { version }) : stage === "ready" ? s("restartLabel", { version }) : s("retryLabel");
-  // A change of stage is spoken through the page's announcer, and a failure carries its reason: a status mounted holding its text is not
-  // read, and a button's own name would hide the sentence around it. Progress is not read out percent by percent.
-  useEffect(() => {
-    announce(stage === "failed" ? `${title}. ${error}` : title, stage === "failed" ? "assertive" : "polite");
-  }, [stage]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Install (or Retry) becomes the busy card when the updater starts: focus, fallen to the page, follows onto it.
+  const working = useFocusHandoff<HTMLDivElement>(busy);
   const children: ReactNode = (
     <>
       <Art styles={styles} />
@@ -144,13 +144,13 @@ function Card({
           {detail}
         </span>
       </div>
-      <Icon part="cardIcon" name={stage === "ready" ? "arrow-right" : stage === "failed" ? "refresh-cw" : "download"} style={r.cardIcon} />
+      {pending ? <Spinner part="cardIcon" decorative style={r.cardIcon} /> : <Icon part="cardIcon" name={stage === "ready" ? "arrow-right" : stage === "failed" ? "refresh-cw" : "download"} style={r.cardIcon} />}
     </>
   );
   // Not clickable while the updater is working: it says what is happening, and when.
   if (busy) {
     return (
-      <div aria-busy data-af-part="card" style={css(rtl(card, dir), partStyle(r, "card", enter("fade")))}>
+      <div ref={working} tabIndex={-1} aria-busy data-af-part="card" style={css(rtl(card, dir), partStyle(r, "card", enter("fade")))}>
         {children}
       </div>
     );
@@ -160,10 +160,12 @@ function Card({
       <button
         type="button"
         data-af-press
-        aria-label={action}
-        aria-describedby={`${ids}-title ${ids}-detail`}
+        // Named by what it shows (WCAG 2.5.3: a voice user says the words they see); what a press does is its description and tooltip.
+        aria-labelledby={`${ids}-title ${ids}-detail`}
         title={action}
-        onClick={() => onPress()}
+        aria-busy={pending || undefined}
+        aria-disabled={pending || undefined}
+        onClick={() => !pending && onPress()}
         {...ui.handlers}
         data-af-part="card"
         style={css(pressable, rtl(card, dir), partStyle(r, "card", enter("rise")))}
@@ -174,29 +176,28 @@ function Card({
   );
 }
 
-function RailIcon({ stage, styles, strings, onPress }: { stage: UpdateBannerStage; styles?: PartStyles<"update-banner">; strings?: Partial<KitStrings["update-banner"]>; onPress: () => void }) {
+function RailIcon({ stage, pending, styles, strings, onPress }: { stage: UpdateBannerStage; pending: boolean; styles?: PartStyles<"update-banner">; strings?: Partial<KitStrings["update-banner"]>; onPress: () => void }) {
   const s = useStrings("update-banner", strings);
   const busy = stage === "downloading" || stage === "installing";
   const ui = useInteraction({ disabled: busy });
   const dot = stage === "available" || stage === "ready" || stage === "failed";
+  // Busy, the icon stays in the tab order (aria-disabled, not disabled), so a keyboard press on it keeps its place.
   const r = useRecipe(recipes["update-banner"], { variants: { stage }, state: { hover: ui.hovered, focus: ui.focused }, styles });
   const title = stage === "downloading" ? s("downloading") : stage === "installing" ? s("installing") : stage === "ready" ? s("ready") : stage === "failed" ? s("failed") : s("available");
-  useEffect(() => {
-    announce(title, stage === "failed" ? "assertive" : "polite");
-  }, [stage]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <button
       type="button"
       data-af-press
       aria-label={title}
       title={title}
-      disabled={ui.disabled}
-      onClick={() => onPress()}
+      aria-busy={pending || busy || undefined}
+      aria-disabled={pending || busy || undefined}
+      onClick={() => !pending && !busy && onPress()}
       {...ui.handlers}
       data-af-part="railIcon"
       style={css(pressable, { alignItems: "center", justifyContent: "center" }, partStyle(r, "railIcon", ui.disabled && { cursor: "default" }))}
     >
-      <Icon part="railGlyph" name={stage === "ready" ? "arrow-right" : stage === "failed" ? "refresh-cw" : "download"} style={r.railGlyph} />
+      {pending ? <Spinner part="railGlyph" decorative style={r.railGlyph} /> : <Icon part="railGlyph" name={stage === "ready" ? "arrow-right" : stage === "failed" ? "refresh-cw" : "download"} style={r.railGlyph} />}
       {/* A dot, never a number: there is only ever one release waiting. */}
       {dot && (
         <span
@@ -216,7 +217,7 @@ function RailIcon({ stage, styles, strings, onPress }: { stage: UpdateBannerStag
 const SHOWN: readonly UpdateBannerStage[] = ["available", "downloading", "installing", "ready", "failed"];
 
 export function UpdateBanner({
-  stage = "available",
+  stage: current = "available",
   version,
   progress = -1,
   error,
@@ -233,20 +234,35 @@ export function UpdateBanner({
   const { platform } = usePlatform();
   const r = useRecipe(recipes["update-banner"], { styles });
   const dir = useDirection();
-  // Installing walks the stage on at once; the updater's own events take it from there.
-  const [current, setStage] = useControllable(stage, onStageChange);
+  // Install and Retry report the request and wait: the stage is the updater's, and moves only when the app passes it (or an `error`), or
+  // when the promise a handler returns settles.
+  const { pending, run } = usePending([current, error, progress]);
   const shown = SHOWN.includes(current);
   const press = () => {
     if (current === "ready") return onRestart?.();
     if (current !== "available" && current !== "failed") return;
-    setStage("downloading");
-    onApply?.();
+    run(
+      onStageChange || onApply
+        ? () => {
+            onStageChange?.("downloading");
+            return onApply?.();
+          }
+        : undefined,
+    );
   };
   // The web's line is said through the page's announcer when it appears or fails.
   const webLine = platform === "web" && shown ? (current === "failed" ? s("reloadFailed") : s("reloadAvailable")) : "";
   useEffect(() => {
     if (webLine) announce(webLine, current === "failed" ? "assertive" : "polite");
   }, [webLine]); // eslint-disable-line react-hooks/exhaustive-deps
+  // The desktop's stage is spoken through the page's announcer when it appears and as it changes, and a failure carries its reason: a status
+  // mounted holding its text is not read, and a button's own name would hide the sentence around it. Said here, not by the card or the rail
+  // icon, so folding or unfolding the rail (one replaces the other) says nothing again. Progress is not read out percent by percent.
+  const stageTitle = current === "downloading" ? s("downloading") : current === "installing" ? s("installing") : current === "ready" ? s("ready") : current === "failed" ? s("failed") : s("available");
+  const deskLine = platform !== "web" && shown ? (current === "failed" ? `${stageTitle}. ${error || s("errorDefault")}` : stageTitle) : "";
+  useEffect(() => {
+    if (deskLine) announce(deskLine, current === "failed" ? "assertive" : "polite");
+  }, [current, platform]); // eslint-disable-line react-hooks/exhaustive-deps
   if (platform === "web") {
     return (
       <div data-af-part="root" {...rootProps(rest)} style={css(box, { maxWidth: "100%" }, r.root, style)}>
@@ -267,8 +283,8 @@ export function UpdateBanner({
   }
   return (
     <div data-af-part="root" {...rootProps(rest)} style={css(box, { maxWidth: "100%" }, r.root, style)}>
-      {shown && expanded && <Card stage={current} version={version} progress={progress} error={error || s("errorDefault")} styles={styles} strings={strings} onPress={press} />}
-      {shown && !expanded && <RailIcon stage={current} styles={styles} strings={strings} onPress={press} />}
+      {shown && expanded && <Card stage={current} pending={pending} version={version} progress={progress} error={error || s("errorDefault")} styles={styles} strings={strings} onPress={press} />}
+      {shown && !expanded && <RailIcon stage={current} pending={pending} styles={styles} strings={strings} onPress={press} />}
     </div>
   );
 }

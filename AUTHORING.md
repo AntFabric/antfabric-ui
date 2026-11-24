@@ -219,7 +219,15 @@ export const switchRecipe = defineRecipe({
   A prop that a press changes (`checked`, `open`, `value`, `active`) goes through
   `useControllable(value, onEvent)`, and its event is declared in the docs with `changes: "<prop>"`.
   That makes it controlled when an app passes both and keeps its own state otherwise, so the
-  catalogue's previews stay pressable.
+  catalogue's previews stay pressable. Never default that prop in the destructuring (the event alone would then hold it at
+  the default); default the result: `const [on = false, setOn] = useControllable(checked, onCheckedChange)`
+  (`pnpm check conventions`, rule `controllable-default`).
+- **A request is not a result.** A press that asks the app for something (send, retry, approve, sign in, turn on) never shows the
+  outcome itself: it runs the handler through `usePending(answer)` (`const { pending, run } = usePending([status, error])`, then
+  `run(onRetry)`), shows `pending` on the pressed control (a spinner, aria-busy, no second press), and draws the outcome only from the props
+  the app passes. Pending ends when a value in `answer` changes or the promise the handler returns settles, so a failure that leaves the
+  props as they were comes back by itself; Cancel, Close and Escape stay live meanwhile. The event's type is `() => void | Promise<unknown>`.
+  Only pure UI state (expanded, revealed, hovered, a selection row's tick) may move on its own.
 - **Built-in text:** a component has no fixed words of its own (aria labels, "Not now", "Required", a counter): it reads them from the
   dictionary in `packages/core/src/strings/<category>.ts`, keyed by its docs id, and a product overrides them per tree (`strings` on
   `AntFabricRoot` / `AntFabricProvider` / `ThemeProvider`, with `locale`) or per instance (the component's `strings` prop).
@@ -249,8 +257,18 @@ export const switchRecipe = defineRecipe({
     cuts the text at its variables the same way; `s("mentions", { n })` is for an attribute, a string and the phone.
 - **Pass-through:** every component's props extend the kit's `RootProps` (`lib/root-props.ts`): `id`, `className`, `data-*`, `aria-*` and
   `ref` on the web, `testID`, `nativeID`, the accessibility label and hint and `ref` on the phone. Destructure `...rest` and spread
-  `{...rootProps(rest)}` on the root after the kit's own attributes and before `style`; on the phone the root's `testID` is
-  `partId(testID, "<id>", "root")` and each part's `partId(testID, "<id>", "<part>")`. They are universal props: the docs do not list them.
+  `{...rootProps(rest)}` on the root after the kit's own attributes (an `aria-label` the kit writes after the spread drops the product's)
+  and before `style`; on the phone the root's `testID` is `partId(testID, "<id>", "root")` and each part's `partId(testID, "<id>", "<part>")`,
+  in every helper the file draws parts with. They are universal props: the docs do not list them.
+  - **The element with the role.** When the root wraps the one element that carries the component's role (a field's input, a select's
+    trigger, a chip's button, a segmented control's tab list, a sheet's `role="dialog"` panel), `id`, `aria-*` and `ref` go to that element
+    and `className`, `data-*` and `style` stay on the root: `splitRootProps(rest)` on the web gives `{ root, control }`; on the phone spread
+    `rootProps(rest)` on the control and nothing on the root. Type the props `RootProps<TheControl>`. A kit `useId` the label points at
+    takes a passed `id` instead (`form?.id ?? passed ?? own`), and a product's `aria-describedby` (`accessibilityHint`) is joined after the
+    kit's, never in place of it. An element with a ref of its own merges the product's with `setRef(ref, el)` (both kits), after the spread.
+  - `pnpm check generic` holds it: every drawing, in both kits, with an `id` and an `aria-label` passed (the phone's `nativeID` and
+    `accessibilityLabel`) must carry both on one element (the one `PASS_THROUGH_TARGET` in `scripts/check.tsx` names, else a drawn
+    `role="dialog"`, else the root), the product's name over the kit's. `passThroughTodo` in `reports/generic.json` is the ratchet.
 - **Locale and direction:** numbers, dates, currency and sorting use `useLocale()` (never a hard-coded `"en-US"`); a style that names a
   side (`paddingLeft`, `left`, a corner) goes through `rtl(style, useDirection())` on the web (recipes are mirrored for you) and a
   transform or swipe direction reads `I18nManager.isRTL` on the phone. Keep physical properties: a left-to-right render must not move.
@@ -260,13 +278,28 @@ export const switchRecipe = defineRecipe({
   - A composite group (menu, menubar, toolbar, tablist, radiogroup, listbox) is one tab stop and moves with the arrows:
     `useRovingKeys` from `lib/roving.ts`. A listbox driven from a field moves `aria-activedescendant`. `keysTodo` lists the ones that do not.
   - An overlay keeps `useOverlayFocus` from `lib/focus.ts`: focus in when it opens (unless the tree says `autoFocus={false}`), Tab trapped
-    when modal, Escape, focus back to the opener when it closes. A focused control that is replaced by something else hands focus on
-    (`useFocusHandoff`).
+    when modal, Escape, focus back to the opener when it closes (an overlay drawn sliding away before the app unmounts it passes `open`).
+    A focused control that is replaced by something else hands focus on (`useFocusHandoff`); a busy control stays focusable
+    (`aria-disabled`, Button's `loading`), never `disabled`; a control whose own part goes with it (a dismissed toast or banner) hands
+    focus to the nearest control that stays (`focusNear`). The re-render pass presses each such control from the keyboard and fails when
+    focus falls to the page (`focusTodo`).
+  - Escape goes to the innermost handler that uses it: a handler that consumes Escape (or Enter) calls `e.preventDefault()`, and returns
+    first when `isComposing(e)` (`lib/keys.ts`), since an IME's keys are its own. An overlay drawn in the layer (`useLayerStack`) takes
+    Escape from the stack, which reads only what nothing inside prevented and gives it to the top overlay; it passes no `onEscape` to
+    `useOverlayFocus` while it floats.
   - A status that appears is announced: `announce()` from `lib/announce.ts` on the web (never a live region mounted with its text) and
-    from `lib/a11y.ts` on the phone (iOS has no live regions).
+    from `lib/a11y.ts` on the phone (iOS has no live regions). A status that changes in place is `useAnnounce(text)` (both kits): said
+    on each new text, not on the first render unless `initial`. The text stays plain: no component draws `aria-live`, `role="status"`,
+    `role="alert"` or `accessibilityLiveRegion` with text in it, and `pnpm check generic` fails on one in any first render (`liveTodo`).
 - **Composition:** import sibling components from their files (`../actions/button`), never from the
   kit's index.
-- **Icons** are lucide names in kebab case, drawn with the kit's `<Icon name>`.
+- **Icons** are lucide names in kebab case, drawn with the kit's `<Icon name>`; every icon prop is an `IconName`,
+  which also takes the icon component. A name is drawn from the kit's registry, `src/lib/icons.ts`, which imports
+  exactly the lucide icons the kit draws, one by one, so an app's bundle holds those and not all of lucide. A name
+  you add to kit code goes in the registry in the same change (`pnpm check code` fails both ways: a drawn name not
+  registered, a registered name not drawn), spelled out where it is drawn (`tone === "danger" ? "circle-alert" :
+  "info"`, never `` `chevron-${dir}` ``). No other kit file imports lucide. Items carry no functions, except a
+  component icon: an item's `icon` may be one, for an app that has not registered the name.
 - **Shortcuts** are written once (`Mod+Enter`) and drawn with `formatShortcut(keys, os)` from
   `@antfabric/ui-core`.
 - **Entrances** (menus and dialogs pop, sheets slide up, banners drop, toasts rise) play on mount,

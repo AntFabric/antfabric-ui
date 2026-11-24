@@ -2,7 +2,7 @@ import { View, type ViewStyle } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { type RootProps, partId, rootProps } from "../../lib/root-props";
-import { EARLIER_BARS, barLayout, fmt, valueDomain, withAlpha, type FormatSpec, type Row } from "@antfabric/ui-core/chart";
+import { EARLIER_BARS, barLayout, fmt, valueDomain, withAlpha, type FormatSpec, type FormatWords, type Row } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { giftedAnimated, useChartTokens, useReducedMotion } from "../../data/theme";
@@ -35,6 +35,7 @@ export interface SparkBarsProps extends RootProps {
 
 const useStyles = createStyles(() => ({
   root: { flexShrink: 0, overflow: "hidden" },
+  under: { transform: [{ scaleY: -1 }] },
 }));
 
 /** The label's default number: two decimals at most, grouped, in the viewer's locale. */
@@ -45,6 +46,8 @@ export function SparkBars({ data, y, width = 96, height = 36, animate = false, t
   const t = useChartTokens();
   const r = useRecipe(recipes["spark-bars"], { styles });
   const str = useStrings("spark-bars", strings);
+  // The words a format writes (points, a duration, the dash) are the kit's, so the default label is said in the product's language.
+  const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
   const reduced = useReducedMotion();
   const values = data.map((row) => row[y]).filter((v): v is number => typeof v === "number" && Number.isFinite(v));
@@ -57,13 +60,24 @@ export function SparkBars({ data, y, width = 96, height = 36, animate = false, t
   const layout = barLayout(width, values.length, t.chart.barGap);
   const { gap } = layout;
   const barWidth = Math.min(layout.barWidth, t.kpi.sparkBarMaxW);
-  const said = label || str("summary", { count: values.length, latest: fmt(format, values[last], undefined, locale) });
+  const said = label || str("summary", { count: values.length, latest: fmt(format, values[last], formatWords, locale) });
+  // gifted-charts measures bars up from zero to `maxValue`, and what is under zero in sections of its own below the axis. So the domain is laid out as
+  // the web's is: all at or above zero, as it is; all at or below, the same bars drawn by their size and turned over, so they hang from the top; both,
+  // zero where it falls, with one section above it and one below, each as tall as its share of the range.
+  const under = hi <= 0 && lo < 0;
+  const both = lo < 0 && hi > 0;
+  const range = hi - lo;
+  const scale = under
+    ? { maxValue: -lo, height }
+    : both
+      ? { maxValue: hi, stepValue: hi, height: (height * hi) / range, noOfSectionsBelowXAxis: 1, mostNegativeValue: lo, negativeStepValue: -lo, negativeStepHeight: (height * -lo) / range }
+      : { maxValue: hi === lo ? lo + 1 : hi, height };
   return (
-    <View testID={partId(testID, "spark-bars", "root")} {...rootProps(rest)} accessible accessibilityRole="image" accessibilityLabel={said} style={frame}>
+    <View testID={partId(testID, "spark-bars", "root")} accessible accessibilityRole="image" accessibilityLabel={said} {...rootProps(rest)} style={[frame, under && s.under]}>
       <BarChart
-        data={values.map((value, i) => ({ value, frontColor: i === last ? color : withAlpha(color, EARLIER_BARS) }))}
+        data={values.map((value, i) => ({ value: under ? -value : value, frontColor: i === last ? color : withAlpha(color, EARLIER_BARS) }))}
         width={width}
-        height={height}
+        {...scale}
         barWidth={barWidth}
         spacing={gap}
         initialSpacing={0}

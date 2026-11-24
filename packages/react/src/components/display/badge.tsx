@@ -4,6 +4,7 @@ import { t } from "../../tokens";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { css, enter, text } from "../../lib/style";
 import { rootProps, type RootProps } from "../../lib/root-props";
+import { useAnnounce } from "../../lib/announce";
 
 export type BadgeTone = "brand" | "neutral" | "inverse";
 
@@ -48,13 +49,17 @@ const dotted: CSSProperties = { minWidth: t.dot.size, paddingInline: 0 };
 export function Badge({ count = 0, max = 99, dot = false, tone = "brand", label, unread = false, live = false, styles, strings, style, ...rest }: BadgeProps) {
   const s = useStrings("badge", strings);
   const r = useRecipe(recipes.badge, { variants: { tone, dot }, styles });
+  const name = dot ? s("newActivity") : label ? s("countWithLabel", { count, label }) : unread ? s("countUnread", { count }) : s("count", { count });
+  const shown = dot || count > 0;
+  // `live`: a change of the count is said through the page's announcer (a region holding the count from the start says nothing new).
+  useAnnounce(live && shown && name);
   // Zero draws nothing, never an empty pill.
-  if (!dot && !(count > 0)) return null;
+  if (!shown) return null;
   return (
     <span
       data-af-part="root"
-      role={live ? "status" : "img"}
-      aria-label={dot ? s("newActivity") : label ? s("countWithLabel", { count, label }) : unread ? s("countUnread", { count }) : s("count", { count })}
+      role="img"
+      aria-label={name}
       {...rootProps(rest)}
       style={css(root, partStyle(r, "root", dot && dotted), style)}
     >

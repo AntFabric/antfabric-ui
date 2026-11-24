@@ -153,9 +153,9 @@ export function NavRail({
   title = "",
   home = "",
   workspace = "",
-  active = "",
-  level = "sections",
-  section = "",
+  active,
+  level,
+  section,
   destinations = [],
   search: showSearch = false,
   searchKeys = "Mod+K",
@@ -182,12 +182,12 @@ export function NavRail({
   ...rest
 }: NavRailProps) {
   const s = useStrings("nav-rail", strings);
-  const { os } = usePlatform();
+  const { shortcutOs } = usePlatform();
   const dir = useDirection();
   const open = expanded;
-  const [current, setCurrent] = useControllable(active, onActiveChange);
-  const [depth, setDepth] = useControllable(level, onLevelChange);
-  const [picked, setPicked] = useControllable(section, onSectionChange);
+  const [current = "", setCurrent] = useControllable(active, onActiveChange);
+  const [depth = "sections", setDepth] = useControllable(level, onLevelChange);
+  const [picked = "", setPicked] = useControllable(section, onSectionChange);
   // Which way the rail last moved between its levels, so the list that arrives slides in from that side. Null until it moves.
   const [moved, setMoved] = useState<"in" | "out" | null>(null);
   // The section last open in each destination, so opening it again goes back there.
@@ -204,7 +204,7 @@ export function NavRail({
   const rPill = useRecipe(recipes["nav-rail"], { state: { hover: pill.hovered, focus: pill.focused }, styles });
   const rSearch = useRecipe(recipes["nav-rail"], { state: { focus: search.focused }, styles });
   const rProfile = useRecipe(recipes["nav-rail"], { state: { hover: profile.hovered, focus: profile.focused }, styles });
-  const searchTitle = s("searchHint", { keys: formatShortcut(searchKeys, os) });
+  const searchTitle = s("searchHint", { keys: formatShortcut(searchKeys, shortcutOs) });
   const fade = enter("fade");
 
   const drills = variant === "drill-in";
@@ -303,7 +303,8 @@ export function NavRail({
       )}
     >
       <div style={css(box, { alignItems: open ? "stretch" : "center", gap: open ? t.space["2xs"] : 14 })}>
-        {inside || logo || title ? (
+        {/* Collapsed, a `title` alone has nothing to draw (the wordmark shows only expanded), so no empty button is drawn for it. */}
+        {inside || logo || (open && title) ? (
           <div style={css(box, { alignItems: "center", gap: open ? t.space["2xs"] : 14 }, open && { flexDirection: "row" })}>
             {inside ? (
               // drill-in: the destination's icon takes the logo's place, and pressing it goes back to the destinations.
@@ -474,7 +475,14 @@ export function NavRail({
           type="button"
           data-af-part="profile"
           data-af-press
-          aria-label={s("profile", { name: userName })}
+          aria-label={
+            presence === "none"
+              ? s("profile", { name: userName })
+              : s("profileWithPresence", {
+                  name: userName,
+                  presence: presence === "active" ? s("presenceActive") : presence === "away" ? s("presenceAway") : presence === "dnd" ? s("presenceDnd") : s("presenceOffline"),
+                })
+          }
           title={s("profile", { name: userName })}
           aria-haspopup="menu"
           aria-expanded={profileMenuOpen}

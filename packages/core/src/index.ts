@@ -16,7 +16,7 @@ export { isReference, referencePath, primitiveAt, primitiveValue, primitiveVar, 
 export { resolveTokens, tokenVars, type Native, type NativeTokens, type TokenVars, type Vars } from "./native";
 export { descriptions, type TokenNote, type TokenPath } from "./descriptions";
 export * from "./art";
-export { menuItemKey, type ActionItem, type AppMark, type IconActionItem, type MenuItem, type NavItem } from "./items";
+export { menuItemKey, type ActionItem, type AppMark, type IconActionItem, type IconComponent, type IconName, type MenuItem, type NavItem } from "./items";
 export type { AgentStep, Approval, Attachment, AvatarIdentity, AvatarPresence, Person, QuestionOption, Reaction, ToolArg } from "./chat-items";
 export {
   defaultStrings,

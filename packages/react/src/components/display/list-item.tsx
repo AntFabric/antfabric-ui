@@ -54,7 +54,7 @@ export interface ListItemProps extends RootProps<HTMLElement> {
   role?: ListItemRole;
   /** The row navigates: with role `link` it is an `<a href>`, so middle-click and ⌘-click open a new tab. A plain click calls `onPress` and stays on the page when there is one. */
   href?: string;
-  /** Called with `selected` as the press leaves it: a press toggles it. */
+  /** Called with `selected` as the press leaves it: a press toggles it on a selection row (role option or checkbox) only. */
   onSelectedChange?: (selected: boolean) => void;
   /** The row was pressed. Opening what the row stands for is the caller's. */
   onPress?: () => void;
@@ -116,7 +116,7 @@ export function ListItem({
   count = 0,
   shortcut = "",
   chevron = false,
-  selected = false,
+  selected,
   unread = false,
   disabled = false,
   destructive = false,
@@ -131,10 +131,10 @@ export function ListItem({
   ...rest
 }: ListItemProps) {
   const s = useStrings("list-item", strings);
-  const { os } = usePlatform();
+  const { shortcutOs } = usePlatform();
   const dir = useDirection();
   const ui = useInteraction({ disabled });
-  const [on, setOn] = useControllable(selected, onSelectedChange);
+  const [on = false, setOn] = useControllable(selected, onSelectedChange);
   const filled = on && (role === "link" || role === "button");
   // `selected` to the recipe is a filled row (a ticked link or button); `on` is the checkbox's own state.
   const r = useRecipe(recipes["list-item"], {
@@ -156,14 +156,14 @@ export function ListItem({
       data-af-press
       role={role === "link" ? undefined : role}
       title={title}
-      aria-keyshortcuts={shortcut ? ariaShortcut(shortcut, os) : undefined}
-      {...rootProps(rest)}
+      aria-keyshortcuts={shortcut ? ariaShortcut(shortcut, shortcutOs) : undefined}
       aria-label={count > 0 ? s("withUnreadCount", { label: named, count }) : unread ? s("withUnread", { label: named }) : named}
       aria-current={on && role === "link" ? "page" : undefined}
       aria-checked={role === "checkbox" ? on : undefined}
       aria-selected={role === "option" ? on : undefined}
       // aria-disabled, not disabled: a disabled menu row stays focusable so its reason can be heard.
       aria-disabled={ui.disabled || undefined}
+      {...rootProps(rest)}
       onClick={(e: MouseEvent) => {
         if (ui.disabled) {
           e.preventDefault();
@@ -172,7 +172,8 @@ export function ListItem({
         // ⌘-, ctrl- and middle-click on a link are the browser's; a plain click is the product's when it gave `onPress`.
         if (anchor && (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || !onPress)) return;
         if (anchor) e.preventDefault();
-        setOn(!on);
+        // Only a selection row (an option, a checkbox) toggles; a link, button or menu row's `selected` is the app's.
+        if (role === "option" || role === "checkbox") setOn(!on);
         onPress?.();
       }}
       {...ui.handlers}

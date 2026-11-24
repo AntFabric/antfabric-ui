@@ -1,11 +1,13 @@
-import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
+import { useRef, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, neg, pressable, row, text } from "../../lib/style";
 import { rootProps, type RootProps } from "../../lib/root-props";
+import { useRovingKeys } from "../../lib/roving";
 import { Avatar, type AvatarIdentity } from "../display/avatar";
 import { Menu, type MenuRowItem } from "./menu";
 
@@ -29,6 +31,8 @@ export interface ContextMenuProps extends RootProps<HTMLDivElement> {
   /** The message text. */
   body?: string;
   onReact?: (emoji: string) => void;
+  /** The + after the quick set was pressed: the app opens its full emoji picker (the kit draws none on web and desktop) and reacts through it. */
+  onMoreReactions?: () => void;
   onSelect?: (item: ContextMenuItem) => void;
   onClose?: () => void;
   /** Per-part styles over the theme: `{ panel: {…}, reaction: {…}, emoji: {…}, divider: {…} }`. */
@@ -80,6 +84,7 @@ export function ContextMenu({
   time = "",
   body = "",
   onReact,
+  onMoreReactions,
   onSelect,
   onClose,
   styles,
@@ -88,15 +93,36 @@ export function ContextMenu({
   ...rest
 }: ContextMenuProps) {
   const s = useStrings("context-menu", strings);
-  // The person's own quick reactions, as one string so a new array of the same emoji is not a change.
-  const [own, setOwn] = useControllable(picked.join(" "));
-  const owned = own.split(" ").filter(Boolean);
+  // The person's own quick reactions (a new array of the same emoji is not a change).
+  const [owned, setOwned] = useControllable(picked);
   const r = useRecipe(recipes["context-menu"], { variants: { showTarget }, styles });
   const mine = (emoji: string) => owned.includes(emoji);
   const keyboard = (e: KeyboardEvent) => {
-    if (e.key !== "Escape") return;
+    if (e.key !== "Escape" || e.defaultPrevented || isComposing(e)) return;
+    e.preventDefault();
     e.stopPropagation();
     onClose?.();
+  };
+  // The quick reactions are one more stop of the menu's arrows: ↑ from the first row and ↓ from the last move into them, ↓ and ↑ move back
+  // to the first and last row, and ← → (Home, End) move across them. Tab closes from them as from the rows.
+  const rows = useRef<HTMLDivElement | null>(null);
+  const strip = useRovingKeys<HTMLDivElement>({ items: "button", orientation: "horizontal" });
+  const between = (e: KeyboardEvent) => {
+    if ((e.key !== "ArrowUp" && e.key !== "ArrowDown") || e.altKey || e.ctrlKey || e.metaKey) return;
+    const group = strip.ref.current;
+    const list = Array.from(rows.current?.querySelectorAll<HTMLElement>('[role^="menuitem"]') ?? []);
+    if (!group || !list.length) return;
+    const at = document.activeElement;
+    const down = e.key === "ArrowDown";
+    const to = group.contains(at) ? list.at(down ? 0 : -1) : at === list.at(down ? -1 : 0) ? group.querySelector<HTMLElement>("button") : null;
+    if (!to) return;
+    e.preventDefault();
+    e.stopPropagation();
+    to.focus();
+  };
+  const stripKeys = (e: KeyboardEvent) => {
+    if (strip.onKeyDown(e)) return;
+    if (e.key === "Tab") onClose?.();
   };
   return (
     <div data-af-part="root" {...rootProps(rest)} style={css(box, { alignSelf: "flex-start" }, r.root, style)}>
@@ -125,9 +151,9 @@ export function ContextMenu({
           </div>
         </div>
       )}
-      <div data-af-part="panel" onKeyDown={keyboard} style={css(panelLook, partStyle(r, "panel", showTarget && { marginTop: neg(t.space.xs) }))}>
+      <div data-af-part="panel" onKeyDownCapture={between} onKeyDown={keyboard} style={css(panelLook, partStyle(r, "panel", showTarget && { marginTop: neg(t.space.xs) }))}>
         {quickReactions.length > 0 && (
-          <div role="group" aria-label={s("quickReactions")} style={css(row, { justifyContent: "space-between", gap: t.space["3xs"], padding: t.space["2xs"] })}>
+          <div ref={strip.ref} role="group" aria-label={s("quickReactions")} onKeyDown={stripKeys} style={css(row, { justifyContent: "space-between", gap: t.space["3xs"], padding: t.space["2xs"] })}>
             {quickReactions.map((emoji) => (
               <Reaction
                 key={emoji}
@@ -135,7 +161,7 @@ export function ContextMenu({
                 mine={mine(emoji)}
                 styles={styles}
                 onPress={() => {
-                  setOwn((mine(emoji) ? owned.filter((e) => e !== emoji) : [...owned, emoji]).join(" "));
+                  setOwned(mine(emoji) ? owned.filter((e) => e !== emoji) : [...owned, emoji]);
                   onReact?.(emoji);
                 }}
               >
@@ -144,13 +170,13 @@ export function ContextMenu({
                 </span>
               </Reaction>
             ))}
-            <Reaction more label={s("more")} title={s("more")} styles={styles}>
+            <Reaction more label={s("more")} title={s("more")} styles={styles} onPress={() => onMoreReactions?.()}>
               <Icon part="moreIcon" name="smile-plus" style={r.moreIcon} />
             </Reaction>
           </div>
         )}
         {quickReactions.length > 0 && <div data-af-part="divider" style={css({ flexShrink: 0, marginBlock: t.space["2xs"] }, r.divider)} />}
-        <Menu items={items} label={label ?? s("actions")} bare onSelect={(item) => onSelect?.(item)} onClose={() => onClose?.()} />
+        <Menu ref={rows} items={items} label={label ?? s("actions")} bare onSelect={(item) => onSelect?.(item)} onClose={() => onClose?.()} />
       </div>
     </div>
   );

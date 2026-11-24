@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { recipes, useControllable, useDirection, useLocale, useStrings, type KitStrings, type Person } from "@antfabric/ui-core";
+import { recipes, useDirection, useLocale, useStrings, type KitStrings, type Person } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
@@ -20,9 +20,8 @@ export interface ThreadSummaryProps extends RootProps<HTMLButtonElement> {
   /** You follow this thread: the bell and "Following". */
   following?: boolean;
   /**
-   * Called with `following` as the press leaves it. Given `following` as well, the line is
-   * controlled and the press changes nothing here; on its own (the catalogue, where opening is
-   * navigation) it flips Following, as Follow in the thread's ⋯ does.
+   * @deprecated Never called: opening a thread is not following it, and nothing on this line changes `following`. It stays
+   * accepted through 1.x so no product breaks, and goes at 2.0.
    */
   onFollowingChange?: (following: boolean) => void;
   /** Opens the thread. */
@@ -50,12 +49,11 @@ const root: CSSProperties = {
 
 const nowrap: CSSProperties = { ...text, whiteSpace: "nowrap", flexShrink: 0 };
 
-export function ThreadSummary({ replyCount, lastReply = "", participants = [], unreadCount = 0, following = false, onFollowingChange, onPress, strings, styles, style, ...rest }: ThreadSummaryProps) {
+export function ThreadSummary({ replyCount, lastReply = "", participants = [], unreadCount = 0, following: follow = false, onFollowingChange: _onFollowingChange, onPress, strings, styles, style, ...rest }: ThreadSummaryProps) {
   const s = useStrings("thread-summary", strings);
   const ui = useInteraction();
   const dir = useDirection();
   const locale = useLocale();
-  const [follow, setFollow] = useControllable(following, onFollowingChange);
   const r = useRecipe(recipes["thread-summary"], { state: { hover: ui.hovered, pressed: ui.pressed, focus: ui.focused }, styles });
   if (!(replyCount > 0)) return null;
   // Grouping and digits follow the reader's locale, so "1,204" is "1.204" for a German reader.
@@ -73,12 +71,9 @@ export function ThreadSummary({ replyCount, lastReply = "", participants = [], u
       type="button"
       data-af-part="root"
       data-af-press
-      {...rootProps(rest)}
       aria-label={label}
-      onClick={() => {
-        setFollow(!follow);
-        onPress?.();
-      }}
+      {...rootProps(rest)}
+      onClick={() => onPress?.()}
       {...ui.handlers}
       style={css(rtl(root, dir), r.root, style)}
     >

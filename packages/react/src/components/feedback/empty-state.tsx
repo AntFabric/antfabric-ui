@@ -24,6 +24,8 @@ export interface EmptyStateProps extends RootProps<HTMLDivElement> {
   actionIcon?: IconName;
   /** The ~248px rails: less padding and a narrower measure. Same drawing, same type ramp. */
   compact?: boolean;
+  /** The title's heading level, 1 to 6, so it keeps the page's heading order: under a pane's h1 it is an h2, inside a section's h2 an h3. */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   onAction?: () => void;
   /** Per-part styles over the theme: `{ root: {…}, title: {…} }`. */
   styles?: PartStyles<"empty-state">;
@@ -73,7 +75,8 @@ function Drawing({ shapes, paint }: { shapes: ArtShape[]; paint: Record<ArtPart,
 
 /* ---------- the component ---------- */
 
-export function EmptyState({ art = "none", icon = "", title, line = "", actionLabel = "", actionIcon = "", compact = false, onAction, styles, style, ...rest }: EmptyStateProps) {
+export function EmptyState({ art = "none", icon = "", title, line = "", actionLabel = "", actionIcon = "", compact = false, headingLevel = 2, onAction, styles, style, ...rest }: EmptyStateProps) {
+  const Title = `h${headingLevel}` as "h2";
   const r = useRecipe(recipes["empty-state"], { variants: { compact }, styles });
   return (
     <div
@@ -104,9 +107,9 @@ export function EmptyState({ art = "none", icon = "", title, line = "", actionLa
           </div>
         )
       )}
-      <h2 data-af-part="title" style={css(text, { marginTop: t.space.mdLg }, r.title)}>
+      <Title data-af-part="title" style={css(text, { marginTop: t.space.mdLg }, r.title)}>
         {title}
-      </h2>
+      </Title>
       {line && (
         <p data-af-part="line" style={css(text, { marginTop: 5, maxWidth: compact ? 214 : 320, lineHeight: 1.6, textWrap: "pretty" }, r.line)}>
           {line}

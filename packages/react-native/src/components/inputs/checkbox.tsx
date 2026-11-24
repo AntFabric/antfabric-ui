@@ -34,15 +34,15 @@ const useStyles = createStyles((t) => ({
   text: { gap: t.space["3xs"], flexShrink: 1, minWidth: 0 },
 }));
 
-export function Checkbox({ label, description = "", checked = false, indeterminate = false, hideLabel = false, disabled = false, onCheckedChange, styles, style, testID, ...rest }: CheckboxProps) {
+export function Checkbox({ label, description = "", checked, indeterminate = false, hideLabel = false, disabled = false, onCheckedChange, styles, style, testID, ...rest }: CheckboxProps) {
   const { t } = useTheme();
   const form = useFormField();
   const s = useStyles();
   const press = usePress({ disabled });
-  const [isChecked, setChecked] = useControllable(checked, onCheckedChange);
+  const [isChecked = false, setChecked] = useControllable(checked, onCheckedChange);
   const [innerMixed, setMixed] = useControllable(indeterminate);
-  // While the app owns `checked` it owns the dash too: it clears it when it takes the change.
-  const mixed = onCheckedChange ? indeterminate : innerMixed;
+  // While the app owns `checked` (the value and its handler) it owns the dash too: it clears it when it takes the change.
+  const mixed = checked !== undefined && onCheckedChange ? indeterminate : innerMixed;
   const filled = isChecked || mixed;
   const r = useRecipe(recipes.checkbox, { state: { on: filled, focus: press.focused, disabled: press.disabled }, styles });
   // The tick's size is its width and height (`size`); what else `styles.tick` sets goes on the glyph.

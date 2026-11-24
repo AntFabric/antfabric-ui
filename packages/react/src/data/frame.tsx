@@ -15,6 +15,8 @@ export function useWidth(initial = DEFAULT_WIDTH): [number, React.RefObject<HTML
     const el = ref.current;
     if (!el) return;
     setWidth(Math.round(el.getBoundingClientRect().width) || initial);
+    // jsdom (a consumer's Jest or Vitest) has no ResizeObserver: the width measured once stands.
+    if (typeof ResizeObserver !== "function") return;
     // One update a frame: dragging a panel edge fires the observer faster than the screen draws, and each width re-lays out the whole plot.
     let frame = 0;
     const watch = new ResizeObserver(([e]) => {

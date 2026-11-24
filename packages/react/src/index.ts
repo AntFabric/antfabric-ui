@@ -1,9 +1,10 @@
 export * from "./platform";
 export { t } from "./tokens";
-export { Icon, Spinner, type IconName } from "./lib/icon";
+export { Icon, Spinner, type IconComponent, type IconName } from "./lib/icon";
+export { registerIcons } from "./lib/icons";
 export { useInteraction } from "./lib/interaction";
 export type { PartStyles, RecipeId } from "./lib/recipe";
-export { ForceState, useControllable, useDirection, useForcedState, useLocale, useStrings, type Direction } from "@antfabric/ui-core";
+export { ForceState, useControllable, useDirection, usePending, useForcedState, useLocale, useStrings, type Direction } from "@antfabric/ui-core";
 export type { RootProps } from "./lib/root-props";
 // The item shapes every list-taking component draws (`packages/core/src/items.ts`), as types.
 export type { ActionItem, AppMark, IconActionItem, MenuItem, NavItem } from "@antfabric/ui-core";

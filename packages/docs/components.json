@@ -487,7 +487,7 @@
                   "radius": "$radius.circle",
                   "bg": "$brand.default",
                   "borderWidth": "$border.wThick",
-                  "borderColor": "$fg.onBrand"
+                  "borderColor": "$os.onFill"
                 }
               }
             }
@@ -496,11 +496,16 @@
             "on": ["desktop", "mobile"],
             "base": { "fg": "$fg.onBrand" },
             "platforms": {
-              "mac": { "base": { "size": "$text.bodySm", "weight": "$font.weightSemibold" } },
+              "mac": { "base": { "size": "$text.bodySm", "weight": "$font.weightSemibold", "fg": "$os.onFill" } },
               "windows": { "base": { "size": "$osBadge.winLabel", "weight": "$font.weightBold" } },
               "linux": { "base": { "size": "$osBadge.linuxLabel", "weight": "$font.weightBold" } },
               "mobile": {
-                "base": { "size": "$osBadge.iosLabel", "line": "$osBadge.iosLabel", "weight": "$font.weightMedium" }
+                "base": {
+                  "size": "$osBadge.iosLabel",
+                  "line": "$osBadge.iosLabel",
+                  "weight": "$font.weightMedium",
+                  "fg": "$os.onFill"
+                }
               }
             }
           },
@@ -550,7 +555,7 @@
           "tabIcon": { "on": ["web"], "base": { "fg": "$fg.muted" } },
           "tabTitle": { "on": ["web"], "base": { "size": "$text.caption", "fg": "$fg.strong" } },
           "favicon": { "on": ["web"], "base": { "square": "$osBadge.browserFavicon" } },
-          "label": { "on": ["mobile"], "base": { "fg": "$fg.onBrand", "weight": "$font.weightMedium" } }
+          "label": { "on": ["mobile"], "base": { "fg": "$os.onFill", "weight": "$font.weightMedium" } }
         },
         "reads": ["$osBadge.winDot", "$identity.indigo", "$identity.ink", "$os.iosLabelShadow", "$font.weightBold"],
         "tokens": [
@@ -575,6 +580,7 @@
           "os.browserTab",
           "os.iosLabelShadow",
           "os.notificationBg",
+          "os.onFill",
           "osBadge.androidDot",
           "osBadge.androidDotInset",
           "osBadge.browserFavicon",
@@ -1003,7 +1009,7 @@
             "platforms": {
               "mac": {
                 "base": { "height": "$osMenu.macItemH", "radius": "$radius.tag" },
-                "states": { "on": { "bg": "$os.macAccent", "fg": "$fg.onBrand" } }
+                "states": { "on": { "bg": "$os.macAccent", "fg": "$os.onFill" } }
               },
               "windows": {
                 "base": { "height": "$control.hSm", "radius": "$radius.tag" },
@@ -1069,7 +1075,6 @@
           "control.hXs",
           "fg.body",
           "fg.faint",
-          "fg.onBrand",
           "fg.strong",
           "fg.subtle",
           "font.sans",
@@ -1083,6 +1088,7 @@
           "os.macAccent",
           "os.notificationBg",
           "os.notificationFg",
+          "os.onFill",
           "os.wallpaper",
           "osMenu.browserMenuW",
           "osMenu.linuxDropW",
@@ -1133,6 +1139,7 @@
           "Inside a menu Up, Down, Home, End and typing a letter move between entries, Left and Right go to the neighbouring menu, and Escape closes the menu and returns focus to the entry that opened it. The Windows ☰ panel and GNOME popover use the same keys; Right opens an entry's flyout, Left or Escape closes it.",
           "The web ⋯ menu is a picture of an open menu (the app owns opening it), so it has no Escape of its own. Its entries take Up, Down, Home, End and typing; the Theme row is a radiogroup that is one stop in that order: Left, Right, Up and Down inside it move between Light, Dark and System and check the option they reach, and Tab leaves it.",
           "Disabled items stay in the menu and are announced as dimmed — a command that vanishes is harder to find again than one that is greyed.",
+          "An entry with `checked` (true or false) is a toggle: a menuitemcheckbox with aria-checked, so its tick is read as checked or not checked, not only seen. Up, Down, Home, End and typing reach it like any entry.",
           "Every entry draws a focus ring. A long menu scrolls inside the window (80% of its height) instead of running off it."
         ]
       },
@@ -1295,6 +1302,11 @@
           "title": "Zoom at its limits",
           "platforms": ["desktop"],
           "handling": "At 200% Zoom In is greyed, at 50% Zoom Out is greyed, and Actual Size is greyed at 100%. Today the items stay enabled and the step pins at the end stop, which reads as a broken shortcut; the spec greys them so the menu says why nothing happened."
+        },
+        {
+          "title": "A toggle entry",
+          "platforms": ["desktop"],
+          "handling": "View › Show Sidebar and Show Status Bar are toggles: an entry with `checked` draws its tick when true and keeps the tick's room when false, so the labels line up, and a screen reader hears it as checked or not checked (menuitemcheckbox). Choosing it reports the entry; the app flips `checked` in its next `menus`."
         },
         {
           "title": "Clicked and pressed: still once",
@@ -1960,7 +1972,11 @@
           "description": "How many waveform bars have played; those are coral.",
           "default": 0
         },
-        "playing": { "type": "boolean", "default": false },
+        "playing": {
+          "type": "boolean",
+          "description": "The voice note is playing: Pause shows. Play and Pause report it through onPlayingChange, and the app starts or stops the audio.",
+          "default": false
+        },
         "compact": {
           "type": "boolean",
           "description": "The staged chip in the composer tray: thumbnail or badge, name, size or progress, and Remove.",
@@ -1973,16 +1989,24 @@
         },
         "onOpen": {
           "type": "event",
-          "description": "Desktop/web: preview (lightbox or file viewer). Mobile: MediaViewer for images, video and previewable files; Share (iOS) or Save to device (Android) for the rest."
+          "description": "Desktop/web: preview (lightbox or file viewer). Mobile: MediaViewer for images, video and previewable files; Share (iOS) or Save to device (Android) for the rest. A ready staged chip's body and a link card's press call it too (the web still follows the link; the phone opens only an http, https or mailto link itself)."
         },
         "onDownload": { "type": "event", "platforms": ["web", "desktop"] },
         "onStatusChange": {
           "type": "event",
-          "description": "Called with `status` as Retry leaves it (uploading). Given `status` too, the card is controlled; otherwise Retry turns it back to uploading itself.",
-          "args": "status: AttachmentCardStatus",
-          "changes": "status"
+          "description": "Retry reports the request: called with uploading. The card never moves `status` itself: Retry spins until the app passes the new `status`, `error` or `progress` (or the promise onRetry returns settles), so a retry that fails again offers Retry again.",
+          "args": "status: AttachmentCardStatus"
         },
-        "onRetry": { "type": "event", "description": "Retry was pressed on a failed upload: the app starts it again." },
+        "onRetry": {
+          "type": "event",
+          "description": "Retry was pressed on a failed upload: the app starts it again and answers with `status`. Retry spins until it does, or until the promise the handler returns settles."
+        },
+        "onPlayingChange": {
+          "type": "event",
+          "description": "Called with `playing` as Play or Pause leaves it: the app starts or stops the voice note. Given `playing` too, the button is controlled; on its own it flips itself.",
+          "args": "playing: boolean",
+          "changes": "playing"
+        },
         "onCancel": {
           "type": "event",
           "description": "Cancel an upload in progress, remove a staged file, or remove a link's preview (Remove preview, web and desktop)."
@@ -2019,6 +2043,7 @@
         "bar",
         "duration",
         "chip",
+        "chipOpen",
         "chipThumb"
       ],
       "recipe": {
@@ -2053,6 +2078,7 @@
           "bar",
           "duration",
           "chip",
+          "chipOpen",
           "chipThumb"
         ],
         "styles": {
@@ -2210,6 +2236,10 @@
               "borderColor": "$border.subtle",
               "bg": "$surface.card"
             }
+          },
+          "chipOpen": {
+            "base": { "gap": "$space.sm", "radius": "$radius.tag" },
+            "states": { "focus": { "shadow": "$shadow.focus" } }
           },
           "chipThumb": { "base": { "borderWidth": "$border.wHairline", "borderColor": "$border.subtle" } }
         },
@@ -2398,6 +2428,16 @@
           "handling": "A thumbnail that 404s or fails to decode falls back to the file card with the image badge, so the file can still be downloaded. A deleted or no-longer-shared file shows \"This file is no longer available\" with no actions."
         },
         {
+          "title": "A staged file is pressed",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "Once a staged chip is ready, its thumbnail or badge and name are one button that calls onOpen, so the sender can check the file before sending. While it uploads, is paused or failed, the body is not a button: Cancel and Retry are the chip's controls."
+        },
+        {
+          "title": "A link that is not a web or mail link",
+          "platforms": ["mobile"],
+          "handling": "A press on a link card calls onOpen; the card opens the link itself only for http, https and mailto, so a message carrying another scheme (an app deep link, tel:, a file path) opens nothing unless the app does it from onOpen."
+        },
+        {
           "title": "Link preview from an untrusted page",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "The domain is printed first and is the real destination (after redirects), not the page's claimed site. Previews are fetched server-side, images are proxied, and nothing autoplays. If the fetch fails there is no card, only the link in the text."
@@ -2437,7 +2477,7 @@
             "The FileRow shape: 40px letter badge in the family colour, name in 13 SemiBold, \"PDF document · 2.4 MB\", a 26px Download. 320 wide, 100% on narrow panes.",
             "Downloads go to the OS Downloads folder through Tauri's dialog/fs plugins and announce themselves with a native notification when the window is not focused.",
             "Files already opened are kept in the app data cache, so they reopen offline; uncached files show \"You're offline. This file will download when you're back.\"",
-            "In the catalogue, Retry on a failed upload sets `status` to uploading (the error line gives way to the progress track), and the voice note's play button toggles `playing`."
+            "In the catalogue, Retry on a failed upload spins until the app answers (the flows pass `status`), and the voice note's play button toggles `playing` and reports it through onPlayingChange."
           ],
           "keyboard": [
             { "keys": "Enter / Space", "action": "Opens the preview" },
@@ -2516,7 +2556,7 @@
         "presence": { "type": "enum", "default": "none", "options": ["none", "active", "away", "dnd", "offline"] },
         "agent": {
           "type": "boolean",
-          "description": "Marks an AI agent: a sparkle badge, so a person never mistakes an agent's message for a colleague's.",
+          "description": "Marks an AI agent: a sparkle badge, so a person never mistakes an agent's message for a colleague's. Its accessible name says it too: 'Fabric, AI agent'.",
           "default": false
         },
         "decorative": {
@@ -2605,7 +2645,8 @@
         "notes": [
           "Initials are hidden from screen readers — the name is the label.",
           "`decorative` removes the role and the name and hides the face from assistive tech (aria-hidden on web; hidden from VoiceOver and TalkBack on the phone): use it beside a visible name.",
-          "Presence is announced in words, never by colour alone; dnd and away also differ in shape on the presence picker."
+          "Presence is announced in words, never by colour alone; dnd and away also differ in shape on the presence picker.",
+          "The agent sparkle is announced too: an agent's avatar is named '{name}, AI agent' (the `labelAgent` string), so a screen reader never takes an agent for a colleague. The sparkle takes the presence dot's place, so its presence is not read."
         ]
       },
       "examples": [
@@ -2822,6 +2863,11 @@
       ],
       "edgeCases": [
         {
+          "title": "A preview shorter than max",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "When the server sends fewer faces than `max` (two of a ten-person channel), the stack draws the two and +8: +N counts everyone the faces do not show, `total` minus the faces drawn."
+        },
+        {
           "title": "Photos side by side",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "Without the ring, three photos read as one smeared image. Every face — the lead's too — wears a 2px ring in the ground's colour; a stack on a selected or sidebar row passes that ground so the ring cuts rather than outlines."
@@ -3000,7 +3046,7 @@
         "role": "img",
         "notes": [
           "The number is hidden; the label says what it counts, e.g. \"3 unread mentions\". With no label the name is the count alone (\"3\"), or \"3 unread\" with `unread`.",
-          "Not a live region by default: `live` makes it role status (web) or a polite live region (phone). Never announce every increment — the parent row's label carries the count."
+          "Never a live region: `live` announces a change of the count politely (through the page's announcer on the web, the screen reader's announcement on the phone), not its first draw. Never announce every increment — the parent row's label carries the count."
         ]
       },
       "examples": [
@@ -3030,7 +3076,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "<span role=\"img\"> (role status when `live`) named by the count and what it counts, inline styles over `t`; pops in with enter(\"pop\")",
+          "base": "<span role=\"img\"> named by the count and what it counts, inline styles over `t`; pops in with enter(\"pop\")",
           "import": "import { Badge } from \"@antfabric/ui-react\"",
           "notes": [
             "The same total also drives the tab title, \"(3) AntFabric\", and the favicon dot — see Tab badge.",
@@ -3048,7 +3094,7 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "<Enter motion=\"pop\"> (an Animated.View; a polite live region only when `live`), StyleSheet over useTheme()",
+          "base": "<Enter motion=\"pop\"> (an Animated.View; `live` announces a change of its count), StyleSheet over useTheme()",
           "import": "import { Badge } from \"@antfabric/ui-react-native\"",
           "notes": [
             "The same total is the home-screen icon badge, set with expo-notifications setBadgeCountAsync and kept in step by the server's push payload.",
@@ -3179,6 +3225,10 @@
           "type": "boolean",
           "description": "Bars run left to right with the categories down the side. A single series gets its value at each bar's end and no value axis. Long category labels are cut with an ellipsis and the tooltip has the full one. On the phone a single horizontal series is a ranked list of rows, not a rotated chart.",
           "default": false
+        },
+        "marks": {
+          "type": "boolean",
+          "description": "Each series past the first is filled with a texture over its colour (lines rising at 45°, lines falling at 135°, both, dots: `seriesMark`), in the plot and in the legend's swatch, so two series are never told apart by hue alone (WCAG 1.4.1). Left out, it is on for two or more series and off for one; `false` keeps flat fills where the product labels the series another way. A single series coloured by sign is never textured."
         }
       },
       "parts": [
@@ -3371,6 +3421,7 @@
           "The figure is named by the sentence core's `summarize` writes from the rows: categories read as highest and lowest, dates as a trend. It is heard, not printed: in the light theme most series colours sit under 3:1 against the card, so the tooltip and \"View as table\" give the numbers without colour.",
           "\"View as table\" shows the same rows in Table, with real headers, and a Button names it by what it will do (\"View as table\", then \"View as chart\").",
           "The legend says what it toggles: each entry is a button that is pressed while its series is on, and one that is off is struck through, not only dimmer. The last series showing cannot be turned off.",
+          "With `marks` (on by default for two or more series), a series is told apart by its texture as well as its colour: the first is plain, the next lines rising at 45°, then lines falling at 135°, then both, then dots, inked tone on tone in the card's colour, so the hue still leads. The legend's swatch draws the same.",
           "A bar coloured by sign is never only coloured: the tooltip and the table print the value with its minus, and a bar below zero hangs under a zero rule.",
           "On the web the plot is a stop for the arrow keys (recharts' accessibility layer): the tooltip moves category to category, and the plot draws a focus edge while the keyboard is in it."
         ]
@@ -3610,6 +3661,7 @@
             "Shipped from the data subpath: recharts is reached only from there. The chart is handed an explicit width and height.",
             "Everything the chart reads from the tokens goes through `rechartsTheme(useChartTokens(), useReducedMotion())`, exported beside the chart: `<CartesianGrid {...theme.grid} /> <XAxis dataKey=\"team\" {...theme.axis} /> <Bar fill={theme.series[0]} radius={theme.bar.radius} maxBarSize={theme.bar.maxBarSize} {...theme.motion.draw} />`. A chart the kit does not ship, written with recharts and the same call, matches.",
             "The hovered category keeps its colour and the rest step back to 38% over 150ms; a bar's fill eases to a new colour over 250ms. The bars draw in once over 600ms on the kit's ease-out and tween to new values; reduced motion turns the movement off and keeps the fades.",
+            "With `marks`, a series' bars are filled with an SVG `<pattern>`: its colour, and its texture over it in the card's colour (`TexturePattern`, core's `texturePath` and `TEXTURE`). The legend's swatch is filled with the same pattern.",
             "A horizontal chart gives its categories up to 40% of the width, cuts a longer label with an ellipsis (the tooltip shows the whole one) and draws each bar's value after it, with no value axis and no rules."
           ],
           "keyboard": [
@@ -3646,6 +3698,7 @@
             "gifted-charts' `height` is the part above zero: sections below zero are added to it, so the kit shrinks the plot by their share to keep the card's height, and moves a negative bar's label under the bar (`autoShiftLabels`).",
             "gifted-charts opens its own tooltip on a grouped bar, but not on a stack (it compares the stack's selection with `===` against an array), so the kit draws the card itself over the pressed stack, centred on it and kept inside the plot. A press also lights the category's bars and steps the rest back, as the web's hover does.",
             "A long series (fourteen days) has more labels than room: the kit draws one in every few, centred on its bar, and the tooltip names the day.",
+            "With `marks`, gifted-charts draws a bar as a view of one colour and has no pattern fill per series, so the kit lays its texture over each bar: an svg with a `Pattern` (`Texture`), handed in as a stack's `innerBarComponent` and, for grouped bars, through the chart's `barInnerComponent` (gifted-charts reads it from the chart, not from the bar). The legend's swatch carries the same. A horizontal single series (the ranked list) has one series, so no texture.",
             "The bars draw in unless the person reduces motion. Under react-native-web (the catalogue, `pnpm check`) gifted-charts' animation is off."
           ],
           "gestures": [
@@ -3738,7 +3791,12 @@
         },
         "onClose": {
           "type": "event",
-          "description": "The person asked to close: ×, backdrop, drag, back, the escape gesture."
+          "description": "The person asked to close: ×, the handle, a press on the backdrop, a drag down, Android's back, the escape gesture (Esc on the web)."
+        },
+        "dismissible": {
+          "type": "boolean",
+          "description": "×, the handle, the backdrop, a drag down, back and the escape gesture close it. Off for a sheet that must be answered from inside: the × is not drawn, the handle is only a picture, and none of the others do anything.",
+          "default": true
         },
         "onDismiss": {
           "type": "event",
@@ -3920,12 +3978,13 @@
       "platforms": {
         "web": {
           "status": "partial",
-          "base": "A <div role=\"dialog\"> aria-modal on a scrim, inline styles over `t`; slides up with enter(\"slide-up\"), then a drag or a close moves it with a transform transition. The handle is a Dismiss <button>; ×, the handle and Esc set `closed` (useControllable) and call onClose; onDismiss fires when the slide down ends",
+          "base": "A <div role=\"dialog\"> aria-modal on a scrim that fills what it is given, inline styles over `t`; slides up with enter(\"slide-up\"), then a drag or a close moves it with a transform transition. The handle is a Dismiss <button>; ×, the handle, a press on the scrim and Esc set `closed` (useControllable) and call onClose, unless `dismissible` is off; onDismiss fires when the slide down ends",
           "import": "import { BottomSheet } from \"@antfabric/ui-react\"",
           "notes": [
             "Decision: a bottom sheet exists on the web only in a phone-width browser. At 640px and wider the same caller content opens as what it is on desktop: a Dialog for pickers and forms, a Menu for action lists, a HoverCard or side panel for details.",
             "The kit does not lift the sheet over the on-screen keyboard or read the safe-area inset: the host that mounts it owns both (visualViewport, env(safe-area-inset-bottom)).",
-            "Drag-to-dismiss and the browser's pull-to-refresh are the host's: the kit's sheet follows `dragging` and `closed` and calls onClose from the handle, the × and Esc."
+            "Drag-to-dismiss and the browser's pull-to-refresh are the host's: the kit's sheet follows `dragging` and `closed` and calls onClose from the handle, the ×, a press on the scrim and Esc.",
+            "The sheet fills the box it is given (the host's layer over the page): its scrim covers that box and the panel sits at its foot. The catalogue draws it in a 375px phone frame."
           ],
           "keyboard": [
             { "keys": "Esc", "action": "Closes (a hardware keyboard on a tablet)" },
@@ -3944,12 +4003,12 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "<Enter motion=\"slide-up\"> (role dialog, accessibilityViewIsModal) around an Animated.View that the handle and title row drag through PanResponder (past 120pt or a fling dismisses), on GlassSurface (Liquid Glass on iOS 26+); ScrollView body; `closed` through useControllable, onDismiss when the slide down ends",
+          "base": "A scrim View that fills what it is given, with a Pressable backdrop, under <Enter motion=\"slide-up\"> (role dialog, accessibilityViewIsModal) around an Animated.View that the handle and title row drag through PanResponder (past 120pt or a fling dismisses), on GlassSurface (Liquid Glass on iOS 26+); ScrollView body; `closed` through useControllable, onDismiss when the slide down ends",
           "import": "import { BottomSheet } from \"@antfabric/ui-react-native\"",
           "notes": [
             "The surface panel with 20pt top corners, the 36 × 5 handle 12pt from the top, then one 16pt rhythm: handle → title row → first child. The title row is the title on the left and the × in a 40pt box whose box (not glyph) sits on the 12pt gutter.",
             "Title is 20pt semibold on a 24pt line; largeTitle is 28pt on the 40pt box line, one line.",
-            "At rest the panel stops under the screen's header row (status bar + 12 + 40 + 8 — y 119 on an 852pt iPhone) so the dimmed title behind is never cut through. With the keyboard up the cap is the space above the keys instead.",
+            "The sheet fills what it is given (the screen, a Modal): the scrim covers it and the panel sits at its foot. A tall sheet fills it to the top, so the host gives it the room above, to stop under the screen's header row (status bar + 12 + 40 + 8 — y 119 on an 852pt iPhone) so the dimmed title behind is never cut through. The catalogue draws it in a 375pt phone frame with that room. With the keyboard up the cap is the space above the keys instead.",
             "Keyboard: on iOS the sheet is inside a KeyboardAvoidingView and lifts above the keys; on Android the window's own adjustResize is relied on (an edge-to-edge Modal window that is not resized needs the host to measure the IME).",
             "Closing always puts the keyboard away too.",
             "Today's Sheet is a plain Modal with animationType slide and no drag. The kit's sheet adds drag-to-dismiss: a PanResponder on the handle and title row.",
@@ -3969,7 +4028,7 @@
               "gesture": "Drag down inside a scrolled list",
               "action": "Scrolls the list; only once the list is at its top does the same drag start moving the sheet"
             },
-            { "gesture": "Tap the backdrop", "action": "Closes" },
+            { "gesture": "Tap the backdrop", "action": "Closes (unless `dismissible` is off)" },
             { "gesture": "Android back", "action": "Dismisses the keyboard first if it is up, then closes" },
             { "gesture": "Two-finger scrub (VoiceOver escape)", "action": "Closes" }
           ]
@@ -4451,7 +4510,7 @@
         },
         "selected": {
           "type": "string",
-          "description": "The part that is picked, by its name: its segment of the bar and its row stay lit and the others step back until it is picked again. Pointing at a part or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
+          "description": "The part that is picked, by its name (`#billing#2` for the second of two rows with one name): its segment of the bar and its row stay lit and the others step back until it is picked again. Pointing at a part or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
         },
         "onSelectedChange": {
           "type": "event",
@@ -5440,7 +5499,7 @@
         {
           "title": "Buttons inside a clickable card",
           "platforms": ["web", "desktop", "mobile"],
-          "handling": "The nested control wins: on web and desktop it sits above the stretched press target (position: relative) and stops propagation; on mobile the inner Pressable claims the responder, so the card does not open. Never put a card's only primary action inside it AND on the card itself."
+          "handling": "The nested control wins: on web and desktop the stretched press target is drawn under the card's content, so a nested button, a plain link or a field takes its own press, and a press inside one never opens the card; on mobile the inner Pressable claims the responder, so the card does not open. Text in an interactive card can be selected: a press that ends a selection does not open it. Never put a card's only primary action inside it AND on the card itself."
         },
         {
           "title": "Keyboard and screen reader",
@@ -5471,10 +5530,10 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A <div> with a stretched <button> under the content as its one press target (nested controls sit above it); hover from useInteraction fills it, keyboard focus rings the whole card; inline styles over `t`",
+          "base": "A <div> with a stretched <button> under the content as its one press target (the content, nested controls and text, sits above it); hover from useInteraction fills it, keyboard focus rings the whole card; inline styles over `t`",
           "import": "import { Card } from \"@antfabric/ui-react\"",
           "notes": [
-            "An interactive card is a stretched link: one <a href> (with `href`) or <button> covers the card, and nested controls sit above it with position: relative. A <button> wrapping the whole card would make every nested button invalid HTML.",
+            "An interactive card is a stretched link: one <a href> (with `href`) or <button> fills the card, drawn under its content (z-index -1 inside the card, which isolates its own stacking context), so whatever the product nests, a plain <a>, a <button>, a field, stays its own control and the card's text can be selected. A press on the card's padding is the target's; a press on its text opens the card too (through the link with `href`, so ⌘-click still opens a tab), unless it ended a text selection. A <button> wrapping the whole card would make every nested button invalid HTML.",
             "A card that navigates (`href`) is an <a>, so middle-click and ⌘-click open it in a new tab.",
             "With no `label`, the target is named by the card's first heading (aria-labelledby) or, with none, by the card's text; give a `label` when that is not what the card is for."
           ],
@@ -5574,7 +5633,11 @@
         "styles": {
           "root": {
             "base": { "gap": "$choice.gap", "paddingY": "$choice.padY", "font": "$font.sans" },
-            "states": { "disabled": { "opacity": "$opacity.disabled" } }
+            "states": { "disabled": { "opacity": "$opacity.disabled" } },
+            "platforms": {
+              "web": { "base": { "minHeight": "$control.hit", "minWidth": "$control.hit" } },
+              "desktop": { "base": { "minHeight": "$control.hit", "minWidth": "$control.hit" } }
+            }
           },
           "box": {
             "base": {
@@ -5806,21 +5869,24 @@
         },
         "removed": {
           "type": "boolean",
-          "description": "The ✕ was pressed: the chip is gone. Set by the chip's own ✕ in the catalogue; in the apps the caller drops the chip from its list on onRemove.",
+          "description": "The chip has been removed and draws nothing. The ✕ (and Backspace / Delete) only reports onRemove: the chip stays until the app drops it from its list or sets this.",
           "default": false
         },
         "disabled": { "type": "boolean", "default": false },
         "onSelectedChange": {
           "type": "event",
-          "description": "Called with `selected` as the press leaves it: flipped.",
+          "description": "A filter chip: called with `selected` as the press leaves it, flipped. A suggestion or object chip never changes `selected` itself; its highlight is the app's.",
           "args": "selected: boolean",
           "changes": "selected"
         },
         "onPress": {
           "type": "event",
-          "description": "The chip was pressed. Its `selected` changes through `onSelectedChange`."
+          "description": "The chip was pressed. A filter's `selected` changes through `onSelectedChange`."
         },
-        "onRemove": { "type": "event" }
+        "onRemove": {
+          "type": "event",
+          "description": "The ✕, or Backspace / Delete on the focused chip, asks to remove it. Once per press: a held key does not repeat it."
+        }
       },
       "parts": ["root", "main", "icon", "count", "remove", "removeIcon"],
       "recipe": {
@@ -5946,7 +6012,7 @@
         "notes": [
           "A filter chip's main button exposes its state as aria-pressed (the phone: a toggle button with checked). A suggestion and an object chip are plain buttons.",
           "The count joins the label (\"DMs, 3\"); the ✕ is a second button named \"Remove {label}\", never just \"Remove\".",
-          "Backspace or Delete on a removable chip removes it. When the chip that has focus goes, focus moves to the next chip, else the previous one, else the row that held it; a keyboard user is not dropped to the top of the page.",
+          "Backspace or Delete on a removable chip asks to remove it, once per press (a held key does not remove a run of chips). When the app drops the chip that had focus, focus moves to the next chip, else the previous one, else the row that held it; a keyboard user is not dropped to the top of the page.",
           "Selection is not colour alone: a chosen chip changes its fill and exposes aria-pressed. Keyboard focus draws a ring on the chip."
         ]
       },
@@ -6036,18 +6102,18 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A row holding two sibling <button>s — the chip (aria-pressed on a filter) and its ✕ — never nested; inline styles over `t`, the root taking the hover and press of either; `selected` through useControllable; Backspace / Delete on a removable chip removes it",
+          "base": "A row holding two sibling <button>s — the chip (aria-pressed on a filter) and its ✕ — never nested; inline styles over `t`, the root taking the hover and press of either; `selected` through useControllable; Backspace / Delete on a removable chip reports onRemove",
           "import": "import { Chip } from \"@antfabric/ui-react\"",
           "notes": [
             "A single-choice filter row is a ToggleGroup (or tablist when it switches a list in place); a multi-choice row is independent Toggles with aria-pressed.",
             "The ✕ is its own button, never inside the chip's button — nested buttons are invalid HTML and the parser splits them.",
-            "Pressing the chip toggles `selected` and the ink fill fades in; pressing the ✕ sets `removed` and the chip goes. Both are `on.press` actions, so the catalogue preview is interactive."
+            "Pressing a filter chip toggles `selected` and the ink fill fades in; a suggestion or object chip only reports onPress. Pressing the ✕ reports onRemove, and the chip goes when the app drops it."
           ],
           "keyboard": [
             { "keys": "Enter / Space", "action": "Activates the chip" },
             {
               "keys": "Backspace / Delete",
-              "action": "On a focused removable chip, removes it and moves focus to the next chip, or to the search field if none is left"
+              "action": "On a focused removable chip, asks to remove it (once per press); when the app drops it, focus moves to the next chip, else the previous one, else the row"
             },
             {
               "keys": "ArrowLeft / ArrowRight",
@@ -6064,11 +6130,11 @@
             "Home's three suggestion chips share the row EQUALLY (flex 1 1 0, min-width fit-content), so a narrow row wraps instead of clipping. object chips do not take an equal share.",
             "object is coral-soft with a coral-200 edge in Light; in Dark it wears the suggestion's edge and keeps the coral in the fill and label.",
             "Desktop has no filter chips today — the command palette's kind filter is ChoicePills (radio-group pills). Filter chips arrive with search filters (From:, In:).",
-            "Pressing toggles `selected` (150ms fill and ink cross-fade); the ✕ sets `removed`, and the caller drops the chip on onRemove."
+            "Pressing a filter toggles `selected` (150ms fill and ink cross-fade); the ✕ reports onRemove, and the caller drops the chip."
           ],
           "keyboard": [
             { "keys": "Enter / Space", "action": "Activates" },
-            { "keys": "Backspace", "action": "Removes a focused removable chip" }
+            { "keys": "Backspace", "action": "Asks to remove a focused removable chip, once per press" }
           ]
         },
         "mobile": {
@@ -6080,7 +6146,7 @@
             "Chosen is ink (surfaceInverse) with inverse ink; the rest are white with text.faint. Coral until the V2 Figma of 2026-10-16 (ADR-9406).",
             "The fill does NOT travel between chips: the chosen chip fills itself at once and the tapped chip gives a small bounce. A sliding pill was tried and turned down (\"No smooth motion\").",
             "The row scrolls sideways (at 393pt the last chip runs off the edge) and choosing a chip scrolls it fully into view.",
-            "Tapping toggles `selected`, with the 0.96 press bounce; the ✕ sets `removed`."
+            "Tapping a filter toggles `selected`, with the 0.96 press bounce; the ✕ reports onRemove and the chip stays until the app drops it."
           ],
           "gestures": [
             {
@@ -6088,7 +6154,10 @@
               "action": "Chooses the filter with a small bounce (none under Reduce Motion)"
             },
             { "gesture": "Horizontal swipe", "action": "Scrolls the row" },
-            { "gesture": "Tap ✕", "action": "Removes; the ✕ has a 44pt hitSlop" }
+            {
+              "gesture": "Tap ✕",
+              "action": "Asks to remove (onRemove); the ✕ has a 44pt hitSlop, which the chip's row takes too so iOS reaches it"
+            }
           ]
         }
       },
@@ -7647,7 +7716,7 @@
         },
         "onAttachmentDownload": {
           "type": "event",
-          "description": "A staged attachment's download was pressed.",
+          "description": "Never called, and deprecated: a staged file is the sender's own, so its chip has no download (a ready chip's body calls onAttachmentOpen). Kept so 1.x code compiles; removed in 2.0.",
           "platforms": ["web", "desktop"],
           "args": "attachment: Attachment"
         },
@@ -7918,7 +7987,7 @@
           "Send exposes its disabled state. Pressing Send or Enter while a file uploads announces \"Waiting for the upload to finish\"; the hint under the box says the same.",
           "The length counter is drawn, not read on every keystroke: it is announced when the draft crosses 100, 50 and 10 characters left, and when it goes over.",
           "The formatting toolbar is one group: arrow keys, Home and End move between its buttons (web and desktop).",
-          "The offline line is a polite live region, so a screen-reader user hears why the send did not go.",
+          "Going offline (and the channel locking) is announced when it happens, so a screen-reader user hears why the send will not go; the line itself is plain text.",
           "Read-only and archived notices replace the box entirely, so there is no field to land in that cannot be used.",
           "`disabled` disables the field and every tool. On the phone the toolbar buttons are 36pt drawn with a touch area that stops short of 44pt until IconButton grows its hit area from the drawn size."
         ]
@@ -8020,6 +8089,16 @@
           "title": "Double press on Send",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "The box is cleared and Send disabled in the same tick as the press, before the request; the message carries a client id so a network retry cannot post it twice."
+        },
+        {
+          "title": "Send pressed while a file is still uploading",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "Send stays reachable (aria-disabled on the web, not disabled), drawn quiet: a press, or Enter, sends nothing and says \"Waiting for the upload to finish\", the same words as the line under the box. Once the upload is done Send lights up."
+        },
+        {
+          "title": "Editing with Mod+Enter to send",
+          "platforms": ["web", "desktop"],
+          "handling": "The edit banner names the key that saves: ⌘↩ (Ctrl+Enter on Windows and Linux) with sendKey mod-enter, Enter otherwise, since plain Enter is a new line there."
         },
         {
           "title": "Offline, then back",
@@ -8346,8 +8425,9 @@
         "role": "status",
         "notes": [
           "A change of state is spoken politely, never interrupting, and never as an alert: nothing here is an error. On the web the strip's message, the degraded note and \"Back online\" go through the page's own announcer when the state changes (a strip mounted holding its text is not read, and the way back would otherwise be silent). On the phone the card's title and message are spoken by the screen reader's announcement call, and the card is role=status.",
-          "The pill is a status element that stays on the page, so its text changing is read: web role=status with aria-live=polite, on the phone role=status and an announcement of its new name. Its label is a sentence (\"No connection to the backend\"), not the colour.",
-          "The strip's spinner is hidden from assistive technology; the message says what is happening."
+          "The pill is a labelled picture that stays on the page (role=img on the web); a change of its name is announced (not on first draw). Its label is a sentence (\"No connection to the backend\"), not the colour.",
+          "The strip's spinner is hidden from assistive technology; the message says what is happening.",
+          "Try now is named by its words (WCAG 2.5.3: a voice user says what they see); \"Try reconnecting now\" is its description and tooltip."
         ]
       },
       "examples": [
@@ -8434,7 +8514,7 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "<Enter motion=\"slide-down\"> card (role status, polite live region) with an Icon and two Texts, StyleSheet over useTheme(), for under the screen header; the pill is a read-only labelled View for HeaderActions",
+          "base": "<Enter motion=\"slide-down\"> card (its words announced, no live region) with an Icon and two Texts, StyleSheet over useTheme(), for under the screen header; the pill is a read-only labelled View for HeaderActions",
           "import": "import { ConnectionBanner } from \"@antfabric/ui-react-native\"",
           "notes": [
             "Offline is a normal mode for a capture app, so it reads as reassurance on a neutral surface — no alarm colour, no Retry: the capture queue drains itself on the reconnect edge.",
@@ -8540,6 +8620,11 @@
           "sample": "Release train is cut: 4.12.0 is on staging. Smoke tests start at 3."
         },
         "onReact": { "type": "event", "args": "emoji: string" },
+        "onMoreReactions": {
+          "type": "event",
+          "description": "The + after the quick set was pressed. The kit draws no emoji picker on web and desktop: the app opens its own (the message row's Add a reaction picker) and reacts through it. The phone's + opens the kit's emoji panel instead (picking).",
+          "platforms": ["web", "desktop"]
+        },
         "onSelect": { "type": "event", "args": "item: ContextMenuItem" },
         "onClose": { "type": "event" }
       },
@@ -8787,7 +8872,7 @@
         "notes": [
           "Quick reactions are toggle buttons with aria-pressed, named \"React with 👍\" / \"Remove your 👍\".",
           "Long-press is not discoverable with VoiceOver or TalkBack, so the message row exposes the same actions as accessibility actions (rotor / actions menu); \"Message actions\" opens this sheet.",
-          "Phone: the sheet is a modal view; Android's back button closes it, screen-reader focus starts at the title (else the handle), the handle's touch area is the 44pt target, the emoji panel's search field is lifted above the keyboard on iOS, and each emoji in the panel is a pressable button that reacts. The panel's emoji lists are the kit's own fixed sets and the search field filters nothing yet.",
+          "Phone: the sheet is a modal view; Android's back button closes it, screen-reader focus starts at the title (else the handle), the handle's touch area is the 44pt target, the emoji panel's search field is lifted above the keyboard on iOS, and each emoji in the panel is a pressable button that reacts. The panel's emoji lists are the kit's own fixed sets; the search field narrows them to the emoji whose English Unicode name holds what is typed, and drops a heading with none left.",
           "On web and desktop the menu rows are a Menu: focus moves to the first enabled row when the menu mounts, ↑ ↓ Home End and type-ahead move between rows, Esc closes, and focus returns to what had it (the message it was opened on) when the menu unmounts."
         ]
       },
@@ -8903,7 +8988,16 @@
               "keys": "Shift+F10 / ContextMenu key",
               "action": "Opens at the focused message's top-left corner"
             },
-            { "keys": "↑ / ↓", "action": "Moves between rows; ← / → move across the quick reactions" },
+            {
+              "keys": "↑ / ↓",
+              "action": "Moves between rows; ↑ from the first row (↓ from the last) moves to the quick reactions, and ↓ (↑) from them back to the rows"
+            },
+            { "keys": "← / → · Home / End", "action": "Move across the quick reactions and the +" },
+            {
+              "keys": "Enter / Space",
+              "action": "On a quick reaction: reacts; on the +: calls onMoreReactions"
+            },
+            { "keys": "Tab", "action": "Closes, from the rows and from the quick reactions" },
             { "keys": "Esc", "action": "Closes and returns focus to the message" }
           ]
         },
@@ -8920,6 +9014,10 @@
           "keyboard": [
             { "keys": "Shift+F10 / Menu key", "action": "Opens on the message cursor (Windows, Linux)" },
             { "keys": "Ctrl+click", "action": "Same as right-click on macOS" },
+            {
+              "keys": "↑ / ↓ · ← / →",
+              "action": "As on the web: ↑ from the first row reaches the quick reactions, ← → move across them"
+            },
             { "keys": "Esc", "action": "Closes this menu only and leaves the message cursor where it was" }
           ]
         },
@@ -9207,7 +9305,7 @@
         },
         "loading": {
           "type": "boolean",
-          "description": "The confirm is in flight: its button spins, Cancel, Esc and the scrim do nothing until it settles.",
+          "description": "The confirm is in flight: its button spins and cannot be pressed again. Cancel, Esc and the scrim still cancel, so the app can abandon the request. A press on the CTA shows the same until the app answers, without this prop.",
           "default": false
         },
         "error": {
@@ -9241,10 +9339,13 @@
         },
         "dismissible": {
           "type": "boolean",
-          "description": "Esc, a press on the scrim, the phone's handle and Android's back cancel it. Off for a step that must be answered with one of its buttons.",
+          "description": "Esc, a press on the scrim, the phone's handle, Android's back and the screen reader's escape gesture cancel it. Off for a step that must be answered with one of its buttons.",
           "default": true
         },
-        "onConfirm": { "type": "event" },
+        "onConfirm": {
+          "type": "event",
+          "description": "Reports the request; the CTA spins until the app answers, by closing the dialog, with a new `error` or `loading`, or by settling the promise the handler returns. A failure with the same `error` as before needs the promise."
+        },
         "onCancel": { "type": "event" }
       },
       "parts": [
@@ -9472,7 +9573,7 @@
           "Web: focus moves in when the dialog mounts, whenever that is (a timer, a deep link, a push), unless the tree is under `autoFocus={false}`; a confirm focuses Cancel, not the CTA, so a reflexive Enter never deletes, and a form focuses its first field. Tab and Shift+Tab wrap inside the panel, Esc cancels (and stops there, so a layer under keeps its own), and when the dialog unmounts focus returns to the control that had it, if that is still on the page.",
           "With `modal` the kit makes the rest of the root inert and hidden from assistive tech and locks the page's scroll while the dialog is open. Without it, the host that mounts the dialog owns those.",
           "The glyph tile is decorative and hidden from assistive tech.",
-          "Phone: the sheet is a modal view; Android's back button cancels, VoiceOver's and TalkBack's escape gesture cancels, and screen-reader focus moves to the title on open. A form dialog lifts its sheet above the keyboard."
+          "Phone: the sheet is a modal view; Android's back button cancels, VoiceOver's and TalkBack's escape gesture cancels (both only while `dismissible`), screen-reader focus moves to the title on open, and an error that arrives is announced. A form dialog lifts its sheet above the keyboard."
         ]
       },
       "examples": [
@@ -9562,6 +9663,11 @@
           "handling": "The CTA disables the moment it is pressed; the request carries an idempotency key. The spinner appears after 300 ms and stays at least 400 ms. While in flight, Cancel, Esc and the scrim do nothing — closing would hide the outcome. After 8 s the label reads \"Still deleting…\". A failure keeps the dialog open with the reason inline, and the same button retries."
         },
         {
+          "title": "A right-click, or a press on the scrim's scrollbar",
+          "platforms": ["web", "desktop"],
+          "handling": "A press on the scrim cancels only when the primary button goes down and comes up on it. A right-click or middle-click, a press on the scrollbar of a scrim that scrolls, and a drag that starts on the scrim and ends in the panel (selecting its text) leave it open."
+        },
+        {
           "title": "Esc and focus",
           "platforms": ["web", "desktop"],
           "handling": "Esc is Cancel and closes only the topmost layer — an open menu first, then the confirm, then the form beneath. Tab and Shift+Tab wrap inside the panel; with nothing focusable, Tab does nothing rather than escaping. On close, focus returns to the control that opened it, or to the pane heading if that control is gone. In macOS full screen, Esc is consumed by the app before the system sees it, so cancelling a dialog never also exits full screen."
@@ -9585,7 +9691,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A <div role=\"alertdialog\"> (confirm) or \"dialog\" (form), aria-modal, labelled by its <h2> and described by the body, on a 3px-blurred scrim; inline styles over `t`; Button and IconButton. Tab wraps inside, Esc cancels, Mod+Enter submits a form, and Cancel (a form: its first field) takes focus on open; pops in with enter(\"pop\") over a fading scrim; `loading` through useControllable",
+          "base": "A <div role=\"alertdialog\"> (confirm) or \"dialog\" (form), aria-modal, labelled by its <h2> and described by the body, on a 3px-blurred scrim; inline styles over `t`; Button and IconButton. Tab wraps inside, Esc cancels, Mod+Enter submits a form, and Cancel (a form: its first field) takes focus on open; pops in with enter(\"pop\") over a fading scrim; a press waits for the app's answer through usePending (`loading` or a new `error` ends it)",
           "import": "import { Dialog } from \"@antfabric/ui-react\"",
           "notes": [
             "The backdrop blurs 3px. With `modal` the dialog is drawn in the overlay layer of its AntFabricRoot (the theme applies, no overflow clips it): the scrim covers the window, the page behind does not scroll (the body and the box the page scrolls in) and the rest of the root is inert; only the top dialog takes Esc and a press on the scrim. Without `modal` it is drawn where it is mounted, and those belong to the host.",
@@ -9609,7 +9715,7 @@
             "Confirm layout: 24 / 20 / 20 padding, 20px corners, a 42px glyph tile, a display-font title, the body at 13px, and the two buttons right-aligned at equal widths (DialogActions).",
             "The CTA is solid danger-coloured for every confirm whose glyph is a bin; Log out, Disconnect and Remove from your list stay on the brand fill because they destroy nothing.",
             "Focus: on mount the first control takes focus (a confirm's Cancel, a form's first field; the panel when it holds nothing focusable), Tab wraps inside, and the opener gets focus back on unmount if it is still on the page.",
-            "In the catalogue the panel pops in over a fading scrim, and pressing the CTA sets `loading`: its button spins and Cancel and Close go quiet, as while the request is in flight.",
+            "In the catalogue the panel pops in over a fading scrim, and pressing the CTA spins it until the app answers; Cancel and Close stay live, as while the request is in flight.",
             "Escape runs through the app's Escape ladder: a popover menu first, then the confirm, then the form under it — one layer per press."
           ],
           "keyboard": [
@@ -9620,14 +9726,14 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "A bottom sheet: <Enter motion=\"slide-up\"> (role alertdialog or dialog, accessibilityViewIsModal) over a fading scrim, StyleSheet over useTheme(); the CTA and Cancel as full-width Buttons, IconButton to close; `loading` through useControllable",
+          "base": "A bottom sheet: <Enter motion=\"slide-up\"> (role alertdialog or dialog, accessibilityViewIsModal) over a fading scrim, StyleSheet over useTheme(); the CTA and Cancel as full-width Buttons, IconButton to close; a press waits for the app's answer through usePending (`loading` or a new `error` ends it)",
           "import": "import { Dialog } from \"@antfabric/ui-react-native\"",
           "notes": [
             "Title row 16 under the handle, message 28 above the buttons, then the CTA and an outlined Cancel, both 56pt and full width — Cancel under the CTA, where the thumb rests after reading.",
             "tone danger is the red destructive button; tone primary is for an approval (granting an agent permission), which must not look like a hazard.",
             "No glyph tile on the phone; the title carries the question.",
             "Closing puts the keyboard away too.",
-            "In the catalogue the sheet slides up, and pressing the CTA sets `loading`: it spins and Cancel and Close go quiet."
+            "In the catalogue the sheet slides up, and pressing the CTA spins it until the app answers; Cancel and Close stay live."
           ],
           "gestures": [
             { "gesture": "Tap the CTA", "action": "Confirms, then closes" },
@@ -9855,7 +9961,7 @@
         },
         "hidden": {
           "type": "array",
-          "description": "The segments the list has turned off, by name: [\"Email\"]. Left out, the chart keeps its own, starting with every segment on. Controlled when the app passes it with `onHiddenChange`."
+          "description": "The segments the list has turned off, by name: [\"Email\"]. A name that two rows share is two segments: the second is `Email#2`. Left out, the chart keeps its own, starting with every segment on. Controlled when the app passes it with `onHiddenChange`."
         },
         "onHiddenChange": {
           "type": "event",
@@ -9865,7 +9971,7 @@
         },
         "selected": {
           "type": "string",
-          "description": "The segment that is picked, by name: the hole shows it and the others step back until it is picked again. Pointing at a segment or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
+          "description": "The segment that is picked, by name (`Email#2` for the second of two rows named Email): the hole shows it and the others step back until it is picked again. Pointing at a segment or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
         },
         "onSelectedChange": {
           "type": "event",
@@ -10035,7 +10141,8 @@
           "$chart.sliceRadius",
           "$chart.sliceLift",
           "$chart.partMinW",
-          "$opacity.muted"
+          "$opacity.muted",
+          "$control.hit"
         ],
         "tokens": [
           "border.subtle",
@@ -10111,7 +10218,7 @@
         "label": "The summary: \"Tickets by channel: #support 312 (40.6%), #billing 158 (20.5%), #platform-eng 121 (15.7%), #onboarding 96 (12.5%), Email 82 (10.7%); total 769.\"",
         "notes": [
           "The figure (the ring on the phone) is named by the sentence core's `segmentsOf` and `summarizeSegments` write from the rows: every segment, its value and its share, and the total. It is heard, not printed: the legend under the ring prints every segment's name, value and share, so colour is never the only way in.",
-          "The list is the legend, the pick and the toggles: each row is a button that is pressed while its segment is the picked one (\"#billing, 158, 20.5%\"), so `selected` is reachable by keyboard and screen reader as well as by touching the ring. Each swatch is its own toggle button named \"Show #billing\", pressed while the segment shows; a segment that is off is struck through and faint, not only dimmer, with an en dash for its share. The last one showing cannot be turned off. The rows and swatches draw a focus ring.",
+          "The list is the legend, the pick and the toggles: each row is a button that is pressed while its segment is the picked one (\"#billing, 158, 20.5%\"), so `selected` is reachable by keyboard and screen reader as well as by touching the ring. Each swatch is its own toggle button named \"Show #billing\", pressed while the segment shows (a switch on the phone), drawn beside the row's button and not inside it, so a screen reader reaches both; a segment that is off is struck through and faint, not only dimmer, with an en dash for its share. The last one showing cannot be turned off. The rows and swatches draw a focus ring.",
           "\"View as table\" is the other way in: every row, with real headers, and nothing folded into \"Other\".",
           "The ring's hole is drawn for the eye and hidden from a screen reader (it repeats the summary)."
         ]
@@ -10403,6 +10510,12 @@
           "type": "boolean",
           "description": "The ~248px assistant rails and the sidebar: less padding and a narrower measure. Same drawing, same type ramp.",
           "default": false,
+          "platforms": ["web", "desktop"]
+        },
+        "headingLevel": {
+          "type": "number",
+          "description": "The title's heading level, 1 to 6, so it keeps the page's heading order: an empty pane under the page's h1 is an h2, an empty section inside an h2 an h3. The phone has one kind of header.",
+          "default": 2,
           "platforms": ["web", "desktop"]
         },
         "onAction": { "type": "event" }
@@ -10699,6 +10812,11 @@
           "handling": "The quoted query is cut at 40 characters on a word boundary with an ellipsis; the full query stays in the search field. The line wraps (text-wrap: pretty) rather than truncating the sentence."
         },
         {
+          "title": "Inside a section that has its own heading",
+          "platforms": ["web", "desktop"],
+          "handling": "Pass `headingLevel` one below the section's heading (3 under an h2), so the outline a screen reader walks stays in order; the title looks the same at every level."
+        },
+        {
           "title": "Narrow rail",
           "platforms": ["web", "desktop"],
           "handling": "compact cuts the padding to 28 × 18 and the measure to 214px so the drawing stays above the fold in a 248px column; the drawing itself never shrinks below 160 × 116."
@@ -10727,11 +10845,11 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A centred flex column with enter(\"fade\"): the 160 × 116 drawing as absolutely placed boxes over `t`, or a glyph in a disc; an <h2> title; the kit's Button (secondary, lg)",
+          "base": "A centred flex column with enter(\"fade\"): the 160 × 116 drawing as absolutely placed boxes over `t`, or a glyph in a disc; an <h2> title (`headingLevel` picks h1 to h6); the kit's Button (secondary, lg)",
           "import": "import { EmptyState } from \"@antfabric/ui-react\"",
           "notes": [
             "Search empties are announced through the search field's own live region (\"No matches\"), not by this component.",
-            "The title is an h2 inside the pane's landmark, so a screen-reader user can jump to it."
+            "The title is a heading inside the pane's landmark (h2 unless `headingLevel` says otherwise), so a screen-reader user can jump to it."
           ]
         },
         "desktop": {
@@ -10808,7 +10926,7 @@
         "disabled": { "type": "boolean", "default": false },
         "wiggle": {
           "type": "boolean",
-          "description": "A press wiggles the glyph for 0.8 s and onPress fires when the wiggle ends, because the sheet it opens covers the disc. One pending press at a time; at once under Reduce Motion.",
+          "description": "A press wiggles the glyph for 0.8 s and onPress fires when the wiggle ends, because the sheet it opens covers the disc. One pending press at a time; at once under Reduce Motion. Disabled during the wiggle, it drops the press and does not fire.",
           "default": false,
           "platforms": ["mobile"]
         },
@@ -11214,6 +11332,17 @@
           "slots": ["children"]
         },
         {
+          "name": "Switch, required and refused",
+          "description": "The switch takes the field's aria-required and aria-invalid, and the error follows its name.",
+          "props": {
+            "label": "Recordings",
+            "required": true,
+            "error": "Turn this on to share #platform-eng's recordings with Fabric.",
+            "hideLabel": true
+          },
+          "slots": ["children"]
+        },
+        {
           "name": "Label hidden",
           "description": "The label is still the control's name; a heading above asks the question.",
           "props": { "hideLabel": true, "description": "" },
@@ -11351,9 +11480,14 @@
         },
         "format": {
           "type": "object",
-          "description": "A format name, its options or a function: what core's `fmt` takes. The value, the target, the two ends, the summary and \"View as table\" all print through it, so they agree.",
+          "description": "A format name, its options or a function: what core's `fmt` takes. The value, the target, the two ends, the summary and \"View as table\" all print through it, so they agree. A percent format prints each as its share of `max`, as Meter does: 58 of 100 is 58%.",
           "default": "percent",
           "sample": "percent"
+        },
+        "showState": {
+          "type": "boolean",
+          "description": "An icon beside the value in the caution (triangle) and critical (circle) states, so the state is not the ring's colour alone (WCAG 1.4.1), as Meter's `showState`. On by default; `false` leaves the colour and the summary to say it (\"84%, caution\"), for a product that prints the state beside the gauge itself.",
+          "default": true
         },
         "size": {
           "type": "number",
@@ -11492,7 +11626,9 @@
           "$chart.gaugeCap",
           "$chart.tickW",
           "$chart.tickOver",
-          "$fg.strong"
+          "$fg.strong",
+          "$icon.sizeMd",
+          "$space.2xs"
         ],
         "tokens": [
           "border.wHairline",
@@ -11542,7 +11678,9 @@
           "font.weightRegular",
           "font.weightSemibold",
           "hover.surface",
+          "icon.sizeMd",
           "radius.row",
+          "space.2xs",
           "space.3xs",
           "space.lg",
           "space.md",
@@ -11561,6 +11699,7 @@
         "label": "The summary: \"Resolved by Fabric: 58.3% of resolved tickets, target 60%.\"",
         "notes": [
           "The figure (the ring on the phone) is named by the sentence core's `summarizeGauge` writes: the value in the chart's format, what it is of, and the target. It is heard, not printed: the value and the target are already in the hole and under the ring.",
+          "In the caution and critical states the summary says so after the value (\"Seats in use: 42 seats, caution …\", Meter's words), and `showState` draws Meter's icon beside the number in the hole.",
           "The colour is never the only signal: the number is in the hole, the target is a tick and a caption (\"Target 60%\"), and a value past `max` says so in the summary (\"over the 100% it is measured against\").",
           "\"View as table\" is the other way in: the measure, its value and its target, with real headers.",
           "The numbers in the hole and under the ring are for the eye: the summary says them once for a screen reader."
@@ -11797,7 +11936,7 @@
         },
         "selected": {
           "type": "string",
-          "description": "The goal that is picked, by its name: the middle shows its share and the other rings and goals step back until it is picked again. Pointing at a goal or tabbing to it lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
+          "description": "The goal that is picked, by its name (`name#2` for the second of two rows with one name): the middle shows its share and the other rings and goals step back until it is picked again. Pointing at a goal or tabbing to it lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`."
         },
         "onSelectedChange": {
           "type": "event",
@@ -12152,7 +12291,7 @@
           "notes": [
             "Shipped from the data subpath: recharts is reached only from there. The rings are handed an explicit size, never a responsive container.",
             "Each band is `chart.ringW` thick with `chart.ringGap` between it and the next ring in; the outermost is the first goal. A ring is its value Pie over a whole track Pie, so the round end of a value sits on the track.",
-            "The overall share is the mean of the rings' fill: a goal that is passed counts as whole and cannot make up for one that is not. Pointing at a ring or at its goal (or tabbing to it) lights it: the other rings and goals fade to 38% over 150ms on the kit's ease-out, and the middle's number eases to that goal's own share (MetricValue) under \"This goal\".",
+            "The overall share is the mean of the rings' fill: a goal that is passed counts as whole and cannot make up for one that is not. Pointing at a ring or at its goal (or tabbing to it) lights it: the other rings and goals fade to 38% over 150ms on the kit's ease-out, and the middle's number eases to that goal's own share (MetricValue) under \"This goal\", past 100% when it is passed (a full ring, 116%).",
             "The rings draw in once over 600ms on the kit's ease-out. Reduced motion turns it off.",
             "The list sits beside the rings and drops under them when the card is narrower than the rings, the gap and `chart.listMinW`."
           ],
@@ -12977,7 +13116,7 @@
         },
         "replying": {
           "type": "boolean",
-          "description": "The inline reply is open. Web and desktop only — on a phone a tap opens the conversation with the composer focused.",
+          "description": "The inline reply is open. Web and desktop only — on a phone a tap opens the conversation with the composer focused. A new notification (another title, context, body or time) starts again from `replying` and `replyText`, as it does from `dismissed`.",
           "default": false,
           "platforms": ["web", "desktop"]
         },
@@ -12990,7 +13129,7 @@
         },
         "dismissed": {
           "type": "boolean",
-          "description": "Dismissed: × or Mark as read on web and desktop, a swipe up on the phone (the catalogue uses the grabber). The banner leaves and nothing is drawn.",
+          "description": "Dismissed: × or Mark as read on web and desktop, a swipe up on the phone (the catalogue uses the grabber). The banner leaves and nothing is drawn, until the next notification: a new title, context, body or time shows again, back at this prop.",
           "default": false
         },
         "onOpen": { "type": "event" },
@@ -13167,7 +13306,8 @@
       "a11y": {
         "role": "status",
         "notes": [
-          "The banner sits in a polite live region that stays on the page (the web's root, the phone's role=status view), so what appears inside it is read as \"Priya Raman in #platform-eng: …\" — never assertive, and it never takes focus. On the phone the same words are also spoken through the screen reader's announcement call, because iOS has no live regions.",
+          "A banner that arrives is announced politely as \"Priya Raman. #platform-eng. …\" (through the page's announcer on the web, the screen reader's announcement call on the phone) — never assertive, and it never takes focus. A failed inline reply is announced at once.",
+          "The open button's name says everything the card shows: 'Priya Raman in #platform-eng, 2m: Mentioned you · can you look at the deck?, +2 more waiting. Open'. With no body it is the title, the time and 'Open', never an empty ': .'.",
           "The kit has no auto-dismiss timer: the app owns it and must stop it while the banner has focus or the pointer is on it, and give a screen-reader user longer (WCAG 2.2.1).",
           "Reply moves focus into the field, and Escape in the field closes the reply and keeps the draft without dismissing the banner (Escape elsewhere on the card dismisses it); focus goes back to Reply when the reply closes. These are the web's: the phone has no reply field."
         ]
@@ -13248,6 +13388,16 @@
           "handling": "One banner at a time, each on screen at least 1.5 s before the next replaces it, with \"+2 more waiting\" so nothing is silently skipped. Three or more from one conversation inside 10 s collapse into one: \"3 new messages\" in #platform-eng. A reconnect backlog never replays as banners — it goes to the rail."
         },
         {
+          "title": "No preview text",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "An event with nothing to preview (a call, a file with no caption) draws its title and time only, and its open button is named 'Design crit starts in 5 min, now. Open' rather than with an empty body."
+        },
+        {
+          "title": "The next one arrives while you reply",
+          "platforms": ["web", "desktop"],
+          "handling": "The reply and its draft belong to the notification they answer. When the banner moves on to another (a new title, context, body or time), it starts from `replying` and `replyText` again, so a half-typed reply to Marcus never ends up in the box under Aisha's message. The app keeps the draft if it wants to offer it back."
+        },
+        {
           "title": "You are typing",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "The banner never takes focus and never moves the composer or the keyboard. On a phone it sits under the status bar; on desktop and web it is top-right, away from the composer."
@@ -13286,7 +13436,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "<div role=\"status\" aria-live=\"polite\"> holding a card that slides in from the right with enter(): one <button> that opens it, an IconButton ×, Button actions and an inline reply <input> with Send; Escape dismisses, Enter sends. Inline styles over `t`; `dismissed`, `replying` and `replyText` kept in local state that follows the props. The app hosts it in its own top-right viewport, apart from the action toasts",
+          "base": "<div role=\"group\"> named \"New notification\" holding a card that slides in from the right with enter(): one <button> that opens it, an IconButton ×, Button actions and an inline reply <input> with Send; Escape dismisses, Enter sends. Inline styles over `t`; `dismissed`, `replying` and `replyText` kept in local state that follows the props. The app hosts it in its own top-right viewport, apart from the action toasts",
           "import": "import { InAppBanner } from \"@antfabric/ui-react\"",
           "notes": [
             "Shown only while this tab is visible AND focused (document.visibilityState === 'visible' && document.hasFocus()). A background tab raises the browser notification instead, and the tab title count changes either way.",
@@ -13318,7 +13468,7 @@
         },
         "mobile": {
           "status": "planned",
-          "base": "View (role status, polite live region) with a card that drops in with <Enter motion=\"drop\">, drawn on GlassSurface (Liquid Glass on iOS 26+); a PanResponder swipe up follows the finger and dismisses, the grabber stands in for it, and a Dismiss accessibilityAction and the iOS escape gesture do the same; StyleSheet over useTheme(). The app hosts it over the root stack, with expo-notifications' handleNotification returning shouldShowBanner: false while the app is in front",
+          "base": "A labelled View with a card that drops in with <Enter motion=\"drop\">, drawn on GlassSurface (Liquid Glass on iOS 26+); a PanResponder swipe up follows the finger and dismisses, the grabber stands in for it, and a Dismiss accessibilityAction and the iOS escape gesture do the same; StyleSheet over useTheme(). The app hosts it over the root stack, with expo-notifications' handleNotification returning shouldShowBanner: false while the app is in front",
           "import": "import { InAppBanner } from \"@antfabric/ui-react-native\"",
           "notes": [
             "Fixes a gap: today every foreground notification raises the OS banner (shouldShowBanner: true), including one for the channel you are reading. The handler now asks the router for the open channel / thread and stays silent for it; everything else draws this banner instead of the OS one.",
@@ -13687,7 +13837,7 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "A View (role status, polite live region) with <Enter motion=\"fade\">, the action under the message as the kit's Button (sm) and the kit's IconButton for Dismiss; dismissing fades it with Animated.timing",
+          "base": "A View (its words announced, no live region) with <Enter motion=\"fade\">, the action under the message as the kit's Button (sm) and the kit's IconButton for Dismiss; dismissing fades it with Animated.timing",
           "import": "import { InlineBanner } from \"@antfabric/ui-react-native\"",
           "notes": [
             "Today's InfoBanner: a sunken strip (surface.muted), 12 × 8 padding, radius 8, a 16pt faint icon nudged 2pt down against the first line, one sentence and no heading. It has no bottom margin — the next SectionHeader owns the gap.",
@@ -14294,8 +14444,7 @@
         },
         "marks": {
           "type": "boolean",
-          "description": "Each series gets its own dash pattern and marker shape besides its colour, in the plot and in the legend's key, so two series are never told apart by hue alone. Markers are left off past 40 points. Off by default: the plot keeps its plain lines.",
-          "default": false
+          "description": "Each series gets its own dash pattern and marker shape besides its colour, in the plot and in the legend's key, so two series are never told apart by hue alone (WCAG 1.4.1). Markers are left off past 40 points. Left out, it is on for two or more series and off for one; `false` keeps plain lines where the product labels the series another way."
         },
         "target": {
           "type": "number",
@@ -14452,7 +14601,7 @@
         "notes": [
           "The figure is named by the sentence core's `summarize` writes from the rows: dates read as a trend (rose, fell, held, and where it peaked), categories as highest and lowest. It is heard, not printed: in the light theme most series colours sit under 3:1 against the card, so the tooltip and \"View as table\" give the numbers without colour.",
           "\"View as table\" is the other way in: the same rows in Table, with real headers. It is a Button, so it is reached by keyboard and named by what it will do.",
-          "With `marks`, a series is told apart by its dash and marker as well as its colour (the first is solid with a round marker, the next dashed with a square, and so on), and the legend's key draws the same. Without it, the tooltip and the table are the relief for series that are close in hue.",
+          "With `marks` (on by default for two or more series), a series is told apart by its dash and marker as well as its colour (the first is solid with a round marker, the next dashed with a square, and so on), and the legend's key draws the same. With `marks={false}`, the tooltip and the table are the relief for series that are close in hue.",
           "The legend says what it toggles: each entry is a button that is pressed while the series is on (\"Resolved, pressed\"), and an entry that is off is struck through and faint, not only dimmer. The last series showing cannot be turned off, so a chart is never blank because of a press.",
           "On the web the plot is a stop for the arrow keys (recharts' accessibility layer): the tooltip moves point to point, and the plot draws a focus edge from the tokens while the keyboard is in it. The phone's plot is one image; the sentence and the table carry it.",
           "The tooltip is drawn with `role=\"tooltip\"` on the web and is never the only place a value is: the table has every one."
@@ -15075,7 +15224,7 @@
         },
         "onSelectedChange": {
           "type": "event",
-          "description": "Called with `selected` as the press leaves it (a press toggles it).",
+          "description": "Called with `selected` as the press leaves it: a press toggles it on a selection row (role option or checkbox) only. A link, button or menu row never changes `selected` itself; it is the app's (the open conversation).",
           "args": "selected: boolean",
           "changes": "selected"
         },
@@ -15392,7 +15541,7 @@
             "A row that opens a conversation is an <a href>, so middle-click and ⌘-click open it in a new tab; the open one carries aria-current=\"page\".",
             "Hover reveals the row's ⋯ menu and its mark-as-read affordance; the same actions are on the row's context menu and in the keyboard map, so hover is never the only way in.",
             "pointer: coarse raises min-height to 44px on touch laptops.",
-            "Pressing toggles `selected` (through useControllable, so the catalogue preview is interactive): a link or button row's grey fill fades in, an option row's check pops in. Opening the conversation is the caller's.",
+            "Pressing an option or checkbox row toggles `selected` (through useControllable, so the catalogue preview is interactive): an option row's check pops in, a checkbox row ticks. A link or button row's grey fill is the app's `selected`: opening the conversation is the caller's, and the row never marks itself current.",
             "A checkbox row is one <button role=\"checkbox\" aria-checked>: the box is drawn inside it, not a second control, so a click anywhere on the row ticks it."
           ],
           "keyboard": [
@@ -15410,7 +15559,7 @@
             "Sidebar rows are 30px with a 7px radius fill; the ⋮ is hover-revealed and the unread count slides beside it (2026-10-06).",
             "FileRow is the two-line, tiled case: a 36px chip, the name in semibold, middot-joined provenance (\"Figma · Nuthan · yesterday · 4.2 MB\"), and the channel trailing. Today's chip is coral-soft; this spec draws it grey because coral is reserved for \"needs you\" — owner to confirm.",
             "Right-click opens the same menu as the ⋮ (native-feeling context menu, drawn in-app).",
-            "Pressing toggles `selected`: the surface.selected fill fades in over 120ms, or the option's check pops in.",
+            "Pressing an option or checkbox row toggles `selected` (the option's check pops in); a link or button row's surface.selected fill, fading in over 120ms, is the app's `selected`.",
             "A checkbox row (ForwardMessage, CreateChannel's invite list) is a <button role=\"checkbox\"> with the box drawn inside, as CreateChannel does (ADR-0527)."
           ],
           "keyboard": [
@@ -15429,7 +15578,7 @@
             "Every glyph sits in a tile: 36 by default, 32 on Settings. The tile is surface.muted so it reads on both a white card and the page (ADR-8910).",
             "Title and subtitle wrap to two lines rather than truncating to one — a phone row has the height.",
             "What desktop reveals on hover is on a swipe (Mark read, Mute) and on long-press; both are also accessibilityActions so VoiceOver and TalkBack users can reach them (ADR-9418). The kit's `onLongPress` is the long press, and it adds the accessibility action itself.",
-            "Tapping toggles `selected`: the trailing check pops in (a picker's chosen row); the 0.6 press dim eases back.",
+            "Tapping an option or checkbox row toggles `selected`: the trailing check pops in (a picker's chosen row); a link or button row never grows one on its own. The 0.6 press dim eases back.",
             "A checkbox row is one Pressable with the kit's tick box trailing: the 20pt brand box fills and its tick pops in, and the whole row is the 44pt target."
           ],
           "gestures": [
@@ -15800,6 +15949,11 @@
           "handling": "One line with an ellipsis; the panel never widens past its set width. The full label stays the accessible name and, on web and desktop, the tooltip."
         },
         {
+          "title": "A row that navigates",
+          "platforms": ["web", "desktop"],
+          "handling": "A row with `href` is an <a href role=\"menuitem\">: ⌘-click and middle-click open a new tab, a plain click calls onSelect. A link takes Enter by itself; the row also takes Space, as every other row does, and keeps it from scrolling the page."
+        },
+        {
           "title": "More rows than the window has room for",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "The panel caps at the space between the trigger and the window edge minus 8px and scrolls inside, keeping its shadow and corners. On a phone, a list longer than about eight rows is a sheet, not a dropdown."
@@ -15837,7 +15991,7 @@
           "import": "import { Menu } from \"@antfabric/ui-react\"",
           "notes": [
             "Portalling and placing the panel are the app's (it takes a `placement` of below or above and does not flip at the viewport's edge); the panel scrolls inside 80vh when it has many rows.",
-            "A row with `href` is a link item (<a href role=\"menuitem\">), so ⌘-click and middle-click open a new tab; a plain click calls onSelect.",
+            "A row with `href` is a link item (<a href role=\"menuitem\">), so ⌘-click and middle-click open a new tab; a plain click, Enter and Space call onSelect.",
             "Shortcut hints are drawn only for shortcuts the page actually owns; a browser-reserved one (⌘W, ⌘T, ⌘N, ⌘L) is replaced by the web alternative, never shown as a promise the browser will break.",
             "Right-click is not this component — see Context menu.",
             "In the catalogue the panel pops in, and pressing a checkable row flips its check (one row at a time, through `toggled`); the menu stays open, as a checkbox row does."
@@ -16073,11 +16227,13 @@
         },
         "onStatusChange": {
           "type": "event",
-          "description": "Retry on a failed message: called with `status` as the press leaves it (sending). Given this too, the row is controlled; otherwise it goes back to sending itself.",
-          "args": "status: MessageStatus",
-          "changes": "status"
+          "description": "Retry on a failed message reports the request: called with sending. The row never moves `status` itself: Retry goes busy until the app passes the new `status` (or the promise onRetry returns settles), so a retry that fails again leaves Retry and Delete ready.",
+          "args": "status: MessageStatus"
         },
-        "onRetry": { "type": "event", "description": "Retry was pressed on a failed message: the app posts it again." },
+        "onRetry": {
+          "type": "event",
+          "description": "Retry was pressed on a failed message: the app posts it again, and answers with `status` (sending, then sent or failed). Retry is busy until it does, or until the promise the handler returns settles."
+        },
         "onDelete": {
           "type": "event",
           "description": "Delete on a failed or queued message: removes only the unsent copy."
@@ -16088,7 +16244,7 @@
         },
         "onReact": {
           "type": "event",
-          "description": "A quick reaction on the bar or a reaction pill was pressed: toggle yours with this emoji. The server owns the counts, so this is a request: pass the new `reactions` when the server answers.",
+          "description": "A quick reaction on the bar or a reaction pill was pressed: toggle yours with this emoji. The server owns the counts, so this is a request: the pill is busy, still showing the old count, until the app passes the new `reactions` (or the promise the handler returns settles), and a rejected reaction stays as it was.",
           "args": "emoji: string"
         },
         "onAddReaction": {
@@ -16490,6 +16646,16 @@
       ],
       "edgeCases": [
         {
+          "title": "The ⋯ menu is open and the pointer moves into it",
+          "platforms": ["web", "desktop"],
+          "handling": "The bar stays drawn while `menuOpen` holds (the row's own state when the app passes only `onMenuOpenChange`), so the menu the app anchors to ⋯ keeps its anchor after the pointer and focus leave the row for the menu."
+        },
+        {
+          "title": "A long press on one row, then another",
+          "platforms": ["web", "desktop"],
+          "handling": "On touch the bar opens by long press, on that row only: a press anywhere outside the row puts it away, so bars are never left open on several rows."
+        },
+        {
           "title": "One enormous token",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "A pasted URL, hash or model dump with no spaces breaks anywhere (overflow-wrap: anywhere, which also counts for min-content), so the row never pushes past the scroller and the timeline never scrolls sideways."
@@ -16549,7 +16715,7 @@
             "The hover wash is a CSS :hover on the row — never an inline background, which would beat it — and the unread wash is painted off a data-unread attribute for the same reason.",
             "Every message has a permalink (…/c/platform-eng/p/<id>); Copy link in ⋯ copies it, and opening it scrolls to and highlights the row.",
             "A background tab still receives messages; the tab title count and favicon dot change, the row does not animate in until the tab is visible.",
-            "Pressing a reaction toggles yours (each pill keeps its own state), and Retry on a failed message moves it back to sending. The row itself does not toggle `hovered` on a press: in an app that would leave a bar behind on a row the pointer has left, so hover, focus inside the row, or the prop draw it.",
+            "Pressing a reaction toggles yours (each pill keeps its own state), and Retry on a failed message goes busy until the app answers (the flows pass `status`). The row itself does not toggle `hovered` on a press: in an app that would leave a bar behind on a row the pointer has left, so hover, focus inside the row, or the prop draw it.",
             "Not in the kit yet: Message has no events for the bar's quick reactions, Add a reaction, Forward or ⋯, nor for a reaction pill's toggle (the spec defines none), so those are inert or local inside Message; the body is plain text, not RichText."
           ],
           "keyboard": [
@@ -16727,6 +16893,7 @@
         "label": "Message actions",
         "notes": [
           "Every control is a real button with a name (\"React with 👍\", \"Reply in thread\").",
+          "⋯ is a menu button, not a toggle: a screen reader hears that it opens a menu and whether the menu is open (aria-haspopup=\"menu\", aria-expanded), never \"pressed\".",
           "Arrow keys, Home and End move between the buttons; left and right follow the tree's direction, so in right-to-left they turn round. Every button is still its own Tab stop: a single roving stop needs IconButton to take a tabIndex, which it does not yet.",
           "Inside a Message, the bar shows on hover, on focus in the row, and after a long press or Shift+F10 / the Menu key; Escape closes it back to the row."
         ]
@@ -16781,7 +16948,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A role=\"toolbar\" box with inline styles over `t`: quick reactions are <button>s with hover and press from useInteraction, the rest the kit's IconButton (square); ⋯ is a toggle IconButton that holds `menuOpen`. ← / → move focus along the bar. Tooltips are each button's title.",
+          "base": "A role=\"toolbar\" box with inline styles over `t`: quick reactions are <button>s with hover and press from useInteraction, the rest the kit's IconButton (square); ⋯ is a menu button (aria-haspopup=\"menu\", aria-expanded) that holds `menuOpen` and draws pressed while the menu is open. ← / → move focus along the bar. Tooltips are each button's title.",
           "import": "import { MessageActions } from \"@antfabric/ui-react/chat\"",
           "notes": [
             "Shown on row hover and on :focus-within, positioned absolute at top 2 / right 14 of the row so it costs the message no height and no reflow.",
@@ -17135,8 +17302,8 @@
         },
         "showState": {
           "type": "boolean",
-          "description": "An icon beside the value in the caution (triangle) and critical (circle) states, so the state is not the fill's colour alone. The spoken value says it either way (\"78%, caution\").",
-          "default": false
+          "description": "An icon beside the value in the caution (triangle) and critical (circle) states, so the state is not the fill's colour alone (WCAG 1.4.1). On by default; `false` leaves the colour and the spoken value to say it (\"78%, caution\"), for a product that prints the state beside the meter itself.",
+          "default": true
         },
         "compact": {
           "type": "boolean",
@@ -18207,7 +18374,7 @@
       "a11y": {
         "notes": [
           "The title is the screen's heading (accessibilityRole header) and the first thing VoiceOver reads after the back control.",
-          "The bell's name carries the count: 'Notifications, 3 unread'. The connection line is a polite live region on Android and is also announced once when it appears, since iOS has no live regions.",
+          "The bell's name carries the count: 'Notifications, 3 unread'. The connection line is plain text, announced when it appears or changes, and \"Back online\" is announced when it goes (iOS has no live regions, so neither phone uses one).",
           "Header titles grow with Dynamic Type up to 1.3x so they stay on one line; the rows and buttons are not fixed-height.",
           "The status bar and its clock are a picture, hidden from the accessibility tree and off by default: the system draws the real one. The header does not read the device's safe-area insets itself; the app pads it by the top inset."
         ]
@@ -18384,7 +18551,7 @@
         },
         "title": {
           "type": "string",
-          "description": "The wordmark beside the tile while expanded. With no `logo` and no `title`, the lockup is not drawn at the menu level.",
+          "description": "The wordmark beside the tile while expanded. With no `logo` and no `title`, the lockup is not drawn at the menu level; with a `title` and no `logo` it is drawn only while expanded (collapsed, there would be nothing in it).",
           "default": "",
           "sample": "AntFabric"
         },
@@ -18767,6 +18934,7 @@
           "Drill-in: the list is a <nav> named for where it is ('Mode', or 'Channels sections'). The top tile is a button named 'Channels. Back to the main menu', so the destination is announced where the logo was.",
           "Drill-in: opening a destination or going back replaces the pressed row, so focus moves to the row that is now current instead of falling to the page. Escape in a destination's sections goes back.",
           "The workspace chip and the profile button are menu buttons (aria-haspopup=\"menu\"); their aria-expanded follows `workspaceMenuOpen` and `profileMenuOpen`, which the app sets while its menu is open.",
+          "The profile button says the face's presence in words: 'Priya Raman, active, profile and sign out' (`profileWithPresence`); with `presence: \"none\"` it is 'Priya Raman, profile and sign out'.",
           "The destination list scrolls when it does not fit, so the utilities and the profile stay in view. Every row, the utilities and the profile draw a focus ring."
         ]
       },
@@ -18848,6 +19016,11 @@
         }
       ],
       "edgeCases": [
+        {
+          "title": "A wordmark with no logo",
+          "platforms": ["web", "desktop"],
+          "handling": "A product that passes a `title` and no `logo` gets its wordmark while the rail is expanded. Collapsed there is no tile to draw it in, so the lockup is left out rather than drawn as an empty button that Tab would stop on."
+        },
         {
           "title": "Big counts in a 64px column",
           "platforms": ["web", "desktop"],
@@ -19066,7 +19239,7 @@
         },
         "approval": {
           "type": "enum",
-          "description": "\"\" is not a request. pending shows Approve / Decline in the row; the rest are its outcomes.",
+          "description": "\"\" is not a request. pending shows Approve / Decline in the row; the rest are its outcomes, and only the app sets them: a press spins until it does.",
           "default": "",
           "options": ["", "pending", "approving", "approved", "declined", "expired"]
         },
@@ -19078,8 +19251,14 @@
         "onOpen": { "type": "event" },
         "onMarkRead": { "type": "event" },
         "onClear": { "type": "event" },
-        "onApprove": { "type": "event" },
-        "onDecline": { "type": "event" }
+        "onApprove": {
+          "type": "event",
+          "description": "Reports the request; Approve spins and Decline locks until the app answers with `approval` (approving, approved, declined, expired) or the promise the handler returns settles. A failure that leaves `approval` at pending brings both buttons back."
+        },
+        "onDecline": {
+          "type": "event",
+          "description": "Reports the request; Decline spins and Approve locks until the app answers with `approval`, or the promise the handler returns settles."
+        }
       },
       "parts": [
         "root",
@@ -19207,6 +19386,7 @@
           "rowAction": {
             "on": ["web", "desktop"],
             "base": {
+              "minHeight": "$control.hit",
               "radius": "$radius.control",
               "borderWidth": "$border.wHairline",
               "borderColor": "$border.subtle",
@@ -19222,7 +19402,7 @@
           "swipeAction": { "on": ["mobile"], "base": { "bg": "$surface.inverse", "fg": "$fg.onInverse" } },
           "swipeDanger": {
             "on": ["mobile"],
-            "base": { "bg": "$danger.solid", "fg": "$fg.onBrand" },
+            "base": { "bg": "$danger.solid", "fg": "$danger.fg" },
             "states": { "pressed": { "bg": "$danger.solidHover" } }
           },
           "swipeIcon": { "on": ["mobile"], "base": { "square": "$icon.size" } },
@@ -19236,6 +19416,8 @@
           "border.wThick",
           "brand.default",
           "brand.softHover",
+          "control.hit",
+          "danger.fg",
           "danger.solid",
           "danger.solidHover",
           "dot.size",
@@ -19420,7 +19602,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "<div role=\"listitem\"> holding one full-width <button> that opens it (one accessible name for the row), Avatar with a kind badge or the glyph tile, and Mark as read / Clear buttons positioned over the row's end that fade in while `revealed`, hovered or focused within; Approve / Decline are Button. Inline styles over `t`, states from useInteraction; `read`, `revealed` and `approval` kept in local state that follows the props",
+          "base": "<div role=\"listitem\"> holding one full-width <button> that opens it (one accessible name for the row), Avatar with a kind badge or the glyph tile, and Mark as read / Clear buttons positioned over the row's end that fade in while `revealed`, hovered or focused within; Approve / Decline are Button. Inline styles over `t`, states from useInteraction; `read` and `revealed` kept in local state that follows the props; `approval` is the app's, and Approve / Decline spin (usePending) until it answers",
           "import": "import { NotificationItem } from \"@antfabric/ui-react\"",
           "notes": [
             "The row's actions mount on :hover AND :focus-within — mounting on hover alone puts nothing in the tab order for a keyboard user, and leaving them always mounted puts two buttons per row in it.",
@@ -19441,7 +19623,7 @@
             "Hover actions are mounted only while the pointer is on the row (React state, not CSS :hover), absolutely positioned so appearing never reflows the text. This spec adds focus-within as a second trigger.",
             "A thread reply leads its preview with \"Replied in a thread\" — read from the same parentMessageId the click uses, so what the row says and where it goes cannot disagree.",
             "Approve / Decline in the row is new: agent approvals have no rail affordance today.",
-            "In the catalogue, pressing a row sets `read` (the tint and dot fade) and toggles `revealed`, so the hover actions fade in; Mark as read sets `read`, and Approve / Decline set `approval`, which swaps the buttons for the outcome line."
+            "In the catalogue, pressing a row sets `read` (the tint and dot fade) and toggles `revealed`, so the hover actions fade in; Mark as read sets `read`, and Approve / Decline spin until the app answers (the flows pass `approval`, which swaps the buttons for the outcome line)."
           ],
           "keyboard": [
             { "keys": "Up / Down", "action": "Moves between rows" },
@@ -19863,6 +20045,11 @@
           "handling": "The Pause button is disabled until the time is later than now (\"Pick a time later than now.\"), and the latest allowed is 7 days ahead; anything longer is turning notifications off, which is the Show Notifications switch."
         },
         {
+          "title": "A field left empty",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "Pause in the Custom… picker is disabled until both the date and the time hold something, so it never pauses 'until , '. (A picker option with its own `until` pauses until that, whatever the fields hold.)"
+        },
+        {
           "title": "Our pause and the OS's Focus",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "Independent, and both apply: macOS/iOS Focus, Windows Do not disturb and Android DND hold what we send; our pause means we do not send. The pill only ever describes ours — we cannot read the OS's Focus state reliably, so we never claim it."
@@ -20002,7 +20189,7 @@
         "lead": { "type": "string", "description": "Words before the body: \"Replied in a thread\".", "default": "" },
         "actions": {
           "type": "array",
-          "description": "The banner's buttons, at most two: `{ key, label, icon?, reply?, rest? }`. The one with `reply` opens the inline reply and its text comes back with the press (Windows always shows that field). `rest` marks the ones the OS shows before the banner is expanded: Windows always, the browser once expanded; macOS and GNOME show them all when expanded, and iOS lists them in the long-press menu with their `icon`.",
+          "description": "The banner's buttons, at most two: `{ key, label, icon?, reply?, rest?, disabled? }`. `disabled` dims a button and it takes no press; `badge` is not drawn (an OS banner's buttons carry no count). The one with `reply` opens the inline reply and its text comes back with the press (Windows always shows that field); in the browser, which has no inline reply, it reports the press with no text and the app opens the conversation. `rest` marks the ones the OS shows before the banner is expanded: Windows always, the browser once expanded; macOS and GNOME show them all when expanded, and iOS lists them in the long-press menu with their `icon`.",
           "default": [],
           "sample": [
             { "key": "reply", "label": "Reply", "icon": "reply", "reply": true },
@@ -20316,7 +20503,7 @@
             }
           },
           "action": {
-            "states": { "focus": { "shadow": "$shadow.focus" } },
+            "states": { "focus": { "shadow": "$shadow.focus" }, "disabled": { "opacity": "$opacity.disabled" } },
             "platforms": {
               "mac": {
                 "base": {
@@ -20725,6 +20912,11 @@
       ],
       "edgeCases": [
         {
+          "title": "Reply in a browser",
+          "platforms": ["web"],
+          "handling": "A browser notification has no inline reply. A reply action marked `rest` is still drawn once the banner is expanded, and pressing it reports `onAction(action)` with no text, so the app opens the conversation with the reply box focused, instead of a button that does nothing."
+        },
+        {
           "title": "Previews hidden (our setting or the lock screen)",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "With \"Hide message previews\" on, the server sends \"New message\" with no body, sender or channel — on every device, because the setting is the person's, not the phone's. Separately, iOS \"Show Previews: When Unlocked\" and Android's lock-screen visibility hide our text on a locked device; we never work around either. Grouping still works because the thread id is not text."
@@ -20961,7 +21153,7 @@
         "role": "navigation (web, desktop)",
         "label": "\"Pages\"; previous and next are \"Previous page\" and \"Next page\", the pages are \"Page 3\" with the current one marked aria-current (web) or selected (phone)",
         "notes": [
-          "The summary is a polite live region, so paging announces \"Showing 6–10 of 48\" without moving focus.",
+          "The summary is announced politely when it changes, so paging says \"Showing 6–10 of 48\" without moving focus; it is plain text, not a live region.",
           "On the first page previous is disabled, on the last next is. When the button a keyboard user pressed becomes disabled, focus moves to the current page button (or, in a compact pager, to the other arrow) so they keep their place.",
           "`pageSizes` and `jump` are labelled Selects (\"Rows per page\", \"Go to page\").",
           "The gap between page numbers is hidden from screen readers."
@@ -21592,7 +21784,10 @@
           "options": ["card", "sheet"],
           "platforms": ["mobile"]
         },
-        "onAllow": { "type": "event", "description": "Runs the OS request — from this click, never on load." },
+        "onAllow": {
+          "type": "event",
+          "description": "Runs the OS request, from this click, never on load. Reports the request: Turn on spins until the app passes the OS's answer as `permission` (or the promise the handler returns settles). A dismissed OS prompt leaves `permission` as it was, and the prompt returns to asking; it never says on before the OS does."
+        },
         "onLater": { "type": "event" },
         "onQuiet": {
           "type": "event",
@@ -21907,13 +22102,13 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "<div role=\"region\"> card with an <h2> title, inline styles over `t`; Button actions; `permission` kept in local state that follows the prop, so Turn on shows the on state at once; pops in with enter(); the blocked-in-browser hint is drawn aria-hidden. The app runs Notification.requestPermission() inside onAllow and watches navigator.permissions.query({ name: 'notifications' })",
+          "base": "<div role=\"region\"> card with an <h2> title, inline styles over `t`; Button actions; `permission` is the app's (the OS's answer): Turn on spins (usePending) until it arrives, and the new title is said only then; pops in with enter(); the blocked-in-browser hint is drawn aria-hidden. The app runs Notification.requestPermission() inside onAllow and watches navigator.permissions.query({ name: 'notifications' })",
           "import": "import { PermissionPrompt } from \"@antfabric/ui-react\"",
           "notes": [
             "Shown in the notification rail and once as a dismissible card on the home screen after the first DM or mention arrives — never as a prompt on page load.",
             "The OS prompt is requested only from the Turn on click: Safari and Firefox refuse a request without a user gesture, and Chrome switches a site that prompts on load to its quiet UI (a crossed bell in the address bar) that most people never see.",
             "Denied cannot be undone from the page — no API reopens the prompt. The card says where the switch is and offers Check again, which re-reads Notification.permission.",
-            "In the catalogue, Turn on notifications sets `permission` to granted (the browser would ask first), so the prompt turns into the on state with Send a test notification. The card pops in."
+            "In the catalogue, Turn on notifications spins until the app answers; the flows pass `permission: \"granted\"`, the on state with Send a test notification. The card pops in."
           ],
           "keyboard": [{ "keys": "Enter / Space", "action": "Activates the focused button" }]
         },
@@ -21927,7 +22122,7 @@
             "Linux: no permission model. If no notification server is running (some tiling setups), notify-rust fails silently; the test button is how a person finds out.",
             "Linux has no settings page to open, so when notifications are off there the card offers Send a test notification instead of a settings button.",
             "The rail's own switches (Notification sound, Show Notifications) are a separate, per-machine setting and are not this permission.",
-            "Turn on notifications sets `permission` to granted in the catalogue (macOS would ask first); the card pops in."
+            "Turn on notifications spins until the app passes the OS's answer (the flows pass granted); the card pops in."
           ],
           "keyboard": [{ "keys": "Enter / Space", "action": "Activates the focused button" }]
         },
@@ -21941,7 +22136,7 @@
             "Android 13+ needs the POST_NOTIFICATIONS runtime permission; Android 12 and earlier are allowed by default, so the sheet skips straight to granted there.",
             "Coming back from Settings with notifications allowed turns the Profile switch on without a second tap (awaitingSettings).",
             "iOS 26+: Liquid Glass — the surface is drawn through expo-glass-effect's GlassView (gated on its availability check; the material itself follows the device's Clear / Tinted, Reduce Transparency and Increase Contrast settings). iOS 18 and earlier keep today's blur/opaque look. Only the sheet presentation takes glass; the card stays opaque so the explanation reads cleanly wherever it sits.",
-            "Turn on notifications sets `permission` to granted in the catalogue (the OS would ask first). The card pops in; the sheet presentation pops too, because one template root carries one entrance — the kit slides the sheet up."
+            "Turn on notifications spins until the app passes the OS's answer (the flows pass granted). The card pops in; the sheet presentation pops too, because one template root carries one entrance — the kit slides the sheet up."
           ],
           "gestures": [{ "gesture": "Swipe the sheet down", "action": "Same as Not now" }]
         }
@@ -22118,6 +22313,16 @@
           "handling": "The popover is above the dialog in the layer stack: Esc and a press outside close the popover first, and the dialog keeps its own."
         },
         {
+          "title": "A dialog or popover opened from the panel",
+          "platforms": ["web", "desktop"],
+          "handling": "A layer opened from the panel's content is drawn in the overlay layer, outside the popover in the page, though React passes its clicks up through the popover. Only a press on the trigger toggles the popover: a click inside the inner layer leaves it open, and the inner layer, on top of the stack, takes Esc and a press outside first."
+        },
+        {
+          "title": "A right-click, or a drag that ends inside",
+          "platforms": ["web", "desktop"],
+          "handling": "A press outside is the primary button going down and coming up outside the panel and its trigger. A right-click, a middle-click, a press on a scrollbar and a drag from outside into the panel (selecting its text) leave it open."
+        },
+        {
           "title": "The page scrolls while it is open",
           "platforms": ["web", "desktop"],
           "handling": "The panel follows its trigger, re-placed on every scroll of any box and on resize. It does not close on scroll."
@@ -22156,7 +22361,11 @@
           "status": "ready",
           "base": "A Pressable round the trigger; while open, the panel is drawn in a transparent Modal over the screen, placed from the trigger's measureInWindow and flipped where there is no room. A press on the backdrop and Android's back close it",
           "import": "import { Popover } from \"@antfabric/ui-react-native\"",
-          "notes": ["`modal` marks the panel accessibilityViewIsModal, so a screen reader stays inside it."]
+          "notes": [
+            "`modal` marks the panel accessibilityViewIsModal, so a screen reader stays inside it.",
+            "The backdrop is a button named Close (`common`'s close), so a screen reader can put the panel away as a press outside does.",
+            "Placed once it is measured: from the trigger's window position when it opens, and again when the window's size changes (the phone turned, a split screen resized). It does not follow a scroll under it, which the Modal stops anyway."
+          ]
         }
       },
       "related": ["menu", "dialog", "hover-card", "tooltip"]
@@ -22179,8 +22388,8 @@
       "props": {
         "value": {
           "type": "number",
-          "description": "0–100, clamped. The desktop kit calls it pct; the mobile kit takes 0–1 and the adapter multiplies by 100, so one prop means one thing everywhere.",
-          "default": 40
+          "description": "0–100, clamped. Left out (or NaN), the bar is indeterminate: no percent is drawn or announced until there is one. The desktop kit calls it pct; the mobile kit takes 0–1 and the adapter multiplies by 100, so one prop means one thing everywhere.",
+          "sample": 40
         },
         "indeterminate": {
           "type": "boolean",
@@ -22326,7 +22535,7 @@
         {
           "title": "Value out of range or missing",
           "platforms": ["web", "desktop", "mobile"],
-          "handling": "Clamped to 0–100, so 130 draws full and −5 draws empty. A NaN or unknown total becomes indeterminate rather than a bar stuck at zero."
+          "handling": "Clamped to 0–100, so 130 draws full and −5 draws empty. A NaN, an unknown total or no value at all (an upload that has not reported yet) is indeterminate rather than a bar stuck at zero or a made-up percent."
         },
         {
           "title": "Fast enough not to show",
@@ -22715,7 +22924,7 @@
         },
         "sending": {
           "type": "boolean",
-          "description": "The answer is on its way: Submit reads Sending… and everything locks, so a second press cannot send a second answer. Pressing Submit sets it; the app removes the panel.",
+          "description": "The answer is on its way: Submit reads Sending… and everything locks, so a second press cannot send a second answer. A press on Submit shows the same until the app answers; the app removes the panel.",
           "default": false
         },
         "onValueChange": { "type": "event", "args": "value: string", "changes": "value" },
@@ -22723,7 +22932,7 @@
         "onExpandedChange": { "type": "event", "args": "expanded: boolean", "changes": "expanded" },
         "onSubmit": {
           "type": "event",
-          "description": "The chosen row's key, or the typed answer trimmed. A gated tool reads approve or deny; a choice sends the option's key; a consent sends the sentence the app maps it to.",
+          "description": "The chosen row's key, or the typed answer trimmed. A gated tool reads approve or deny; a choice sends the option's key; a consent sends the sentence the app maps it to. Reports the request: the panel reads Sending… until the app answers with `sending` or `offline` (or the promise the handler returns settles), so a send that fails comes back to Submit with the answer still chosen.",
           "args": "answer: string"
         }
       },
@@ -23282,6 +23491,10 @@
           "default": {},
           "sample": { "q4": "Q4 2026", "q3": "Q3 2026" }
         },
+        "marks": {
+          "type": "boolean",
+          "description": "Each series gets its own dash pattern and marker shape besides its colour, the line chart's (`seriesMark`): in its outline, at each axis and in the legend's key, so two series are never told apart by hue alone (WCAG 1.4.1). Left out, it is on for two or more series and off for one; `false` keeps plain outlines where the product labels the series another way."
+        },
         "height": {
           "type": "number",
           "description": "The plot's height, in px (points on the phone). The card is as wide as the space it is given.",
@@ -23460,6 +23673,7 @@
           "The figure is named by the sentence core's `summarize` writes from the rows, categories read as highest and lowest; it is heard, not printed: in the light theme most series colours sit under 3:1 against the card, so the tooltip and \"View as table\" give the scores without colour.",
           "\"View as table\" is the other way in, and the better one for exact numbers: one row per axis, one column per series, with real headers.",
           "The legend says what it toggles: each entry is a button that is pressed while the series is on, struck through when it is off. The last series showing cannot be turned off.",
+          "With `marks` (on by default for two or more series), a series is told apart by its outline's dash and the marker at each axis as well as its colour (the first solid with round markers, the next dashed with squares), and the legend's key draws the same.",
           "A radar is not read polygon by polygon: the summary and the table carry the scores, and the tooltip is never the only place a value is."
         ]
       },
@@ -23641,6 +23855,7 @@
             "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there.",
             "gifted-charts' radar applies one opacity to a polygon's fill and line alike, so each series is two polygons in `dataSet`: its fill at `FLAT_FILL`, then its line over it. Its grid and polygon gradients default on and share ids across charts, which draws the wrong colours, so `showGradient` is off on every one and the fills are the tokens'.",
             "gifted-charts' radar has no pointer of its own: the kit finds the axis under a finger from where it lands (core's `nearestAxis`) and draws the tooltip card, so a finger can read each axis as the web's pointer does.",
+            "With `marks`, each outline is dashed through the polygon config's `strokeDashArray`. gifted-charts' radar draws no markers, so the kit draws them in an svg over the plot, at the points the library draws (core's `radarPoint`: the same centre, outer ring and angles). They do not draw in with the polygons: they are there from the start.",
             "The polygons draw in unless the person reduces motion. Under react-native-web (the catalogue, `pnpm check`) gifted-charts' animation is off, because the values it animates with reach the DOM as text."
           ],
           "gestures": [
@@ -23931,7 +24146,7 @@
         "role": "radiogroup",
         "label": "{label}",
         "notes": [
-          "Each option is role=radio with aria-checked; the visible legend is aria-hidden because it is already the group's name. Inside a FormField with no label of its own, the field's label names the group.",
+          "Each option is role=radio with aria-checked; the visible legend is aria-hidden on the web because it is already the group's name. On the phone VoiceOver and TalkBack never read a container's name, so the legend is read there, before the options; with hideLabel the heading above asks the question. Inside a FormField with no label of its own, the field's label names the group.",
           "The group is one tab stop (the chosen option, or the first when nothing is chosen). The arrow keys move to the next enabled option and choose it, wrapping; with nothing chosen the first arrow press moves too. Left and right follow the direction of the tree.",
           "An option's description is its aria-describedby (the phone: its accessibilityHint). Inside a FormField the group takes the field's description, error, aria-invalid and aria-required.",
           "As cards, the card itself is the radio (aria-checked), so the choice is announced as it is for the list; the card draws no ring, since its edge shows the choice, and its preview is hidden from screen readers. Its name is its label then its tags (\"Sidebar In use\"; the phone says the tags in its hint, before the description). A card that cannot be chosen is disabled, dimmed and skipped by the arrows."
@@ -24235,7 +24450,7 @@
         },
         "onMineChange": {
           "type": "event",
-          "description": "Called with `mine` as the press leaves it: flipped, for a reaction (the add pill never calls it). Given `mine` too, the pill is controlled and the caller's count is the truth; otherwise it flips itself and moves its count by one.",
+          "description": "Called with `mine` as the press leaves it: flipped, for a reaction (the add pill never calls it). Given `mine` too, the pill is controlled and this reports the request: it is busy (aria-busy) and shows the caller's `mine` and `count` until the app passes new ones (or the promise the handler returns settles), so a rejected reaction stays as it was. On its own it flips itself and moves its count by one.",
           "args": "mine: boolean",
           "changes": "mine"
         },
@@ -24396,6 +24611,11 @@
       ],
       "edgeCases": [
         {
+          "title": "Nobody to name yet",
+          "platforms": ["web", "desktop"],
+          "handling": "With `reactors` empty (the names still loading, or a product that does not send them), hover and focus open no card: an empty card would say nothing. The pill's name is the emoji and the count."
+        },
+        {
           "title": "Hundreds of reactors",
           "platforms": ["web", "desktop"],
           "handling": "The sentence names up to 50 people and then \"and 112 others\", so the card is capped by content as well as by its 420px width. A name that will not wrap breaks anywhere rather than widening the card."
@@ -24525,7 +24745,7 @@
         },
         "label": {
           "type": "string",
-          "description": "Accessible name when it should differ from the placeholder. Falls back to the placeholder.",
+          "description": "Accessible name when it should differ from the placeholder. Falls back to a FormField's label, then the placeholder.",
           "default": ""
         },
         "shortcut": {
@@ -24655,11 +24875,11 @@
       },
       "a11y": {
         "role": "searchbox",
-        "label": "{label || placeholder}",
+        "label": "{label || FormField label || placeholder}",
         "notes": [
           "The glass is decoration. While busy it becomes a progressbar named by strings.search-field.loading (\"Loading\"; a product that wants \"Searching\" sets it).",
           "Enter submits and Escape clears the text, then blurs on the second press. When the clear button goes away with the text, focus moves to the field.",
-          "Inside a FormField with no label or placeholder of its own, the field's label names it, and it takes the field's description, error, aria-invalid and aria-required. Result counts are the product's to announce."
+          "Inside a FormField with no label of its own, the field's visible label names it (never the placeholder, WCAG 2.5.3), and it takes the field's description, error, aria-invalid and aria-required. Result counts are the product's to announce."
         ]
       },
       "states": ["hover", "focus", "disabled"],
@@ -24879,6 +25099,12 @@
           "default": "",
           "sample": "Notifications"
         },
+        "panel": {
+          "type": "string",
+          "description": "The id of the panel the strip switches: the chosen tab points at it (aria-controls). Each tab's id is the strip's id (or a generated one) and its key, `<id>-<key>`, so the panel can name itself with aria-labelledby.",
+          "default": "",
+          "platforms": ["web", "desktop"]
+        },
         "onValueChange": { "type": "event", "args": "key: string", "changes": "value" }
       },
       "parts": ["track", "card", "tab", "count"],
@@ -24992,14 +25218,21 @@
         "label": "{label}",
         "notes": [
           "Each segment is role=tab with aria-selected / accessibilityState.selected. The count chip is hidden and joins the tab's name instead: \"Mentions, 3\".",
-          "The strip is one tab stop; the arrow keys move to the neighbouring segment and choose it, and Home and End go to the first and last. In a right-to-left tree ArrowRight goes to the previous segment. There is no live region: the panel change is the feedback.",
-          "On the phone each segment's touch area is grown to 44pt without drawing more."
+          "The strip is one tab stop; the arrow keys move to the neighbouring segment and choose it, and Home and End go to the first and last. In a right-to-left tree ArrowRight goes to the previous segment. A key held with Alt, Cmd, Ctrl or Shift is not taken. There is no live region: the panel change is the feedback.",
+          "Web and desktop: each tab's id is the strip's id (or a generated one) and its key (`inbox-view-mentions`); given `panel`, the chosen tab points at that panel with aria-controls, and the panel names itself with aria-labelledby set to the chosen tab's id.",
+          "On the phone each segment's touch area is grown to 44pt without drawing more; the strip takes the same slop, since iOS drops a touch outside a parent before asking its children (a scrollable strip's ScrollView still clips it). VoiceOver and TalkBack never read a container's name, so each tab says the strip's label after its own, as its hint."
         ]
       },
       "states": ["hover", "pressed", "focus"],
       "examples": [
         { "name": "Notification rail", "props": {} },
         { "name": "Full width", "props": { "full": true }, "platforms": ["web", "desktop"] },
+        {
+          "name": "Switches a panel",
+          "description": "The chosen tab points at the panel it shows (aria-controls); the panel names itself after that tab.",
+          "props": { "panel": "notifications-panel" },
+          "platforms": ["web", "desktop"]
+        },
         {
           "name": "Tasks with counts",
           "props": {
@@ -25096,7 +25329,7 @@
           "keyboard": [
             {
               "keys": "ArrowLeft / ArrowRight",
-              "action": "Moves to and selects the previous / next segment (automatic activation); wraps at the ends"
+              "action": "Moves to and selects the previous / next segment (automatic activation); wraps at the ends. Only the plain keys: Alt / Cmd / Ctrl / Shift with an arrow are left to the browser"
             },
             { "keys": "Home / End", "action": "Selects the first / last segment" },
             {
@@ -25634,7 +25867,7 @@
       },
       "a11y": {
         "role": "combobox",
-        "label": "{label || placeholder}",
+        "label": "{label || FormField label || placeholder}",
         "notes": [
           "Web and desktop: the trigger is role=combobox with aria-haspopup=listbox, aria-expanded and aria-activedescendant; rows are role=option with aria-selected. Arrow keys, Home, End, Enter, Space and typing a letter work from the trigger; Escape closes and keeps focus on the trigger; Tab closes.",
           "A searchable select moves focus into the filter when it opens. The filter names the list it drives (aria-controls) and the row under the cursor (aria-activedescendant); the arrow keys and Enter work from it, Escape clears the text and then closes, and Tab moves on and closes the panel.",
@@ -25866,7 +26099,7 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "A Pressable trigger (the text field's 48pt box) and a sheet drawn under it that slides up through <Enter motion=\"slide-up\">: grabber, title, an optional SearchField, then Pressable radio rows in a ScrollView capped at 90% of the screen; `value`, `open` and `query` through useControllable. The sheet is not a Modal: the screen places the Select where its sheet should appear, and the backdrop and focus return are the screen's",
+          "base": "A Pressable trigger (the text field's 48pt box) and a sheet drawn under it that slides up through <Enter motion=\"slide-up\">: grabber, title, an optional SearchField, then Pressable radio rows in a ScrollView capped at 90% of the screen; `value`, `open` and `query` through useControllable. The sheet is not a Modal: the screen places the Select where its sheet should appear, and the backdrop is the screen's. Opening focuses the search field (searchable) or puts the screen reader on the title; closing puts it back on the trigger",
           "import": "import { Select } from \"@antfabric/ui-react-native\"",
           "notes": [
             "No dropdown on the phone: a 48pt trigger (the text field's box) opens a bottom sheet. A popover anchored to a field is too small to tap reliably and lands under the keyboard.",
@@ -25936,7 +26169,7 @@
         "biometricAvailable": { "type": "boolean", "default": true, "platforms": ["mobile"] },
         "unlocked": {
           "type": "boolean",
-          "description": "The lock was just passed: the tile turns to an open lock in success green, the buttons go, and the app comes forward. What the Unlock button does in the catalogue; in the app onUnlock fires and the lock screen leaves.",
+          "description": "The lock was just passed: the tile turns to an open lock in success green, the buttons go, and the app comes forward. The app's answer to onUnlock: the button spins until the app passes it (or a new `error`), then the lock screen leaves.",
           "default": false,
           "platforms": ["mobile"]
         },
@@ -25950,9 +26183,16 @@
           "description": "No backend answering: Sign in would do nothing, so the card says so.",
           "default": false
         },
-        "onSignIn": { "type": "event" },
+        "onSignIn": {
+          "type": "event",
+          "description": "Reports the request; Sign in spins until the app answers with `state` (waiting), `error` or `offline`, or settles the promise the handler returns. The card never turns to waiting on its own."
+        },
         "onCancel": { "type": "event" },
-        "onUnlock": { "type": "event", "platforms": ["mobile"] },
+        "onUnlock": {
+          "type": "event",
+          "description": "Reports the request; Unlock spins until the app answers with `unlocked` or `error`, or settles the promise the handler returns. The lock never opens on its own.",
+          "platforms": ["mobile"]
+        },
         "onSignOut": { "type": "event" }
       },
       "parts": ["root", "tile", "tileIcon", "title", "body", "wait", "spinner", "waitText", "note", "actions"],
@@ -26136,7 +26376,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "A role=\"region\" card named by its title, inline styles over `t`, popping in with enter(\"pop\"), with the kit's Button; Sign in again turns it to waiting (`state` through useControllable) while the route's same-tab OIDC redirect runs (TanStack Start beforeLoad → /sign-in?next=…)",
+          "base": "A role=\"region\" card named by its title, inline styles over `t`, popping in with enter(\"pop\"), with the kit's Button; Sign in again reports the request and spins (usePending) until the app sets `state` to waiting while the route's same-tab OIDC redirect runs (TanStack Start beforeLoad → /sign-in?next=…)",
           "import": "import { SessionState } from \"@antfabric/ui-react\"",
           "notes": [
             "Sign in again keeps the URL: the current path rides in next= and the router sends the person back to it. Only a same-origin path is accepted, never an absolute URL, so the parameter cannot become an open redirect.",
@@ -26153,7 +26393,7 @@
             "Only the hand-off id rides the custom-scheme URL — never a token. A callback whose state does not match the sign-in this window started is refused.",
             "The reason line uses the gateway's refusal CODE, never its message: an ordinary expiry, account_suspended, or account_deleted.",
             "\"Open the browser again\" and Cancel on the waiting card are new; today the Login screen says \"Signing you in…\" and waits.",
-            "In the catalogue the card pops in, and Login with AntFabric (Sign in again on the web) sets `state` to waiting, which is what the person sees while the browser has them."
+            "In the catalogue the card pops in, and Login with AntFabric (Sign in again on the web) spins until the app answers; the flows pass `state: \"waiting\"`, which is what the person sees while the browser has them."
           ],
           "keyboard": [
             { "keys": "Enter", "action": "Activates the primary button" },
@@ -26162,13 +26402,13 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "<Enter motion=\"pop\"> card, StyleSheet over useTheme(), with the kit's Button; `state` and `unlocked` through useControllable. The app runs expo-auth-session (ASWebAuthenticationSession / Custom Tabs) and expo-local-authentication around it",
+          "base": "<Enter motion=\"pop\"> card, StyleSheet over useTheme(), with the kit's Button; `state` and `unlocked` are the app's: Sign in and Unlock spin (usePending) until it answers. The app runs expo-auth-session (ASWebAuthenticationSession / Custom Tabs) and expo-local-authentication around it",
           "import": "import { SessionState } from \"@antfabric/ui-react-native\"",
           "notes": [
             "The lock screen auto-prompts for Face ID / fingerprint when it opens, and falls back to the passcode when the hardware is missing or nothing is enrolled.",
             "Signing in or out never draws a login screen at someone who is mid-sign-in: while the keychain read or the profile flush is outstanding, a loader shows instead.",
             "Sign out unregisters this phone's push token first, or the next person would receive the previous person's notifications.",
-            "In the catalogue the card pops in; Login with AntFabric sets `state` to waiting, and Unlock (or Use passcode) sets `unlocked`, so the tile turns to an open lock and the buttons go."
+            "In the catalogue the card pops in; Login with AntFabric and Unlock (or Use passcode) spin until the app answers; the flows pass `state: \"waiting\"` and `unlocked: true`, so the tile turns to an open lock and the buttons go."
           ],
           "gestures": [{ "gesture": "Swipe the sign-in sheet down", "action": "Cancels; nothing is signed in" }]
         }
@@ -26236,7 +26476,11 @@
           "type": "node",
           "description": "The actions under the body, parted from it by a hairline, at the end of the row. Empty draws no footer."
         },
-        "showClose": { "type": "boolean", "description": "Draws the ✕ in the header.", "default": true },
+        "showClose": {
+          "type": "boolean",
+          "description": "Draws the ✕ in the header. On the phone the ✕ sits beside the title, so a sheet with no title draws none there: it is put away by its handle, a drag down, a press on the scrim or Android's back.",
+          "default": true
+        },
         "label": {
           "type": "string",
           "description": "The sheet's accessible name when it has no title (a navigation drawer: \"Menu\").",
@@ -26355,6 +26599,11 @@
           "handling": "The panel is never wider than the window: on a phone-width browser it fills it."
         },
         {
+          "title": "A right-click, or a press on the scrim's scrollbar",
+          "platforms": ["web", "desktop"],
+          "handling": "A press on the scrim cancels only when the primary button goes down and comes up on it. A right-click or middle-click, a press on the scrollbar of a scrim that scrolls, and a drag that starts on the scrim and ends in the panel (selecting its text) leave it open."
+        },
+        {
           "title": "Something must be finished first",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "With `dismissible` off, Esc and the scrim do nothing and the ✕ is disabled; the footer's actions close it."
@@ -26383,7 +26632,10 @@
           "status": "partial",
           "base": "The BottomSheet, with the title, the ✕, the subtitle at the top of the body and the footer under it; `side` and `width` are the web's. Drawn where it is mounted, as the BottomSheet is: the app presents it (a Modal or its navigator's sheet)",
           "import": "import { Sheet } from \"@antfabric/ui-react-native\"",
-          "alternative": "BottomSheet"
+          "alternative": "BottomSheet",
+          "notes": [
+            "The ✕ is drawn in the title row, so it needs a `title`: a sheet named only by `label` has its handle (named Dismiss) and the drag down instead."
+          ]
         }
       },
       "related": ["dialog", "bottom-sheet", "popover"]
@@ -26470,7 +26722,7 @@
         "external": { "type": "boolean", "description": "Shared with another organisation.", "default": false },
         "actionsVisible": {
           "type": "boolean",
-          "description": "The row's ⋮ (Move to…, Mute, Leave), always shown when set. With `onMenu` alone it is there but transparent until the pointer is over the row or keyboard focus is in it; the room for it is reserved, so showing it never reflows the row.",
+          "description": "The row's ⋮ (Move to…, Mute, Leave), always shown when set. With `onMenu` alone it is there but transparent until the pointer is over the row or keyboard focus is in it, and takes no press while transparent (a tap on a touch screen lands on the row); the room for it is reserved, so showing it never reflows the row.",
           "default": false,
           "platforms": ["web", "desktop"]
         },
@@ -26591,6 +26843,7 @@
         "notes": [
           "A button on every platform (there is no href prop): the row reports `onPress` and the app navigates. Middle-click and open-in-new-tab are the app's to add.",
           "The whole row is one accessible name: '#design-crit, 3 mentions, muted, draft'. The glyph and the badge's own number are hidden so nothing is read twice.",
+          "A row with `avatar` says its face in words, after the name: 'Fabric, AI agent' for the sparkle, 'Lena Fischer, away' for the presence dot. Neither is colour or shape alone.",
           "The open conversation has aria-current=\"page\" (selected on the phone); selection is never carried by colour alone. Pressing the open row leaves it open.",
           "Web and desktop: with `onMenu` the row's ⋮ appears while the row has pointer hover or keyboard focus and stays in the tab order; the context menu and Shift+F10 or the Menu key on the row also call `onMenu`.",
           "Phone: `onLongPress` is also an accessibility action, 'Options for #design-crit', so a screen reader, Voice Control or Switch Control user can run it.",
@@ -26760,7 +27013,7 @@
         {
           "title": "Hover-only ⋮ on touch",
           "platforms": ["web", "desktop", "mobile"],
-          "handling": "On a phone the ⋮ does not exist: long-press opens the action sheet and swipe reveals Mark as read and Mute. On a touch laptop (pointer: coarse) the ⋮ is always visible on the open row and the row grows to 40px."
+          "handling": "On a phone the ⋮ does not exist: long-press opens the action sheet and swipe reveals Mark as read and Mute. On a touch screen with the web or desktop kit, a hidden ⋮ takes no press (pointer-events: none until it shows), so a tap at the row's end opens the row rather than an invisible menu; pass `actionsVisible` to keep the ⋮ there for touch. On a touch laptop (pointer: coarse) the ⋮ is always visible on the open row and the row grows to 40px."
         },
         {
           "title": "Text at 130% on a phone",
@@ -26787,14 +27040,14 @@
         },
         "desktop": {
           "status": "ready",
-          "base": "The same @antfabric/ui-react component as the web: a <button> row (6/10 padding, radius.row) + Avatar, Badge and the ⋮ IconButton as a sibling; inline styles over t, states from useInteraction. active is kept by the row (useControllable) and toggled by a press; a surrounding section decides through selectedName",
+          "base": "The same @antfabric/ui-react component as the web: a <button> row (6/10 padding, radius.row) + Avatar, Badge and the ⋮ IconButton as a sibling; inline styles over t, states from useInteraction. active is the app's (a press reports onPress and never makes the row current itself); a surrounding section decides through selectedName",
           "import": "import { SidebarItem } from \"@antfabric/ui-react/shell\"",
           "notes": [
             "Unread is asked first: a channel you have open can still gather unread (window in the background) and then it is bold AND selected.",
             "The ⋮ is a sibling button laid over the row's right end, never a button inside a button; the row reserves its room only while it is shown, so it never covers the count. The catalogue draws it with actionsVisible.",
             "Muted and typing are new in this spec — today's sidebar has neither. Draft (pencil, fg.faint at 5.33:1, never an opacity) and the # / lock / face rules are today's.",
             "The external-organisation glyph is new; it stays on even when the row is muted, because who can read the channel is not a notification preference.",
-            "Pressing the row makes it `active` (the grey selected fill fades in) and leaves it active if pressed again: the current page is not a toggle. Inside a sidebar-section the section's `selected` decides instead, through `selectedName`, so only one row is ever open."
+            "Pressing the row reports onPress; the app navigates and passes `active` (the grey selected fill fades in), so a row never claims to be current before the page is. Inside a sidebar-section the section's `selected` decides instead, through `selectedName`, so only one row is ever open."
           ],
           "keyboard": [
             { "keys": "Enter / Space", "action": "Opens the conversation" },
@@ -26874,7 +27127,7 @@
         },
         "actionsVisible": {
           "type": "boolean",
-          "description": "Draws + and ⋯. On web and desktop the kit reveals them on header hover or focus-within (opacity, so revealing never reflows); on a phone they are always there.",
+          "description": "Draws + (when there is an `onAdd`) and ⋯ (when there is an `onMenu`; the phone has no ⋯, a long press on the header instead). On web and desktop the kit reveals them on header hover or focus-within (opacity, so revealing never reflows); on a phone + is always there. A button with nothing to fire is never drawn.",
           "default": true
         },
         "divided": {
@@ -26906,14 +27159,23 @@
         },
         "onExpandedChange": { "type": "event", "args": "expanded: boolean", "changes": "expanded" },
         "onSelectedChange": { "type": "event", "args": "selected: string", "changes": "selected" },
+        "onItemMenu": {
+          "type": "event",
+          "description": "A row's options were asked for: its ⋮ (drawn on each row while this is given, shown on hover or focus), the context menu on it, or Shift+F10 or the Menu key. Its key; the app opens the row's menu (Mark as read, Mute, Star, Move to…, Leave) from it. The phone's is `onItemLongPress`.",
+          "platforms": ["web", "desktop"],
+          "args": "key: string"
+        },
         "onItemLongPress": {
           "type": "event",
-          "description": "A row was long-pressed: its key. The app opens the row's action sheet (Mark as read, Mute, Star, Move to…, Leave) from it.",
+          "description": "A row was long-pressed: its key. The app opens the row's action sheet (Mark as read, Mute, Star, Move to…, Leave) from it. Left out, a hold is a press and the rows offer no options action. The web's is `onItemMenu`.",
           "platforms": ["mobile"],
           "args": "key: string"
         },
-        "onAdd": { "type": "event" },
-        "onMenu": { "type": "event" }
+        "onAdd": { "type": "event", "description": "+ was pressed. Left out, no + is drawn." },
+        "onMenu": {
+          "type": "event",
+          "description": "The section's options were asked for: ⋯ on web and desktop, a long press on the header (and its accessibility action) on the phone. Left out, no ⋯ is drawn and the header takes no long press."
+        }
       },
       "parts": ["root", "header", "toggle", "chevron", "starIcon", "label", "list", "emptyText"],
       "recipe": {
@@ -27005,7 +27267,8 @@
           "The header toggle carries aria-expanded; collapsed with unread, its name is 'Channels, 12 unread'.",
           "The badge's own number is hidden; the toggle's name already says it.",
           "Phone: `onMenu` (the long press on the header) is also an accessibility action, 'Channels options', and `onItemLongPress` is one on each row.",
-          "The + and ⋯ buttons are revealed while the header has hover or focus-within, by opacity, so they stay in the tab order. The list is a role=list of the rows."
+          "The + and ⋯ buttons are revealed while the header has hover or focus-within, by opacity, so they stay in the tab order. Each is drawn only with its handler (`onAdd`, `onMenu`). The list is a role=list of the rows.",
+          "Web and desktop: with `onItemMenu` each row has the SidebarItem ⋮, its context menu and Shift+F10 or the Menu key, all reporting the row's key, as `onItemLongPress` does on the phone."
         ]
       },
       "states": ["hover", "focus"],
@@ -27170,6 +27433,11 @@
           "title": "A long section name",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "The label truncates; the chevron, the total and the actions never shrink. The full name is the tooltip and the group's accessible name."
+        },
+        {
+          "title": "A row's own menu",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "Each row offers its options the platform's way, reporting the same thing, the row's key: on web and desktop `onItemMenu` (its ⋮ on hover or focus, a right-click, Shift+F10 or the Menu key), on the phone `onItemLongPress` (a long press, and an accessibility action). The app opens one menu from either. Without the handler no row offers options."
         },
         {
           "title": "Reordering",
@@ -27443,6 +27711,11 @@
           "title": "Screen reader",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "Hears \"Loading conversations\" once, from the group; the shapes are hidden. A list of forty rows is still one announcement."
+        },
+        {
+          "title": "Laid out but not yet visible",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "While `visible` is false (its first 300 ms) the placeholder is hidden from screen readers too, not only from sight: nothing is announced and there is no \"Loading\" group to find until it fades in."
         },
         {
           "title": "Text scaled to 130%",
@@ -28355,7 +28628,7 @@
             "base": { "height": "$control.hit", "bg": "$danger.default" },
             "states": { "focus": { "shadow": "$shadow.focus" } }
           },
-          "dangerLabel": { "base": { "size": "$text.body", "weight": "$font.weightMedium", "fg": "$fg.onBrand" } }
+          "dangerLabel": { "base": { "size": "$text.body", "weight": "$font.weightMedium", "fg": "$danger.fg" } }
         },
         "tokens": [
           "border.subtle",
@@ -28364,10 +28637,10 @@
           "brand.tint",
           "control.hit",
           "danger.default",
+          "danger.fg",
           "fg.body",
           "fg.faint",
           "fg.muted",
-          "fg.onBrand",
           "fg.strong",
           "font.weightMedium",
           "font.weightNormal",
@@ -28454,6 +28727,11 @@
           "title": "Scrolling while a row is open",
           "platforms": ["mobile"],
           "handling": "A vertical scroll that starts on a row scrolls the list, never half-opens the row (the pan activates on horizontal movement only); the open row stays open until another opens or it is tapped closed."
+        },
+        {
+          "title": "A drag that starts on an open row",
+          "platforms": ["mobile"],
+          "handling": "The drag starts from where the row rests, open, at once (the animated value's own reading arrives a frame later on the native driver), so the row follows the finger from the tray's edge instead of jumping to closed first."
         },
         {
           "title": "Reduced motion",
@@ -28641,7 +28919,7 @@
         "label": "{label}",
         "notes": [
           "role=switch with aria-checked; announced \"Notification sound, switch, on\". The track is hidden: the state is in aria-checked.",
-          "The description is the control's aria-describedby (the phone: its accessibilityHint); inside a FormField the field's description and error follow it.",
+          "The description is the control's aria-describedby (the phone: its accessibilityHint); inside a FormField the field's description and error follow it, and on the web and desktop the switch takes its aria-invalid and aria-required.",
           "The thumb travels toward the end edge, so it moves the other way in a right-to-left tree. The on state is brand-coloured against a grey off track, and keyboard focus draws a ring on the track."
         ]
       },
@@ -28799,7 +29077,7 @@
         },
         "expanded": {
           "type": "boolean",
-          "description": "The tabs are shown. Left (false) is the bar squeezed by scrolling down: a 42pt circle with the current tab's icon. Scrolling up or a tap opens it again.",
+          "description": "The tabs are shown. Left (false) is the bar squeezed by scrolling down: a 42pt circle (a 44pt touch area) with the current tab's icon, or a chevron when no tab is open. Scrolling up or a tap opens it again.",
           "default": true
         },
         "keyboardUp": {
@@ -28815,7 +29093,7 @@
         },
         "action": {
           "type": "object",
-          "description": "ActionItem: { key, label, icon?, badge?, disabled? }. The floating round button beside the bar; its `label` is its accessible name. Leave it out for none.",
+          "description": "ActionItem: { key, label, icon?, badge?, disabled? }. The floating round button beside the bar; its `label` is its accessible name, with the `badge` count after it ('Fabric, 2 new'). `badge` draws a count on its corner; `disabled` dims it and takes no press. Leave it out for none.",
           "sample": { "key": "fabric", "icon": "sparkles", "label": "Fabric" }
         },
         "onActiveChange": { "type": "event", "args": "active: string", "changes": "active" },
@@ -28908,7 +29186,7 @@
               "bg": "$brand.tint",
               "shadow": "$shadow.float"
             },
-            "states": { "focus": { "shadow": "$shadow.focus" } }
+            "states": { "focus": { "shadow": "$shadow.focus" }, "disabled": { "opacity": "$opacity.disabled" } }
           },
           "actionIcon": { "base": { "fg": "$brand.default" } },
           "safeArea": {
@@ -28941,6 +29219,7 @@
           "gutter.pane",
           "homeIndicator.h",
           "icon.sizeLg",
+          "opacity.disabled",
           "osHeader.androidHomeBarH",
           "osHeader.androidHomeBarW",
           "osHeader.androidNavH",
@@ -28980,6 +29259,11 @@
         { "name": "Android gesture handle", "props": {}, "os": "android" }
       ],
       "edgeCases": [
+        {
+          "title": "The floating action, busy or waiting",
+          "platforms": ["mobile"],
+          "handling": "The action is an ActionItem like any other: a `badge` draws its count on the button's corner and is read with its name ('Fabric, 2 new'); `disabled` dims it, takes no press and is announced as dimmed, for a moment the app cannot start what it opens."
+        },
         {
           "title": "Badge counts",
           "platforms": ["mobile"],
@@ -29269,7 +29553,7 @@
         },
         "rowKey": {
           "type": "string",
-          "description": "The field of each row that names it, for selection and for React's keys. The keys `selected` holds are its values as text.",
+          "description": "The field of each row that names it, for selection and for React's keys. The keys `selected` holds are its values as text. A row without the field is named by its index in `rows`.",
           "default": "key"
         },
         "sort": {
@@ -30723,7 +31007,7 @@
           "import": "import { Table } from \"@antfabric/ui-react-native/data\"",
           "notes": [
             "One card per row. The column with the lowest `priority` is the card's title, a `badge` column among the next three sits beside it, and the rest are label and value lines. A column with no priority is left off the card; when none has one, the columns' order is the priority.",
-            "Sorting is the sort bar above the cards: the Select picks a column (the same first direction as the header's first press) and the arrow button beside it reverses the direction. \"As listed\" clears the sort.",
+            "Sorting is the sort bar above the cards: the Select picks a column (the same first direction as the header's first press) and the arrow button beside it reverses the direction. \"As listed\" clears the sort. With no sortable column the bar has no Select, and with neither a sort nor `selectable` there is no bar.",
             "A card's height is its content, and `table.rowH` (52pt) is the least a one-line card is.",
             "`dense` and `maxHeight` have no meaning here and are not props on the phone.",
             "The card shows the title and three more columns, lowest `priority` first; the other columns are not dropped: the card's details button opens them in place as more label and value lines (`expanded`)."
@@ -30975,7 +31259,12 @@
         {
           "title": "Nothing chosen",
           "platforms": ["web", "desktop", "mobile"],
-          "handling": "A value that matches no tab draws no bar at all. The channel shelf depends on it: with the details or thread panel open, no shelf tab is showing, and a bar under Files would be the strip telling a lie. When a tab is chosen again the bar is placed there, not slid in from where it last was. Tab then lands on the first tab."
+          "handling": "A value that matches no tab (empty, or a key no tab has) chooses none and draws no bar at all; the kit never falls back to the first tab. The channel shelf depends on it: with the details or thread panel open, no shelf tab is showing, and a bar under Files would be the strip telling a lie. When a tab is chosen again the bar is placed there, not slid in from where it last was. Tab then lands on the first enabled tab, the strip's one tab stop while none is chosen."
+        },
+        {
+          "title": "Nothing chosen and the first tab disabled",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "A disabled tab is never chosen for the app: with no value matching, no tab is chosen, and on web and desktop Tab lands on the first enabled tab (Pinned here), from which the arrows move on, skipping the disabled one."
         },
         {
           "title": "More tabs than room",
@@ -31697,7 +31986,7 @@
         },
         "autoComplete": {
           "type": "string",
-          "description": "What the browser or the phone may fill in: email, username, current-password, new-password, one-time-code, tel, off."
+          "description": "What the browser or the phone may fill in: email, username, current-password, new-password, one-time-code, tel, off. On iOS a password field with new-password is offered a strong new password, not the saved one."
         },
         "inputMode": {
           "type": "enum",
@@ -31723,7 +32012,7 @@
         },
         "reveal": {
           "type": "boolean",
-          "description": "With type password: a Show / Hide button at the end of the field. On, the characters are shown until it is pressed again; its accessible name says Show password or Hide password, and aria-pressed says which.",
+          "description": "With type password: a Show / Hide button at the end of the field. On, the characters are shown until it is pressed again; its accessible name follows the word it shows, Show password or Hide password, with no aria-pressed (the name says the state).",
           "default": false
         },
         "helper": {
@@ -31978,7 +32267,7 @@
         "label": "{label}",
         "notes": [
           "The label is a real <label for> (the phone: the accessibility label, falling back to the placeholder); the placeholder is never the name unless there is no label.",
-          "The helper or the error is the input's aria-describedby (the phone: its accessibility hint) and the field sets aria-invalid; an error that appears is announced once, politely. Required is aria-required (the phone: said after the name).",
+          "The helper or the error is the input's aria-describedby (the phone: its accessibility hint) and the field sets aria-invalid; an error that appears is announced once, politely. Required is aria-required (the phone: \"Required\" said after the name, also when a tag is drawn in its place).",
           "The counter is part of the description, read when the field is focused; it is not a live region. When typing pauses within the last 10% of the limit (at least 5 characters) the characters left are announced, and reaching the limit is announced once.",
           "`type` sets the input type and, on the phone, the keyboard and secure entry; an address, a number or a password is always laid out left to right.",
           "Inside a FormField the control takes the field's id, description, error, aria-invalid and aria-required."
@@ -32338,6 +32627,11 @@
       ],
       "edgeCases": [
         {
+          "title": "Only thinking, no steps yet, on the web",
+          "platforms": ["web", "desktop"],
+          "handling": "The lattice, the word and the clock are drawing only; the row also holds the sentence it announces (\"Fabric is thinking\") as plain hidden text, so a reader moving through the page finds what the agent is doing, not an empty row."
+        },
+        {
           "title": "A long turn",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "The clock reads seconds to a tenth under a minute, then minutes and seconds (1m 05s). Past five steps (three on the phone) the oldest are counted as \"+N earlier\"."
@@ -32435,9 +32729,8 @@
         },
         "onFollowingChange": {
           "type": "event",
-          "description": "Called with `following` as the press leaves it. Given `following` too, the line is controlled and the press changes nothing on it; on its own (the catalogue, where opening is navigation) the press flips Following.",
-          "args": "following: boolean",
-          "changes": "following"
+          "description": "Deprecated, never called: opening a thread is not following it, so the press only calls onPress and `following` is always the app's. Accepted through 1.x so no product breaks; it goes at 2.0.",
+          "args": "following: boolean"
         },
         "onPress": {
           "type": "event",
@@ -32605,7 +32898,7 @@
           "notes": [
             "Opens the thread in the right-hand panel and updates the URL (…/c/platform-eng/t/<id>), so a thread is a link that can be pasted, bookmarked and opened in a new tab with ⌘-click.",
             "Hover lifts it to a card edge (Slack's) so it reads as a button and not as the message's text.",
-            "Opening the thread is navigation, so in the catalogue a press toggles `following` instead (what Follow / Unfollow in the thread's ⋯ does): the bell and 'Following' fade in or out."
+            "Opening the thread is navigation, so in the catalogue a press only reports onPress; `following` comes from the app (Follow / Unfollow in the thread's ⋯), never from opening."
           ],
           "keyboard": [
             { "keys": "Enter / Space", "action": "Opens the thread panel" },
@@ -32686,7 +32979,7 @@
         },
         "searchPlaceholder": {
           "type": "string",
-          "description": "The field's text. Empty uses the `searchPlaceholder` string (\"Search\"); a product says what it searches.",
+          "description": "The field's text, and its accessible name, so what the field shows is what it is called. Empty uses the `searchPlaceholder` string (\"Search\") on the field and the `searchLabel` string as its name; a product says what it searches.",
           "default": ""
         },
         "searchKeys": {
@@ -32868,8 +33161,8 @@
               "windows": {
                 "base": { "width": "$osWindow.winCaptionW", "fg": "$fg.body" },
                 "states": {
-                  "hover": { "bg": "$os.winClose", "fg": "$fg.onBrand" },
-                  "pressed": { "bg": "$os.winClosePressed", "fg": "$fg.onBrand" },
+                  "hover": { "bg": "$os.winClose", "fg": "$os.onFill" },
+                  "pressed": { "bg": "$os.winClosePressed", "fg": "$os.onFill" },
                   "focus": { "shadow": "$shadow.focus" }
                 }
               },
@@ -32904,7 +33197,6 @@
           "control.hXs",
           "fg.body",
           "fg.faint",
-          "fg.onBrand",
           "fg.strong",
           "fg.subtle",
           "font.sans",
@@ -32918,6 +33210,7 @@
           "os.macLightEdge",
           "os.macMax",
           "os.macMin",
+          "os.onFill",
           "os.winClose",
           "os.winClosePressed",
           "osWindow.linuxCaption",
@@ -33018,7 +33311,12 @@
         {
           "title": "Keyboard and screen reader",
           "platforms": ["desktop"],
-          "handling": "Tab order: ☰ (Windows/Linux), Back, Forward, History, Search, Help. Window controls are skipped, as the native ones are. F6 moves between the title bar and the regions below it, so nobody has to tab through the rail to reach search."
+          "handling": "Tab order: ☰ (Windows/Linux), Back, Forward, History, Search, Help. Window controls are skipped, as the native ones are: Windows and GNOME never put the caption buttons in the tab order, and Alt+Space opens the system window menu (Minimise, Maximise, Close) from anywhere in the window, so a keyboard user reaches them there. F6 moves between the title bar and the regions below it, so nobody has to tab through the rail to reach search."
+        },
+        {
+          "title": "A product's own placeholder",
+          "platforms": ["desktop"],
+          "handling": "`searchPlaceholder` is both the words on the field and its accessible name, so a speech user who says what they see reaches it (WCAG 2.5.3). Without it the field shows the `searchPlaceholder` string and is named by the `searchLabel` string."
         },
         {
           "title": "Hidden in the tray, then reopened",
@@ -33139,8 +33437,14 @@
           "description": "How long the toast stays, in milliseconds, before it dismisses itself and fires onDismiss. 0 keeps it until it is dismissed. The clock stops while the pointer is on the toast or focus is inside it (web and desktop) and runs twice as long while a screen reader is on (phone).",
           "default": 0
         },
-        "onAction": { "type": "event" },
-        "onDismiss": { "type": "event" },
+        "onAction": {
+          "type": "event",
+          "description": "The action (Undo, View) was pressed. The toast goes too, so onDismiss follows it."
+        },
+        "onDismiss": {
+          "type": "event",
+          "description": "The toast went: Dismiss, the ×, its duration running out, or its action (after onAction). The app unmounts it, which frees its slot."
+        },
         "onPauseChange": {
           "type": "event",
           "description": "The pointer or focus entered the toast (true) or both left (false): for an app that keeps its own timer.",
@@ -33191,7 +33495,7 @@
             "variants": {
               "tone": {
                 "success": { "bg": "$brand.default" },
-                "error": { "bg": "$danger.solid" },
+                "error": { "bg": "$danger.solid", "fg": "$danger.fg" },
                 "info": { "fg": "$fg.onInverse" }
               }
             }
@@ -33220,6 +33524,7 @@
           "brand.default",
           "control.hIconSm",
           "control.hit",
+          "danger.fg",
           "danger.solid",
           "fg.onBrand",
           "fg.onInverse",
@@ -33281,6 +33586,16 @@
       ],
       "edgeCases": [
         {
+          "title": "The message changes while it is shown",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "A toast whose `message` changes in place (\"Uploading 2 files…\" becomes \"2 files uploaded\") is announced again, and on the web and desktop its `duration` starts again, so the new words get their full time."
+        },
+        {
+          "title": "A theme's ink in another colour form",
+          "platforms": ["mobile"],
+          "handling": "The Undo and Dismiss chips are the pill's ink at a low alpha; the ink may be #rgb, #rrggbb (with or without alpha), rgb() or hsl(), and a colour name leaves the chips unfilled rather than drawing a wrong colour."
+        },
+        {
           "title": "Several toasts at once",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "Never a stack. Web and desktop show the newest and drop the older — except that a success never replaces an error still in its first 2 s; it waits behind it. Mobile queues oldest-first, 4 s each. Identical messages raised within the window collapse into one (\"Link copied\" three times shows once)."
@@ -33339,7 +33654,7 @@
       "platforms": {
         "web": {
           "status": "ready",
-          "base": "The ink pill: a role=status / alert <div> with aria-live, rising in with enter(\"rise\"); Undo, Dismiss and the × are <button>s with hover and focus from useInteraction. Pressing one keeps `dismissed` inside and fades it back down; placement and the timer are the app's",
+          "base": "The ink pill: a <div> (its message said through the page's announcer, never a live region of its own), rising in with enter(\"rise\"); Undo, Dismiss and the × are <button>s with hover and focus from useInteraction. Pressing one keeps `dismissed` inside and fades it back down; placement and the timer are the app's",
           "import": "import { Toast } from \"@antfabric/ui-react\"",
           "notes": [
             "Bottom-centre, 24px up, one at a time. The fixed viewport is pointer-events: none and only the pill takes clicks, so the strip never eats the composer's clicks.",
@@ -33360,7 +33675,7 @@
           "import": "import { Toast } from \"@antfabric/ui-react\"",
           "notes": [
             "Today: one ink pill, bottom-centred, 5.2 s, Dismiss on the right. A second toast REPLACES the first (one timer).",
-            "The mark follows toastTone (ADR-4734): a failure no longer wears a tick. aria-live follows it too — polite for success, assertive for a refusal.",
+            "The mark follows toastTone (ADR-4734): a failure no longer wears a tick. The announcement follows it too — polite for success, assertive for a refusal.",
             "A progress toast (\"Refreshing…\", ADR-0783) has no timer and a 700 ms floor; finishing never wipes a different toast raised meanwhile.",
             "Dismiss's fill is derived from the toast's own ink, so it survives the inverse surface turning light in the dark themes.",
             "Copy rules live in toast-copy.ts: names cut to 32 characters on a word boundary, refusal codes mapped to plain sentences, log-line-shaped upstream messages never shown.",
@@ -33433,7 +33748,10 @@
           "description": "The most toasts shown at once; the newest are kept, the older ones wait out of sight.",
           "default": 3
         },
-        "children": { "type": "node", "description": "The toasts, oldest first." }
+        "children": {
+          "type": "node",
+          "description": "The toasts, oldest first, each with its own React `key` (the notification's id), so one leaving never remounts the others."
+        }
       },
       "parts": ["root"],
       "recipe": {
@@ -33463,6 +33781,11 @@
           "title": "More toasts than max",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "Only the newest `max` are drawn; when one is dismissed, the next older one comes back into view."
+        },
+        {
+          "title": "A toast leaves while others stay",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "Each toast is held by its own `key`, not its place: when the oldest is dismissed, the ones after it keep their nodes, so their timers run on, they are not announced again, and focus on a later Undo stays where it is."
         },
         {
           "title": "A toast over an open dialog",
@@ -33921,7 +34244,7 @@
                   "radius": "$osTray.macRowRadius",
                   "size": "$text.bodySm"
                 },
-                "states": { "hover": { "bg": "$info.default", "fg": "$fg.onBrand" }, "disabled": { "fg": "$fg.faint" } }
+                "states": { "hover": { "bg": "$info.default", "fg": "$os.onFill" }, "disabled": { "fg": "$fg.faint" } }
               },
               "linux": { "base": { "height": "$osTray.linuxRowH", "radius": "$osTray.linuxRowRadius" } }
             }
@@ -33969,7 +34292,6 @@
           "border.wHairline",
           "fg.faint",
           "fg.muted",
-          "fg.onBrand",
           "fg.strong",
           "font.weightMedium",
           "hover.surface",
@@ -33977,6 +34299,7 @@
           "os.macClose",
           "os.notificationBg",
           "os.notificationFg",
+          "os.onFill",
           "os.wallpaper",
           "osTray.glyph",
           "osTray.glyphRadius",
@@ -34418,6 +34741,11 @@
           "handling": "Your own participant id is filtered out, so typing on the phone never shows \"Priya is typing…\" to Priya on the desktop."
         },
         {
+          "title": "Nobody typing",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "With `names` empty nothing is drawn, and on the phone the dots' loop does not run: it starts when someone starts typing and stops when the last one stops."
+        },
+        {
           "title": "Someone stops without sending",
           "platforms": ["web", "desktop", "mobile"],
           "handling": "A \"stopped\" removes them at once; a lost \"stopped\" (closed laptop, dead socket) still lapses after 8 s, because the list is always read through the TTL, never straight off the last event."
@@ -34546,19 +34874,22 @@
         },
         "onStageChange": {
           "type": "event",
-          "description": "Called with `stage` as the press leaves it: downloading after Install or Retry (desktop), checking after Check again (phone). Given `stage` too, the notice is controlled and the updater's own events move it; otherwise it moves itself.",
-          "args": "stage: UpdateBannerStage",
-          "changes": "stage"
+          "description": "Reports the request a press makes: downloading after Install or Retry (desktop), checking after Check again (phone). The notice never moves `stage` itself: the pressed control spins until the app answers with a new `stage` or `error` (or the promise onApply or onCheck returns settles), so a check or retry that fails the same way again comes back to where it was.",
+          "args": "stage: UpdateBannerStage"
         },
         "onApply": {
           "type": "event",
-          "description": "Desktop: install the waiting release, or retry a failed one. Phone: open the store for a store-required version."
+          "description": "Desktop: install the waiting release, or retry a failed one; the card spins until the app answers with `stage` or `error`, or the promise the handler returns settles. Phone: open the store for a store-required version."
         },
         "onRestart": {
           "type": "event",
           "description": "Desktop: Restart to update relaunches onto the installed release. Web: Reload. Phone: Restart now in the sheet."
         },
-        "onCheck": { "type": "event", "platforms": ["mobile"] }
+        "onCheck": {
+          "type": "event",
+          "description": "Check again: reports the request; the button spins until the app answers with `stage` (checking, latest, failed) or `error`, or the promise the handler returns settles.",
+          "platforms": ["mobile"]
+        }
       },
       "parts": [
         "root",
@@ -34854,7 +35185,7 @@
       "a11y": {
         "notes": [
           "A change of stage is spoken when it happens, through the page's own announcer on the web and desktop (a failure assertively, with the updater's reason read out after the title) and through the screen reader's announcement call on the phone for a failure, the latest-version note and the store notice. Progress is not read out percent by percent. The card is not a live region itself: one that arrives holding its text is not read.",
-          "The card's button is named by the whole action (\"Restart to update to version 0.43.0\") and described by the title and the detail line, so reaching it reads the failure too. The web's reload line is announced the same way.",
+          "The card's button is named by what it shows, its title and its detail line (\"Restart to update v0.43.0\"), so a voice user says the words they see (WCAG 2.5.3) and reaching it reads the failure too; the whole action (\"Restart to update to version 0.43.0\") is its description and tooltip. The web's reload line is announced the same way.",
           "On the phone Android's back button puts the restart sheet away.",
           "The detail line truncates for sighted readers only; the full error is in the DOM and in the tooltip."
         ]
@@ -34939,12 +35270,12 @@
         },
         "desktop": {
           "status": "ready",
-          "base": "A <button> card (role=\"status\", or \"alert\" when failed) for the foot of the nav rail, inline styles over `t`, rising in with enter(\"rise\"); a non-pressable busy card while downloading or installing; a 40px rail <button> with a dot when collapsed. Hover and focus from useInteraction, `stage` through useControllable; the app drives it from the Tauri updater plugin",
+          "base": "A <button> card (role=\"status\", or \"alert\" when failed) for the foot of the nav rail, inline styles over `t`, rising in with enter(\"rise\"); a non-pressable busy card while downloading or installing; a 40px rail <button> with a dot when collapsed. Hover and focus from useInteraction; `stage` is the app's (a press waits through usePending); the app drives it from the Tauri updater plugin",
           "import": "import { UpdateBanner } from \"@antfabric/ui-react\"",
           "notes": [
             "Renders nothing unless a release is genuinely waiting: a failed launch check, or a shell with no updater configured, stays idle and silent.",
             "No dismiss, by the owner's design (ADR-0294): a waiting update stays until it is installed or the app restarts.",
-            "The card rises in. Pressing Update available (or a failed one) moves it to downloading at once and calls onApply; downloading → installing → ready then follow the updater's events through `stage`. The busy card is not pressable. Restart to update calls onRestart, which relaunches.",
+            "The card rises in. Pressing Update available (or a failed one) calls onStageChange(\"downloading\") and onApply and spins until the app passes the next `stage`; downloading → installing → ready follow the updater's events through `stage`. The busy card is not pressable. Restart to update calls onRestart, which relaunches.",
             "The title must fit a 127 px column at the 15 px top of the type ladder — every stage title is one line, nowrap.",
             "Collapsed rail: the same glyph with a dot, never a number — there is only ever one release waiting.",
             "The running app re-checks periodically, not only at launch; an app nobody quits otherwise never learns a release exists."
@@ -34953,12 +35284,12 @@
         },
         "mobile": {
           "status": "ready",
-          "base": "A View card with the kit's Button, StyleSheet over useTheme(); the Restart to apply? sheet slides up with <Enter motion=\"slide-up\"> and follows a downward drag (PanResponder + Animated) to put itself away. `stage` and `confirm` through useControllable; the app drives it from expo-updates",
+          "base": "A View card with the kit's Button, StyleSheet over useTheme(); the Restart to apply? sheet slides up with <Enter motion=\"slide-up\"> and follows a downward drag (PanResponder + Animated) to put itself away. `confirm` through useControllable; `stage` is the app's (Check again waits through usePending), driven from expo-updates",
           "import": "import { UpdateBanner } from \"@antfabric/ui-react-native\"",
           "notes": [
             "OTA updates replace the JavaScript only. A change to native code bumps runtimeVersion, and the phone is then told to update from the store — an OTA cannot deliver it.",
             "Restarting is optional: an update that has downloaded applies on its own the next time the app opens.",
-            "In the catalogue Check for updates moves latest or failed to checking, Restart to apply update sets `confirm` so the sheet slides up, and Later puts it away.",
+            "In the catalogue Check for updates spins until the app answers (the flows pass `stage: \"checking\"`), Restart to apply update sets `confirm` so the sheet slides up, and Later puts it away.",
             "In a development build expo-updates rejects every call, so the card says \"Updates are not enabled in this build.\" rather than pretending it checked."
           ],
           "gestures": [{ "gesture": "Swipe the sheet down", "action": "Same as Later" }]
@@ -35010,7 +35341,7 @@
         },
         "searchPlaceholder": {
           "type": "string",
-          "description": "The field's text. Empty uses the `searchPlaceholder` string (\"Search\"); a product says what it searches.",
+          "description": "The field's text, and its accessible name (and the compact magnifier's), so what the field shows is what it is called. Empty uses the `searchPlaceholder` string (\"Search\") on the field and the `searchLabel` string as its name; a product says what it searches.",
           "default": ""
         },
         "searchKeys": {
@@ -35170,7 +35501,17 @@
         {
           "title": "Narrow window (under 768px)",
           "platforms": ["web"],
-          "handling": "Search collapses to its magnifier and 'Open in desktop app' to its icon, each keeping its full name as tooltip and accessible label. Back, Forward and History never collapse. At 320 CSS px (400% zoom on a laptop, WCAG 1.4.10) the bar still fits without horizontal scroll."
+          "handling": "Search collapses to its magnifier and 'Open in desktop app' to its icon, each keeping its full name as tooltip and accessible label, and Recent history leaves the bar. Back and Forward never collapse; `compact` does the same at any width. At 320 CSS px (400% zoom on a laptop, WCAG 1.4.10) the bar still fits without horizontal scroll."
+        },
+        {
+          "title": "A product's own placeholder",
+          "platforms": ["web"],
+          "handling": "`searchPlaceholder` is both the words on the field and its accessible name, and the compact magnifier's, so a speech user who says what they see reaches it (WCAG 2.5.3). Without it the field shows the `searchPlaceholder` string and is named by the `searchLabel` string."
+        },
+        {
+          "title": "Right-to-left",
+          "platforms": ["web"],
+          "handling": "In Arabic or Hebrew the bar mirrors: the sidebar button and history sit at the right, the ⋯ menu at the left, and the search field's text starts at its right edge. Back points right and Forward points left."
         },
         {
           "title": "Several AntFabric tabs open",
@@ -35558,8 +35899,8 @@
           "Each tile's name says everything a sighted person reads off it: 'Northwind Health, 3 mentions, Command 2'.",
           "The current tile has aria-current; the black ring and the left bar are never the only signal.",
           "Signed-out tiles stay focusable and say 'signed out' — choosing one starts sign-in.",
-          "Web: a role=menu named by its 'Workspaces' heading (which sits outside the menu) holding menuitemradio links, the current one checked, and the add row. The menu is one tab stop (the current row); Up, Down, Home, End and typing a letter move between rows. Truncated names and hosts are in each row's tooltip.",
-          "Phone: a sheet (accessibilityViewIsModal) of buttons with the current one selected."
+          "Web: a role=menu named by its 'Workspaces' heading (which sits outside the menu) holding menuitemradio links, the current one checked, and the add row. The menu is one tab stop (the current row, else the first, else the add row when there are no workspaces); Up, Down, Home, End and typing a letter move between rows, and Enter or Space chooses one (Space never scrolls the page). Truncated names and hosts are in each row's tooltip.",
+          "Phone: a sheet (accessibilityViewIsModal) of buttons with the current one selected. A row's name says what its badge or dot shows: 'Lumen Studio, 3 mentions', 'Northwind Health, new messages'."
         ]
       },
       "states": ["hover", "focus"],
@@ -35570,6 +35911,11 @@
         { "name": "Phone sheet", "props": {}, "platforms": ["mobile"] }
       ],
       "edgeCases": [
+        {
+          "title": "No workspaces yet",
+          "platforms": ["web", "desktop", "mobile"],
+          "handling": "With nothing signed in, only the add tile (desktop), the add row (web) or the add row (phone) is drawn. On the web the add row is then the menu's tab stop, so Tab still enters the menu."
+        },
         {
           "title": "Only one workspace signed in at a time (today)",
           "platforms": ["desktop"],

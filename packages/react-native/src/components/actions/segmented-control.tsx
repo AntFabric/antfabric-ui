@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from "react";
-import { Animated, I18nManager, PanResponder, Pressable, ScrollView, Text, View, type ViewStyle } from "react-native";
+import { useRef, useState } from "react";
+import { Animated, I18nManager, PanResponder, Platform, Pressable, ScrollView, Text, View, type ViewStyle } from "react-native";
 import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { GlassSurface } from "../../lib/glass";
@@ -16,6 +16,7 @@ export interface SegmentedControlItem {
   count?: number;
 }
 
+/** `nativeID`, the accessibility label and hint, and `ref` name the tab list; `testID` and `style` stay on the root. */
 export interface SegmentedControlProps extends RootProps {
   items: SegmentedControlItem[];
   /** The chosen item's key. A value that matches no item is allowed and draws no card — for a strip whose panel can be closed. */
@@ -54,11 +55,13 @@ interface SegmentProps {
   styles?: PartStyles<"segmented-control">;
   strings?: Partial<KitStrings["segmented-control"]>;
   testID?: string;
+  /** The strip's name, said after each tab's on iOS and Android, where a container's own name is never read. */
+  group?: string;
   pick: () => void;
   place: (slot: { x: number; y: number; w: number; h: number }) => void;
 }
 
-function Segment({ item, chosen, full, pick, place, styles, strings, testID }: SegmentProps) {
+function Segment({ item, chosen, full, pick, place, styles, strings, testID, group }: SegmentProps) {
   const { t } = useTheme();
   const s = useStyles();
   const str = useStrings("segmented-control", strings);
@@ -72,6 +75,7 @@ function Segment({ item, chosen, full, pick, place, styles, strings, testID }: S
       accessibilityRole="tab"
       accessibilityLabel={n > 0 ? str("labelWithCount", { label: item.label, count: n }) : item.label}
       accessibilityState={{ selected: chosen }}
+      accessibilityHint={group || undefined}
       hitSlop={typeof tab.view.height === "number" ? hitSlopTo(t.control.hit, tab.view.height) : undefined}
       onPress={pick}
       onLayout={(e) => {
@@ -94,12 +98,17 @@ function Segment({ item, chosen, full, pick, place, styles, strings, testID }: S
   );
 }
 
-export function SegmentedControl({ items, value = "", full = false, scrollable = false, label = "", onValueChange, styles, strings, style, testID, ...rest }: SegmentedControlProps) {
-  const { glass } = useTheme();
+export function SegmentedControl({ items, value, full = false, scrollable = false, label = "", onValueChange, styles, strings, style, testID, ...rest }: SegmentedControlProps) {
+  const { t, glass } = useTheme();
   const s = useStyles();
   const r = useRecipe(recipes["segmented-control"], { styles });
-  const [current, setCurrent] = useControllable(value, onValueChange);
+  const [current = "", setCurrent] = useControllable(value, onValueChange);
   const at = items.findIndex((i) => i.key === current);
+  // Each tab's slop reaches 44pt, but iOS tests a touch against the parents first and drops one outside their bounds: the track and the
+  // root, as tall as the tabs, take the same slop so it is reached. A scrolling strip's ScrollView still clips it.
+  const slop = typeof r.tab.view.height === "number" ? hitSlopTo(t.control.hit, r.tab.view.height) : undefined;
+  // iOS and Android never read a container's name, so each tab says the strip's after its own; the web reads the tablist's.
+  const group = Platform.OS === "web" ? "" : (rest.accessibilityLabel as string | undefined) || label;
 
   // iOS 26's selection lens: dragging across the strip lifts the chosen card into clear glass that
   // follows the finger and settles on the segment under it. A plain tap still lands on the segment.
@@ -107,44 +116,43 @@ export function SegmentedControl({ items, value = "", full = false, scrollable =
   const lensX = useRef(new Animated.Value(0)).current;
   const [lens, setLens] = useState<{ y: number; w: number; h: number } | null>(null);
   const lensOn = glass && !scrollable && at >= 0;
-  const drag = useRef({ from: 0, at }).current;
-  drag.at = at;
-  const responder = useMemo(
-    () =>
-      PanResponder.create({
-        onMoveShouldSetPanResponderCapture: (_, g) => lensOn && Math.abs(g.dx) > 6 && Math.abs(g.dx) > Math.abs(g.dy),
-        onPanResponderGrant: () => {
-          const from = slots.current[drag.at];
-          if (!from) return;
-          drag.from = from.x;
-          lensX.setValue(from.x);
-          setLens({ y: from.y, w: from.w, h: from.h });
-        },
-        onPanResponderMove: (_, g) => {
-          const all = slots.current;
-          const last = all[all.length - 1];
-          const w = all[drag.at]?.w ?? 0;
-          if (last) lensX.setValue(Math.min(Math.max(drag.from + g.dx, all[0]!.x), last.x + last.w - w));
-        },
-        onPanResponderRelease: (_, g) => {
-          const all = slots.current;
-          const centre = drag.from + g.dx + (all[drag.at]?.w ?? 0) / 2;
-          const off = (i: number) => Math.abs((all[i]?.x ?? 0) + (all[i]?.w ?? 0) / 2 - centre);
-          let best = drag.at;
-          all.forEach((_, i) => {
-            if (off(i) < off(best)) best = i;
-          });
-          setLens(null);
-          const landed = items[best];
-          if (landed) setCurrent(landed.key);
-        },
-        onPanResponderTerminate: () => setLens(null),
-      }),
-    [lensOn, items, setCurrent, lensX, drag],
-  );
+  // The responder is made once and reads the latest props from here: one rebuilt by a parent's re-render mid-drag would lose the gesture.
+  const drag = useRef({ from: 0, at, lensOn, items, setCurrent }).current;
+  Object.assign(drag, { at, lensOn, items, setCurrent });
+  const responder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponderCapture: (_, g) => drag.lensOn && Math.abs(g.dx) > 6 && Math.abs(g.dx) > Math.abs(g.dy),
+      onPanResponderGrant: () => {
+        const from = slots.current[drag.at];
+        if (!from) return;
+        drag.from = from.x;
+        lensX.setValue(from.x);
+        setLens({ y: from.y, w: from.w, h: from.h });
+      },
+      onPanResponderMove: (_, g) => {
+        const all = slots.current;
+        const last = all[all.length - 1];
+        const w = all[drag.at]?.w ?? 0;
+        if (last) lensX.setValue(Math.min(Math.max(drag.from + g.dx, all[0]!.x), last.x + last.w - w));
+      },
+      onPanResponderRelease: (_, g) => {
+        const all = slots.current;
+        const centre = drag.from + g.dx + (all[drag.at]?.w ?? 0) / 2;
+        const off = (i: number) => Math.abs((all[i]?.x ?? 0) + (all[i]?.w ?? 0) / 2 - centre);
+        let best = drag.at;
+        all.forEach((_, i) => {
+          if (off(i) < off(best)) best = i;
+        });
+        setLens(null);
+        const landed = drag.items[best];
+        if (landed) drag.setCurrent(landed.key);
+      },
+      onPanResponderTerminate: () => setLens(null),
+    }),
+  ).current;
 
   const strip = (
-    <View testID={partId(testID, "segmented-control", "track")} accessibilityRole="tablist" accessibilityLabel={label || undefined} {...(lensOn ? responder.panHandlers : null)} style={[s.track, partStyle(r, "track", { view: full && { flexGrow: 1 } }).view]}>
+    <View testID={partId(testID, "segmented-control", "track")} accessibilityRole="tablist" accessibilityLabel={label || undefined} hitSlop={slop} {...rootProps(rest)} {...(lensOn ? responder.panHandlers : null)} style={[s.track, partStyle(r, "track", { view: full && { flexGrow: 1 } }).view]}>
       {items.map((item, i) => (
         <Segment
           key={item.key}
@@ -154,6 +162,7 @@ export function SegmentedControl({ items, value = "", full = false, scrollable =
           styles={styles}
           strings={strings}
           testID={testID}
+          group={group}
           pick={() => setCurrent(item.key)}
           place={(slot) => {
             slots.current[i] = slot;
@@ -170,12 +179,12 @@ export function SegmentedControl({ items, value = "", full = false, scrollable =
 
   if (scrollable) {
     return (
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} {...rootProps(rest)} style={[{ alignSelf: "stretch" }, style]} contentContainerStyle={full ? { flexGrow: 1 } : undefined}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={[{ alignSelf: "stretch" }, style]} contentContainerStyle={full ? { flexGrow: 1 } : undefined}>
         {strip}
       </ScrollView>
     );
   }
-  return <View {...rootProps(rest)} style={[s.root, full && { alignSelf: "stretch" }, style]}>
+  return <View hitSlop={slop} style={[s.root, full && { alignSelf: "stretch" }, style]}>
       {strip}
     </View>;
 }

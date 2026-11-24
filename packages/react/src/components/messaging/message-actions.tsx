@@ -78,7 +78,7 @@ export function MessageActions({
   forward = false,
   actions = [],
   more = false,
-  menuOpen = false,
+  menuOpen,
   onReact,
   onAddReaction,
   onReplyInThread,
@@ -92,7 +92,7 @@ export function MessageActions({
   ...rest
 }: MessageActionsProps) {
   const s = useStrings("message-actions", strings);
-  const [open, setOpen] = useControllable(menuOpen, onMenuOpenChange);
+  const [open = false, setOpen] = useControllable(menuOpen, onMenuOpenChange);
   const r = useRecipe(recipes["message-actions"], { styles });
   // Arrows (and Home, End) move between the buttons; left and right follow the tree's direction.
   const keys = useRovingKeys<HTMLDivElement>({ items: "button:not(:disabled)", orientation: "horizontal", roving: true });
@@ -113,7 +113,20 @@ export function MessageActions({
       {actions.map((a) => (
         <IconButton key={a.key} icon={a.icon} label={a.label} badge={a.badge} disabled={a.disabled} shape="square" onPress={() => onAction?.(a)} />
       ))}
-      {more && <IconButton icon="ellipsis" label={s("more")} shape="square" toggle active={open} onActiveChange={(next) => setOpen(next)} />}
+      {more && (
+        // A menu button, not a toggle: it says it opens a menu and whether the menu is open (a null `aria-pressed` drops the toggle's
+        // attribute); it still draws pressed while the menu is open.
+        <IconButton
+          icon="ellipsis"
+          label={s("more")}
+          shape="square"
+          active={open}
+          onPress={() => setOpen(!open)}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          {...({ "aria-pressed": null } as object)}
+        />
+      )}
     </div>
   );
 }

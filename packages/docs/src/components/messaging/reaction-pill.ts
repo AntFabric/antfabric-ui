@@ -51,7 +51,7 @@ const docs: ComponentDocs = {
       type: "event",
       args: "mine: boolean",
       changes: "mine",
-      description: "Called with `mine` as the press leaves it: flipped, for a reaction (the add pill never calls it). Given `mine` too, the pill is controlled and the caller's count is the truth; otherwise it flips itself and moves its count by one.",
+      description: "Called with `mine` as the press leaves it: flipped, for a reaction (the add pill never calls it). Given `mine` too, the pill is controlled and this reports the request: it is busy (aria-busy) and shows the caller's `mine` and `count` until the app passes new ones (or the promise the handler returns settles), so a rejected reaction stays as it was. On its own it flips itself and moves its count by one.",
     },
     onPress: {
       type: "event",
@@ -191,6 +191,15 @@ const docs: ComponentDocs = {
   ],
   states: ["hover", "pressed", "focus", "disabled"],
   edgeCases: [
+    {
+      title: "Nobody to name yet",
+      platforms: ["web", "desktop"],
+      handling: "With `reactors` empty (the names still loading, or a product that does not send them), hover and focus open no card: an empty card would say nothing. The pill's name is the emoji and the count.",
+      example: {
+        name: "No reactors",
+        props: { emoji: "👀", count: 3, reactors: "" },
+      },
+    },
     {
       title: "Hundreds of reactors",
       platforms: ["web", "desktop"],

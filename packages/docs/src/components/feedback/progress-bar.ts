@@ -10,8 +10,8 @@ const docs: ComponentDocs = {
   props: {
     value: {
       type: "number",
-      default: 40,
-      description: "0–100, clamped. The desktop kit calls it pct; the mobile kit takes 0–1 and the adapter multiplies by 100, so one prop means one thing everywhere.",
+      sample: 40,
+      description: "0–100, clamped. Left out (or NaN), the bar is indeterminate: no percent is drawn or announced until there is one. The desktop kit calls it pct; the mobile kit takes 0–1 and the adapter multiplies by 100, so one prop means one thing everywhere.",
     },
     indeterminate: {
       type: "boolean",
@@ -181,7 +181,7 @@ const docs: ComponentDocs = {
     {
       title: "Value out of range or missing",
       platforms: ["web", "desktop", "mobile"],
-      handling: "Clamped to 0–100, so 130 draws full and −5 draws empty. A NaN or unknown total becomes indeterminate rather than a bar stuck at zero.",
+      handling: "Clamped to 0–100, so 130 draws full and −5 draws empty. A NaN, an unknown total or no value at all (an upload that has not reported yet) is indeterminate rather than a bar stuck at zero or a made-up percent.",
       example: {
         name: "Clamped",
         props: {

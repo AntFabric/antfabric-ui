@@ -5,6 +5,8 @@ export const display = {
   avatar: {
     /** The avatar's accessible name when it shows a presence dot: the name, then the presence word. */
     labelWithPresence: "{name}, {presence}",
+    /** The avatar's accessible name when it wears the agent sparkle (which takes the presence dot's place): the name, then what it is. */
+    labelAgent: "{name}, AI agent",
     /** The presence word a screen reader hears for the green dot. */
     presenceActive: "active",
     /** The presence word for the away dot. */

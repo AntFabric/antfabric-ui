@@ -38,7 +38,7 @@ const docs: ComponentDocs = {
       type: "boolean",
       default: false,
       platforms: ["mobile"],
-      description: "A press wiggles the glyph for 0.8 s and onPress fires when the wiggle ends, because the sheet it opens covers the disc. One pending press at a time; at once under Reduce Motion.",
+      description: "A press wiggles the glyph for 0.8 s and onPress fires when the wiggle ends, because the sheet it opens covers the disc. One pending press at a time; at once under Reduce Motion. Disabled during the wiggle, it drops the press and does not fire.",
     },
     onPress: {
       type: "event",

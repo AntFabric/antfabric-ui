@@ -1,10 +1,22 @@
 /**
  * The item shapes both kits draw from data: a menu's rows, a place to go, a button the kit draws for the product, an app's mark. They live
  * here, once, and each kit re-exports them as types from its root (`import type { MenuItem } from "@antfabric/ui-react"`). An icon is a
- * lucide name in kebab case (`IconName` is `string` in both kits). Items carry no functions: data stays serialisable, so a product can build
- * it from config or plugins and the docs can describe it. A component that needs more extends one of these in its own file; nothing adds
- * fields to the base types here.
+ * lucide name in kebab case or the icon component itself (`IconName` in both kits). Items carry no functions: data stays serialisable, so a
+ * product can build it from config or plugins and the docs can describe it. The one exception is a component icon, for a glyph the app has not
+ * registered by name; an item that must stay serialisable names its icon. A component that needs more extends one of these in its own file;
+ * nothing adds fields to the base types here.
  */
+
+import type { ComponentType } from "react";
+
+/**
+ * An icon drawn as a component rather than by name: a lucide component (`import { Trash2 } from "lucide-react"`, or from
+ * `lucide-react-native` on the phone), or any component that takes the same props.
+ */
+export type IconComponent = ComponentType<{ size?: number | string; color?: string; strokeWidth?: number | string }>;
+
+/** An icon: a lucide name in kebab case (`"trash-2"`), drawn from the kit's registry, or the icon component itself. */
+export type IconName = string | IconComponent;
 
 /** A row of a menu. Menu, ContextMenu, AppMenuBar and TrayMenu draw it. */
 export interface MenuItem {
@@ -13,7 +25,7 @@ export interface MenuItem {
   /** Leave it out for a row; `separator` draws a hairline and `label` a heading (a tray's dimmed readout). */
   type?: "item" | "separator" | "label";
   label?: string;
-  icon?: string;
+  icon?: IconName;
   /** A second line: what the row will do, or why it is disabled. */
   sublabel?: string;
   /** A trailing number or word: 3, "Mentions", "9:00". */
@@ -34,7 +46,7 @@ export interface MenuItem {
 export interface NavItem {
   key: string;
   label: string;
-  icon: string;
+  icon: IconName;
   badge?: number;
   /** The badge prints up to this, then max+, as on Badge. Default 9. */
   max?: number;
@@ -49,13 +61,13 @@ export interface ActionItem {
   key: string;
   /** The accessible name; drawn as text where the component draws labels. */
   label: string;
-  icon?: string;
+  icon?: IconName;
   badge?: number;
   disabled?: boolean;
 }
 
 /** A button that is only an icon: TitleBar's, WebTopBar's and MobileHeader's actions, Composer's tools, MessageActions' actions. A product's action cannot draw a blank button. */
-export type IconActionItem = ActionItem & { icon: string };
+export type IconActionItem = ActionItem & { icon: IconName };
 
 /** A one-colour vector mark the kit draws at its own size and colour (the app icon in AppBadge). */
 export interface AppMark {

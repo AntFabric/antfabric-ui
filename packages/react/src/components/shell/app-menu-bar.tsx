@@ -88,13 +88,18 @@ const scrolls: CSSProperties = { maxHeight: "80vh", overflowY: "auto" };
 type Focus = { focus: "first" | "last" } | { focus: "entry"; key: string };
 type Pending = MutableRefObject<Focus | null>;
 
-const ROWS = '[role="menuitem"]';
-const NESTED_ROWS = '[role="menu"] [role="menu"] [role="menuitem"]';
+const ROWS = '[role="menuitem"], [role="menuitemcheckbox"]';
+const NESTED_ROWS = '[role="menu"] [role="menu"] [role="menuitem"], [role="menu"] [role="menu"] [role="menuitemcheckbox"]';
 const TITLES = '[data-af-part="title"], [data-af-part="appTitle"]';
+
+/** The element under `root` matching `selector` whose `data-af-menu` is `key`, compared as a value, so a key holding `"` or `\` is not a selector. */
+function byMenuKey(root: HTMLElement | null, selector: string, key: string): HTMLElement | undefined {
+  return Array.from(root?.querySelectorAll<HTMLElement>(selector) ?? []).find((el) => el.dataset.afMenu === key);
+}
 
 /** Focus the first or last entry of the open menu `key` (the entries of its own menu, not of one nested in it). */
 function focusRows(root: HTMLElement | null, key: string, how: "first" | "last"): void {
-  const menu = root?.querySelector<HTMLElement>(`[role="menu"][data-af-menu="${key}"]`) ?? root?.querySelector<HTMLElement>('[data-af-part="panel"]');
+  const menu = byMenuKey(root, '[role="menu"][data-af-menu]', key) ?? root?.querySelector<HTMLElement>('[data-af-part="panel"]');
   const rows = Array.from(menu?.querySelectorAll<HTMLElement>(ROWS) ?? []);
   (how === "first" ? rows[0] : rows[rows.length - 1])?.focus();
 }
@@ -112,13 +117,15 @@ interface RowProps {
   menuKey?: string;
   /** The menu's one tab stop. The others are reached with the arrows. */
   tab?: boolean;
+  /** A toggle (`checked` true or false): a `menuitemcheckbox` that says whether it is on. */
+  checked?: boolean;
   /** `byKeyboard` is true when Enter or Space made the press, so the menu it opens can take focus. */
   onPress: (byKeyboard: boolean) => void;
   styles?: PartStyles<"app-menu-bar">;
   children: (lit: boolean) => ReactNode;
 }
 
-function MenuRow({ desk, label, lit = false, disabled = false, popup = false, expanded, menuKey, tab = false, onPress, styles, children }: RowProps) {
+function MenuRow({ desk, label, lit = false, disabled = false, popup = false, expanded, menuKey, tab = false, checked, onPress, styles, children }: RowProps) {
   const ui = useInteraction({ disabled });
   const dir = useDirection();
   // A menu highlights the entry under the pointer and the one keyboard focus is on alike.
@@ -130,7 +137,8 @@ function MenuRow({ desk, label, lit = false, disabled = false, popup = false, ex
       data-af-part="row"
       data-af-menu={menuKey}
       data-af-press
-      role="menuitem"
+      role={checked === undefined ? "menuitem" : "menuitemcheckbox"}
+      aria-checked={checked}
       tabIndex={tab ? 0 : -1}
       aria-label={label}
       aria-haspopup={popup ? "menu" : undefined}
@@ -157,12 +165,12 @@ function Entries({ desk, items, highlight, onChoose, styles, tabFirst = false }:
       item.type === "separator" ? (
         <div key={i} role="separator" data-af-part="separator" style={css(separator, r.separator)} />
       ) : (
-        <MenuRow key={i} desk={desk} label={item.label ?? ""} lit={menuItemKey(item) === highlight} disabled={item.disabled} tab={tabFirst && i === 0} onPress={() => onChoose(item)} styles={styles}>
+        <MenuRow key={i} desk={desk} label={item.label ?? ""} lit={menuItemKey(item) === highlight} disabled={item.disabled} checked={item.checked} tab={tabFirst && i === 0} onPress={() => onChoose(item)} styles={styles}>
           {(on) => (
             <>
               <Icon part="entryIcon" name="check" size={r.entryIcon.width} style={partStyle(r, "entryIcon", { opacity: item.checked ? 1 : 0 })} />
               <span style={rtl(itemLabel, dir)}>{item.label}</span>
-              {item.shortcut ? <Kbd keys={item.shortcut} tone="bare" style={css({ alignSelf: "center" }, mac && on && { color: t.fg.onBrand })} /> : null}
+              {item.shortcut ? <Kbd keys={item.shortcut} tone="bare" style={css({ alignSelf: "center" }, mac && on && { color: t.os.onFill })} /> : null}
               {item.submenu && <Icon part="entryIcon" name={dir === "rtl" ? "chevron-left" : "chevron-right"} size={r.entryIcon.width} style={partStyle(r, "entryIcon", { opacity: 0.7 })} />}
             </>
           )}
@@ -725,13 +733,13 @@ function WebMenu({
 
 export function AppMenuBar({
   menus = [],
-  openMenu = "",
+  openMenu,
   highlight = "",
   workspace = "",
   host = "",
   workspaceIdentity = "ink",
   webItems = [],
-  colorScheme = "system",
+  colorScheme,
   clock = "",
   onSelect,
   onOpenMenuChange,
@@ -746,8 +754,8 @@ export function AppMenuBar({
   const { platform, os } = usePlatform();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const pending = useRef<Focus | null>(null);
-  const [open, setOpen] = useControllable(openMenu, onOpenMenuChange);
-  const [scheme, setScheme] = useControllable(colorScheme, onColorSchemeChange);
+  const [open = "", setOpen] = useControllable(openMenu, onOpenMenuChange);
+  const [scheme = "system", setScheme] = useControllable(colorScheme, onColorSchemeChange);
   // Choosing an entry closes the menu, as the system's own menus do.
   const choose = (item: AppMenuBarItem) => {
     onSelect?.(item);
@@ -762,7 +770,7 @@ export function AppMenuBar({
     pending.current = null;
     const root = rootRef.current;
     if (!root) return;
-    if (want.focus === "entry") root.querySelector<HTMLElement>(`button[data-af-menu="${want.key}"]`)?.focus();
+    if (want.focus === "entry") byMenuKey(root, "button[data-af-menu]", want.key)?.focus();
     else focusRows(root, open, want.focus);
   }, [open]);
   return (

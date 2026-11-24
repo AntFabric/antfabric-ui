@@ -1,5 +1,5 @@
 import { Pressable, Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { recipes, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles } from "../../theme";
 import { Icon, type IconName } from "../../lib/icon";
 import { usePress } from "../../lib/press";
@@ -101,8 +101,8 @@ export function SidebarItem({
   const s = useStyles();
   const str = useStrings("sidebar-item", strings);
   const press = usePress();
-  const [on, setOn] = useControllable(active);
-  const open = selectedName ? selectedName === name : on;
+  // Current is the app's (or the surrounding section's): a press reports itself and never makes the row current on its own.
+  const open = selectedName ? selectedName === name : active;
   // The row is one line, as V2 draws it today: the last message and its time need the backend, so the second line is only for someone typing.
   const twoLines = typing;
   const loud = unread && !muted;
@@ -114,7 +114,10 @@ export function SidebarItem({
   const kindIcon = glyphOf(partStyle(r, "kindIcon", { view: s.kindIcon }));
   const meta = glyphOf(r.metaIcon);
   const typed = typingText || str("typing");
+  // The face's sparkle and presence dot are said in words too: an agent, or someone away, is not only a colour.
+  const face = !avatar ? "" : agent ? str("agent") : presence === "active" ? str("presenceActive") : presence === "away" ? str("presenceAway") : presence === "dnd" ? str("presenceDnd") : presence === "offline" ? str("presenceOffline") : "";
   const details = [
+    face,
     description,
     mentions > 0 ? str("withMentions", { count: mentions }) : unread && !muted ? str("unread") : "",
     muted ? str("muted") : "",
@@ -132,15 +135,12 @@ export function SidebarItem({
         accessibilityRole="button"
         accessibilityLabel={said}
         accessibilityState={{ selected: open }}
-        onPress={() => {
-          // The current page is not a toggle: pressing the row again leaves it current.
-          setOn(true);
-          onPress?.();
-        }}
-        onLongPress={() => onLongPress?.()}
+        onPress={() => onPress?.()}
+        // Only with a handler: attached, a hold is taken by the long press and never becomes the press.
+        onLongPress={onLongPress ? () => onLongPress() : undefined}
         // A long press has no touch-free route of its own: it is an action a screen reader, Voice Control or Switch Control can run.
         accessibilityActions={onLongPress ? [{ name: "longpress", label: str("options", { name }) }] : undefined}
-        onAccessibilityAction={(e) => e.nativeEvent.actionName === "longpress" && onLongPress?.()}
+        onAccessibilityAction={onLongPress ? (e) => e.nativeEvent.actionName === "longpress" && onLongPress() : undefined}
         {...press.handlers}
         style={[s.row, row.view]}
       >

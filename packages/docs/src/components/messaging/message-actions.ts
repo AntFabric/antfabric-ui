@@ -75,7 +75,7 @@ const docs: ComponentDocs = {
   platforms: {
     web: {
       status: "ready",
-      base: "A role=\"toolbar\" box with inline styles over `t`: quick reactions are <button>s with hover and press from useInteraction, the rest the kit's IconButton (square); ⋯ is a toggle IconButton that holds `menuOpen`. ← / → move focus along the bar. Tooltips are each button's title.",
+      base: "A role=\"toolbar\" box with inline styles over `t`: quick reactions are <button>s with hover and press from useInteraction, the rest the kit's IconButton (square); ⋯ is a menu button (aria-haspopup=\"menu\", aria-expanded) that holds `menuOpen` and draws pressed while the menu is open. ← / → move focus along the bar. Tooltips are each button's title.",
       import: "import { MessageActions } from \"@antfabric/ui-react/chat\"",
       notes: [
         "Shown on row hover and on :focus-within, positioned absolute at top 2 / right 14 of the row so it costs the message no height and no reflow.",
@@ -164,6 +164,7 @@ const docs: ComponentDocs = {
     label: "Message actions",
     notes: [
       "Every control is a real button with a name (\"React with 👍\", \"Reply in thread\").",
+      "⋯ is a menu button, not a toggle: a screen reader hears that it opens a menu and whether the menu is open (aria-haspopup=\"menu\", aria-expanded), never \"pressed\".",
       "Arrow keys, Home and End move between the buttons; left and right follow the tree's direction, so in right-to-left they turn round. Every button is still its own Tab stop: a single roving stop needs IconButton to take a tabIndex, which it does not yet.",
       "Inside a Message, the bar shows on hover, on focus in the row, and after a long press or Shift+F10 / the Menu key; Escape closes it back to the row.",
     ],

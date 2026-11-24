@@ -59,6 +59,14 @@ export function Fab({ variant = "ink", icon, label, src = "", disabled = false, 
     },
     [],
   );
+  // Disabled mid-wiggle: the press is dropped and the glyph settles, so a Fab turned off never fires.
+  useEffect(() => {
+    if (!disabled || !pending.current) return;
+    clearTimeout(pending.current);
+    pending.current = null;
+    swing.stopAnimation();
+    swing.setValue(0);
+  }, [disabled, swing]);
   const activate = () => {
     if (!wiggle) return onPress?.();
     if (pending.current) return;

@@ -82,7 +82,7 @@ const docs: ComponentDocs = {
     },
     mobile: {
       status: "ready",
-      base: "A View (role status, polite live region) with <Enter motion=\"fade\">, the action under the message as the kit's Button (sm) and the kit's IconButton for Dismiss; dismissing fades it with Animated.timing",
+      base: "A View (its words announced, no live region) with <Enter motion=\"fade\">, the action under the message as the kit's Button (sm) and the kit's IconButton for Dismiss; dismissing fades it with Animated.timing",
       import: "import { InlineBanner } from \"@antfabric/ui-react-native\"",
       notes: [
         "Today's InfoBanner: a sunken strip (surface.muted), 12 × 8 padding, radius 8, a 16pt faint icon nudged 2pt down against the first line, one sentence and no heading. It has no bottom margin — the next SectionHeader owns the gap.",

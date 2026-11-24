@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useId, type CSSProperties } from "react";
 import { recipes, useControllable, useDirection, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { METRIC_KEY, barScale, fmt, metricTotal, prepare, seriesColors, summarize, useSeries, type FormatSpec, type Metric, type Row, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
@@ -115,10 +115,11 @@ export function MetricTabs({ data, x, metrics, title, subtitle = "", format = "i
   const r = useRecipe(recipes["metric-tabs"], { state: { focus: ui.focused }, styles });
   const [picked, setPicked] = useControllable(value, onValueChange);
   const tabs = metrics.slice(0, MOST);
-  // Named from the title, not a generated id, so the markup is the same on every mount; two tab sets on one page need different titles.
-  const uid = `metric-tabs-${title.replace(/\W+/g, "-")}`;
-  const panelId = `${uid}-panel`;
-  const tabId = (i: number) => `${uid}-tab-${i}`;
+  // React's id, so two tab sets never share one (a title of non-Latin words would have been all dashes); the server and the client give the same.
+  // In the chart family (`af-chart-…`, word characters only), as the charts' own generated ids are.
+  const uid = `af-chart-${useId().replace(/\W/g, "")}`;
+  const panelId = `${uid}panel`;
+  const tabId = (i: number) => `${uid}tab${i}`;
   // The arrows move by the reading direction and the tab chosen is the one focused (automatic activation); Home and End go to the ends.
   const keys$ = useRovingKeys<HTMLDivElement>({ items: '[role="tab"]', orientation: "horizontal", onMove: (_, i) => tabs[i] && setPicked(tabs[i].field) });
   const palette = seriesColors(tk);
@@ -165,7 +166,8 @@ export function MetricTabs({ data, x, metrics, title, subtitle = "", format = "i
           ))}
         </div>
       ) : null}
-      <div role="tabpanel" id={panelId} aria-labelledby={chosen ? tabId(at) : undefined} aria-label={chosen ? undefined : title} style={css(box)}>
+      {/* Named by its tab while the tabs are drawn; while loading or empty there is no tab to point at, so the title names it. */}
+      <div role="tabpanel" id={panelId} aria-labelledby={chosen && !loading && !nothing ? tabId(at) : undefined} aria-label={chosen && !loading && !nothing ? undefined : title} style={css(box)}>
         <ChartFrame height={height} label={loading ? str("loading", { title }) : summary} loading={loading} empty={nothing} emptyTitle={empty ?? str("empty")} emptyLine={emptyLine ?? str("emptyLine")} loadingLabel={str("loadingChart")}>
           {(width) => <RechartsBars tk={tk} theme={theme} ui={ui} plot={partStyle(r, "plot", { color: s.colorOf(s.visible[0]!), transition: `color ${tk.duration.slow} ${tk.ease.out}` })} hint={str("arrowKeys", { title })} data={rows} rows={rows} keys={keys} fields={[METRIC_KEY]} s={s} labels={labels} format={shown} formatWords={formatWords} scale={scale} easeColor width={width} height={height} />}
         </ChartFrame>

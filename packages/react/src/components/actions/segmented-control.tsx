@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent, type Ref } from "react";
 import { cap, recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { box, css, pressable, row, text } from "../../lib/style";
 
 export type SegmentedControlSize = "sm" | "md";
@@ -15,6 +15,7 @@ export interface SegmentedControlItem {
   count?: number;
 }
 
+/** `id`, `aria-*` and `ref` name the tablist; `className` and `data-*` go on the root (`splitRootProps`). */
 export interface SegmentedControlProps extends RootProps<HTMLDivElement> {
   items: SegmentedControlItem[];
   /** The chosen item's key. A value that matches no item is allowed and draws no card — for a strip whose panel can be closed. */
@@ -27,6 +28,11 @@ export interface SegmentedControlProps extends RootProps<HTMLDivElement> {
   scrollable?: boolean;
   /** The strip's accessible name. */
   label?: string;
+  /**
+   * The `id` of the panel the strip switches: the chosen tab points at it (`aria-controls`). Each tab's `id` is the strip's `id` (or a
+   * generated one) and its key, `<id>-<key>`, so the panel can name itself with `aria-labelledby`.
+   */
+  panel?: string;
   onValueChange?: (key: string) => void;
   /** Per-part styles over the theme: `{ track: {…}, card: {…}, tab: {…}, count: {…} }`. */
   styles?: PartStyles<"segmented-control">;
@@ -55,6 +61,9 @@ const count: CSSProperties = { ...box, alignItems: "center", justifyContent: "ce
 
 interface SegmentProps {
   item: SegmentedControlItem;
+  /** The tab's id, and the panel it shows (the chosen tab only). */
+  id: string;
+  controls?: string;
   chosen: boolean;
   /** Draw this segment's own card: before the strip has been measured, the one card cannot slide yet. */
   ownCard: boolean;
@@ -66,7 +75,7 @@ interface SegmentProps {
   strings?: Partial<KitStrings["segmented-control"]>;
 }
 
-function Segment({ item, chosen, ownCard, stop, size, full, pick, styles, strings }: SegmentProps) {
+function Segment({ item, id, controls, chosen, ownCard, stop, size, full, pick, styles, strings }: SegmentProps) {
   const s = useStrings("segmented-control", strings);
   const ui = useInteraction();
   const r = useRecipe(recipes["segmented-control"], { variants: { size, full }, state: { on: chosen, hover: ui.hovered, focus: ui.focused }, styles });
@@ -75,8 +84,10 @@ function Segment({ item, chosen, ownCard, stop, size, full, pick, styles, string
     <button
       type="button"
       data-af-press
+      id={id}
       role="tab"
       aria-selected={chosen}
+      aria-controls={controls}
       aria-label={n > 0 ? s("labelWithCount", { label: item.label, count: n }) : item.label}
       tabIndex={stop ? 0 : -1}
       onClick={pick}
@@ -102,15 +113,21 @@ const KEYS: Record<string, (at: number, n: number) => number> = {
   End: (_, n) => n - 1,
 };
 
-export function SegmentedControl({ items, value = "", size = "md", full = false, scrollable = false, label = "", onValueChange, styles, strings, style, ...rest }: SegmentedControlProps) {
+export function SegmentedControl({ items, value, size = "md", full = false, scrollable = false, label = "", panel = "", onValueChange, styles, strings, style, ...rest }: SegmentedControlProps) {
+  const own = useId();
   const dir = useDirection();
   const r = useRecipe(recipes["segmented-control"], { styles });
-  const [current, setCurrent] = useControllable(value, onValueChange);
+  const [current = "", setCurrent] = useControllable(value, onValueChange);
   const at = items.findIndex((i) => i.key === current);
 
   // ONE card travels between segments. It is measured after mount; until then (and on the server)
   // the chosen segment draws its own card in the same place.
   const ref = useRef<HTMLDivElement>(null);
+  const pass = splitRootProps(rest);
+  const { ref: passedRef, ...control } = pass.control as { ref?: Ref<HTMLDivElement> } & Record<string, unknown>;
+  // A tab's id is the strip's and its key (whitespace cannot sit in an id that aria-labelledby names).
+  const base = (control.id as string | undefined) || own;
+  const tabId = (key: string) => `${base}-${key.replace(/\s+/g, "-")}`;
   const [slot, setSlot] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   useEffect(() => {
     const strip = ref.current;
@@ -120,12 +137,16 @@ export function SegmentedControl({ items, value = "", size = "md", full = false,
       setSlot(el ? { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight } : null);
     };
     measure();
+    // A test DOM (jsdom) has no ResizeObserver: the card is measured once.
+    if (typeof ResizeObserver === "undefined") return;
     const watch = new ResizeObserver(measure);
     watch.observe(strip);
     return () => watch.disconnect();
   }, [current, items, size, full]);
 
   const move = (e: KeyboardEvent<HTMLDivElement>) => {
+    // Only a plain key moves: Alt+Arrow (back), Cmd+Arrow (line start) and the like stay the browser's and the system's.
+    if (e.altKey || e.metaKey || e.ctrlKey || e.shiftKey) return;
     // Left and right follow the tree's direction: in right-to-left, ArrowRight goes to the previous segment.
     const swap = dir === "rtl" && (e.key === "ArrowLeft" || e.key === "ArrowRight");
     const next = KEYS[swap ? (e.key === "ArrowLeft" ? "ArrowRight" : "ArrowLeft") : e.key];
@@ -138,7 +159,7 @@ export function SegmentedControl({ items, value = "", size = "md", full = false,
 
   return (
     <div
-      {...rootProps(rest)}
+      {...pass.root}
       style={css(
         row,
         { alignItems: "stretch", alignSelf: "flex-start", maxWidth: "100%" },
@@ -147,7 +168,17 @@ export function SegmentedControl({ items, value = "", size = "md", full = false,
         style,
       )}
     >
-      <div ref={ref} role="tablist" aria-label={label || undefined} onKeyDown={move} data-af-part="track" style={css(track, partStyle(r, "track", full && { flexGrow: 1 }))}>
+      <div
+        ref={(el) => {
+          ref.current = el;
+          setRef(passedRef, el);
+        }}
+        role="tablist"
+        aria-label={label || undefined}
+        onKeyDown={move}
+        {...control}
+        data-af-part="track"
+        style={css(track, partStyle(r, "track", full && { flexGrow: 1 }))}>
         {slot && (
           <span
             aria-hidden
@@ -169,6 +200,8 @@ export function SegmentedControl({ items, value = "", size = "md", full = false,
           <Segment
             key={item.key}
             item={item}
+            id={tabId(item.key)}
+            controls={i === at && panel ? panel : undefined}
             chosen={i === at}
             ownCard={i === at && !slot}
             stop={i === Math.max(at, 0)}

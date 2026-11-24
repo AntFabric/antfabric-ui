@@ -56,13 +56,13 @@ export function ProgressRing({ value, max = 1, size, thickness = 0, tone = "defa
   return (
     <span
       data-af-part="root"
-      {...rootProps(rest)}
       role="progressbar"
       aria-label={label || spoken}
       aria-valuemin={known ? 0 : undefined}
       aria-valuemax={known ? max : undefined}
       aria-valuenow={known ? Math.min(max, Math.max(0, value)) : undefined}
       aria-valuetext={known ? spoken : undefined}
+      {...rootProps(rest)}
       style={css(partStyle(r, "root", { display: "inline-block", position: "relative", flexShrink: 0, width: diameter, height: diameter }), style)}
     >
       <PieChart accessibilityLayer={false} width={diameter} height={diameter} style={{ display: "block" }}>

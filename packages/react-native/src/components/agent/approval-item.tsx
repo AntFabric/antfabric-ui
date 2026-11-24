@@ -103,7 +103,7 @@ export function ApprovalItem({
   decidedBy = "",
   verify = false,
   deciding = false,
-  expanded = false,
+  expanded,
   onExpandedChange,
   onRetry,
   onApprove,
@@ -118,7 +118,7 @@ export function ApprovalItem({
   const s = useStyles();
   const str = useStrings("approval-item", strings);
   const r = useRecipe(recipes["approval-item"], { styles });
-  const [more, setMore] = useControllable(expanded, onExpandedChange);
+  const [more = false, setMore] = useControllable(expanded, onExpandedChange);
   const open = status === "pending" || status === "question";
   const decided = status === "approved" || status === "rejected";
   const closed = decided || status === "expired" || status === "failed";

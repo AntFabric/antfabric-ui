@@ -32,7 +32,7 @@ export interface LineChartProps extends RootProps {
   labels?: Record<string, string>;
   /** A flat fill under the first series: its colour at one opacity, never a gradient. */
   area?: boolean;
-  /** Each series gets its own dash and marker besides its colour, in the plot and in the legend, so two series are never told apart by hue alone. */
+  /** Each series gets its own dash and marker besides its colour, in the plot and in the legend, so two series are never told apart by hue alone. Left out, on for two or more series. */
   marks?: boolean;
   /** A reference line at this value: a goal, a limit. The scale takes it in. */
   target?: number;
@@ -62,7 +62,7 @@ export interface LineChartProps extends RootProps {
 /** gifted-charts draws at most five series on a line chart (`data` to `data5`); the web draws the same five, so both kits show the same chart. */
 const MOST = 5;
 
-export function LineChart({ data, x, y, title, subtitle = "", headline, format = "integer", xFormat, labels = {}, area = false, marks = false, target, targetLabel = "", height = 240, empty, emptyLine, loading = false, hidden, onHiddenChange, styles, strings, headingLevel: _headingLevel, testID, style, ...rest }: LineChartProps) {
+export function LineChart({ data, x, y, title, subtitle = "", headline, format = "integer", xFormat, labels = {}, area = false, marks: marksProp, target, targetLabel = "", height = 240, empty, emptyLine, loading = false, hidden, onHiddenChange, styles, strings, headingLevel: _headingLevel, testID, style, ...rest }: LineChartProps) {
   const str = useStrings("line-chart", strings);
   const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
@@ -72,6 +72,8 @@ export function LineChart({ data, x, y, title, subtitle = "", headline, format =
   const r = useRecipe(recipes["line-chart"], { styles });
   const every = [y].flat();
   const fields = every.slice(0, MOST);
+  // Two or more series are told apart by more than hue unless the product says otherwise (WCAG 1.4.1); one series needs no key.
+  const marks = marksProp ?? fields.length > 1;
   const s = useSeries(fields, theme.series, { hidden, onHiddenChange });
   const { rows, keys, ordered } = prepare(data, x, formatWords, xFormat, locale);
   const scale = lineScale(data, s.visible, target);

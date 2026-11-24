@@ -58,7 +58,7 @@ export const appMenuBar = defineRecipe({
       base: { size: "$text.bodySm" },
       states: { disabled: { opacity: "$opacity.disabled" }, focus: { shadow: "$shadow.focus" } },
       platforms: {
-        mac: { base: { height: "$osMenu.macItemH", radius: "$radius.tag" }, states: { on: { bg: "$os.macAccent", fg: "$fg.onBrand" } } },
+        mac: { base: { height: "$osMenu.macItemH", radius: "$radius.tag" }, states: { on: { bg: "$os.macAccent", fg: "$os.onFill" } } },
         windows: { base: { height: "$control.hSm", radius: "$radius.tag" }, states: { on: { bg: "$hover.surface" }, pressed: { bg: "$surface.selected" } } },
         linux: { base: { height: "$osMenu.linuxItemH", radius: "$radius.control" }, states: { on: { bg: "$hover.surface" }, pressed: { bg: "$surface.selected" } } },
       },

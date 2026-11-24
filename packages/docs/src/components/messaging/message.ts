@@ -169,12 +169,11 @@ const docs: ComponentDocs = {
     onStatusChange: {
       type: "event",
       args: "status: MessageStatus",
-      changes: "status",
-      description: "Retry on a failed message: called with `status` as the press leaves it (sending). Given this too, the row is controlled; otherwise it goes back to sending itself.",
+      description: "Retry on a failed message reports the request: called with sending. The row never moves `status` itself: Retry goes busy until the app passes the new `status` (or the promise onRetry returns settles), so a retry that fails again leaves Retry and Delete ready.",
     },
     onRetry: {
       type: "event",
-      description: "Retry was pressed on a failed message: the app posts it again.",
+      description: "Retry was pressed on a failed message: the app posts it again, and answers with `status` (sending, then sent or failed). Retry is busy until it does, or until the promise the handler returns settles.",
     },
     onDelete: {
       type: "event",
@@ -187,7 +186,7 @@ const docs: ComponentDocs = {
     onReact: {
       type: "event",
       args: "emoji: string",
-      description: "A quick reaction on the bar or a reaction pill was pressed: toggle yours with this emoji. The server owns the counts, so this is a request: pass the new `reactions` when the server answers.",
+      description: "A quick reaction on the bar or a reaction pill was pressed: toggle yours with this emoji. The server owns the counts, so this is a request: the pill is busy, still showing the old count, until the app passes the new `reactions` (or the promise the handler returns settles), and a rejected reaction stays as it was.",
     },
     onAddReaction: {
       type: "event",
@@ -246,7 +245,7 @@ const docs: ComponentDocs = {
         "The hover wash is a CSS :hover on the row — never an inline background, which would beat it — and the unread wash is painted off a data-unread attribute for the same reason.",
         "Every message has a permalink (…/c/platform-eng/p/<id>); Copy link in ⋯ copies it, and opening it scrolls to and highlights the row.",
         "A background tab still receives messages; the tab title count and favicon dot change, the row does not animate in until the tab is visible.",
-        "Pressing a reaction toggles yours (each pill keeps its own state), and Retry on a failed message moves it back to sending. The row itself does not toggle `hovered` on a press: in an app that would leave a bar behind on a row the pointer has left, so hover, focus inside the row, or the prop draw it.",
+        "Pressing a reaction toggles yours (each pill keeps its own state), and Retry on a failed message goes busy until the app answers (the flows pass `status`). The row itself does not toggle `hovered` on a press: in an app that would leave a bar behind on a row the pointer has left, so hover, focus inside the row, or the prop draw it.",
         "Not in the kit yet: Message has no events for the bar's quick reactions, Add a reaction, Forward or ⋯, nor for a reaction pill's toggle (the spec defines none), so those are inert or local inside Message; the body is plain text, not RichText.",
       ],
       keyboard: [
@@ -560,6 +559,20 @@ const docs: ComponentDocs = {
   states: ["hover"],
   edgeCases: [
     {
+      title: "The ⋯ menu is open and the pointer moves into it",
+      platforms: ["web", "desktop"],
+      handling: "The bar stays drawn while `menuOpen` holds (the row's own state when the app passes only `onMenuOpenChange`), so the menu the app anchors to ⋯ keeps its anchor after the pointer and focus leave the row for the menu.",
+      example: {
+        name: "Menu open, pointer elsewhere",
+        props: { more: true, menuOpen: true, hovered: false },
+      },
+    },
+    {
+      title: "A long press on one row, then another",
+      platforms: ["web", "desktop"],
+      handling: "On touch the bar opens by long press, on that row only: a press anywhere outside the row puts it away, so bars are never left open on several rows.",
+    },
+    {
       title: "One enormous token",
       platforms: ["web", "desktop", "mobile"],
       handling: "A pasted URL, hash or model dump with no spaces breaks anywhere (overflow-wrap: anywhere, which also counts for min-content), so the row never pushes past the scroller and the timeline never scrolls sideways.",
@@ -791,7 +804,7 @@ const docs: ComponentDocs = {
         {
           kind: "state",
           title: "Back to sending, in place",
-          detail: "The row doesn't move to the bottom. It goes back to dimmed with \"Sending…\" where it was.",
+          detail: "The app answers with status: sending. The row doesn't move to the bottom. It goes back to dimmed with \"Sending…\" where it was; until that answer, Retry is busy and the row still says it didn't send.",
         },
         {
           kind: "result",

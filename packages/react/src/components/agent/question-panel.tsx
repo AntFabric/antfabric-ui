@@ -1,10 +1,11 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { recipes, useControllable, useDirection, useStrings, type KitStrings, type QuestionOption, type ToolArg } from "@antfabric/ui-core";
+import { recipes, useControllable, usePending, useDirection, useStrings, type KitStrings, type QuestionOption, type ToolArg } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useAutoFocus } from "../../platform";
 import { useInteraction } from "../../lib/interaction";
-import { announce } from "../../lib/announce";
+import { announce, useAnnounce } from "../../lib/announce";
 import { rootProps, type RootProps } from "../../lib/root-props";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, input, neg, pressable, row, rtl, text } from "../../lib/style";
 import { Button } from "../actions/button";
@@ -45,13 +46,13 @@ export interface QuestionPanelProps extends RootProps<HTMLDivElement> {
   expanded?: boolean;
   /** Submit waits: an answer given offline has nowhere to go. */
   offline?: boolean;
-  /** The answer is on its way. Pressing Submit sets it; the app removes the panel once the answer lands. */
+  /** The answer is on its way. A press on Submit shows the same until the app answers; the app removes the panel once the answer lands. */
   sending?: boolean;
   onValueChange?: (value: string) => void;
   onTypedChange?: (typed: string) => void;
   onExpandedChange?: (expanded: boolean) => void;
-  /** The chosen row's key, or the typed answer, trimmed. */
-  onSubmit?: (answer: string) => void;
+  /** The chosen row's key, or the typed answer, trimmed. Submit shows Sending… until the app answers with `sending` or `offline`, or the returned promise settles. */
+  onSubmit?: (answer: string) => void | Promise<unknown>;
   /** This panel's built-in text (the waiting bar, the paused and offline lines, the confirm field's words, Submit) over the tree's and the English defaults. */
   strings?: Partial<KitStrings["question-panel"]>;
   /** Per-part styles over the theme: `{ root: {…}, title: {…} }`. */
@@ -150,9 +151,9 @@ export function QuestionPanel({
   placeholder = "",
   confirmText = "",
   confirmOption = "",
-  value = "",
-  typed = "",
-  expanded = true,
+  value,
+  typed,
+  expanded,
   autoFocus = false,
   offline = false,
   sending = false,
@@ -168,11 +169,14 @@ export function QuestionPanel({
 }: QuestionPanelProps) {
   const s = useStrings("question-panel", strings);
   const id = useId();
-  const [chosen, setChosen] = useControllable(value, onValueChange);
-  const [entry, setEntry] = useControllable(typed, onTypedChange);
-  const [open, setOpen] = useControllable(expanded, onExpandedChange);
+  const [chosen = "", setChosen] = useControllable(value, onValueChange);
+  const [entry = "", setEntry] = useControllable(typed, onTypedChange);
+  const [open = true, setOpen] = useControllable(expanded, onExpandedChange);
   const shut = !open;
-  const [busy, setBusy] = useControllable(sending);
+  // Submit reports the answer and waits: `sending` is the app's, and a press waits through usePending until the app answers (a new
+  // `sending` or `offline`, or the promise onSubmit returns settling), so a failed send comes back to Submit.
+  const { pending, run } = usePending([sending, offline]);
+  const busy = sending || pending;
   const allowFocus = useAutoFocus();
   const heading = useRef<HTMLSpanElement | null>(null);
   const detailsScroll = useScrollRegion();
@@ -202,8 +206,8 @@ export function QuestionPanel({
   const move = (step: number) => choose(((index < 0 ? 0 : index) + step + options.length) % options.length, true);
   const submit = () => {
     if (!canSubmit) return;
-    setBusy(true);
-    onSubmit?.(field ? entry.trim() : chosen);
+    const answer = field ? entry.trim() : chosen;
+    run(onSubmit && (() => onSubmit(answer)));
   };
   const toggle = (to: boolean) => {
     toggled.current = true;
@@ -221,6 +225,8 @@ export function QuestionPanel({
     rows.current[at]?.focus();
   };
 
+  // Going offline while the question waits is said (the footer line is plain text).
+  useAnnounce(!shut && offline && s("offline"));
   // A question that blocks the turn is said when it appears or opens, and takes focus when the product asks it to.
   useEffect(() => {
     if (shut || busy) return;
@@ -322,8 +328,8 @@ export function QuestionPanel({
           onFocus={() => setFocus("field")}
           onBlur={() => setFocus(null)}
           onKeyDown={(e) => {
-            // Enter submits here, and only here: on a row it chooses.
-            if (e.key !== "Enter") return;
+            // Enter submits here, and only here: on a row it chooses. An IME's Enter commits its candidate instead.
+            if (e.key !== "Enter" || isComposing(e)) return;
             e.preventDefault();
             submit();
           }}
@@ -382,10 +388,11 @@ export function QuestionPanel({
 
       <div data-af-part="footer" style={css(row, r.footer)}>
         {/* Offline replaces the paused line rather than sitting beside it. */}
-        <span role={offline ? "status" : undefined} data-af-part="status" style={css(text, { flex: 1 }, r.status)}>
+        <span data-af-part="status" style={css(text, { flex: 1 }, r.status)}>
           {offline ? s("offline") : agentName ? s("pausedNamed", { name: agentName }) : s("paused")}
         </span>
-        <Button label={busy ? s("sending") : s("submit")} variant="primary" size="md" disabled={!canSubmit} onPress={submit} />
+        {/* Sending is Button's `loading`: blocked but still focusable, so a keyboard press on Submit keeps its place. */}
+        <Button label={busy ? s("sending") : s("submit")} variant="primary" size="md" loading={busy} disabled={!canSubmit && !busy} onPress={submit} />
       </div>
     </div>
   );

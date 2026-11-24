@@ -8,10 +8,15 @@
  *
  * Nothing is drawn: the regions are clipped to one pixel. On the server, and before the page has a body, it does nothing.
  */
+import { useEffect, useRef } from "react";
+
 export type Politeness = "polite" | "assertive";
 
 const regions: Partial<Record<Politeness, HTMLElement>> = {};
+/** Set while a message waits for the beat. */
 const timers: Partial<Record<Politeness, ReturnType<typeof setTimeout>>> = {};
+/** What is waiting for the beat to pass, per politeness. */
+const pending: Record<Politeness, string[]> = { polite: [], assertive: [] };
 
 function region(kind: Politeness): HTMLElement | null {
   if (typeof document === "undefined" || !document.body) return null;
@@ -29,14 +34,42 @@ function region(kind: Politeness): HTMLElement | null {
   return el;
 }
 
-/** Says `message` to screen readers. The same message twice in a row is read twice: the region is emptied first. */
+/**
+ * Says `message` to screen readers. The same message twice in a row is read twice: the region is emptied first, and filled after a beat.
+ * Messages that arrive within that beat (an error and the toast that reports it, a field's error and its form's) are read together, in
+ * order, each ending in a full stop (one region change, which every reader reads whole); the same text twice in one beat is read once.
+ */
 export function announce(message: string, politeness: Politeness = "polite"): void {
   const el = region(politeness);
   if (!el || !message) return;
+  const queue = pending[politeness];
+  if (!queue.includes(message)) queue.push(message);
+  // Already waiting for the beat: this one is read with the others when it passes (a stream of messages cannot hold the region empty).
+  if (timers[politeness] !== undefined) return;
   el.textContent = "";
-  clearTimeout(timers[politeness]);
   // A beat between emptying and filling, so the change is seen as new text.
   timers[politeness] = setTimeout(() => {
-    el.textContent = message;
+    timers[politeness] = undefined;
+    // The region again: the page may have dropped the one emptied above (a router replacing the body) during the beat.
+    const live = region(politeness);
+    if (!live) return void queue.splice(0);
+    live.textContent = queue.splice(0).reduce((said, m) => (said ? `${said.trimEnd()}${/[.!?…]$/.test(said.trimEnd()) ? "" : "."} ${m}` : m), "");
   }, 50);
+}
+
+/**
+ * Announces `message` each time it changes to a new text ("" or nothing says nothing): a status that changes in place (a send that failed, a
+ * page count, offline), drawn as plain text beside it. Not on the first render unless `initial`: what was there when the screen came is not
+ * news, while a toast or a banner, whose arrival is the news, passes `initial`.
+ *
+ *   useAnnounce(status === "failed" ? s("failed") : "", "assertive");
+ */
+export function useAnnounce(message: string | false | null | undefined, politeness: Politeness = "polite", { initial = false }: { initial?: boolean } = {}): void {
+  const said = useRef<string | false | null | undefined>(initial ? undefined : message);
+  useEffect(() => {
+    if (message && message !== said.current) announce(message, politeness);
+    said.current = message;
+    // Keyed on the text: the same words drawn again are not said again.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message]);
 }

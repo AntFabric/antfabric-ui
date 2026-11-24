@@ -72,7 +72,9 @@
  *            packages' import rules (`pnpm check code` runs just them): `recharts` only under packages/react/src/data/ and
  *            packages/react/src/components/data/, `react-native-gifted-charts` and `gifted-charts-core` only under the same two folders of
  *            packages/react-native/src/, `@tanstack/table-core`
- *            only under packages/core/src/table/, nothing third-party under packages/core/src/chart/, and a file under
+ *            only under packages/core/src/table/, nothing third-party under packages/core/src/chart/, `lucide-react` and
+ *            `lucide-react-native` only in their kit's src/lib/icons.ts, whose registry holds exactly the icon names the kit's source
+ *            spells (`icons-ast.ts`), and a file under
  *            packages/{react,react-native}/src/templates/ imports only its kit's public entries (and core's). The app frame ships from
  *            each kit's `./shell` (`src/shell/index.ts`): no kit file outside src/shell/ imports that entry, or a file it re-exports (a
  *            category's every file when it re-exports the category's index), so the root and `./data` never reach it; the same of `./chat`
@@ -86,10 +88,13 @@
  *            every size, spacing, radius, colour, opacity and cursor it already had set to another value, and every part that appears must
  *            carry them (`styles` wins over the kit's own inline styles). A component that fails is in `stylesProofTodo` with its parts
  *            The probe also fails a component whose recipe has a `root` part when a drawing shows its parts and no root of its own
- *            (the web: its outermost part is not `root`; the phone: a part of it with no `<id>.root`); today's are in `stylesProofTodo` as `<kit>:root`
+ *            (the web: its outermost part is not `root`; the phone: a part of it with no `<id>.root`); today's are in `stylesProofTodo` as `<kit>:root`.
+ *            And the pass-through props: every drawing of every component, in both kits, drawn with an `id` and an `aria-label` (the phone's
+ *            `nativeID` and `accessibilityLabel`), must carry both, once, on the element they name (a single-control composite's control, a
+ *            sheet's dialog, else the root; `PASS_THROUGH_TARGET`), the product's name over the kit's; what fails is `passThroughTodo`
  *   conventions  reports/api/conventions.md as far as a machine reads it (`pnpm check conventions`, and part of `code`): no component declares
- *            `onChange` or `collapsed` (docs or either kit), a `required` prop has no documented `default`, and every `changes: "<prop>"` event is named
- *            `on<Prop>Change`. What breaks a rule today is in `conventionsTodo` in reports/generic.json (`{ id: ["<rule>: <detail>"] }`): a violation not
+ *            `onChange` or `collapsed` (docs or either kit), a `required` prop has no documented `default`, every `changes: "<prop>"` event is named
+ *            `on<Prop>Change`, and a prop passed to `useControllable` with its event has no destructuring default (handler only keeps its own state). What breaks a rule today is in `conventionsTodo` in reports/generic.json (`{ id: ["<rule>: <detail>"] }`): a violation not
  *            listed fails and a listed one that now passes must come off, so the list only shrinks
  *   defaults  a documented non-event prop with a `default` (not `required`) is the kit's: in the web and the phone kit, the component drawn
  *            with every documented default and again with that one left out draws the same markup. Mismatches are in `defaultsTodo`
@@ -156,12 +161,15 @@ import { sourceFile } from "./sources";
 import * as ReactRecipe from "../../../packages/react/src/lib/recipe";
 import * as NativeRecipe from "../../../packages/react-native/src/lib/recipe";
 import { placeholdersOf, readStrings, type FileStrings } from "./strings-ast";
+import { readControllable } from "./controllable-ast";
+import { readIconNames, readIconRegistry } from "./icons-ast";
 import { platformOnly, type PlatformOnly, type StringTemplate } from "../../../packages/core/src/strings";
 import { PART_MARKS, canonical, normalise, unknownVars, type DrawnIn } from "./snapshot-hash";
 import { citedPaths, componentsJson, llmsTxt } from "./agent-surface";
 import { tokensJson, EXTENSION, REFERENCE } from "@antfabric/ui-core/dtcg";
 import { tokenLeaves, tokenPaths } from "./token-leaves";
-import { barLayout, barScale, bySign, chartTable, clampScore, easeFn, cellText as coreCellText, fitLabel, fmt as coreFmt, gaugeState, labelWidth, lineScale, goalsOf, lttb, meterReading as coreMeterReading, meterTone, moved as coreMoved, nearestAxis, niceScale, onHalfRing, prepare as corePrepare, segmentAt, segmentsOf, shareOf, sparseLabels, summarize as coreSummarize, summarizeCompare as coreSummarizeCompare, summarizeGauge as coreSummarizeGauge, summarizeGoals as coreSummarizeGoals, summarizeSegments as coreSummarizeSegments, tipRows as coreTipRows, totalOf, valueDomain, valueParts as coreValueParts, withAlpha, withoutSign, type CompareWords, type FormatSpec, type FormatWords, type GaugeWords, type GoalWords, type SegmentWords, type SummaryWords } from "@antfabric/ui-core/chart";
+import { barLayout, barScale, bySign, chartTable, clampScore, easeFn, cellText as coreCellText, fitLabel, fmt as coreFmt, gaugeState, labelWidth, lineScale, goalsOf, lttb, meterReading as coreMeterReading, meterShown, meterTone, moved as coreMoved, nearestAxis, niceScale, onHalfRing, pickState, prepare as corePrepare, rowIds, segmentAt, segmentsOf, shareOf, sortRows, sparseLabels, summarize as coreSummarize, summarizeCompare as coreSummarizeCompare, summarizeGauge as coreSummarizeGauge, summarizeGoals as coreSummarizeGoals, summarizeSegments as coreSummarizeSegments, tipRows as coreTipRows, toggleRow, totalOf, valueDomain, valueParts as coreValueParts, whenOf, withAlpha, withoutSign, type CompareWords, type FormatSpec, type FormatWords, type GaugeWords, type GoalWords, type SegmentWords, type SummaryWords } from "@antfabric/ui-core/chart";
+import { exceptZero, radarPoint, seriesMark, shortNumber, texturePath } from "@antfabric/ui-core/chart";
 import { contrast, lightnessChroma, separation } from "../src/lib/palette";
 import { rowCount } from "../src/lib/token-ref";
 
@@ -486,6 +494,76 @@ function checkLiterals() {
   }
 }
 
+// Text and marks hold their contrast in both shipped themes and two tenant probes, light and dark (WCAG 1.4.3 and 1.4.11): 4.5:1 for text on the
+// brand fill (at rest, hovered and pressed) and body text on the surfaces, 3:1 for a chart mark and the focus ring on the card. A colour with alpha
+// is laid over what it sits on first. What fails today and is out of reach is in `contrastTodo` (reports/generic.json) with its reason; the list only shrinks.
+function checkContrast() {
+  const at = "contrast";
+  const todo = readGeneric().contrastTodo ?? {};
+  type RGBA = [number, number, number, number];
+  const parse = (v: string): RGBA => {
+    const s = v.trim();
+    const h = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(s)?.[1];
+    if (h) {
+      const full = h.length <= 4 ? [...h].map((c) => c + c).join("") : h;
+      const n = [0, 2, 4, 6].map((i) => (i < full.length ? parseInt(full.slice(i, i + 2), 16) : 255));
+      return [n[0]!, n[1]!, n[2]!, n[3]! / 255];
+    }
+    const m = /^rgba?\(\s*([\d.]+)\s*[,\s]\s*([\d.]+)\s*[,\s]\s*([\d.]+)(?:\s*[,/]\s*([\d.]+)(%?))?\s*\)$/i.exec(s);
+    if (!m) throw new Error(`"${v}" is not a colour the contrast check reads`);
+    const a = m[4] === undefined ? 1 : Number(m[4]) / (m[5] ? 100 : 1);
+    return [Number(m[1]), Number(m[2]), Number(m[3]), a];
+  };
+  const over = ([r, g, b, a]: RGBA, [R, G, B]: RGBA): RGBA => [r * a + R * (1 - a), g * a + G * (1 - a), b * a + B * (1 - a), 1];
+  const lum = ([r, g, b]: RGBA) => {
+    const l = [r, g, b].map((v) => v / 255).map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * l[0]! + 0.7152 * l[1]! + 0.0722 * l[2]!;
+  };
+  const ratio = (a: RGBA, b: RGBA) => {
+    const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p) as [number, number];
+    return (x + 0.05) / (y + 0.05);
+  };
+  const SURFACES = ["surface.page", "surface.card", "surface.raised", "surface.sidebar"];
+  const MARKS = [...Array.from({ length: 8 }, (_, i) => `chart.series${i + 1}`), "chart.previous", "chart.other", "data.accent", "data.positive", "data.negative", "data.warning", "focus.ring"];
+  const pairs: [fg: string, bg: string, min: number][] = [
+    ...["brand.default", "brand.hover", "brand.active"].map((bg) => ["fg.onBrand", bg, 4.5] as [string, string, number]),
+    ...["fg.body", "fg.muted"].flatMap((fg) => SURFACES.map((bg) => [fg, bg, 4.5] as [string, string, number])),
+    ...MARKS.map((fg) => [fg, "surface.card", 3] as [string, string, number]),
+  ];
+  const probes: [string, Theme][] = [
+    ["antfabric", antfabric],
+    ["neutral", themes.neutral],
+    ["indigo", defineTheme({ name: "Indigo", brand: { primary: "#4F46E5" } })],
+    ["yellow", defineTheme({ name: "Yellow", brand: { primary: "#FACC15" } })],
+  ];
+  const seen = new Set<string>();
+  const rows: string[] = [];
+  for (const [name, theme] of probes)
+    for (const scheme of ["light", "dark"] as const) {
+      // The web's values (not `resolveTokens`, whose memo is bounded and would push out what `checkBrand` holds it to).
+      const values = tokenValues("web", scheme, undefined, theme);
+      const get = (path: string) => parse(values[cssVarName(path)]!);
+      const page = over(get("surface.page"), scheme === "light" ? [255, 255, 255, 1] : [0, 0, 0, 1]);
+      for (const [fg, bg, min] of pairs) {
+        const ground = bg === "surface.page" ? page : over(get(bg), page);
+        const r = ratio(over(get(fg), ground), ground);
+        const key = `${name}/${scheme}: ${fg} on ${bg}`;
+        seen.add(key);
+        const listed = key in todo;
+        if (r + 0.005 < min && !listed) err(at, `${key} is ${r.toFixed(2)}:1, under ${min}:1. Fix the token, or list "${key}" in contrastTodo in reports/generic.json with the reason`);
+        else if (r + 0.005 >= min && listed) err(GENERIC_AT, `contrastTodo lists "${key}", which now holds ${r.toFixed(2)}:1: take it off`);
+        else if (listed) rows.push(`${key} ${r.toFixed(2)}:1`);
+      }
+    }
+  const keys = Object.keys(todo);
+  if (keys.some((k, i) => i > 0 && keys[i - 1]! >= k)) err(GENERIC_AT, "contrastTodo is not sorted");
+  for (const [k, why] of Object.entries(todo)) {
+    if (!seen.has(k)) err(GENERIC_AT, `contrastTodo: "${k}" is not a pair the contrast check measures`);
+    if (!why.trim()) err(GENERIC_AT, `contrastTodo: "${k}" has no reason`);
+  }
+  if (!quiet && rows.length) console.warn(`  ! ${at}: (contrastTodo) ${rows.join("; ")}`);
+}
+
 // A chart palette whose colours sit too light or too close together fails the people it is for: a series that vanishes on the card, two that merge for someone who cannot tell red from green.
 function checkPalette() {
   const at = "palette";
@@ -570,6 +648,28 @@ function checkChart() {
     ["missing", ["integer", null], "–"],
     ["undefined", ["integer", undefined], "–"],
     ["NaN", ["compact", NaN], "–"],
+    // The review's inputs (reports/audit/2026-11-23-component-review.md, batch 5).
+    ["date, an ISO date-only string (H8)", ["date", "2026-05-01"], "May 1, 2026"],
+    ["month, an ISO date-only string (H8)", ["month", "2026-05-01"], "May"],
+    ["day, an ISO date-only string (H8)", ["day", "2026-03-01"], "Mar 1"],
+    ["date, a full ISO date-time is its instant", [{ type: "date", timeZone: "UTC" }, "2026-03-15T12:00:00Z"], "Mar 15, 2026"],
+    ["date, text that is not a date (H8)", ["date", "soon"], "–"],
+    ["date, an invalid Date", ["date", new Date(Number.NaN)], "–"],
+    ["date, a timestamp past what a Date holds", ["date", Infinity], "–"],
+    ["no spec, an invalid Date", [undefined, new Date(Number.NaN)], "–"],
+    ["currency keeps whole units by default (M44)", ["currency", 19.99], "$20"],
+    ["currency, digits 2 prints cents (M44)", [{ type: "currency", digits: 2 }, 19.99], "$19.99"],
+    ["currency, digits leave compact alone (M44)", [{ type: "currency", compact: true, digits: 2 }, 12400], "$12.4K"],
+    ["points, a loss that rounds to nothing (L64)", ["points", -0.0001], "0.0 pts"],
+    ["points, a gain that rounds to nothing (L64)", ["points", 0.0001], "0.0 pts"],
+    ["points, numeric text", ["points", "0.032"], "+3.2 pts"],
+    ["duration, negative (L64)", ["duration", -150], "-2m 30s"],
+    ["duration, negative under a second is zero (L64)", ["duration", -0.4], "0m 00s"],
+    ["integer, text that is not a number (L64)", ["integer", "abc"], "–"],
+    ["percent, text that is not a number (L64)", ["percent", "abc"], "–"],
+    ["duration, text that is not a number (L64)", ["duration", "abc"], "–"],
+    ["integer, empty text", ["integer", ""], "–"],
+    ["integer, numeric text", ["integer", "1234.6"], "1,235"],
   ];
   for (const [what, args, want] of fmts) same(`fmt ${what}`, fmt(...args), want);
   // The words a format writes are the caller's: another language's set changes the dash, the points and the duration, and nothing else.
@@ -579,6 +679,30 @@ function checkChart() {
   same("fmt, a duration in other words", coreFmt("duration", 125, other), "2 min 05 s");
   same("fmt, other words leave numbers and dates alone", [coreFmt("integer", 1234.6, other), coreFmt({ type: "month", timeZone: "UTC" }, new Date(utc), other)], ["1,235", "Mar"]);
   same("cellText, a blank is the words' dash", [coreCellText({ key: "n", label: "N" }, null, other), coreCellText({ key: "n", label: "N", cell: "number", format: "duration" }, 61, other)], ["n/d", "1 min 01 s"]);
+  // A date-only string is a calendar day: its own day in every zone (and so on the server and the client alike), while a full date-time is an
+  // instant and the zone decides its day (H9). The zones are passed in, so the result does not hang on the zone this check runs in.
+  for (const timeZone of ["UTC", "America/Los_Angeles", "Asia/Tokyo", "Pacific/Kiritimati", "Pacific/Pago_Pago"]) {
+    same(`fmt, a date-only string is its own day in ${timeZone} (H9)`, [fmt({ type: "date", timeZone }, "2026-03-01"), fmt({ type: "day", timeZone }, "2026-12-31"), fmt({ type: "month", timeZone }, "2026-01-01")], ["Mar 1, 2026", "Dec 31", "Jan"]);
+    same(`cellText, a date-only string is its own day in ${timeZone} (H9)`, coreCellText({ key: "d", label: "D", cell: "date", format: { type: "date", timeZone } }, "2026-03-01", EN_WORDS), "Mar 1, 2026");
+  }
+  same("cellText, a date-only string in the viewer's own zone (H9)", coreCellText({ key: "d", label: "D", cell: "date" }, "2026-03-01", EN_WORDS), "Mar 1, 2026");
+  same("fmt, a date-time keeps its zone", [fmt({ type: "date", timeZone: "America/Los_Angeles" }, "2026-03-01T03:00:00Z"), fmt({ type: "date", timeZone: "Asia/Tokyo" }, "2026-03-01T03:00:00Z")], ["Feb 28, 2026", "Mar 1, 2026"]);
+  same("cellText, a date function is handed the timestamp", coreCellText({ key: "d", label: "D", cell: "date", format: (v: number) => String(v) }, "2026-03-01", EN_WORDS), String(Date.UTC(2026, 2, 1)));
+  same("cellText, text that is not a date (H8)", coreCellText({ key: "d", label: "D", cell: "date" }, "soon", EN_WORDS), "–");
+  same("whenOf", [whenOf("2026-03-01"), whenOf("soon"), whenOf(new Date(Number.NaN)), whenOf(utc)], [Date.UTC(2026, 2, 1), undefined, undefined, utc]);
+  // Sorting by a date: what is not a date goes last whichever way, in the order it came (L65).
+  const dated = [{ i: 0, d: "2026-03-01" }, { i: 1, d: "not a date" }, { i: 2, d: new Date(Number.NaN) }, { i: 3, d: "2026-01-01" }, { i: 4, d: new Date(Date.UTC(2026, 1, 1)) }];
+  const dateColumn = [{ key: "d", label: "D", cell: "date" as const }];
+  same("sortRows, invalid dates last, ascending (L65)", sortRows(dated, dateColumn, { column: "d", direction: "asc" }).map((r) => r.i), [3, 4, 0, 1, 2]);
+  same("sortRows, invalid dates last, descending (L65)", sortRows(dated, dateColumn, { column: "d", direction: "desc" }).map((r) => r.i), [0, 4, 3, 1, 2]);
+  // A row's id: its rowKey field, or its index in the rows as they came, so one box ticks one row (M51).
+  const keyless = [{ a: "x" }, { a: "y" }, { a: "z" }];
+  same("rowIds, rows without the field are their index (M51)", rowIds(keyless, keyless, "key"), ["0", "1", "2"]);
+  same("rowIds, the index is the row's own, sorted or paged (M51)", rowIds([keyless[2]!, keyless[0]!], keyless, "key"), ["2", "0"]);
+  same("rowIds, the field when it is there", rowIds([{ key: "acc-1" }, { key: 7 }], [{ key: "acc-1" }, { key: 7 }], "key"), ["acc-1", "7"]);
+  const mixed = [{ key: "1", name: "A" }, { name: "B" }, { key: "#1", name: "C" }];
+  same("rowIds, a keyless row's index never takes a row's own key", rowIds(mixed, mixed, "key"), ["1", "##1", "#1"]);
+  same("rowIds, ticking one keyless row ticks one (M51)", pickState(rowIds(keyless, keyless, "key"), toggleRow(rowIds(keyless, keyless, "key")[1]!, [])), { all: false, some: true });
   same("withoutSign on a name", withoutSign("percent"), { type: "percent", sign: false });
   same("withoutSign keeps options", withoutSign({ type: "percent", digits: 0, sign: true }), { type: "percent", digits: 0, sign: false });
   same("withoutSign leaves a function", typeof withoutSign((v: number) => String(v)), "function");
@@ -612,12 +736,32 @@ function checkChart() {
     ["a single negative value stays below zero", [[-0.5, -0.5]], [-1.5, -1, -0.5, 0]],
     ["padding stops at zero", [[3, 100], { pad: 0.1 }], [0, 50, 100, 150]],
     ["padding stops at zero, below", [[-100, -3], { pad: 0.1 }], [-150, -100, -50, 0]],
+    // The review's inputs (M41): a small range at a large magnitude steps no finer than 12 significant digits tell apart.
+    ["near 1e16, a range of 10 (M41)", [[1e16, 1e16 + 10]], [1e16, 1e16 + 1e6]],
+    ["near 1e12, a range of 3 (M41)", [[1e12, 1e12 + 3]], [1e12, 1e12 + 100]],
+    ["a side that is NaN takes the other's (M41)", [[Number.NaN, 1]], [0, 0.5, 1, 1.5, 2]],
+    ["a side that is Infinity takes the other's (M41)", [[0, Infinity]], [0, 0.25, 0.5, 0.75, 1]],
+    ["neither side a number (M41)", [[Number.NaN, Number.NaN]], [0, 0.25, 0.5, 0.75, 1]],
+    ["a reversed domain", [[97, 0]], [0, 25, 50, 75, 100]],
+    ["count 0 is 4 (M41)", [[0, 97], { count: 0 }], [0, 25, 50, 75, 100]],
+    ["a negative count is 4 (M41)", [[0, 97], { count: -2 }], [0, 25, 50, 75, 100]],
+    ["a count that is NaN is 4 (M41)", [[0, 97], { count: Number.NaN }], [0, 25, 50, 75, 100]],
   ];
   for (const [what, args, want] of ticks) {
     const got = niceScale(...args);
     same(`niceScale ${what}`, got.ticks, want);
     same(`niceScale ${what}: min, max and step agree`, [got.min, got.max, +(got.ticks[1]! - got.ticks[0]!).toPrecision(12)], [want[0], want[want.length - 1], got.step]);
   }
+  // Whatever the domain, the ticks are finite, distinct, rising, cover what is a number of it, and are a short list, made quickly (M41).
+  const hard: [number, number][] = [[1e16, 1e16 + 1], [1e16, 1e16 + 10], [-1e16 - 10, -1e16], [9.99999999999e15, 9.99999999999e15 + 3e4], [1e12, 1e12 + 3], [1e-12, 1e-12 + 1e-20], [Number.NaN, 1], [0, Infinity], [-Infinity, Infinity], [3, 3]];
+  for (const domain of hard)
+    for (const count of [4, 1, 0, 1e9]) {
+      const began = performance.now();
+      const { ticks: tk } = niceScale(domain, { count });
+      const took = performance.now() - began;
+      const finite = domain.filter(Number.isFinite);
+      same(`niceScale [${domain}] count ${count}: finite, distinct, rising, covering, short and quick`, [tk.every(Number.isFinite), tk.every((v, k) => k === 0 || v > tk[k - 1]!), tk.length >= 2 && tk.length <= 1002, finite.every((v) => v >= tk[0]! && v <= tk[tk.length - 1]!), took < 50], [true, true, true, true, true]);
+    }
 
   // The sentence a screen reader hears. Core works out what there is to say; the words are the chart's, so these tests give it the English the dictionary has, read as a kit reads it.
   const wordsOf = <W,>(id: Parameters<typeof stringsFor>[0], keys: Record<string, string>): W => {
@@ -639,12 +783,23 @@ function checkChart() {
   same("summarize, two series", summarize({ label: "Chart", keys: ["A", "B"], fields: ["x", "y"], labels: { y: "Why" }, format: "integer", data: [{ x: 1, y: 5 }, { x: 4, y: 2 }] }, seriesWords), "Chart: x: highest B (4), lowest A (1); Why: highest A (5), lowest B (2).");
   same("summarize, no rows", summarize({ ...mrr, data: [] }, seriesWords), "Revenue: no data.");
   same("summarize, no values", summarize({ ...mrr, data: [{ v: null }] }, seriesWords), "Revenue: MRR: no values.");
+  // The review's inputs (M47): from 0 the direction is the sign; NaN and text that is not a number are gaps; numeric text is its number.
+  same("summarize, 0 to a loss fell (M47)", summarize({ ...mrr, ordered: true, data: [{ v: 0 }, { v: -2 }, { v: -5 }] }, seriesWords), "Revenue, Jan to Mar: MRR fell from $0 to -$5, highest in Jan.");
+  same("summarize, 0 to a gain rose (M47)", summarize({ ...mrr, ordered: true, data: [{ v: 0 }, { v: 2 }, { v: 5 }] }, seriesWords), "Revenue, Jan to Mar: MRR rose from $0 to $5, highest in Mar.");
+  same("summarize, NaN is a gap (M47)", summarize({ ...mrr, ordered: true, data: [{ v: 100 }, { v: Number.NaN }, { v: 120 }] }, seriesWords), "Revenue, Jan to Mar: MRR rose from $100 to $120.");
+  same("summarize, numeric text is its number (M47)", summarize({ ...mrr, ordered: true, data: [{ v: "100" }, { v: "140" }, { v: "120" }] }, seriesWords), "Revenue, Jan to Mar: MRR rose from $100 to $120, highest in Feb.");
+  same("summarize, text that is not a number is a gap (M47)", summarize({ label: "Tickets", keys: ["Mon", "Tue", "Wed"], fields: ["n"], labels: { n: "Open" }, format: "integer", data: [{ n: "n/a" }, { n: 12 }, { n: "3" }] }, seriesWords), "Tickets: Open: highest Tue (12), lowest Wed (3).");
+  same("summarize, only NaN has no values (M47)", summarize({ ...mrr, data: [{ v: Number.NaN }] }, seriesWords), "Revenue: MRR: no values.");
 
   // A chart's rows as a table, a tooltip's rows, and rows as the libraries take them.
   const t = chartTable({ data: [{ month: "Jan", mrr: 1, cost: 2 }], x: "month", y: ["mrr", "cost"], labels: { mrr: "MRR" }, format: "integer" });
   same("chartTable columns", t.columns.map((c) => [c.key, c.label, c.cell, c.priority, c.align ?? null]), [["month", "Month", "text", 1, null], ["mrr", "MRR", "number", 2, "end"], ["cost", "cost", "number", 3, "end"]]);
   same("chartTable rows", t.rows, [{ month: "Jan", mrr: 1, cost: 2, key: "row-0" }]);
   same("chartTable, one field", chartTable({ data: [], x: "day", y: "n", xLabel: "Date" }).columns.map((c) => c.label), ["Date", "n"]);
+  same("chartTable names its rows by the Table's default", t.rowKey, "key");
+  const keyed = chartTable({ data: [{ key: "Jan", n: 1 }, { key: "Jan", n: 2 }], x: "key", y: "n" });
+  same("chartTable keeps a data field named key (L61)", [keyed.rowKey, keyed.rows], ["_key", [{ key: "Jan", n: 1, _key: "row-0" }, { key: "Jan", n: 2, _key: "row-1" }]]);
+  same("chartTable, and one named _key too (L61)", chartTable({ data: [{ key: 1, _key: 2 }], x: "key", y: "_key" }).rowKey, "__key");
   const colorOf = (f: string) => ({ a: "#a", b: "#b" })[f as "a" | "b"];
   same("tipRows", tipRows({ __x: "Jan", a: 1200, b: -300 }, { fields: ["a", "b"], labels: { a: "Alpha" }, colorOf, format: "compact" }), { title: "Jan", rows: [{ key: "a", label: "Alpha", value: "1.2K", color: "#a" }, { key: "b", label: "b", value: "-300", color: "#b" }], total: null });
   same("tipRows, stacked total", tipRows({ __x: "Jan", a: 1200, b: 300 }, { fields: ["a", "b"], labels: {}, colorOf, format: "compact", stacked: true }).total, "1.5K");
@@ -690,6 +845,21 @@ function checkChart() {
   same("moved, in points", moved(0.038, "points"), { direction: "up", known: true, value: "3.8 pts" });
   same("moved, flat", moved(0), { direction: "flat", known: true, value: "" });
   same("moved, not a number", moved(NaN), { direction: "flat", known: false, value: "" });
+  // The spoken change is in the locale the figure beside it is printed in (L62).
+  same("moved, in the locale", coreMoved(0.113, EN_WORDS, undefined, "de-DE").value, "11,3 %");
+  // An engine without `signDisplay` or `notation: "compact"` (Hermes may lack them, L59) gets the same text from the fallbacks, checked here against Node's Intl.
+  const pct = (l: string) => new Intl.NumberFormat(l, { style: "percent", maximumFractionDigits: 1 });
+  for (const [l, v] of [["en-US", 0.124], ["en-US", -0.05], ["en-US", 0], ["en-US", 0.00001], ["en-US", -0.00001], ["de-DE", 0.113], ["de-DE", -0.113]] as const)
+    same(`exceptZero ${l} ${v}`, exceptZero(pct(l), v), new Intl.NumberFormat(l, { style: "percent", maximumFractionDigits: 1, signDisplay: "exceptZero" }).format(v));
+  const one = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+  for (const v of [0, 987, -987, 1234, 12400, -12400, 999_949, 999_950, 3_200_000, 4.5e9, 7e12])
+    same(`shortNumber ${v}`, shortNumber(one, v), new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(v));
+  // A radar's points where gifted-charts puts them (its outer ring at 0.8 of the half-size, the first axis straight up, clockwise): the phone's markers sit on its polygons.
+  same("radarPoint, the first axis at full", radarPoint(0, 3, 100, 100, 280), { x: 140, y: 28 });
+  same("radarPoint, the second axis at half", [radarPoint(1, 4, 50, 100, 280)].map((p) => [Math.round(p.x * 1000) / 1000, Math.round(p.y * 1000) / 1000])[0], [196, 140]);
+  same("texturePath, none is nothing", texturePath("none"), "");
+  same("seriesMark, the first series is plain and the textures follow the dashes", [0, 1, 2, 3, 4].map((i) => seriesMark(i).texture), ["none", "rising", "falling", "cross", "dots"]);
+  same("shortNumber, a currency", shortNumber(new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 1 }), 184200), "$184.2K");
   // The words for it are the dictionary's: a KPI card, a stat tile and a period comparison say them the same way.
   const say = stringsFor("kpi-card", undefined, undefined);
   same("the sentence about a change", [say("up", { value: "4.4%" }), say("down", { value: "10.1%" }), say("noChange"), say("changeUnavailable"), say("againstPeriod", { change: say("up", { value: "4.4%" }), period: "on September" })], ["Up 4.4%", "Down 10.1%", "No change", "Change unavailable", "Up 4.4% on September"]);
@@ -755,7 +925,8 @@ function checkChart() {
   const channels = [["#support", 212], ["#billing", 148], ["#platform-eng", 101], ["#onboarding", 86], ["Email", 62], ["#design-crit", 48], ["#sales-ops", 38], ["#security", 27], ["Slack Connect", 22], ["Chat widget", 16], ["Phone", 9]].map(([channel, tickets]) => ({ channel, tickets }));
   const segs = segmentsOf(channels, "channel", "tickets", "Other");
   same("segmentsOf, eleven rows are eight and Other", segs.length, 9);
-  same("segmentsOf, Other is the ninth row on", segs[8], { label: "Other", value: 47, folded: 3 });
+  same("segmentsOf, Other is the ninth row on", segs[8], { key: "Other", label: "Other", value: 47, folded: 3 });
+  same("segmentsOf, a name that repeats is two segments (L66)", segmentsOf([{ a: "Email", v: 1 }, { a: "Chat", v: 2 }, { a: "Email", v: 3 }], "a", "v", "Other").map((s) => s.key), ["Email", "Chat", "Email#2"]);
   same("segmentsOf, the first eight are as given", segs.slice(0, 8).map((s) => s.label), channels.slice(0, 8).map((r) => r.channel));
   same("segmentsOf, the total is the rows' total", totalOf(segs), 769);
   same("segmentsOf, eight rows are not folded", segmentsOf(channels.slice(0, 8), "channel", "tickets", "Other").some((s) => s.folded), false);
@@ -787,6 +958,20 @@ function checkChart() {
   same("summarizeGauge", summarizeGauge({ label: "Resolved by Fabric", value: 0.583, max: 1, target: 0.6, caption: "of resolved tickets", format: "percent" }, gaugeWords), "Resolved by Fabric: 58.3% of resolved tickets, target 60%.");
   same("summarizeGauge, over", summarizeGauge({ label: "G", value: 1.12, max: 1, format: "percent" }, gaugeWords), "G: 112%, over the 100% it is measured against.");
   same("summarizeGauge, no value", summarizeGauge({ label: "G", value: Number.NaN, max: 1 }, gaugeWords), "G: no value.");
+  // A percent format prints a share of max, as Meter does (M43).
+  same("meterShown", [meterShown(58, 100, "percent"), meterShown(58, 100, { type: "percent", digits: 0 }), meterShown(42, 50, "integer"), meterShown(42, 50, undefined)], [0.58, 0.58, 42, 42]);
+  same("summarizeGauge, a percent of a max of 100 (M43)", summarizeGauge({ label: "G", value: 58, max: 100, target: 70, format: "percent" }, gaugeWords), "G: 58%, target 70%.");
+  same("summarizeGauge, over a max of 100 (M43)", summarizeGauge({ label: "G", value: 112, max: 100, format: "percent" }, gaugeWords), "G: 112%, over the 100% it is measured against.");
+  same("summarizeGauge, another format prints the value", summarizeGauge({ label: "Seats", value: 42, max: 50, format: "integer" }, gaugeWords), "Seats: 42.");
+  same("summarizeGauge, no format prints the value", summarizeGauge({ label: "G", value: 58, max: 100 }, gaugeWords), "G: 58.");
+  // The gauge and a score meter drawn by both kits: the gauge says 58% of 100 (M43); a meter with no value has no state icon (L60).
+  for (const [platform, os] of [["web", "browser"], ["mobile", "ios"]] as const) {
+    const drawn = (id: string, props: Record<string, unknown>) => renderToString(createElement(Stage, { platform, os, scheme: "light", theme: antfabric, children: createElement(Thing, { id, platform, props }) }));
+    const gauge = drawn("gauge-chart", { value: 58, max: 100, target: 70, title: "Resolved", format: "percent" });
+    same(`gauge-chart on ${platform} prints the share of max (M43)`, [gauge.includes("5,800"), gauge.includes("10,000"), gauge.includes("58"), gauge.includes("100%")], [false, false, true, true]);
+    const icons = (value: number) => (drawn("meter", { value, kind: "score", showState: true, label: "Goal" }).match(/<svg/g) ?? []).length;
+    same(`meter on ${platform}: a low score has its icon, no value has none (L60)`, [icons(0.1) > icons(Number.NaN), icons(Number.NaN), icons(0.9)], [true, 0, 0]);
+  }
   const week = [{ day: "Mon", a: 3, b: 2 }, { day: "Tue", a: 5, b: 4 }];
   const weeks: { label: string; keys: string[]; fields: [string, string]; labels: Record<string, string>; format: "integer" } = { label: "Tickets", keys: ["Mon", "Tue"], fields: ["a", "b"], labels: { a: "This week", b: "Last week" }, format: "integer" };
   same("summarizeCompare", summarizeCompare({ ...weeks, data: week }, compareWords), "Tickets: This week 8 against Last week 6, up 33.3%. This week: highest Tue (5), lowest Mon (3); Last week: highest Tue (4), lowest Mon (2).");
@@ -1019,8 +1204,11 @@ function checkCode(doc: ComponentDocs, platform: Platform) {
   for (const m of src.matchAll(/\bon(?:Click|Press|PointerDown|KeyDown)=\{(on[A-Z][A-Za-z0-9]*)\}/g)) {
     err(at, `${m[0]} hands the app the DOM or native event — call it with its documented args: () => ${m[1]}?.(…)`);
   }
-  for (const m of src.matchAll(/useControllable\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*,\s*(on[A-Z][A-Za-z0-9]*)\s*\)/g)) {
-    if (doc.props[m[2]!]?.changes !== m[1]) err(at, `useControllable(${m[1]}, ${m[2]}) — declare it in the docs as ${m[2]}: { changes: "${m[1]}" }`);
+  // Read from the syntax tree, so a renamed local (`{ checked: checkedProp }`) still names its prop.
+  for (const c of readControllable(file, src)) {
+    const prop = c.prop ?? (/^[A-Za-z_]\w*$/.test(c.arg) ? c.arg : undefined);
+    if (!prop || !c.handler || !/^on[A-Z]/.test(c.handler)) continue;
+    if (doc.props[c.handler]?.changes !== prop) err(at, `useControllable(${c.arg}, ${c.handler}) — declare it in the docs as ${c.handler}: { changes: "${prop}" }`);
   }
   // Atomic design holds in the code, not only in the catalogue's order: what a component draws is never bigger than it.
   for (const m of src.matchAll(/from\s+"\.\.?\/(?:[a-z-]+\/)?([a-z0-9-]+)"/g)) {
@@ -1036,6 +1224,9 @@ function checkCode(doc: ComponentDocs, platform: Platform) {
 //   no-collapsed       no component declares `collapsed`: a panel that opens and closes takes `expanded` (rule 3)
 //   required-no-default  a `required` prop has no documented `default`: its catalogue value is its `sample` (rule 6)
 //   change-event-name  every event that is declared `changes: "<prop>"` is named `on<Prop>Change` (rule 1)
+//   controllable-default  a prop passed to `useControllable(<prop>, on<Prop>Change)` has no default in the destructuring (either kit, read from the
+//                      syntax tree by scripts/controllable-ast.ts): with one, the handler alone would hold it at the default. Default the result
+//                      instead, `const [on = false, setOn] = useControllable(checked, onCheckedChange)` (rule 1)
 const upperFirst = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 function conventionViolations(doc: ComponentDocs): string[] {
   const out = new Set<string>();
@@ -1043,6 +1234,10 @@ function conventionViolations(doc: ComponentDocs): string[] {
   for (const kit of ["react", "react-native"] as const) {
     const file = sourceFile(kit, doc.id);
     for (const m of (file && propsOf(readFileSync(file, "utf8"), pascal(doc.id))) || []) declared.add(m);
+  }
+  for (const kit of ["react", "react-native"] as const) {
+    const file = sourceFile(kit, doc.id);
+    for (const c of file ? readControllable(file, readFileSync(file, "utf8")) : []) if (c.defaulted && c.handler) out.add(`controllable-default: ${c.prop}`);
   }
   if (declared.has("onChange")) out.add("no-onChange: onChange");
   if (declared.has("collapsed")) out.add("no-collapsed: collapsed");
@@ -1086,6 +1281,12 @@ interface Generic {
   defaultsTodo?: string[];
   /** `{ "<id>": ["<rule>: <detail>", …] }`: the API conventions (reports/api/conventions.md) a component still breaks. */
   conventionsTodo?: Record<string, string[]>;
+  /** `{ "<theme>/<scheme>: <fg> on <bg>": "<reason>" }`: the pairs `checkContrast` measures that fall short today. */
+  contrastTodo?: Record<string, string>;
+  /** `"<id>/<kit>: <what>"`: a passed `id` or `aria-label` that does not reach the element it names (checkPassThrough). */
+  passThroughTodo?: string[];
+  /** `"<id>/<platform>: <region>"`: a live region a component mounts with its text (`checkLiveRegions`). */
+  liveTodo?: string[];
 }
 const readGeneric = () => JSON.parse(readFileSync(GENERIC_FILE, "utf8")) as Generic;
 function checkStyles() {
@@ -1234,6 +1435,54 @@ function propSets(doc: ComponentDocs, platform: Platform): { name: string; props
     // A matrix row is its cases (W0): a plain row's values, or the prop bundles a removed enum became.
     ...cases.matrix.flatMap((m) => m.cases.map((c) => ({ name: `${m.prop}=${c.name}`, props: c.props as Record<string, unknown> }))),
   ];
+}
+
+// A status that appears is announced (`announce()`), never a live region mounted with its text (AUTHORING.md, "Keyboard and focus"): a region that
+// arrives already holding its text is not read by most screen readers, and iOS has no live regions at all. A live region is `aria-live` (other than "off")
+// or `role="status" | "alert" | "log"`; on the phone React Native Web writes `accessibilityLiveRegion` as `aria-live` and the alert role as `role="alert"`,
+// so both kits are read from their markup. Every drawing a component page shows is a first render (the rest, the examples, the edge cases, each matrix
+// value), on the web, the desktop and the phone: none may hold a live region with text in it. Text that changes in place (a page count, an upload's
+// percent, a rotating word) is said by `announce()` on the change, not by a region that holds it. `LIVE_EXCEPTIONS` names a region meant to be live from
+// its first render, with its reason (none today). What fails is `liveTodo` in reports/generic.json (`"<id>/<platform>: <region>"`), which only shrinks.
+const LIVE = '[aria-live]:not([aria-live="off"]), [role="status"], [role="alert"], [role="log"]';
+const LIVE_EXCEPTIONS: Record<string, string> = {};
+function checkLiveRegions() {
+  const at = "live regions";
+  setReducedMotion(true);
+  const todo = readGeneric().liveTodo ?? [];
+  if (todo.some((k, i) => i > 0 && todo[i - 1]! >= k)) err(GENERIC_AT, "liveTodo is not sorted");
+  const found = new Map<string, string>();
+  const ids = new Set<string>();
+  for (const doc of components) {
+    for (const platform of PLATFORMS) {
+      if (doc.platforms[platform].status === "not-applicable" || !kitComponent(doc.id, platform)) continue;
+      ids.add(doc.id);
+      const os: OS = platform === "mobile" ? "ios" : platform === "desktop" ? "mac" : "browser";
+      const defaults = defaultsFor(usedIds(doc), platform);
+      for (const c of propSets(doc, platform)) {
+        if (c.os && c.os !== os) continue;
+        const { html } = drawQuiet(createElement(DefaultsProvider, { value: defaults }, createElement(Stage, { platform, os, scheme: "light", theme: antfabric, state: c.state, children: createElement(Thing, { id: doc.id, platform, props: c.props }) })));
+        if (!html || waitingFor(html)) continue;
+        const { document } = parseHTML(`<!doctype html><html><body>${html}</body></html>`);
+        for (const el of document.querySelectorAll(LIVE) as unknown as Element[]) {
+          const text = (el.textContent ?? "").replace(/\s+/g, " ").trim();
+          if (!text) continue;
+          const live = ["role", "aria-live"].map((a) => (el.getAttribute(a) ? `${a}=${el.getAttribute(a)}` : "")).filter(Boolean).join(" ");
+          const part = el.getAttribute("data-af-part") ?? el.getAttribute("data-testid")?.replace(/^.*\./, "") ?? el.tagName.toLowerCase();
+          const key = `${doc.id}/${platform}: ${part} [${live}]`;
+          if (LIVE_EXCEPTIONS[key] || found.has(key)) continue;
+          found.set(key, `${c.name}: "${text.slice(0, 60)}"`);
+        }
+      }
+    }
+  }
+  setReducedMotion(false);
+  if (process.env.AF_TODO_WRITE) {
+    writeFileSync(GENERIC_FILE, JSON.stringify({ ...readGeneric(), liveTodo: [...found.keys()].sort() }, null, 2) + "\n");
+    return console.log(`wrote liveTodo (${found.size}) to ${GENERIC_AT}`);
+  }
+  for (const [key, where] of found) if (!todo.includes(key)) err(`${at} ${key}`, `a live region mounted with its text (${where}). Say it with \`announce()\` in an effect keyed on the change and draw the text plainly (AUTHORING.md), or list "${key}" in liveTodo in ${GENERIC_AT}`);
+  for (const key of todo) if (ids.has(key.split("/")[0]!) && !found.has(key)) err(GENERIC_AT, `liveTodo lists "${key}", which no longer mounts a live region with its text: take it off`);
 }
 
 // `styles` reaches every part, and it wins over everything the kit computes for it (the precedence in AUTHORING.md: recipe, theme override, the kit's own inline
@@ -1456,6 +1705,104 @@ function checkStylesProbe() {
   }
 }
 
+// The pass-through props reach the element they name, and the product's name beats the kit's (AUTHORING.md "Pass-through"). Every component is drawn through each of
+// its drawings (the rest, the examples, the edge cases, each matrix value) on web, desktop and the phone's two OSes with `id="probe-id"` and `aria-label="Probe name"`
+// (the phone: `nativeID` and `accessibilityLabel`, which React Native Web writes as `id` and `aria-label`). Both must land on one element, once:
+//   the target   a component in PASS_THROUGH_TARGET: the element its selector finds (inside the root first, then the root itself);
+//   the dialog   a drawing with a `role="dialog"` or `"alertdialog"`: the surface itself, so a sheet with no title is named by the caller;
+//   the root     everything else: the component's outermost element (a `hidden` anchor beside it is not drawn).
+// What fails today is `passThroughTodo` in reports/generic.json (`"<id>/<kit>: <what>"`), and the list only shrinks.
+const PASS_THROUGH_TARGET: Record<string, { select?: string; kit?: "react" | "react-native"; why: string }> = Object.fromEntries([
+  // Single-control composites: the wrapper draws the label, the helper and the error around one control, which a `<label htmlFor>`, a form's jump
+  // to its first invalid field and an `aria-describedby` must reach (AUTHORING.md "Pass-through").
+  ...(
+    [
+      ["text-field", "input"],
+      ["text-area", "textarea"],
+      ["search-field", 'input, [data-af-part="launcher"]'],
+      ["select", '[role="combobox"], [role="button"]'],
+      ["chip", 'button, [role="button"], [role="togglebutton"]'],
+      ["checkbox", '[role="checkbox"]'],
+      ["switch", '[role="switch"]'],
+      ["radio-group", '[role="radiogroup"]'],
+      ["segmented-control", '[role="tablist"]'],
+    ] as const
+  ).map(([id, select]) => [id, { select, why: "a single-control composite: the control, not its wrapper" }]),
+  ["menu", { select: '[role="menu"]', why: "the root lays the trigger out beside the panel; the menu is the panel" }],
+  ...["bar-chart", "breakdown", "combo-chart", "donut-chart", "gauge-chart", "goal-rings", "kpi-card", "line-chart", "metric-tabs", "period-compare", "radar-chart", "stat-tile"].map((id) => [
+    id,
+    { select: `[data-af-part="root"], [data-testid="${id}.root"]`, why: "a ready-made chart sits in the kit's Card: the chart's own root inside it (ChartCard's `root`)" },
+  ]),
+  ["nav-rail", { select: "nav", why: "the catalogue draws the rail in a window (RailWindow); the rail is its <nav>" }],
+  ["inline-banner", { select: '[data-testid="inline-banner.root"]', kit: "react-native", why: "the phone's root is an entrance wrapper around the banner, which is its own root part" }],
+  // No selector: the root, though a dialog is drawn inside it.
+  ["popover", { why: "the root holds the trigger and the panel, which mounts only while open: the pass-through names the popover, not the panel" }],
+  ["update-banner", { why: "the confirm it raises is a Dialog of its own: the pass-through names the banner" }],
+]);
+/** `"<id>/<kit>: <what>"` the check would report, kept on purpose, with the reason. Unlike `passThroughTodo`, these are not meant to go. */
+const PASS_THROUGH_EXCEPT: Record<string, string> = {
+  "message/react-native: aria-label lands on a <div>, not the root":
+    "the phone's row is not an accessibility stop (its words, reactions and thread are), so the product's label names the words, the stop that reads the message; `nativeID` and `ref` stay on the row",
+};
+function checkPassThrough() {
+  const at = "pass-through";
+  setReducedMotion(true);
+  const todo = readGeneric().passThroughTodo ?? [];
+  // `"<id>/<kit>: <what>"` → the drawings it failed in.
+  const failed = new Map<string, Set<string>>();
+  const targets: { kit: "react" | "react-native"; platform: Platform; os: OS }[] = [
+    { kit: "react", platform: "web", os: "browser" },
+    { kit: "react", platform: "desktop", os: "mac" },
+    { kit: "react-native", platform: "mobile", os: "ios" },
+    { kit: "react-native", platform: "mobile", os: "android" },
+  ];
+  const ID = "probe-id";
+  const NAME = "Probe name";
+  for (const doc of components) {
+    const { id } = doc;
+    for (const { kit, platform, os } of targets) {
+      if (doc.platforms[platform].status === "not-applicable" || !kitComponent(id, platform)) continue;
+      const mobile = platform === "mobile";
+      const probe = mobile ? { nativeID: ID, accessibilityLabel: NAME } : { id: ID, "aria-label": NAME };
+      const defaults = defaultsFor(usedIds(doc), platform);
+      for (const c of propSets(doc, platform)) {
+        if (c.os && c.os !== os) continue;
+        const drawn = drawQuiet(createElement(DefaultsProvider, { value: defaults }, createElement(Stage, { platform, os, scheme: "light", theme: antfabric, state: c.state, children: createElement(Thing, { id, platform, props: { ...c.props, ...probe } }) })));
+        if (drawn.html === null || waitingFor(drawn.html)) continue;
+        const { document } = parseHTML(`<!doctype html><html><body>${drawn.html}</body></html>`);
+        // The stage: AntFabricRoot's element on the web, the View the phone's Stage wraps the component in.
+        const stage = mobile ? document.body.firstElementChild : document.querySelector("[data-af-platform]");
+        const root = [...(stage?.children ?? [])].find((e) => !/^(?:STYLE|SCRIPT)$/.test(e.tagName) && !e.hasAttribute("hidden"));
+        if (!root) continue;
+        const listed = PASS_THROUGH_TARGET[id]?.kit && PASS_THROUGH_TARGET[id]!.kit !== kit ? undefined : PASS_THROUGH_TARGET[id];
+        const found = !listed ? null : !listed.select ? root : (root.querySelector(listed.select) ?? (root.matches(listed.select) ? root : null));
+        const dialog = document.querySelector('[role="dialog"], [role="alertdialog"]');
+        const [where, target] = found ? [found === root ? "root" : "target", found] : dialog ? ["dialog", dialog] : ["root", root];
+        const fail = (why: string) => {
+          const entry = `${id}/${kit}: ${why}`;
+          (failed.get(entry) ?? failed.set(entry, new Set()).get(entry)!).add(`${platform}/${os} ${c.name}`);
+        };
+        if (listed?.select && !found) fail(`no ${listed.select} is drawn`);
+        const withId = document.querySelectorAll(`[id="${ID}"]`);
+        if (withId.length > 1) fail(`id is drawn ${withId.length} times`);
+        if (target.getAttribute("id") !== ID) fail(withId.length ? `id lands on a <${withId[0]!.tagName.toLowerCase()}>, not the ${where}` : `id is dropped`);
+        const named = target.getAttribute("aria-label");
+        if (named !== NAME) {
+          const elsewhere = document.querySelector(`[aria-label="${NAME}"]`);
+          fail(elsewhere ? `aria-label lands on a <${elsewhere.tagName.toLowerCase()}>, not the ${where}` : named ? `the kit's aria-label wins on the ${where}` : `aria-label is dropped`);
+        }
+      }
+    }
+  }
+  setReducedMotion(false);
+  for (const e of Object.keys(PASS_THROUGH_EXCEPT)) if (!failed.delete(e)) err(at, `PASS_THROUGH_EXCEPT lists "${e}", which no longer happens: take it off`);
+  const now = [...failed.keys()].sort();
+  if (todo.some((e, i) => i > 0 && todo[i - 1]! >= e)) err(GENERIC_AT, "passThroughTodo is not sorted");
+  const seen = (e: string) => [...failed.get(e)!].slice(0, 3).join("; ");
+  for (const e of now) if (!todo.includes(e)) err(at, `${e} (${seen(e)}). A passed \`id\` and \`aria-label\` name the control, the dialog or the root (AUTHORING.md "Pass-through"): fix it, or list "${e}" in passThroughTodo in reports/generic.json`);
+  for (const e of todo) if (!now.includes(e)) err(GENERIC_AT, `passThroughTodo lists "${e}", which now passes: take it off`);
+}
+
 // The documented default of a prop is the kit's: a component drawn with every documented default, then again with one prop left out, draws the same markup. A
 // difference means the docs say a default the component does not have (the catalogue's controls and flows are drawn from the docs), or the kit has a default the docs do
 // not. `required` props and events are not compared (a required `label`'s documented default is the catalogue's sample). Mismatches are listed in `defaultsTodo`
@@ -1502,6 +1849,9 @@ const ONLY_UNDER: { pkg: RegExp; under: string | string[]; why: string }[] = [
   { pkg: /^recharts(?:\/|$)/, under: ["packages/react/src/data/", "packages/react/src/components/data/"], why: "charts reach the React kit only through its data subpath" },
   { pkg: /^(?:react-native-gifted-charts|gifted-charts-core)(?:\/|$)/, under: ["packages/react-native/src/data/", "packages/react-native/src/components/data/"], why: "charts reach the phone kit only through its data subpath" },
   { pkg: /^@tanstack\/table-core(?:\/|$)/, under: "packages/core/src/table/", why: "the table engine is core's table subpath" },
+  // Named imports of the icons the kit draws, in one file, so a bundler keeps those and drops the rest of lucide (`checkIconRegistry`).
+  { pkg: /^lucide-react(?:\/|$)/, under: "packages/react/src/lib/icons.ts", why: "the kit's icons are its registry's, imported one by one" },
+  { pkg: /^lucide-react-native(?:\/|$)/, under: "packages/react-native/src/lib/icons.ts", why: "the kit's icons are its registry's, imported one by one" },
 ];
 
 /** Every module a file names: `from "x"`, `import "x"`, `import("x")`, `require("x")`, with comments blanked first. */
@@ -1583,6 +1933,52 @@ function checkImports() {
   }
 }
 const an = (level: string) => `${/^[aeiou]/.test(level) ? "an" : "a"} ${level}`;
+
+/* ---------- icons ---------- */
+
+/** Source written here for the icon-name reader: each way a name reaches an icon, and a string that is not one. */
+const ICON_PROBE = `const MAP = { danger: "circle-alert", info: "info" };
+const LIST = [["bold", "bold-icon", label], "rule"] as const;
+function Row({ tone, glyph = "pin" }) {
+  const meta = (named: string) => <Icon name={named} />;
+  return (
+    <div title="not-an-icon">
+      {meta("pencil")}
+      <Icon name={glyph} />
+      <Icon name={tone === "danger" ? "triangle-alert" : MAP[tone]} />
+      {LIST.map((t) => (t === "rule" ? null : <IconButton icon={t[1]} label={t[0]} />))}
+      <Button iconLeading={\`chevron-\${tone}\`} />
+    </div>
+  );
+}`;
+const ICON_PROBE_NAMES = ["circle-alert", "info", "bold-icon", "pin", "pencil", "triangle-alert", "dynamic:`chevron-${tone}`"];
+
+/**
+ * A kit ships only the lucide icons it draws (`src/lib/icons.ts`), so every name its source spells for an icon (`readIconNames`: `<Icon name>`,
+ * an icon prop, a default, a ternary, a map, a list read in a `.map`, a local helper's argument) must be registered there, and everything
+ * registered must be drawn. A name an app passes is the app's to register; a name built at run time cannot be held to the registry, so it fails.
+ */
+function checkIconRegistry() {
+  const probe = readIconNames("probe.tsx", ICON_PROBE).map((u) => (u.dynamic ? `dynamic:${u.name}` : u.name));
+  if (probe.length !== ICON_PROBE_NAMES.length || ICON_PROBE_NAMES.some((n) => !probe.includes(n))) err("scripts/icons-ast.ts", `readIconNames read [${probe.join(", ")}] from the probe, not [${ICON_PROBE_NAMES.join(", ")}]`);
+  const root = repoRoot();
+  for (const kit of ["react", "react-native"] as const) {
+    const at = `packages/${kit}/src/lib/icons.ts`;
+    const registry = readIconRegistry(readFileSync(join(root, at), "utf8"));
+    const drawn = new Set<string>();
+    for (const file of sourcesUnder(join(root, "packages", kit, "src"))) {
+      const rel = file.slice(root.length + 1);
+      if (rel === at) continue;
+      for (const u of readIconNames(file, readFileSync(file, "utf8"))) {
+        const where = `${rel}:${u.line}`;
+        if (u.dynamic) err(where, `builds an icon name (${u.name}): spell each name out, so it can be held to the registry in ${at}`);
+        else if (!registry.has(pascal(u.name))) err(where, `draws the icon "${u.name}", which ${at} does not register: import ${pascal(u.name)} there and add it to the registry, or an app gets an empty box`);
+        else drawn.add(pascal(u.name));
+      }
+    }
+    for (const n of registry) if (!drawn.has(n)) err(at, `registers ${n}, which no file of the kit draws: take it out (the registry holds the kit's own icons; an app registers the rest)`);
+  }
+}
 
 /* ---------- strings ---------- */
 
@@ -2222,6 +2618,9 @@ function parityIdOf(key: string) {
 }
 /** An entry of `accepted` is a component or screen id (every key of it may move) or one snapshot key (`bar-chart/mobile@mounted`: that key alone). */
 const parityAccepted = (key: string) => key in PARITY.accepted || parityIdOf(key) in PARITY.accepted;
+/** An entry `token:<path>` accepts that token leaf of `packages/core/tokens.json`, or every leaf under it when it names a group (`token:chart`). */
+const TOKEN_ACCEPT = "token:";
+const tokenAccepted = (path: string) => Object.keys(PARITY.accepted).some((k) => k.startsWith(TOKEN_ACCEPT) && (path === k.slice(TOKEN_ACCEPT.length) || path.startsWith(`${k.slice(TOKEN_ACCEPT.length)}.`)));
 
 const git = (...args: string[]) => spawnSync("git", args, { cwd: repoRoot(), encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
 const canon = (v: unknown): string => JSON.stringify(v, (_, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => a.localeCompare(b))) : x));
@@ -2255,7 +2654,7 @@ function checkParity() {
   // An accepted entry names a render the commit had (an id, or one of its keys), and says why. Prefer the key when only one moved.
   const ids = new Set(Object.keys(base.was).map(parityIdOf));
   for (const [id, why] of Object.entries(PARITY.accepted)) {
-    if (!ids.has(id) && !(id in base.was)) warn("reports/parity.json", `accepted: ${id} is neither an id nor a snapshot key the commit ${paritySha()} had`);
+    if (!id.startsWith(TOKEN_ACCEPT) && !ids.has(id) && !(id in base.was)) warn("reports/parity.json", `accepted: ${id} is neither an id nor a snapshot key the commit ${paritySha()} had`);
     if (!why.trim()) err("reports/parity.json", `accepted: ${id} has no reason`);
   }
 
@@ -2274,10 +2673,16 @@ function checkParity() {
   if (oldTokens.status !== 0) return warn(at, `${tokensFile} is not in ${paritySha()}: the token check is skipped`);
   const before = dtcgLeaves(JSON.parse(oldTokens.stdout));
   const after = dtcgLeaves(JSON.parse(readFileSync(join(repoRoot(), tokensFile), "utf8")));
+  for (const id of Object.keys(PARITY.accepted)) {
+    if (!id.startsWith(TOKEN_ACCEPT)) continue;
+    const want = id.slice(TOKEN_ACCEPT.length);
+    if (![...before.keys()].some((p) => p === want || p.startsWith(`${want}.`))) warn("reports/parity.json", `accepted: ${id} names no token leaf or group the commit ${paritySha()} had`);
+  }
   for (const [path, was] of before) {
+    if (tokenAccepted(path)) continue;
     const is = after.get(path);
     if (!is) err(tokensFile, `${path}: a token the parity commit ${paritySha()} had is gone`);
-    else if (canon(is.value) !== canon(was.value)) err(tokensFile, `${path}: $value changed since ${paritySha()} (${canon(was.value)} → ${canon(is.value)})`);
+    else if (canon(is.value) !== canon(was.value)) err(tokensFile, `${path}: $value changed since ${paritySha()} (${canon(was.value)} → ${canon(is.value)}); accept token:${path} in reports/parity.json if that is meant`);
     else if (canon(is.modes) !== canon(was.modes)) err(tokensFile, `${path}: $extensions modes changed since ${paritySha()} (${canon(was.modes)} → ${canon(is.modes)})`);
   }
 }
@@ -2310,6 +2715,93 @@ function checkHelpers() {
       err(at, `@antfabric/ui-${kit} declares its own ${name}; core exports one under the same name (re-export it from core instead)`);
     }
   }
+
+  // The text helpers both kits draw with: a plus key is a key (it used to throw off the Mac), `browser` is Ctrl until the visitor is known,
+  // and an initial is a whole character as a person sees it (an emoji, a joined family), never half a surrogate pair.
+  const shortcuts: [string, string, string][] = [
+    ["Mod++", "windows", "Ctrl+Plus"],
+    ["Mod++", "mac", "⌘+"],
+    ["Ctrl+Shift++", "linux", "Ctrl+Shift+Plus"],
+    ["Shift+Plus", "windows", "Shift+Plus"],
+    ["Shift+Plus", "mac", "⇧+"],
+    ["+", "browser", "Plus"],
+    ["Mod+K", "browser", "Ctrl+K"],
+    ["Mod+K", "mac", "⌘K"],
+    ["Mod+K", "windows", "Ctrl+K"],
+    ["Mod+Shift+K", "ios", "⌘⇧K"],
+  ];
+  for (const [keys, os, want] of shortcuts) {
+    let got: string;
+    try {
+      got = Core.formatShortcut(keys, os);
+    } catch (e) {
+      got = `threw ${(e as Error).message}`;
+    }
+    if (got !== want) err(at, `formatShortcut(${JSON.stringify(keys)}, "${os}") is ${JSON.stringify(got)}, not ${JSON.stringify(want)}`);
+  }
+  const names: [string, string][] = [
+    ["Priya Raman", "PR"],
+    ["🦊 Fox", "🦊F"],
+    ["👨‍👩‍👧 Family", "👨‍👩‍👧F"],
+    ["🇮🇳 India", "🇮🇳I"],
+    ["王小明", "王"],
+    ["山田 太郎", "山太"],
+    ["  ", ""],
+  ];
+  for (const [name, want] of names) if (Core.initials(name) !== want) err(at, `initials(${JSON.stringify(name)}) is ${JSON.stringify(Core.initials(name))}, not ${JSON.stringify(want)}`);
+}
+
+// A provider nested to scope `strings` (or a theme) keeps what it is not given: the page's platform, OS, version and scheme, in both kits.
+// The charts read their colours from it, so a chart under a nested provider on a dark page is drawn dark.
+function checkNesting() {
+  const at = "themes";
+  const seen: ReactKit.PlatformInfo[] = [];
+  const Probe = () => (seen.push(ReactKit.usePlatform()), null);
+  const chart: ReturnType<typeof ReactData.useChartTokens>[] = [];
+  const ChartProbe = () => (chart.push(ReactData.useChartTokens()), null);
+  const inner = (children: ReactNode) => createElement(ReactKit.AntFabricProvider, { strings: { "text-field": { required: "Obligatoire" } }, children });
+  renderToString(
+    createElement(ReactKit.AntFabricRoot, { platform: "desktop", os: "windows", scheme: "dark", theme: antfabric, children: inner([createElement(Probe, { key: "p" }), createElement(ChartProbe, { key: "c" })]) }),
+  );
+  const got = seen[0];
+  if (!got || got.platform !== "desktop" || got.os !== "windows" || got.scheme !== "dark" || got.theme !== antfabric)
+    err(at, `an AntFabricProvider nested in a dark Windows desktop root reads ${got ? `${got.platform}/${got.os}/${got.scheme}/${got.theme.name}` : "nothing"}, not desktop/windows/dark/AntFabric`);
+  const dark = resolveTokens("desktop", "dark", { web: true, os: "windows", theme: antfabric });
+  const light = resolveTokens("desktop", "light", { web: true, os: "windows", theme: antfabric });
+  if (chart[0] !== dark || dark.chart.grid === light.chart.grid) err(at, "a chart under an AntFabricProvider nested in a dark root resolves other tokens than the dark root's (its colours go light)");
+  // A version and a platform carry over; a platform given that the parent does not have takes its own OS; the top is web, browser, light.
+  seen.length = 0;
+  renderToString(
+    createElement(ReactKit.AntFabricProvider, {
+      platform: "desktop",
+      os: "mac",
+      osVersion: 26,
+      theme: antfabric,
+      children: [createElement(ReactKit.AntFabricProvider, { key: "a", locale: "fr", children: createElement(Probe) }), createElement(ReactKit.AntFabricProvider, { key: "b", platform: "web", children: createElement(Probe) })],
+    }),
+  );
+  renderToString(createElement(ReactKit.AntFabricProvider, { theme: antfabric, children: createElement(Probe) }));
+  const [kept, web, top] = seen;
+  if (kept?.osVersion !== 26 || !kept.glass) err(at, `a provider nested in macOS 26 has osVersion ${String(kept?.osVersion)} and glass ${String(kept?.glass)}`);
+  if (web?.os !== "browser" || web.osVersion !== undefined) err(at, `a web provider nested in a Mac desktop one reads os ${String(web?.os)}, version ${String(web?.osVersion)}, not browser`);
+  if (top?.platform !== "web" || top.os !== "browser" || top.scheme !== "light" || top.shortcutOs !== "browser") err(at, `a provider with nothing above reads ${JSON.stringify(top && { ...top, theme: top.theme.name })}, not web, browser, light`);
+  // A root nested in a dark one writes the dark scheme and the parent's OS on its element.
+  const nestedRoot = renderToString(createElement(ReactKit.AntFabricRoot, { platform: "desktop", os: "windows", scheme: "dark", theme: antfabric, children: createElement(ReactKit.AntFabricRoot, { css: false, children: "x" }) })).replace(/<style\b[\s\S]*?<\/style>/g, "");
+  if ((nestedRoot.match(/data-af-theme="dark"/g) ?? []).length !== 2 || (nestedRoot.match(/data-af-os="windows"/g) ?? []).length !== 2) err(at, "an AntFabricRoot nested in a dark Windows root does not write data-af-theme=\"dark\" and data-af-os=\"windows\"");
+  // The phone: a ThemeProvider nested to scope strings keeps the scheme, OS and version.
+  const native: ReturnType<typeof NativeKit.useTheme>[] = [];
+  const NativeProbe = () => (native.push(NativeKit.useTheme()), null);
+  renderToString(
+    createElement(NativeKit.ThemeProvider, {
+      scheme: "dark",
+      os: "android",
+      theme: antfabric,
+      children: createElement(NativeKit.ThemeProvider, { strings: { "text-field": { required: "Obligatoire" } }, children: createElement(NativeProbe) }),
+    }),
+  );
+  const phone = native[0];
+  if (!phone || phone.scheme !== "dark" || phone.os !== "android" || phone.t !== resolveTokens("mobile", "dark", { web: RN.OS === "web", os: "android", theme: antfabric }))
+    err(at, `a ThemeProvider nested in a dark Android one reads ${phone ? `${phone.scheme}/${phone.os}` : "nothing"}, not dark/android with the dark tokens`);
 }
 
 // A tenant's colours over the defaults: only the brand family moves, nothing moves without a brand, and both kits draw it.
@@ -2322,8 +2814,8 @@ function checkBrand() {
     const fb = flat(b);
     return Object.keys({ ...fa, ...fb }).filter((k) => fa[k] !== fb[k]).sort();
   };
-  // fg.onBrand moves only for a primary too light for white, so it is in the family but not expected to move for the sample tenant.
-  const family = [...BRAND_PATHS].filter((p) => p !== "fg.onBrand").sort();
+  // fg.onBrand is ink on AntFabric's coral (white fails 4.5:1 there), so it moves for the sample tenant's dark teal (white) and not for a light primary (ink).
+  const family = [...BRAND_PATHS].sort();
   const same = (got: string[], want: string[], what: string) => {
     if (got.join() !== want.join()) err(at, `${what}: moved ${got.join(", ") || "nothing"}; expected ${want.join(", ") || "nothing"}`);
   };
@@ -2357,7 +2849,7 @@ function checkBrand() {
     const onBrand = (primary: string) => (flat(through({ primary })) as Record<string, string>)["fg.onBrand"];
     if (onBrand(brand.primary!) !== "#ffffff") err(at, `${where}: fg.onBrand on ${brand.primary} is ${onBrand(brand.primary!)}, not white`);
     if (onBrand("#f2c94c") !== "#0e1828") err(at, `${where}: fg.onBrand on a light yellow brand is ${onBrand("#f2c94c")}, not ink`);
-    same(moved(plain, through({ primary: "#f2c94c" })), [...family.filter((p) => !p.startsWith("accent.")), "fg.onBrand"].sort(), `${where} light primary`);
+    same(moved(plain, through({ primary: "#f2c94c" })), family.filter((p) => !p.startsWith("accent.") && p !== "fg.onBrand"), `${where} light primary`);
     // A hand-picked tint wins over the derived one.
     const pick = { light: "#e6f4f1", dark: "#12302c" };
     const picked = flat(through({ primary: brand.primary, soft: pick })) as Record<string, string>;
@@ -2728,6 +3220,11 @@ function checkThemes() {
     err(at, `a child theme did not keep its parent's leaves under its own: control.hMd ${String(kid["control.hMd"])}, font.sans ${String(kid["font.sans"])}`);
   if (kid["fg.onBrand"] !== "#0e1828") err(at, `a light brand primary in a child theme gives fg.onBrand ${String(kid["fg.onBrand"])}, not ink`);
   if ((flat(resolveTokens("mobile", "light", { os: "ios", theme: grandchild })) as Record<string, unknown>)["fg.onBrand"] !== "#ffffff") err(at, "a dark brand primary over a parent's light one kept the parent's ink fg.onBrand");
+  // A brand.default the theme writes as hsl() is read too, and one nothing can read takes white, never the schema's ink.
+  for (const [fill, want] of [["hsl(243 47% 20%)", "#ffffff"], ["hsl(50 95% 60%)", "#0e1828"], ["hsl(0.5turn 80% 25%)", "#ffffff"], ["oklch(0.3 0.1 260)", "#ffffff"]] as const) {
+    const got = defineTheme({ name: "Fill", extends: null, tokens: { schemes: { light: { brand: { default: fill } } } } }).sets.schemes.light?.["fg.onBrand"];
+    if (got !== want) err(at, `brand.default ${fill} gives fg.onBrand ${String(got)}, not ${want}`);
+  }
   if ((child.recipes as Record<string, unknown>).button === undefined) err(at, "a child theme dropped its parent's recipes");
 
   // Frozen all the way down, without freezing what the caller passed.
@@ -2745,6 +3242,26 @@ function checkThemes() {
   throws("a value that breaks out of its declaration", () => defineTheme({ name: "Typo", extends: null, tokens: { shared: { radius: { card: "4px;}body{display:none" } } } }), ["Typo", "radius.card"]);
   throws("a bad brand colour", () => defineTheme({ name: "Typo", extends: null, brand: { primary: "teal" } }), ["Typo", "brand"]);
   throws("a bad mono family", () => defineTheme({ name: "Typo", extends: null, fonts: { mono: "Mono; color: red" } }), ["Typo", "fonts"]);
+  // A hand-picked brand colour is a colour: hex, rgb() or hsl(), never a url or a word, naming the theme and the field.
+  for (const field of ["soft", "softHover", "onSoft", "tint"] as const) {
+    throws(`a brand ${field} that is a url`, () => defineTheme({ name: "Typo", extends: null, brand: { [field]: { light: "url(https://x)", dark: "#000" } } }), ["Typo", "brand", `brand.${field}.light`]);
+    throws(`a brand ${field} that is a word`, () => defineTheme({ name: "Typo", extends: null, brand: { [field]: { light: "#000", dark: "teal" } } }), ["Typo", "brand", `brand.${field}.dark`]);
+  }
+  for (const ok of ["#fde8e8", "#fde8e880", "rgba(159,166,255,.14)", "rgb(0 0 0 / 0.1)", "hsl(210 40% 96%)", "hsla(210, 40%, 96%, .5)"])
+    defineTheme({ name: "Fine", extends: null, brand: { soft: { light: ok, dark: ok }, softHover: { light: ok, dark: ok }, onSoft: { light: ok, dark: ok }, tint: { light: ok, dark: ok } } });
+  // A length the phone reads as a number, given in a unit React Native has none for, throws when the phone's tokens are resolved (the web keeps it).
+  for (const [what, value] of [
+    ["a rem", "0.5rem"],
+    ["an em", "1em"],
+    ["a percentage", "10%"],
+    ["a calc", "calc(4px + 2px)"],
+  ] as const) {
+    const remTheme = defineTheme({ name: "Rem", extends: null, tokens: { shared: { radius: { card: value } }, profiles: { mobile: { radius: { card: value } } } } });
+    throws(`${what} on the phone`, () => resolveTokens("mobile", "light", { os: "ios", theme: remTheme }), ["Rem", "radius.card", value]);
+    resolveTokens("web", "light", { theme: remTheme });
+  }
+  if ((flat(resolveTokens("mobile", "light", { os: "ios", theme: defineTheme({ name: "Round", extends: null, tokens: { profiles: { mobile: { radius: { card: "50%" } } } } }) })) as Record<string, unknown>)["radius.card"] !== 9999)
+    err(at, "a theme's 50% radius on the phone is not the circle radius 9999");
   // A value that a stylesheet reads past its declaration: an escaped brace swallows every later block, a comment or an unclosed quote,
   // parenthesis or bracket does the same. Each throws naming the theme, the layer, the path and the character.
   for (const [what, value, ch] of [
@@ -2756,6 +3273,20 @@ function checkThemes() {
     ["an unclosed parenthesis", "rgb(0 0 0", "("],
     ["an unclosed bracket", "a[b", "["],
     ["a stray closing parenthesis", "red)", ")"],
+    ["a newline", "red\nblue", "U+000A"],
+    ["a carriage return", "red\rblue", "U+000D"],
+    ["a tab", "red\tblue", "U+0009"],
+    ["a delete character", "red\u007f", "U+007F"],
+    ["a url", "url(https://x.test/a.png)", "url("],
+    ["an uppercase url with a space", "URL (https://x.test/a.png)", "url("],
+    ["an image-set", "image-set(\"https://x.test/a.png\" 1x)", "image-set("],
+    ["a -webkit-image-set", "-webkit-image-set(\"https://x.test/a.png\" 1x)", "-webkit-image-set("],
+    ["an image", "image(\"https://x.test/a.png\")", "image("],
+    ["a src", "src(\"https://x.test/a.png\")", "src("],
+    ["an element", "element(#logo)", "element("],
+    ["a cross-fade", "cross-fade(red, blue)", "cross-fade("],
+    ["an at-sign", "@import", "@"],
+    ["an important", "red !important", "!"],
   ] as const) {
     throws(`a value with ${what}`, () => defineTheme({ name: "Typo", extends: null, tokens: { schemes: { light: { fg: { body: value } } } } }), ["Typo", "tokens.schemes.light", "fg.body", ch]);
     throws(`a sans family with ${what}`, () => defineTheme({ name: "Typo", extends: null, fonts: { sans: `Foo${value}` } }), ["Typo", "fonts", "Foo"]);
@@ -2840,6 +3371,7 @@ if (!only.length || only.includes("tokens")) checkTokenMap();
 if (!only.length || only.includes("tokens") || only.includes("primitives")) checkPrimitives();
 if (!only.length || only.includes("tokens")) checkTokensJson();
 if (!only.length || only.includes("tokens") || only.includes("palette")) checkPalette();
+if (!only.length || only.includes("tokens")) checkContrast();
 if (!only.length || only.includes("chart")) checkChart();
 
 // A token the Foundations page cannot place (no section, or two) fails the site build, which `check` does not run.
@@ -2859,14 +3391,20 @@ if (!only.length || only.includes("helpers")) checkHelpers();
 if (!only.length || only.includes("themes") || only.includes("brand")) {
   checkBrand();
   checkThemes();
+  checkNesting();
 }
-if (!only.length || only.includes("code")) checkImports();
+if (!only.length || only.includes("code")) {
+  checkImports();
+  checkIconRegistry();
+}
 if (!only.length || only.includes("code") || only.includes("conventions")) checkConventions();
 if (!only.length || only.includes("code") || only.includes("generic")) {
   checkStyles();
   checkStylesProof();
   checkPartStyle();
   timed("styles probe", checkStylesProbe);
+  timed("pass-through", checkPassThrough);
+  timed("live regions", checkLiveRegions);
 }
 if (!only.length || only.includes("strings")) timed("strings", checkStrings);
 if (!only.length || only.includes("defaults")) timed("defaults", checkDefaults);

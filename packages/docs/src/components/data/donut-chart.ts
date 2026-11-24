@@ -41,7 +41,7 @@ const docs: ComponentDocs = {
     loading,
     hidden: {
       type: "array",
-      description: "The segments the list has turned off, by name: [\"Email\"]. Left out, the chart keeps its own, starting with every segment on. Controlled when the app passes it with `onHiddenChange`.",
+      description: "The segments the list has turned off, by name: [\"Email\"]. A name that two rows share is two segments: the second is `Email#2`. Left out, the chart keeps its own, starting with every segment on. Controlled when the app passes it with `onHiddenChange`.",
     },
     onHiddenChange: {
       type: "event",
@@ -51,7 +51,7 @@ const docs: ComponentDocs = {
     },
     selected: {
       type: "string",
-      description: "The segment that is picked, by name: the hole shows it and the others step back until it is picked again. Pointing at a segment or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`.",
+      description: "The segment that is picked, by name (`Email#2` for the second of two rows named Email): the hole shows it and the others step back until it is picked again. Pointing at a segment or tabbing to its row lights it too, for as long as the pointer or the keyboard is there. Left out, the chart keeps its own, starting with none. Controlled when the app passes it with `onSelectedChange`.",
     },
     onSelectedChange: {
       type: "event",
@@ -109,7 +109,7 @@ const docs: ComponentDocs = {
     label: "The summary: \"Tickets by channel: #support 312 (40.6%), #billing 158 (20.5%), #platform-eng 121 (15.7%), #onboarding 96 (12.5%), Email 82 (10.7%); total 769.\"",
     notes: [
       "The figure (the ring on the phone) is named by the sentence core's `segmentsOf` and `summarizeSegments` write from the rows: every segment, its value and its share, and the total. It is heard, not printed: the legend under the ring prints every segment's name, value and share, so colour is never the only way in.",
-      "The list is the legend, the pick and the toggles: each row is a button that is pressed while its segment is the picked one (\"#billing, 158, 20.5%\"), so `selected` is reachable by keyboard and screen reader as well as by touching the ring. Each swatch is its own toggle button named \"Show #billing\", pressed while the segment shows; a segment that is off is struck through and faint, not only dimmer, with an en dash for its share. The last one showing cannot be turned off. The rows and swatches draw a focus ring.",
+      "The list is the legend, the pick and the toggles: each row is a button that is pressed while its segment is the picked one (\"#billing, 158, 20.5%\"), so `selected` is reachable by keyboard and screen reader as well as by touching the ring. Each swatch is its own toggle button named \"Show #billing\", pressed while the segment shows (a switch on the phone), drawn beside the row's button and not inside it, so a screen reader reaches both; a segment that is off is struck through and faint, not only dimmer, with an en dash for its share. The last one showing cannot be turned off. The rows and swatches draw a focus ring.",
       "\"View as table\" is the other way in: every row, with real headers, and nothing folded into \"Other\".",
       "The ring's hole is drawn for the eye and hidden from a screen reader (it repeats the summary).",
     ],

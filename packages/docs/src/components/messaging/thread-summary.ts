@@ -52,8 +52,7 @@ const docs: ComponentDocs = {
     onFollowingChange: {
       type: "event",
       args: "following: boolean",
-      changes: "following",
-      description: "Called with `following` as the press leaves it. Given `following` too, the line is controlled and the press changes nothing on it; on its own (the catalogue, where opening is navigation) the press flips Following.",
+      description: "Deprecated, never called: opening a thread is not following it, so the press only calls onPress and `following` is always the app's. Accepted through 1.x so no product breaks; it goes at 2.0.",
     },
     onPress: {
       type: "event",
@@ -68,7 +67,7 @@ const docs: ComponentDocs = {
       notes: [
         "Opens the thread in the right-hand panel and updates the URL (…/c/platform-eng/t/<id>), so a thread is a link that can be pasted, bookmarked and opened in a new tab with ⌘-click.",
         "Hover lifts it to a card edge (Slack's) so it reads as a button and not as the message's text.",
-        "Opening the thread is navigation, so in the catalogue a press toggles `following` instead (what Follow / Unfollow in the thread's ⋯ does): the bell and 'Following' fade in or out.",
+        "Opening the thread is navigation, so in the catalogue a press only reports onPress; `following` comes from the app (Follow / Unfollow in the thread's ⋯), never from opening.",
       ],
       keyboard: [
         {

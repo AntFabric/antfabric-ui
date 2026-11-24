@@ -1,22 +1,13 @@
-import * as lucide from "lucide-react-native";
 import type { ComponentType } from "react";
 import { ActivityIndicator, Platform, View, type ViewStyle } from "react-native";
-import { pascal } from "@antfabric/ui-core";
+import type { IconName } from "@antfabric/ui-core";
 import { useTheme } from "../theme";
+import { iconFor } from "./icons";
 
-/** A lucide icon name in kebab case: `"trash-2"`, `"chevron-right"`. The same names as the React kit. */
-export type IconName = string;
+/** A lucide icon name in kebab case (`"trash-2"`, `"chevron-right"`), the same names as the React kit, or the icon component itself (`Trash2` from `lucide-react-native`). */
+export type { IconComponent, IconName } from "@antfabric/ui-core";
 
 type Glyph = ComponentType<{ size?: number; color?: string; strokeWidth?: number; style?: ViewStyle; testID?: string; "data-testid"?: string }>;
-
-/**
- * Looked up among the package's exports, not its `icons` subpath: lucide v1 renamed some icons
- * (`trash-2` is now `trash`) and keeps the old names only as alias exports.
- */
-const glyph = (name: string): Glyph | null => {
-  const g = (lucide as unknown as Record<string, unknown>)[pascal(name)];
-  return g && typeof g === "object" && "$$typeof" in g ? (g as Glyph) : null;
-};
 
 export interface IconProps {
   name: IconName;
@@ -31,12 +22,15 @@ export interface IconProps {
   style?: ViewStyle;
 }
 
-/** A lucide icon by name, stroked at the phone's weight (1.5). */
+/**
+ * A lucide icon by name or as a component, stroked at the phone's weight (1.5). A name is drawn from the kit's registry (the icons the kit
+ * draws itself, and whatever the app adds with `registerIcons`); a name nobody registered draws an empty box of the icon's size.
+ */
 export function Icon({ name, size, color, strokeWidth, testID, style }: IconProps) {
   const { t } = useTheme();
   const s = size ?? t.icon.size;
-  const Glyph = glyph(name);
-  if (!Glyph) return <View testID={`missing-icon:${name}`} style={[{ width: s, height: s }, style]} />;
+  const Glyph = (typeof name === "string" ? iconFor(name) : name) as Glyph | null;
+  if (!Glyph) return <View testID={`missing-icon:${name as string}`} style={[{ width: s, height: s }, style]} />;
   // In the catalogue (React Native Web) the glyph is a DOM <svg>, which takes `data-testid` and rejects `testID`.
   return <Glyph size={s} color={color ?? t.fg.body} strokeWidth={strokeWidth ?? t.icon.stroke} style={style} {...(Platform.OS === "web" ? { "data-testid": testID } : { testID })} />;
 }

@@ -42,7 +42,7 @@ export const appBadge = defineRecipe({
       },
     },
     // The app icon is the `mark` the product passes (a vector mark), or its name's first letter. On the desktop it is the mark alone, in the brand colour, as a desktop
-    // app's own icon is; on the phone it is white on a brand tile, as a phone app's is.
+    // app's own icon is; on the phone it is the brand's ink (`fg.onBrand`) on a brand tile, as a phone app's is.
     appIcon: {
       on: ["desktop", "mobile"],
       platforms: { mobile: { base: { bg: "$brand.default", shadow: "$shadow.card" } } },
@@ -70,17 +70,17 @@ export const appBadge = defineRecipe({
           variants: { mutedAll: { true: { bg: "$fg.faint" } } },
         },
         ios: { base: { top: "$osBadge.iosHangY", right: "$osBadge.iosHangX", minWidth: "$osBadge.iosSize", height: "$osBadge.iosSize", paddingX: "$osBadge.iosPadX", bg: "$os.badge", shadow: "$shadow.hairline" } },
-        android: { base: { right: "$osBadge.androidDotInset", square: "$osBadge.androidDot", radius: "$radius.circle", bg: "$brand.default", borderWidth: "$border.wThick", borderColor: "$fg.onBrand" } },
+        android: { base: { right: "$osBadge.androidDotInset", square: "$osBadge.androidDot", radius: "$radius.circle", bg: "$brand.default", borderWidth: "$border.wThick", borderColor: "$os.onFill" } },
       },
     },
     digits: {
       on: ["desktop", "mobile"],
       base: { fg: "$fg.onBrand" },
       platforms: {
-        mac: { base: { size: "$text.bodySm", weight: "$font.weightSemibold" } },
+        mac: { base: { size: "$text.bodySm", weight: "$font.weightSemibold", fg: "$os.onFill" } },
         windows: { base: { size: "$osBadge.winLabel", weight: "$font.weightBold" } },
         linux: { base: { size: "$osBadge.linuxLabel", weight: "$font.weightBold" } },
-        mobile: { base: { size: "$osBadge.iosLabel", line: "$osBadge.iosLabel", weight: "$font.weightMedium" } },
+        mobile: { base: { size: "$osBadge.iosLabel", line: "$osBadge.iosLabel", weight: "$font.weightMedium", fg: "$os.onFill" } },
       },
     },
     runDot: { on: ["desktop"], base: { square: "$osBadge.macRunDot", bg: "$fg.muted" } },
@@ -92,7 +92,7 @@ export const appBadge = defineRecipe({
     tabIcon: { on: ["web"], base: { fg: "$fg.muted" } },
     tabTitle: { on: ["web"], base: { size: "$text.caption", fg: "$fg.strong" } },
     favicon: { on: ["web"], base: { square: "$osBadge.browserFavicon" } },
-    label: { on: ["mobile"], base: { fg: "$fg.onBrand", weight: "$font.weightMedium" } },
+    label: { on: ["mobile"], base: { fg: "$os.onFill", weight: "$font.weightMedium" } },
   },
   // Left to the kit: a count-less Windows dot (its size follows the count, which is not a documented option), the 1.5px badge
   // edge (no token), the home screen's gradient and its label's text shadow (no key).

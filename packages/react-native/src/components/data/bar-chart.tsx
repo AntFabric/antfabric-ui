@@ -33,6 +33,8 @@ export interface BarChartProps extends RootProps {
   stacked?: boolean;
   /** Bars run left to right, categories down the side. A single series is a ranked list of rows on the phone, not a rotated chart. */
   horizontal?: boolean;
+  /** Each series past the first is filled with a texture (lines one way, the other, both, dots) over its colour, in the plot and in the legend, so two series are never told apart by hue alone. Left out, on for two or more series. */
+  marks?: boolean;
   /** The plot's height, in points. */
   height?: number;
   /** The title of the empty state when there are no rows. */
@@ -67,7 +69,7 @@ const useStyles = createStyles(() => ({
 /** The share of the track a bar fills, never less than this, so a value near zero is still a bar you can see. */
 const LEAST = 0.02;
 
-export function BarChart({ data, x, y, title, subtitle = "", headline, format = "integer", xFormat, labels = {}, stacked = false, horizontal = false, height = 240, empty, emptyLine, loading = false, hidden, onHiddenChange, styles, strings, headingLevel: _headingLevel, testID, style, ...rest }: BarChartProps) {
+export function BarChart({ data, x, y, title, subtitle = "", headline, format = "integer", xFormat, labels = {}, stacked = false, horizontal = false, marks: marksProp, height = 240, empty, emptyLine, loading = false, hidden, onHiddenChange, styles, strings, headingLevel: _headingLevel, testID, style, ...rest }: BarChartProps) {
   const str = useStrings("bar-chart", strings);
   const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
@@ -77,6 +79,7 @@ export function BarChart({ data, x, y, title, subtitle = "", headline, format = 
   const theme = giftedTheme(tk, reduced);
   const r = useRecipe(recipes["bar-chart"], { styles });
   const fields = [y].flat();
+  const marks = marksProp ?? fields.length > 1;
   const series = useSeries(fields, theme.series, { hidden, onHiddenChange });
   const { rows, keys, ordered } = prepare(data, x, formatWords, xFormat, locale);
   // A single series with a loss colours each bar by its sign, so a bar below zero reads as a loss.
@@ -106,7 +109,7 @@ export function BarChart({ data, x, y, title, subtitle = "", headline, format = 
   const zeroAt = -least / range;
   return (
     <ChartCard
-      legend={!loading && data.length > 0 ? <Legend series={series} labels={labels} label={str("legend")} /> : null}
+      legend={!loading && data.length > 0 ? <Legend series={series} labels={labels} label={str("legend")} marks={marks && "texture"} /> : null}
       id="bar-chart"
       testID={testID}
       root={rootProps(rest)}
@@ -142,7 +145,7 @@ export function BarChart({ data, x, y, title, subtitle = "", headline, format = 
               })}
             </View>
           ) : (
-            <GiftedBars tk={tk} theme={theme} rows={rows} s={series} fields={series.visible} labels={labels} format={format} formatWords={formatWords} stacked={stacked} totalLabel={str("total")} signed={signed} width={width} height={height} scale={scale} />
+            <GiftedBars tk={tk} theme={theme} rows={rows} s={series} fields={series.visible} labels={labels} format={format} formatWords={formatWords} stacked={stacked} totalLabel={str("total")} signed={signed} marks={marks} width={width} height={height} scale={scale} />
           )
         }
       </ChartFrame>

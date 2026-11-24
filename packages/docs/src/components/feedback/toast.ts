@@ -43,9 +43,11 @@ const docs: ComponentDocs = {
     },
     onAction: {
       type: "event",
+      description: "The action (Undo, View) was pressed. The toast goes too, so onDismiss follows it.",
     },
     onDismiss: {
       type: "event",
+      description: "The toast went: Dismiss, the ×, its duration running out, or its action (after onAction). The app unmounts it, which frees its slot.",
     },
     onPauseChange: {
       type: "event",
@@ -57,7 +59,7 @@ const docs: ComponentDocs = {
   platforms: {
     web: {
       status: "ready",
-      base: "The ink pill: a role=status / alert <div> with aria-live, rising in with enter(\"rise\"); Undo, Dismiss and the × are <button>s with hover and focus from useInteraction. Pressing one keeps `dismissed` inside and fades it back down; placement and the timer are the app's",
+      base: "The ink pill: a <div> (its message said through the page's announcer, never a live region of its own), rising in with enter(\"rise\"); Undo, Dismiss and the × are <button>s with hover and focus from useInteraction. Pressing one keeps `dismissed` inside and fades it back down; placement and the timer are the app's",
       import: "import { Toast } from \"@antfabric/ui-react\"",
       notes: [
         "Bottom-centre, 24px up, one at a time. The fixed viewport is pointer-events: none and only the pill takes clicks, so the strip never eats the composer's clicks.",
@@ -78,7 +80,7 @@ const docs: ComponentDocs = {
       import: "import { Toast } from \"@antfabric/ui-react\"",
       notes: [
         "Today: one ink pill, bottom-centred, 5.2 s, Dismiss on the right. A second toast REPLACES the first (one timer).",
-        "The mark follows toastTone (ADR-4734): a failure no longer wears a tick. aria-live follows it too — polite for success, assertive for a refusal.",
+        "The mark follows toastTone (ADR-4734): a failure no longer wears a tick. The announcement follows it too — polite for success, assertive for a refusal.",
         "A progress toast (\"Refreshing…\", ADR-0783) has no timer and a 700 ms floor; finishing never wipes a different toast raised meanwhile.",
         "Dismiss's fill is derived from the toast's own ink, so it survives the inverse surface turning light in the dark themes.",
         "Copy rules live in toast-copy.ts: names cut to 32 characters on a word boundary, refusal codes mapped to plain sentences, log-line-shaped upstream messages never shown.",
@@ -196,6 +198,16 @@ const docs: ComponentDocs = {
     },
   ],
   edgeCases: [
+    {
+      title: "The message changes while it is shown",
+      platforms: ["web", "desktop", "mobile"],
+      handling: "A toast whose `message` changes in place (\"Uploading 2 files…\" becomes \"2 files uploaded\") is announced again, and on the web and desktop its `duration` starts again, so the new words get their full time.",
+    },
+    {
+      title: "A theme's ink in another colour form",
+      platforms: ["mobile"],
+      handling: "The Undo and Dismiss chips are the pill's ink at a low alpha; the ink may be #rgb, #rrggbb (with or without alpha), rgb() or hsl(), and a colour name leaves the chips unfilled rather than drawing a wrong colour.",
+    },
     {
       title: "Several toasts at once",
       platforms: ["web", "desktop", "mobile"],

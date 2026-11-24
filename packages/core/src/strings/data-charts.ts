@@ -139,6 +139,10 @@ export const dataCharts = {
     summaryTarget: ", target {target}",
     /** The whole sentence: the title, the value and whichever of the others there are. */
     summary: "{label}: {value}{caption}{over}{target}.",
+    /** The value in the summary in the caution state, so the state is not the fill's colour alone: "78%, caution". Meter's words. */
+    stateWarning: "{value}, caution",
+    /** The value in the summary in the loss state: "32%, critical". Meter's words. */
+    stateDanger: "{value}, critical",
   },
   "goal-rings": {
     ...chart,

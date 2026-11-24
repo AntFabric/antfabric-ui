@@ -88,7 +88,7 @@ export function ChartCard({ r, title, subtitle = "", headline, table, legend, ch
               ) : null}
             </div>
           ) : null}
-          {showing ? <Table columns={rows.columns} rows={rows.rows as Row[]} dense label={title} /> : children}
+          {showing ? <Table columns={rows.columns} rows={rows.rows as Row[]} rowKey={rows.rowKey} dense label={title} /> : children}
         </div>
       }
     />

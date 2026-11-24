@@ -34,11 +34,11 @@ const useStyles = createStyles((t) => ({
 const REST = [0.35, 0.65, 1];
 
 /** af-bounce: up 3pt and to full opacity at 30% of a 1.2 s cycle, back down by 60%, then still. */
-function useBounce() {
+function useBounce(typing: boolean) {
   const { t } = useTheme();
   const values = useRef(REST.map(() => new Animated.Value(0))).current;
-  // Follows Settings live: turning Reduce Motion on stops the bounce at once.
-  const moving = !useReducedMotion();
+  // Follows Settings live: turning Reduce Motion on stops the bounce at once. Nobody typing, nothing is drawn and nothing loops.
+  const moving = !useReducedMotion() && typing;
   useEffect(() => {
     if (!moving) return;
     const native = Platform.OS !== "web";
@@ -61,7 +61,7 @@ function useBounce() {
 export function TypingIndicator({ names = [], strings, styles, style, testID, ...rest }: TypingIndicatorProps) {
   const s = useStyles();
   const str = useStrings("typing-indicator", strings);
-  const dots = useBounce();
+  const dots = useBounce(names.length > 0);
   const r = useRecipe(recipes["typing-indicator"], { styles });
   if (names.length === 0) return null;
   const who = names.length === 1 ? names[0]! : names.length === 2 ? str("two", { first: names[0]!, second: names[1]! }) : str("several");

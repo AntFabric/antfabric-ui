@@ -8,6 +8,7 @@ import { BottomSheet } from "./bottom-sheet";
 
 export type SheetSide = "start" | "end";
 
+/** `nativeID`, the accessibility label and hint, and `ref` name the dialog; `testID` and `style` stay on the root. */
 export interface SheetProps extends RootProps {
   /** The sheet is showing. ✕, the handle, a drag down and Android's back close it (unless `dismissible` is off). */
   open?: boolean;
@@ -42,15 +43,16 @@ const useStyles = createStyles((t) => ({
  * The phone's Sheet is the BottomSheet: the same job (a record's details, a short form) in the phone's idiom, rising from the bottom.
  * Like the BottomSheet it is drawn where it is mounted; the app presents it (a Modal or its navigator's sheet).
  */
-export function Sheet({ open = false, onOpenChange, side: _side = "end", width: _width = 0, title = "", subtitle = "", children, footer, showClose = true, label = "", dismissible = true, styles, strings, style, testID, ...rest }: SheetProps) {
+export function Sheet({ open, onOpenChange, side: _side = "end", width: _width = 0, title = "", subtitle = "", children, footer, showClose = true, label = "", dismissible = true, styles, strings, style, testID, ...rest }: SheetProps) {
   const s = useStyles();
   const str = useStrings("sheet", strings);
   const r = useRecipe(recipes.sheet, { styles });
-  const [shown, setShown] = useControllable(open, onOpenChange);
+  const [shown = false, setShown] = useControllable(open, onOpenChange);
   if (!shown) return null;
   return (
-    <View testID={partId(testID, "sheet", "root")} accessibilityLabel={title ? undefined : label || str("label")} {...rootProps(rest)} style={[r.root.view, style]}>
-      <BottomSheet title={title} showClose={showClose && dismissible} onClose={() => dismissible && setShown(false)}>
+    <View testID={partId(testID, "sheet", "root")} style={[r.root.view, style]}>
+      {/* With no title, the dialog is named by `label`: the BottomSheet puts its pass-through on the dialog. */}
+      <BottomSheet title={title} showClose={showClose} dismissible={dismissible} onClose={() => setShown(false)} accessibilityLabel={title ? undefined : label || str("label")} {...rootProps(rest)}>
         <View style={s.body}>
           {subtitle ? <Text testID={partId(testID, "sheet", "subtitle")} style={[r.subtitle.view, r.subtitle.text]}>{subtitle}</Text> : null}
           {children}

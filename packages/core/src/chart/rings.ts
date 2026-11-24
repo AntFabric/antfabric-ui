@@ -5,18 +5,30 @@
  */
 
 import { fmt, type FormatSpec, type FormatWords } from "./format";
-import { meterTone, type MeterKind, type MeterThresholds } from "./meter";
+import { meterShown, meterTone, type MeterKind, type MeterThresholds } from "./meter";
 import type { Row } from "./types";
 
 /** The most segments a donut gives a colour of the palette to: the palette has eight, and a ninth would wrap onto the first. Rows after the eighth fold into one more, which the kit names. */
 export const MOST_SEGMENTS = 8;
 
 export interface Segment {
+  /** What names the segment in `hidden` and `selected` (and a React key): its label, or `label#2`, `label#3`… for the second and third of the same name, so two rows with one name are two segments, not one. */
+  key: string;
   label: string;
   /** A share of the whole is never negative: a value under zero, or one that is not a number, counts as 0. */
   value: number;
   /** For "Other": how many rows it holds. */
   folded?: number;
+}
+
+/** A key for each of `labels`: the label itself the first time, `label#2` the second, and so on, so labels that repeat still name one item each. */
+export function keysOf(labels: readonly string[]): string[] {
+  const seen = new Map<string, number>();
+  return labels.map((l) => {
+    const n = (seen.get(l) ?? 0) + 1;
+    seen.set(l, n);
+    return n === 1 ? l : `${l}#${n}`;
+  });
 }
 
 /**
@@ -25,13 +37,14 @@ export interface Segment {
  */
 export function segmentsOf(data: Row[], label: string, value: string, other: string, most: number = MOST_SEGMENTS): Segment[] {
   const all = data.map((r) => ({ label: String(r[label] ?? "–"), value: Number.isFinite(+(r[value] as number)) ? Math.max(0, +(r[value] as number)) : 0 }));
-  if (all.length <= most) return all;
   const rest = all.slice(most);
-  return [...all.slice(0, most), { label: other, value: rest.reduce((s, r) => s + r.value, 0), folded: rest.length }];
+  const kept: Omit<Segment, "key">[] = all.length <= most ? all : [...all.slice(0, most), { label: other, value: rest.reduce((s, r) => s + r.value, 0), folded: rest.length }];
+  const keys = keysOf(kept.map((x) => x.label));
+  return kept.map((x, i) => ({ key: keys[i]!, ...x }));
 }
 
 /** The sum of some segments' values. */
-export const totalOf = (segments: readonly Segment[]): number => segments.reduce((s, x) => s + x.value, 0);
+export const totalOf = (segments: readonly Omit<Segment, "key">[]): number => segments.reduce((s, x) => s + x.value, 0);
 
 /** A segment's share of the whole, or NaN while the whole is nothing (which `fmt` prints as an en dash). */
 export const shareOf = (value: number, total: number): number => (total > 0 ? value / total : NaN);
@@ -56,7 +69,7 @@ export interface SegmentWords {
 }
 
 /** Every segment's share of the donut's sentence, in the chart's words: its name, value and share for each, then the total. A whole of nothing says so. */
-export function summarizeSegments({ label, segments, format, formatWords, locale }: { label: string; segments: readonly Segment[]; format?: FormatSpec; formatWords: FormatWords; locale?: string }, words: SegmentWords): string {
+export function summarizeSegments({ label, segments, format, formatWords, locale }: { label: string; segments: readonly Omit<Segment, "key">[]; format?: FormatSpec; formatWords: FormatWords; locale?: string }, words: SegmentWords): string {
   if (!segments.length) return words.noData({ title: label });
   const total = totalOf(segments);
   if (total <= 0) return words.allZero({ title: label, zero: fmt(format, 0, formatWords, locale) });
@@ -139,10 +152,11 @@ export interface GaugeWords {
   summary(v: { label: string; value: string; caption: string; over: string; target: string }): string;
 }
 
-/** A gauge's sentence, in the chart's words: the value in its format, what it is of, whether it is past the capacity, and the target. */
+/** A gauge's sentence, in the chart's words: the value in its format (a percent format prints its share of `max`), what it is of, whether it is past the capacity, and the target. */
 export function summarizeGauge({ label, value, max, target, caption, format, formatWords, locale }: { label: string; value: number; max: number; target?: number; caption?: string; format?: FormatSpec; formatWords: FormatWords; locale?: string }, words: GaugeWords): string {
   if (!(Number.isFinite(value) && Number.isFinite(max) && max > 0)) return words.noValue({ title: label });
-  const f = (v: number) => fmt(format, v, formatWords, locale);
+  // Meter's reading: a percent format says the share of `max` (58 of 100 is 58%), any other the value.
+  const f = (v: number) => fmt(format, meterShown(v, max, format), formatWords, locale);
   return words.summary({
     label,
     value: f(value),
@@ -176,6 +190,18 @@ export const clampScore = (value: unknown, max: number): number => {
   const n = +(value as number);
   return Number.isFinite(n) ? Math.min(max, Math.max(0, n)) : 0;
 };
+
+/**
+ * Where a value sits on a radar drawn as the phone's library draws one (gifted-charts' RadarChart): `size` square, the outer ring at `reach` of
+ * the half-size, axis `index` of `count` at `startAngle` degrees (counter-clockwise from three o'clock) stepping clockwise. The kit draws a series'
+ * markers here, over the library's polygons.
+ */
+export function radarPoint(index: number, count: number, value: number, max: number, size: number, { startAngle = 90, clockwise = true, reach = 0.8 }: { startAngle?: number; clockwise?: boolean; reach?: number } = {}): { x: number; y: number } {
+  const c = size / 2;
+  const a = ((startAngle + index * (360 / Math.max(1, count)) * (clockwise ? -1 : 1)) * Math.PI) / 180;
+  const d = max > 0 ? c * reach * (value / max) : 0;
+  return { x: c + d * Math.cos(a), y: c - d * Math.sin(a) };
+}
 
 /**
  * Which of `count` axes a point is nearest to, on a radar drawn with the first axis at `startAngle` (degrees, counter-clockwise from three o'clock,

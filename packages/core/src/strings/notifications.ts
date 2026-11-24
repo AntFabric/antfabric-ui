@@ -20,9 +20,14 @@ export const notifications = {
   "in-app-banner": {
     /** The banner's accessible name. */
     newNotification: "New notification",
-    /** What the hit area reads: "Priya Raman: …. Open". */
-    open: "{title}: {body}. Open",
-    openIn: "{title} in {context}: {body}. Open",
+    /** The hit area's name starts with the title, and the conversation when there is one: "Priya Raman in #design-crit". */
+    titleIn: "{title} in {context}",
+    /** Then the body (with its lead), after the title and the time: "Priya Raman, 2m: Mentioned you · can you look?". */
+    withBody: "{label}: {body}",
+    /** The body with its lead, as the name reads it. */
+    leadBody: "{lead} · {body}",
+    /** Last, what pressing it does: "…, +3 more waiting. Open". */
+    toOpen: "{label}. Open",
     /** Before the body: "Mentioned you · ". */
     leadSuffix: "{lead} · ",
     more: "+{count} more waiting",

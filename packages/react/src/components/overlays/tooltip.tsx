@@ -2,6 +2,8 @@ import { useEffect, useId, useRef, useState, type CSSProperties, type FocusEvent
 import { MOTION, recipes, useControllable } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
+import { useLayerStack } from "../../lib/layer";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import type { IconName } from "../../lib/icon";
 import { box, css, enter, row, text } from "../../lib/style";
@@ -62,11 +64,11 @@ const bubble: CSSProperties = {
  * the control is `aria-describedby` the bubble. With `children` the bubble floats beside them; with none it draws the built-in icon button
  * and the bubble in flow, as the catalogue does.
  */
-export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = true, triggerIcon = "bell-off", children, open = false, onOpenChange, styles, style, ref, ...rest }: TooltipProps) {
+export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = true, triggerIcon = "bell-off", children, open, onOpenChange, styles, style, ref, ...rest }: TooltipProps) {
   const r = useRecipe(recipes.tooltip, { styles });
-  const { os } = usePlatform();
+  const { shortcutOs } = usePlatform();
   const id = useId();
-  const [shown, setShown] = useControllable(open, onOpenChange);
+  const [shown = false, setShown] = useControllable(open, onOpenChange);
   const host = useRef<HTMLDivElement | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   // The control already says the label, so the bubble describes only what is more (the shortcut).
@@ -91,7 +93,7 @@ export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = t
     const had = el.getAttribute("aria-describedby");
     const hadKeys = el.getAttribute("aria-keyshortcuts");
     el.setAttribute("aria-describedby", [had, id].filter(Boolean).join(" "));
-    if (shortcut) el.setAttribute("aria-keyshortcuts", ariaShortcut(shortcut, os));
+    if (shortcut) el.setAttribute("aria-keyshortcuts", ariaShortcut(shortcut, shortcutOs));
     const name = (el.getAttribute("aria-label") ?? el.textContent ?? "").trim().toLowerCase();
     setSame(name === label.trim().toLowerCase());
     return () => {
@@ -102,10 +104,14 @@ export function Tooltip({ label, shortcut = "", side = "bottom", showTrigger = t
         else el.removeAttribute("aria-keyshortcuts");
       }
     };
-  }, [id, label, shortcut, os, children, showTrigger, triggerIcon]);
+  }, [id, label, shortcut, shortcutOs, children, showTrigger, triggerIcon]);
 
+  // Esc hides a shown bubble (WCAG 1.4.13) and stops there: from its control, and from anywhere while it is the top layer, so one opened by
+  // hover goes too. A hidden one leaves the key alone.
+  useLayerStack(shown, () => [host.current], { onEscape: hide });
   const keyboard = (e: KeyboardEvent) => {
-    if (e.key !== "Escape" || !shown) return;
+    if (e.key !== "Escape" || !shown || e.defaultPrevented || isComposing(e)) return;
+    e.preventDefault();
     e.stopPropagation();
     hide();
   };

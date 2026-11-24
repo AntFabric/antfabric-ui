@@ -1,10 +1,12 @@
-import { useEffect, type CSSProperties, type ReactNode } from "react";
+import { useEffect, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { recipes, useControllable, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
+import { useFocusHandoff } from "../../lib/focus";
 import { Icon, Spinner } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { box, css, enter, glass, input, neg, pressable, row, text, truncate } from "../../lib/style";
@@ -157,18 +159,19 @@ function CloseButton({ os, label, icon = "x", styles, onPress }: { os: Desk; lab
   );
 }
 
-function ActionButton({ os, label, styles, onPress }: { os: Desk; label: string; styles?: PartStyles<"os-notification">; onPress: () => void }) {
-  const ui = useInteraction();
-  const r = useRecipe(recipes["os-notification"], { state: { hover: ui.hovered, focus: ui.focused }, styles });
+function ActionButton({ os, label, disabled = false, styles, onPress }: { os: Desk; label: string; disabled?: boolean; styles?: PartStyles<"os-notification">; onPress: () => void }) {
+  const ui = useInteraction({ disabled });
+  const r = useRecipe(recipes["os-notification"], { state: { hover: ui.hovered, focus: ui.focused, disabled: ui.disabled }, styles });
   return (
     <button
       type="button"
       data-af-part="action"
       data-af-press
       aria-label={label}
+      disabled={ui.disabled}
       onClick={() => onPress()}
       {...ui.handlers}
-      style={css(pressable, center, { flex: 1 }, os === "browser" && { borderRadius: 0 }, r.action)}
+      style={css(pressable, center, { flex: 1 }, os === "browser" && { borderRadius: 0 }, partStyle(r, "action", ui.disabled && { cursor: "default" }))}
     >
       <span style={css(text, truncate(1))}>{label}</span>
     </button>
@@ -185,9 +188,11 @@ interface ReplyProps {
   styles?: PartStyles<"os-notification">;
   onChange: (text: string) => void;
   onSend: () => void;
+  /** The field, for the hand-off from Reply. */
+  fieldRef?: RefObject<HTMLInputElement | null>;
 }
 
-function ReplyRow({ os, sender, placeholder, value, sending, strings, styles, onChange, onSend }: ReplyProps) {
+function ReplyRow({ os, sender, placeholder, value, sending, strings, styles, onChange, onSend, fieldRef }: ReplyProps) {
   const s = useStrings("os-notification", strings);
   const field = useInteraction({ disabled: sending });
   const send = useInteraction({ disabled: !value || sending });
@@ -197,13 +202,14 @@ function ReplyRow({ os, sender, placeholder, value, sending, strings, styles, on
   return (
     <div style={css(row, { gap: t.space.xs }, win && { padding: "0 16px 8px" })}>
       <input
+        ref={fieldRef}
         data-af-input
         value={value}
         placeholder={placeholder}
         aria-label={s("replyTo", { name: sender })}
         disabled={field.disabled}
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && onSend()}
+        onKeyDown={(e) => e.key === "Enter" && !isComposing(e) && onSend()}
         {...field.handlers}
         data-af-part="replyField"
         style={css(
@@ -294,8 +300,11 @@ export function OsNotification({
   const said = preview && body ? s("withBody", { label: withContext, body }) : withContext;
   const typing = !!replyAction && (replying === "typing" || replying === "sending");
   const status = !!replyAction && (replying === "sending" || replying === "failed");
+  // Reply swaps the buttons for the field: focus, fallen to the page, follows into it.
+  const replyField = useFocusHandoff<HTMLInputElement>(typing);
 
-  const press = (a: OsNotificationAction) => (a.reply ? setReplying("typing") : onAction?.(a));
+  // The browser has no inline reply: there a reply action reports itself, and the app opens the conversation.
+  const press = (a: OsNotificationAction) => (a.reply && os !== "browser" ? setReplying("typing") : onAction?.(a));
   const send = () => {
     if (replyAction && draft && replying !== "sending") onAction?.(replyAction, draft);
   };
@@ -330,12 +339,12 @@ export function OsNotification({
     shown.length > 0 && (
       <div data-af-part="actions" style={css(row, { alignItems: "stretch" }, ACTIONS[os], partStyle(r, "actions", motion && enter("fade")))}>
         {shown.map((a) => (
-          <ActionButton key={a.key} os={os} label={a.label} styles={styles} onPress={() => press(a)} />
+          <ActionButton key={a.key} os={os} label={a.label} disabled={a.disabled} styles={styles} onPress={() => press(a)} />
         ))}
       </div>
     );
   const replyRow = (placeholder: string) => (
-    <ReplyRow os={os} sender={sender} placeholder={placeholder} value={draft} sending={replying === "sending"} strings={strings} styles={styles} onChange={setDraft} onSend={send} />
+    <ReplyRow os={os} sender={sender} placeholder={placeholder} value={draft} sending={replying === "sending"} strings={strings} styles={styles} onChange={setDraft} onSend={send} fieldRef={replyField} />
   );
 
   return (

@@ -1,6 +1,7 @@
-import { useEffect, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
+import { focusNear } from "../../lib/focus";
 import { announce } from "../../lib/announce";
 import { Icon, type IconName } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -70,6 +71,8 @@ export function InlineBanner({
   const [gone, setGone] = useControllable(dismissed);
   const icon = given ?? TONE_ICON[tone];
   const r = useRecipe(recipes["inline-banner"], { variants: { tone }, styles });
+  // The × goes with the banner: focus moves to the nearest control that stays (the banner is the ×'s parent).
+  const close = useRef<HTMLButtonElement>(null);
   // A failure is announced at once; the other tones wait for a pause. Through the page's announcer: a live region that arrives
   // holding its text is not read.
   useEffect(() => {
@@ -94,7 +97,9 @@ export function InlineBanner({
           icon="x"
           label={s("dismiss")}
           size="sm"
+          ref={close}
           onPress={() => {
+            focusNear(close.current?.parentElement);
             setGone(true);
             onDismiss?.();
           }}

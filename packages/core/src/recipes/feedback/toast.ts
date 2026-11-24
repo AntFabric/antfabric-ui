@@ -15,7 +15,7 @@ export const toast = defineRecipe({
       base: { gap: "$space.md", paddingX: "$space.lg", bg: "$surface.inverse", fg: "$fg.onInverse", shadow: "$shadow.pill", font: "$font.sans" },
       platforms: { mobile: { base: { gap: "$space.sm", paddingX: "$space.md", paddingY: "$space.sm" } } }, // idiom: tighter insets
     },
-    mark: { on: ["web", "desktop"], base: { radius: "$radius.circle", fg: "$fg.onBrand" }, variants: { tone: { success: { bg: "$brand.default" }, error: { bg: "$danger.solid" }, info: { fg: "$fg.onInverse" } } } },
+    mark: { on: ["web", "desktop"], base: { radius: "$radius.circle", fg: "$fg.onBrand" }, variants: { tone: { success: { bg: "$brand.default" }, error: { bg: "$danger.solid", fg: "$danger.fg" }, info: { fg: "$fg.onInverse" } } } },
     markIcon: { on: ["web", "desktop"], base: { square: "$icon.sizeSm" } },
     markBang: { on: ["web", "desktop"], base: { size: "$text.caption", weight: "$font.weightBold" } },
     icon: {

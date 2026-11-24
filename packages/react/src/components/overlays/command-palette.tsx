@@ -1,14 +1,15 @@
-import { useEffect, useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode, type Ref } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon, Spinner, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, input, pressable, row, text, truncate } from "../../lib/style";
-import { announce } from "../../lib/announce";
+import { announce, useAnnounce } from "../../lib/announce";
 import { useOverlayFocus } from "../../lib/focus";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { Avatar, type AvatarIdentity, type AvatarPresence } from "../display/avatar";
 import { Kbd } from "../display/kbd";
 
@@ -43,6 +44,7 @@ export interface CommandPaletteGroup {
   items: CommandPaletteItem[];
 }
 
+/** `id`, `aria-*` and `ref` name the dialog (the panel); `className` and `data-*` go on the root, the backdrop (`splitRootProps`). */
 export interface CommandPaletteProps extends RootProps<HTMLDivElement> {
   query?: string;
   /** The field's placeholder. Default: the `placeholder` string. */
@@ -129,10 +131,10 @@ function Pill({ label, on, styles, onPress }: { label: string; on: boolean; styl
 }
 
 export function CommandPalette({
-  query = "",
+  query,
   placeholder,
   filters = [],
-  filter = "",
+  filter,
   selected = "",
   groups = [],
   loading = false,
@@ -157,12 +159,13 @@ export function CommandPalette({
   const fieldUi = useInteraction();
   const r = useRecipe(recipes["command-palette"], { state: { focus: fieldUi.focused }, styles });
   const field = useRef<HTMLInputElement>(null);
-  const [q, setQ] = useControllable(query, onQueryChange);
-  const [kind, setKind] = useControllable(filter, onFilterChange);
+  const [q = "", setQ] = useControllable(query, onQueryChange);
+  const [kind = "", setKind] = useControllable(filter, onFilterChange);
   const [pick, setPick] = useControllable(selected);
   const all = groups.flatMap((g) => g.items);
   const isOn = (item: CommandPaletteItem) => (pick ? item.key === pick : !!item.selected);
-  const current = all.find(isOn);
+  // What Enter takes is what is highlighted: the picked row, else (after filtering it away, or before any pick) the first.
+  const current = all.find(isOn) ?? all[0];
   const optionId = (item: CommandPaletteItem) => `${id}-${all.indexOf(item)}`;
   const choose = (item: CommandPaletteItem) => {
     setPick(pick === "" && item.selected ? "" : item.key);
@@ -172,18 +175,26 @@ export function CommandPalette({
   // The focus contract: focus moves to the field when the palette mounts, Tab stays inside, and focus returns to the opener when it
   // unmounts. Esc is the field's own (it clears the query first), and closes from anywhere else in the panel.
   const focus = useOverlayFocus<HTMLDivElement>({ trap: true, initial: () => field.current, onEscape: () => onClose?.() });
+  const pass = splitRootProps(rest);
+  const { ref, ...named } = pass.control as { ref?: Ref<HTMLDivElement> } & Record<string, unknown>;
   const asking = !groups[0] && !loading && q !== "" && ask;
 
-  // How many results there are, said once when typing pauses: never per keystroke, never as a region that arrives holding its text.
+  // How many results there are (or that there are none), said once when typing pauses: never per keystroke, never as a region that
+  // arrives holding its text.
   const count = all.length;
   useEffect(() => {
-    if (q === "" || loading || count === 0) return;
-    const wait = setTimeout(() => announce(s("resultCount", { count })), 400);
+    if (q === "" || loading) return;
+    const wait = setTimeout(() => announce(count ? s("resultCount", { count }) : ask ? s("emptyAsk", { name: agentName }) : s("empty")), 400);
     return () => clearTimeout(wait);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, count, loading]);
 
+  // Offline is news when the palette opens with it, and when it changes while open.
+  useAnnounce(offline && s("offline"), "polite", { initial: true });
+
   const keyboard = (e: KeyboardEvent) => {
+    // An IME's Enter commits its candidate and its Escape cancels it: neither chooses, clears or closes.
+    if (isComposing(e)) return;
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       if (!all.length) return;
@@ -193,9 +204,10 @@ export function CommandPalette({
       document.getElementById(optionId(next))?.scrollIntoView({ block: "nearest" });
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (current ?? all[0]) choose((current ?? all[0])!);
+      if (current) choose(current);
       else if (q && !loading && ask) onAsk?.(q);
     } else if (e.key === "Escape") {
+      e.preventDefault();
       e.stopPropagation();
       if (q) setQ("");
       else onClose?.();
@@ -208,7 +220,7 @@ export function CommandPalette({
   return (
     <div
       data-af-part="root"
-      {...rootProps(rest)}
+      {...pass.root}
       style={css(
         box,
         {
@@ -226,11 +238,15 @@ export function CommandPalette({
       )}
     >
       <div
-        ref={focus.ref}
+        ref={(el) => {
+          focus.ref.current = el;
+          setRef(ref, el);
+        }}
         role="dialog"
         aria-modal
         aria-label={s("label")}
         onKeyDown={focus.onKeyDown}
+        {...named}
         data-af-part="panel"
         style={css(box, { maxWidth: "100%", overflow: "hidden", ...enter("pop") }, r.panel)}
       >
@@ -265,7 +281,7 @@ export function CommandPalette({
           </div>
         )}
         {offline && (
-          <div role="status" data-af-part="offline" style={css(row, { gap: t.space.sm, paddingBlock: t.space.sm, paddingInline: t.space.lgXl }, r.offline)}>
+          <div data-af-part="offline" style={css(row, { gap: t.space.sm, paddingBlock: t.space.sm, paddingInline: t.space.lgXl }, r.offline)}>
             <Icon part="offlineIcon" name="wifi-off" style={r.offlineIcon} />
             <span data-af-part="offlineText" style={css(text, r.offlineText)}>{s("offline")}</span>
           </div>
@@ -279,7 +295,7 @@ export function CommandPalette({
               {g.items.map((item) => {
                 const keys = platform === "web" && item.webShortcut ? item.webShortcut : item.shortcut;
                 return (
-                  <Option key={item.key} id={optionId(item)} label={item.hint ? s("option", { label: item.label, hint: item.hint }) : item.label} selected={isOn(item)} styles={styles} onPress={() => choose(item)}>
+                  <Option key={item.key} id={optionId(item)} label={item.hint ? s("option", { label: item.label, hint: item.hint }) : item.label} selected={item === current} styles={styles} onPress={() => choose(item)}>
                     <span aria-hidden data-af-part="slot" style={css(slotLook, r.slot)}>
                       {item.avatar ? (
                         <Avatar name={item.label} identity={item.identity ?? "indigo"} presence={item.presence ?? "none"} agent={item.agent ?? false} style={{ width: t.palette.slot, height: t.palette.slot, fontSize: t.text.micro }} />
@@ -299,14 +315,14 @@ export function CommandPalette({
             </div>
           ))}
           {loading && (
-            <div role="status" aria-live="polite" data-af-part="loading" style={css(row, { gap: t.space.sm, paddingBlock: t.space.smMd }, r.loading)}>
+            <div data-af-part="loading" style={css(row, { gap: t.space.sm, paddingBlock: t.space.smMd }, r.loading)}>
               <Spinner decorative part="loadingSpinner" label={s("searching")} style={r.loadingSpinner} />
               <span data-af-part="loadingText" style={css(text, r.loadingText)}>{s("loadingText")}</span>
             </div>
           )}
           {empty && (
             <div style={css(box, { alignItems: "center", gap: t.space.md, padding: t.space.md })}>
-              <span role="status" aria-live="polite" data-af-part="emptyText" style={css(text, { paddingTop: t.space.sm, textAlign: "center" }, r.emptyText)}>
+              <span data-af-part="emptyText" style={css(text, { paddingTop: t.space.sm, textAlign: "center" }, r.emptyText)}>
                 {q ? (ask ? s("emptyAsk", { name: agentName }) : s("empty")) : s("prompt")}
               </span>
               {q && ask && (

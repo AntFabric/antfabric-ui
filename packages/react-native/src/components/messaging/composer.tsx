@@ -5,7 +5,7 @@ import { createStyles } from "../../theme";
 import { Icon } from "../../lib/icon";
 import { Enter } from "../../lib/motion";
 import { usePress } from "../../lib/press";
-import { announce } from "../../lib/a11y";
+import { announce, useAnnounce } from "../../lib/a11y";
 import { rootProps, partId, type RootProps } from "../../lib/root-props";
 import { fontScale } from "../../lib/type";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -172,13 +172,13 @@ function AlsoSend({ on, to, onToggle, strings, styles }: Pick<ComposerProps, "st
 
 export function Composer({
   placeholder = "",
-  value = "",
+  value,
   mode = "default",
   uploading = false,
   attachments = [],
   lengthHint = "",
   tooLong = false,
-  alsoSend = false,
+  alsoSend,
   alsoSendTo = "",
   formatting = false,
   attach = false,
@@ -214,8 +214,8 @@ export function Composer({
 }: ComposerProps) {
   const s = useStyles();
   const str = useStrings("composer", strings);
-  const [draft, setDraft] = useControllable(value, onValueChange);
-  const [also, setAlso] = useControllable(alsoSend, onAlsoSendChange);
+  const [draft = "", setDraft] = useControllable(value, onValueChange);
+  const [also = false, setAlso] = useControllable(alsoSend, onAlsoSendChange);
   const [inside, setInside] = useState(false);
 
   const locked = mode === "readonly" || mode === "archived";
@@ -223,6 +223,8 @@ export function Composer({
   const offline = mode === "offline";
   const typed = draft.trim() !== "";
   const sendable = typed && !uploading && !tooLong && !offline && !disabled;
+  // Only the upload stands in the way: Send stays pressable, so a tap says why it waits.
+  const waiting = typed && uploading && !tooLong && !offline && !disabled;
   // The counter is read at a few thresholds (100, 50, 10 left, then over), not on every keystroke.
   const left = /\d/.test(lengthHint) ? Number(lengthHint.replace(/[^\d]/g, "")) : null;
   const bucket = tooLong ? "over" : left === null ? "none" : left <= 10 ? "10" : left <= 50 ? "50" : left <= 100 ? "100" : "none";
@@ -239,9 +241,12 @@ export function Composer({
   const r = useRecipe(recipes.composer, { variants: { mode }, state: { focus: inside || focused, invalid: tooLong }, styles });
   // `placeholderTextColor` is the TextInput's prop, not a style.
   const { placeholderTextColor, ...inputText } = r.input.text;
+  // Going offline, or the channel locking, while the composer is on screen is said; the line itself is plain text.
+  useAnnounce(offline && str("offline"));
+  useAnnounce(locked && (mode === "archived" ? str("archivedTitle") : str("readonlyTitle")));
   const send = () => {
     // Send is disabled while a file uploads; a tap in that window says why (iOS has no live region for the hint).
-    if (typed && uploading && !tooLong && !offline) announce(str("uploadWaiting"));
+    if (waiting) announce(str("uploadWaiting"));
     if (!sendable) return;
     const words = draft;
     // Cleared in the same tick as the tap, so a double tap cannot send twice.
@@ -261,7 +266,7 @@ export function Composer({
         </Enter>
       ) : null}
       {offline ? (
-        <Enter motion="rise" testID="composer.offline" accessibilityLiveRegion="polite" style={[s.offline, r.offline.view]}>
+        <Enter motion="rise" testID="composer.offline" style={[s.offline, r.offline.view]}>
           <Icon testID="composer.offlineIcon" name="wifi-off" {...iconOf(r.offlineIcon.view)} color={r.offlineIcon.text.color} />
           <Text style={[r.offline.text, s.offlineText]}>{str("offline")}</Text>
         </Enter>
@@ -342,7 +347,7 @@ export function Composer({
               </Text>
             ) : null}
             {record && !editing ? <IconButton icon="mic" label={str("record")} disabled={offline || disabled} onPress={() => onRecord?.()} style={s.bar} /> : null}
-            <IconButton icon={editing ? "check" : "send"} label={editing ? str("save") : str("sendMessage")} variant={sendable ? "solid" : "ghost"} disabled={!sendable} onPress={send} style={s.bar} />
+            <IconButton icon={editing ? "check" : "send"} label={editing ? str("save") : str("sendMessage")} variant={sendable ? "solid" : "ghost"} disabled={!sendable && !waiting} onPress={send} style={s.bar} />
           </View>
         </View>
       ) : null}
@@ -350,7 +355,7 @@ export function Composer({
         <View style={s.below}>
           {mode === "thread" ? <AlsoSend on={also} to={alsoSendTo || str("conversation")} onToggle={() => setAlso(!also)} strings={strings} styles={styles} /> : null}
           {uploading ? (
-            <Text testID="composer.hint" accessibilityLiveRegion="polite" style={[r.hint.view, r.hint.text]}>
+            <Text testID="composer.hint" style={[r.hint.view, r.hint.text]}>
               {str("uploadWaiting")}
             </Text>
           ) : null}

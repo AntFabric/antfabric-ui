@@ -13,6 +13,10 @@
  *   tokens    leaves by set: `shared`, `schemes`, `profiles`, `os`
  *   recipes   per-component recipe overrides by recipe id (`ThemeRecipes`), a child's cell over its parent's; `recipeFor` lays them over a recipe
  *
+ * `fg.onBrand` follows the fill: in each scheme where this theme's `brand` or `tokens` set `brand.default`, it is white or ink by contrast
+ * (`onBrandFor`, WCAG 4.5:1), unless the theme's own `tokens` set `fg.onBrand` for that scheme too. A theme that leaves `brand.default`
+ * alone keeps its parent's (the schema's is what `onBrandFor` gives AntFabric's coral: ink).
+ *
  * Every path is checked against `tokenSource` for its set (an OS set against its platform's profile), so a typo throws here,
  * naming the theme, the layer and the path, not at render time. A value is a literal (`"#18181b"`, `6`, `"6px"`) or a primitive
  * reference (`"{primitives.color.neutral.900}"`); `sets` holds it resolved, and the stylesheet writes a reference as the
@@ -30,7 +34,7 @@
  * overrides give the same id on any machine, the phone memoises on it, and the web scopes the theme's sheet by it. A theme is frozen.
  */
 
-import { BRAND_PATHS, brandValues, type BrandFont, type BrandTokens } from "./brand";
+import { BRAND_PATHS, brandValues, onBrandFor, rgbOf, type BrandFont, type BrandTokens } from "./brand";
 import { cssValue, flatten, referencedPrimitives, type Tree } from "./css";
 import { primitiveMeta } from "./primitives";
 import type { RecipeOverride } from "./recipe";
@@ -143,10 +147,19 @@ function isLeaf(tree: Tree, path: string): boolean {
 /**
  * The first thing in a value a stylesheet cannot hold, as `[character, why]`, or `undefined`: `;`, `{`, `}`, `<`, `>`, a backslash
  * (it escapes the closing brace and swallows every block after it), a comment marker, and a quote, parenthesis or bracket nothing closes
- * (or closes without an opening). Inside a quoted string only its closing quote counts, as in CSS.
+ * (or closes without an opening). Inside a quoted string only its closing quote counts, as in CSS. Also a control character (a newline
+ * ends the declaration), `@` and `!` (an at-rule, `!important`), and a function that loads a resource (`url(`, `image(`, `image-set(`,
+ * `-webkit-image-set(`, `src(`, `element(`, `cross-fade(`): a tenant's theme must not make every viewer fetch a URL.
  */
 function flaw(v: string): [string, string] | undefined {
-  const bad = /[;{}<>\\]/.exec(v);
+  const control = /[\u0000-\u001f\u007f]/.exec(v);
+  if (control) {
+    const code = `U+${control[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, "0")}`;
+    return [code, `a control character (${code})`];
+  }
+  const fetches = /(?<![\w-])(-webkit-image-set|image-set|image|url|src|element|cross-fade)\s*\(/i.exec(v);
+  if (fetches) return [`${fetches[1]!.toLowerCase()}(`, `the function ${fetches[1]!.toLowerCase()}(`];
+  const bad = /[;{}<>\\@!]/.exec(v);
   if (bad) return [bad[0], bad[0] === "\\" ? "a backslash" : `"${bad[0]}"`];
   const comment = /\/\*|\*\//.exec(v);
   if (comment) return [comment[0], `the comment marker ${comment[0]}`];
@@ -229,7 +242,8 @@ const deepFreeze = <T>(v: T): T => {
 /**
  * Builds a theme from its layers (extends, brand, fonts, tokens; see the top of this file; `extends` left out is `themes.neutral`). Throws on a path `tokenSource` does
  * not have for its set, a value that is neither a string nor a number, a string a stylesheet cannot hold (`;`, `{`, `}`, `<`, `>`,
- * a backslash, a comment marker, or a quote, parenthesis or bracket nothing closes; a font family name is held to the same)
+ * `@`, `!`, a backslash, a control character, a comment marker, a function that loads a resource such as `url(`, or a quote, parenthesis or
+ * bracket nothing closes; a font family name is held to the same), a brand `soft`, `softHover`, `onSoft` or `tint` that is not a colour
  * or a reference that names no primitive, naming the theme, the layer and the path; and on a recipe override naming a recipe, part,
  * layer, variant prop or value, state, platform or style key the recipe does not have, or a value that is not a `$token` the tokens
  * have, `transparent` or `none`, naming the theme, the recipe and where. Frozen.
@@ -241,6 +255,8 @@ export function defineTheme(input: ThemeInput): Theme {
     throw new Error(`defineTheme("${name}"), ${layer}: ${message}`);
   };
   const sets = new Map<SetName, Record<string, Value>>();
+  /** The layer that last wrote each `<set>|<path>`, so `fg.onBrand` can follow a `brand.default` this theme set. */
+  const by = new Map<string, string>();
   const put = (layer: string, set: SetName, path: string, v: unknown) => {
     const [schema, schemaName] = schemaOf(set);
     if (!path || !isLeaf(schema, path)) fail(layer, `"${path}" is not a token of ${schemaName}`);
@@ -260,6 +276,7 @@ export function defineTheme(input: ThemeInput): Theme {
     } else fail(layer, `${path} must be a string or a number, got ${v === null ? "null" : Array.isArray(v) ? "an array" : typeof v}`);
     if (!sets.has(set)) sets.set(set, {});
     sets.get(set)![path] = v as Value;
+    by.set(`${set}|${path}`, layer);
   };
 
   // extends: the parent's sets as it wrote them (a parent built elsewhere has only its resolved ones). Left out is `neutral`; `null` is the schema.
@@ -288,8 +305,6 @@ export function defineTheme(input: ThemeInput): Theme {
       } catch (e) {
         fail("brand", e instanceof Error ? e.message : String(e));
       }
-      // `brandValues` leaves `fg.onBrand` out while white reads on the primary (white is the kit's); a parent may have changed it, so say it.
-      if (input.brand.primary !== undefined && values["fg.onBrand"] === undefined) values["fg.onBrand"] = tokenSource.themes[scheme].fg.onBrand;
       for (const [path, v] of Object.entries(values)) put("brand", (BRAND_PATHS as readonly string[]).includes(path) ? `schemes.${scheme}` : fontSet(path), path, v);
     }
 
@@ -327,6 +342,16 @@ export function defineTheme(input: ThemeInput): Theme {
     named("schemes", t.schemes, SCHEMES, (k) => `schemes.${k}`);
     named("profiles", t.profiles, PLATFORMS, (k) => `profiles.${k}`);
     named("os", t.os, OSES, (k) => `os.${k}`);
+  }
+
+  // fg.onBrand: by contrast on a `brand.default` this theme set (its brand or its tokens), unless its own tokens set `fg.onBrand` for the scheme.
+  for (const scheme of SCHEMES) {
+    const set: SetName = `schemes.${scheme}`;
+    const fill = by.get(`${set}|brand.default`);
+    if (!fill || fill.startsWith("extends") || by.get(`${set}|fg.onBrand`)?.startsWith("tokens")) continue;
+    const rgb = rgbOf(String(resolveValue(sets.get(set)!["brand.default"]!)));
+    // A fill this cannot read (oklch(), a keyword) takes white, as every brand did before 1.1, not the schema's ink (AntFabric's coral's).
+    put(fill, set, "fg.onBrand", rgb ? onBrandFor(rgb) : "#ffffff");
   }
 
   // Resolved, in the shape `Theme.sets` has: only the sets that hold something.

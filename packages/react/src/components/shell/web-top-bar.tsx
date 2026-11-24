@@ -1,11 +1,11 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
-import { formatShortcut, recipes, useControllable, useStrings, type IconActionItem, type KitStrings } from "@antfabric/ui-core";
+import { formatShortcut, recipes, useControllable, useDirection, useStrings, type IconActionItem, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { css, pressable, row, text, truncate } from "../../lib/style";
+import { css, pressable, row, rtl, text, truncate } from "../../lib/style";
 import { Button } from "../actions/button";
 import { IconButton } from "../actions/icon-button";
 import { Kbd } from "../display/kbd";
@@ -89,6 +89,7 @@ const menuAt: CSSProperties = { position: "absolute", top: "100%", right: 0, zIn
 
 function Search({ placeholder, keys, label, hint, onPress, styles }: { placeholder: string; keys: string; label: string; hint: string; onPress: () => void; styles?: PartStyles<"web-top-bar"> }) {
   const ui = useInteraction();
+  const dir = useDirection();
   const r = useRecipe(recipes["web-top-bar"], { state: { hover: ui.hovered, focus: ui.focused }, styles });
   return (
     <button
@@ -100,10 +101,10 @@ function Search({ placeholder, keys, label, hint, onPress, styles }: { placehold
       title={hint}
       onClick={() => onPress()}
       {...ui.handlers}
-      style={css(search, r.search)}
+      style={css(rtl(search, dir), r.search)}
     >
       <Icon part="searchIcon" name="search" size={r.searchIcon.width} style={r.searchIcon} />
-      <span style={css(text, truncate(1), { flex: 1, textAlign: "left" })}>{placeholder}</span>
+      <span style={rtl(css(text, truncate(1), { flex: 1, textAlign: "left" }), dir)}>{placeholder}</span>
       <Kbd keys={keys} style={{ alignSelf: "center" }} />
     </button>
   );
@@ -119,8 +120,8 @@ export function WebTopBar({
   compact = false,
   actions = [],
   workspace = "",
-  menuOpen = false,
-  sidebarExpanded = false,
+  menuOpen,
+  sidebarExpanded,
   menu,
   trailing,
   onSidebarExpandedChange,
@@ -137,11 +138,14 @@ export function WebTopBar({
   ...rest
 }: WebTopBarProps) {
   const s = useStrings("web-top-bar", strings);
-  const { os } = usePlatform();
+  const { shortcutOs } = usePlatform();
+  const dir = useDirection();
   const r = useRecipe(recipes["web-top-bar"], { styles });
-  const [open, setOpen] = useControllable(menuOpen, onMenuOpenChange);
-  const [sidebar, setSidebar] = useControllable(sidebarExpanded, onSidebarExpandedChange);
+  const [open = false, setOpen] = useControllable(menuOpen, onMenuOpenChange);
+  const [sidebar = false, setSidebar] = useControllable(sidebarExpanded, onSidebarExpandedChange);
   const placeholder = searchPlaceholder || s("searchPlaceholder");
+  // A product's own placeholder says what the field searches, so it is the name too: the words on the field are in its name (WCAG 2.5.3).
+  const searchName = searchPlaceholder || s("searchLabel");
   const menuId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -156,6 +160,8 @@ export function WebTopBar({
       setNarrow(w > 0 && w < NARROW);
     };
     watch();
+    // A test DOM (jsdom) has no ResizeObserver: the bar is measured once.
+    if (typeof ResizeObserver === "undefined") return;
     const ro = new ResizeObserver(watch);
     ro.observe(el);
     return () => ro.disconnect();
@@ -202,9 +208,9 @@ export function WebTopBar({
           onPress={() => setSidebar(!sidebar)}
         />
         <div role="group" aria-label={s("history")} style={css(row, { gap: t.space["3xs"] })}>
-          <IconButton icon="arrow-left" label={s("back")} size="sm" disabled={!canGoBack} onPress={() => onBack?.()} />
-          <IconButton icon="arrow-right" label={s("forward")} size="sm" disabled={!canGoForward} onPress={() => onForward?.()} />
-          {history && !narrow ? <IconButton icon="clock" label={s("recentHistory")} size="sm" onPress={() => onHistory?.()} /> : null}
+          <IconButton icon={dir === "rtl" ? "arrow-right" : "arrow-left"} label={s("back")} size="sm" disabled={!canGoBack} onPress={() => onBack?.()} />
+          <IconButton icon={dir === "rtl" ? "arrow-left" : "arrow-right"} label={s("forward")} size="sm" disabled={!canGoForward} onPress={() => onForward?.()} />
+          {history && !small ? <IconButton icon="clock" label={s("recentHistory")} size="sm" onPress={() => onHistory?.()} /> : null}
         </div>
       </div>
       {!small && (
@@ -213,8 +219,8 @@ export function WebTopBar({
             <Search
               placeholder={placeholder}
               keys={searchKeys}
-              label={s("searchLabel")}
-              hint={s("searchHint", { placeholder, keys: formatShortcut(searchKeys, os) })}
+              label={searchName}
+              hint={s("searchHint", { placeholder, keys: formatShortcut(searchKeys, shortcutOs) })}
               onPress={() => onSearch?.()}
               styles={styles}
             />
@@ -222,7 +228,7 @@ export function WebTopBar({
         </div>
       )}
       <div style={css(side, { justifyContent: "flex-end" })}>
-        {small && showSearch ? <IconButton icon="search" label={s("searchLabel")} size="sm" onPress={() => onSearch?.()} /> : null}
+        {small && showSearch ? <IconButton icon="search" label={searchName} size="sm" onPress={() => onSearch?.()} /> : null}
         {trailing}
         {actions.map((a) =>
           a.showLabel && !small ? (
@@ -234,7 +240,7 @@ export function WebTopBar({
         {menu ? (
           <div ref={boxRef} style={menuBox} onKeyDown={closeOnEscape}>
             {trigger}
-            {open ? <div id={menuId} style={menuAt}>{menu}</div> : null}
+            {open ? <div id={menuId} style={rtl(menuAt, dir)}>{menu}</div> : null}
           </div>
         ) : (
           trigger

@@ -7,6 +7,7 @@ import { useCoarsePointer, useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, pressable, rtl, text, truncate } from "../../lib/style";
 import { useOverlayFocus } from "../../lib/focus";
+import { isComposing } from "../../lib/keys";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { useRovingKeys } from "../../lib/roving";
 import { IconButton } from "../actions/icon-button";
@@ -109,7 +110,7 @@ function useFlip(toggled: string) {
 const spoken = (item: MenuItem) => `${item.label ?? ""}${item.count != null ? `, ${item.count}` : ""}${item.sublabel ? `, ${item.sublabel}` : ""}`;
 
 function MenuRow({ item, checked, coarse, tabbable, styles, onPress }: { item: MenuRowItem; checked: boolean; coarse: boolean; tabbable: boolean; styles?: PartStyles<"menu">; onPress: () => void }) {
-  const { platform, os } = usePlatform();
+  const { platform, shortcutOs } = usePlatform();
   const dir = useDirection();
   const ui = useInteraction({ disabled: item.disabled });
   const toggle = typeof item.checked === "boolean";
@@ -126,7 +127,7 @@ function MenuRow({ item, checked, coarse, tabbable, styles, onPress }: { item: M
       data-af-part={part}
       data-af-press
       role={toggle ? (item.radio ? "menuitemradio" : "menuitemcheckbox") : "menuitem"}
-      aria-keyshortcuts={keys ? ariaShortcut(keys, os) : undefined}
+      aria-keyshortcuts={keys ? ariaShortcut(keys, shortcutOs) : undefined}
       aria-checked={toggle ? checked : undefined}
       // Disabled rows stay reachable by the arrows so a screen reader can say why.
       aria-disabled={item.disabled || undefined}
@@ -140,6 +141,16 @@ function MenuRow({ item, checked, coarse, tabbable, styles, onPress }: { item: M
         if (anchor) e.preventDefault();
         onPress();
       }}
+      // A link takes Enter by itself; Space, which every other row takes, it has to be given (and kept from scrolling the page).
+      onKeyDown={
+        anchor
+          ? (e: KeyboardEvent) => {
+              if (e.key !== " " || isComposing(e)) return;
+              e.preventDefault();
+              onPress();
+            }
+          : undefined
+      }
       {...ui.handlers}
       style={css(rtl(rowLook, dir), partStyle(r, part, { alignItems: item.sublabel ? "flex-start" : "center" }, coarse && { minHeight: t.menu.rowHCoarse }, ui.disabled && { cursor: "default" }))}
     >

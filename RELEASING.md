@@ -63,17 +63,20 @@ the repository is public (it refuses provenance for a private one).
 - `pnpm release:dry`: builds the packages, packs them with pnpm and runs `npm publish --dry-run` on
   each tarball, listing what it would hold. Nothing is sent.
 - `pnpm verify:packages`: packs the three packages, installs them in a scratch project, renders and
-  type-checks them.
+  type-checks them (under `moduleResolution` bundler and nodenext), and checks the `"use client"`
+  directives, the source maps and which of core's entries load under the `react-server` condition.
+  `build:packages` gives the `.d.ts` files' relative imports their `.js`, so `nodenext` can follow them.
 - Always publish a **pnpm-packed tarball** (`scripts/publish-packages.mjs` does): only pnpm applies
   `publishConfig` (the `dist` exports) and turns `workspace:^` into a version range. A plain
   `npm publish` in a package folder would ship the TypeScript sources' export map.
 
 ## Known follow-ups
 
-- **Types under `moduleResolution: node16` / `nodenext`.** The `.d.ts` files use extensionless
-  relative imports. Bundler resolution (Vite, Metro, Next, `moduleResolution: bundler`) is fine;
-  `verify:packages` only checks that. Emit `.js` extensions or bundle the declarations to serve
-  `nodenext` consumers.
+- **Core in the server graph.** The kits' files start with `"use client"`; core's do not, so a server
+  layout can import from it. Its `./dtcg` and `./antfabric` entries load under the `react-server`
+  condition; its root and `./chart` do not, because `state.ts` and `strings/react.ts` call
+  `createContext` (and `chart/tween.ts` imports `useState`) when they load. `verify:packages` lists
+  them in `SERVER_TODO`; moving the React parts out of core's root takes them off.
 - **Exact dependency versions.** `recharts`, `react-native-gifted-charts` and `gifted-charts-core` are
   pinned exactly. A caret range would let an app share one copy with its own.
 - **The catalogue has no public host yet.** `pnpm build` writes it to `apps/catalogue/dist`, and CI

@@ -13,7 +13,8 @@ import { Button } from "../actions/button";
 
 export type TextFieldType = "text" | "email" | "password" | "search" | "tel" | "url" | "number";
 
-export interface TextFieldProps extends RootProps {
+/** `nativeID`, the accessibility label and hint, and `ref` name the input; `testID` and `style` stay on the root. */
+export interface TextFieldProps extends RootProps<TextInput> {
   /** Visible label and the field's accessibility label. */
   label?: string;
   value?: string;
@@ -76,7 +77,8 @@ function entry(type: TextFieldType, autoComplete?: string): Partial<TextInputPro
     keyboardType: type === "email" ? "email-address" : type === "tel" ? "phone-pad" : type === "url" ? "url" : type === "number" ? "decimal-pad" : "default",
     autoCapitalize: address ? "none" : undefined,
     autoCorrect: address ? false : undefined,
-    textContentType: type === "email" ? "emailAddress" : type === "password" ? "password" : type === "tel" ? "telephoneNumber" : type === "url" ? "URL" : undefined,
+    // A sign-up field (`new-password`) is offered a strong new password, not the saved one.
+    textContentType: type === "email" ? "emailAddress" : type === "password" ? (autoComplete === "new-password" ? "newPassword" : "password") : type === "tel" ? "telephoneNumber" : type === "url" ? "URL" : undefined,
     autoComplete: autoComplete ? known[autoComplete] : undefined,
     returnKeyType: type === "search" ? "search" : undefined,
   };
@@ -100,7 +102,7 @@ const useStyles = createStyles(() => ({
 
 export function TextField({
   label = "",
-  value = "",
+  value,
   placeholder = "",
   type = "text",
   autoComplete,
@@ -134,7 +136,7 @@ export function TextField({
   // A password with `reveal` shows its characters while the Show button is on.
   const [visible, setVisible] = useState(false);
   const revealing = reveal && type === "password";
-  const [current, setText] = useControllable(value, onValueChange);
+  const [current = "", setText] = useControllable(value, onValueChange);
   const [hasFocus, setFocus] = useState(false);
   const [justCopied, setCopied] = useControllable(copied);
   const copiedSaid = str("copied");
@@ -173,7 +175,7 @@ export function TextField({
   const { placeholderTextColor, ...inputText } = input.text;
   const tagText = partStyle(r, "tag", { text: { lineHeight: (r.tag.text.fontSize as number) * 1.2 } }).text;
   return (
-    <View testID={partId(testID, "text-field", "root")} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
+    <View testID={partId(testID, "text-field", "root")} style={[s.root, r.root.view, style]}>
       {label || tag || required ? (
         <View style={[s.header, { gap: t.space.sm }]}>
           {label ? (
@@ -201,9 +203,8 @@ export function TextField({
           onChangeText={(next) => setText(next)}
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
-          accessibilityLabel={label || placeholder || form?.label}
-          // What is said after the name: the error or the helper, the field's own description and error, and that it is required.
-          accessibilityHint={[showError ? error : helper, form?.hint, required && !form?.required ? tag || str("required") : ""].filter(Boolean).join(". ") || undefined}
+          // Inside a FormField its visible label beats the placeholder (WCAG 2.5.3).
+          accessibilityLabel={label || form?.label || placeholder || undefined}
           accessibilityState={{ disabled }}
           editable={!disabled && !readOnly}
           maxLength={maxLength > 0 ? maxLength : undefined}
@@ -218,6 +219,10 @@ export function TextField({
             setFocus(false);
             onBlur?.();
           }}
+          {...rootProps(rest)}
+          // What is said after the name: the error or the helper, the field's own description and error, that it is required (never the tag
+          // in its place: the tag is read where it is drawn), then the product's hint.
+          accessibilityHint={[showError ? error : helper, form?.hint, required && !form?.required ? str("required") : "", rest.accessibilityHint].filter(Boolean).join(". ") || undefined}
           style={[s.input, input.view, inputText]}
         />
         {trailing || revealing ? (

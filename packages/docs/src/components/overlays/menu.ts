@@ -121,7 +121,7 @@ const docs: ComponentDocs = {
       import: "import { Menu } from \"@antfabric/ui-react\"",
       notes: [
         "Portalling and placing the panel are the app's (it takes a `placement` of below or above and does not flip at the viewport's edge); the panel scrolls inside 80vh when it has many rows.",
-        "A row with `href` is a link item (<a href role=\"menuitem\">), so ⌘-click and middle-click open a new tab; a plain click calls onSelect.",
+        "A row with `href` is a link item (<a href role=\"menuitem\">), so ⌘-click and middle-click open a new tab; a plain click, Enter and Space call onSelect.",
         "Shortcut hints are drawn only for shortcuts the page actually owns; a browser-reserved one (⌘W, ⌘T, ⌘N, ⌘L) is replaced by the web alternative, never shown as a promise the browser will break.",
         "Right-click is not this component — see Context menu.",
         "In the catalogue the panel pops in, and pressing a checkable row flips its check (one row at a time, through `toggled`); the menu stays open, as a checkbox row does.",
@@ -403,6 +403,27 @@ const docs: ComponentDocs = {
             {
               label: "Move to #platform-eng-incident-review-2026-q4-follow-ups",
               icon: "folder",
+            },
+            {
+              label: "Copy link",
+              icon: "link",
+            },
+          ],
+        },
+      },
+    },
+    {
+      title: "A row that navigates",
+      platforms: ["web", "desktop"],
+      handling: "A row with `href` is an <a href role=\"menuitem\">: ⌘-click and middle-click open a new tab, a plain click calls onSelect. A link takes Enter by itself; the row also takes Space, as every other row does, and keeps it from scrolling the page.",
+      example: {
+        name: "Link rows",
+        props: {
+          items: [
+            {
+              label: "Open in a new window",
+              icon: "external-link",
+              href: "/channels/platform-eng",
             },
             {
               label: "Copy link",

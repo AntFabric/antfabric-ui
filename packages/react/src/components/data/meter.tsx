@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
-import { meterReading, meterTone, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
+import { meterIcon, meterReading, meterTone, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { type RootProps, rootProps } from "../../lib/root-props";
@@ -24,7 +24,7 @@ export interface MeterProps extends RootProps<HTMLDivElement> {
   thresholds?: MeterThresholds;
   /** Just a short track with the value beside it, for a row of a table or a list that already names what it is. The label stays the track's accessible name. */
   compact?: boolean;
-  /** An icon beside the value in the caution and critical states, so the state is not the fill's colour alone. The spoken value always says it. */
+  /** An icon beside the value in the caution and critical states, so the state is not the fill's colour alone. On by default. The spoken value always says it. */
   showState?: boolean;
   /** Per-part styles over the theme: `{ root: {…}, head: {…}, label: {…}, value: {…}, track: {…}, fill: {…} }`. */
   styles?: PartStyles<"meter">;
@@ -33,20 +33,22 @@ export interface MeterProps extends RootProps<HTMLDivElement> {
   style?: CSSProperties;
 }
 
-export function Meter({ value, max = 1, label, kind = "usage", format = "percent", thresholds, compact = false, showState = false, styles, strings, style, ...rest }: MeterProps) {
+export function Meter({ value, max = 1, label, kind = "usage", format = "percent", thresholds, compact = false, showState = true, styles, strings, style, ...rest }: MeterProps) {
   const r = useRecipe(recipes.meter, { variants: { kind }, styles });
   const s = useStrings("meter", strings);
   const formatWords: FormatWords = { unavailable: s("unavailable"), points: ({ value }) => s("formatPoints", { value }), duration: ({ minutes, seconds }) => s("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
   const known = Number.isFinite(value) && Number.isFinite(max) && max > 0;
   const share = known ? value / max : 0;
-  const tone = meterTone(kind, share, thresholds);
+  // No value has no state: an empty score is not critical, in the fill, the icon or the words.
+  const tone = known ? meterTone(kind, share, thresholds) : "ok";
   const reading = meterReading(value, max, formatWords, format, locale);
   const shown = reading.kind === "unavailable" ? s("unavailable") : reading.kind === "of" ? s("valueOfMax", { value: reading.value, max: reading.max }) : reading.value;
   const fill = tone === "warning" ? t.data.warning : tone === "danger" ? t.data.negative : null;
   // The state is spoken as well as drawn: the fill's colour is never the only signal.
   const said = tone === "warning" ? s("stateWarning", { value: shown }) : tone === "danger" ? s("stateDanger", { value: shown }) : shown;
-  const mark = showState && tone !== "ok" ? <Icon name={tone === "danger" ? "circle-alert" : "triangle-alert"} size={t.icon.sizeMd} color={fill ?? undefined} style={{ marginRight: t.space["2xs"] }} /> : null;
+  const icon = meterIcon(tone);
+  const mark = showState && icon ? <Icon name={icon} size={t.icon.sizeMd} color={fill ?? undefined} style={{ marginRight: t.space["2xs"] }} /> : null;
   const valueText = <span data-af-part="value" style={css(text, partStyle(r, "value", { fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap", ...(mark ? { display: "inline-flex", alignItems: "center" } : {}) }))}>{mark}{shown}</span>;
   return (
     <div data-af-part="root" {...rootProps(rest)} style={css(box, partStyle(r, "root", { alignSelf: "stretch" }, compact ? { flexDirection: "row", alignItems: "center" } : { minWidth: t.kpi.meterMinW }), style)}>

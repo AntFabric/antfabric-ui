@@ -3,10 +3,11 @@ import { formatShortcut, recipes, useControllable, useDirection, useStrings, typ
 import { useAutoFocus, usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { useInteraction } from "../../lib/interaction";
 import { box, css, enter, input, pressable, row, rtl, text } from "../../lib/style";
-import { announce } from "../../lib/announce";
+import { announce, useAnnounce } from "../../lib/announce";
 import { useRovingKeys } from "../../lib/roving";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { IconButton } from "../actions/icon-button";
@@ -76,7 +77,10 @@ export interface ComposerProps extends RootProps<HTMLDivElement> {
   onAction?: (action: IconActionItem) => void;
   /** A staged attachment's card was pressed (the preview). */
   onAttachmentOpen?: (attachment: Attachment) => void;
-  /** A staged attachment's download was pressed. */
+  /**
+   * Never called: a staged file is the sender's own, so its chip has no download (a ready chip's body calls `onAttachmentOpen`).
+   * @deprecated Kept so 1.x code compiles; removed in 2.0.
+   */
   onAttachmentDownload?: (attachment: Attachment) => void;
   /** A staged attachment's remove or cancel was pressed: take it out of `attachments`. */
   onAttachmentCancel?: (attachment: Attachment) => void;
@@ -122,14 +126,14 @@ function AlsoSend({ on, to, onToggle, strings, styles }: Pick<ComposerProps, "st
 
 export function Composer({
   placeholder = "",
-  value = "",
+  value,
   mode = "default",
   sendKey = "enter",
   uploading = false,
   attachments = [],
   lengthHint = "",
   tooLong = false,
-  alsoSend = false,
+  alsoSend,
   alsoSendTo = "",
   formatting = false,
   attach = false,
@@ -162,9 +166,9 @@ export function Composer({
   ...rest
 }: ComposerProps) {
   const s = useStrings("composer", strings);
-  const { os } = usePlatform();
-  const [draft, setDraft] = useControllable(value, onValueChange);
-  const [also, setAlso] = useControllable(alsoSend, onAlsoSendChange);
+  const { shortcutOs } = usePlatform();
+  const [draft = "", setDraft] = useControllable(value, onValueChange);
+  const [also = false, setAlso] = useControllable(alsoSend, onAlsoSendChange);
   const [inside, setInside] = useState(false);
   const field = useRef<HTMLTextAreaElement>(null);
   const dir = useDirection();
@@ -190,6 +194,8 @@ export function Composer({
   const offline = mode === "offline";
   const typed = draft.trim() !== "";
   const sendable = typed && !uploading && !tooLong && !offline && !disabled;
+  // Only the upload stands in the way: Send stays pressable (aria-disabled), so a press says why it waits.
+  const waiting = typed && uploading && !tooLong && !offline && !disabled;
   // The counter is read at a few thresholds (100, 50, 10 left, then over), not on every keystroke.
   const left = /\d/.test(lengthHint) ? Number(lengthHint.replace(/[^\d]/g, "")) : null;
   const bucket = tooLong ? "over" : left === null ? "none" : left <= 10 ? "10" : left <= 50 ? "50" : left <= 100 ? "100" : "none";
@@ -199,9 +205,12 @@ export function Composer({
     lastBucket.current = bucket;
     if (bucket !== "none" && lengthHint) announce(lengthHint, bucket === "over" ? "assertive" : "polite");
   }, [bucket, lengthHint]);
+  // Going offline, or the channel locking, while the composer is on screen is said; the line itself is plain text.
+  useAnnounce(offline && s("offline"));
+  useAnnounce(locked && (mode === "archived" ? s("archivedTitle") : s("readonlyTitle")));
   const send = () => {
-    // Send is disabled while a file uploads; a press or Enter in that window says why.
-    if (typed && uploading && !tooLong && !offline) announce(s("uploadWaiting"));
+    // Send waits while a file uploads; a press or Enter in that window says why.
+    if (waiting) announce(s("uploadWaiting"));
     if (!sendable) return;
     const words = draft;
     // Cleared in the same tick as the press, so a double press cannot send twice.
@@ -210,7 +219,7 @@ export function Composer({
   };
   const keys = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     // Enter that commits an IME composition never sends.
-    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+    if (isComposing(e)) return;
     if (e.key === "Escape" && editing) {
       e.preventDefault();
       onCancelEdit?.();
@@ -256,18 +265,18 @@ export function Composer({
             {s("editing")}
           </span>
           <span data-af-part="editHint" style={css(text, r.editHint)}>
-            {s.parts("editHint", { save: formatShortcut("Enter", os) })}
+            {s.parts("editHint", { save: formatShortcut(sendKey === "mod-enter" ? "Mod+Enter" : "Enter", shortcutOs) })}
           </span>
         </div>
       )}
       {offline && (
-        <div role="status" aria-live="polite" data-af-part="offline" style={css(row, text, r.offline, enter("rise"))}>
+        <div data-af-part="offline" style={css(row, text, r.offline, enter("rise"))}>
           <Icon part="offlineIcon" name="wifi-off" size={r.offlineIcon.width} color={r.offlineIcon.color} style={r.offlineIcon} />
           <span style={css(text, { flex: 1 })}>{s("offline")}</span>
         </div>
       )}
       {locked && (
-        <div role="status" data-af-part="locked" style={css(row, { padding: "13px 15px" }, r.locked)}>
+        <div data-af-part="locked" style={css(row, { padding: "13px 15px" }, r.locked)}>
           <Icon part="lockedIcon" name={mode === "archived" ? "archive" : "lock"} size={r.lockedIcon.width} color={r.lockedIcon.color} style={r.lockedIcon} />
           <div style={css(box, { flex: 1, gap: t.space["3xs"] })}>
             <span data-af-part="lockedTitle" style={css(text, r.lockedTitle)}>
@@ -369,7 +378,8 @@ export function Composer({
               icon={editing ? "check" : "send"}
               label={editing ? s("save") : s("sendMessage")}
               variant={sendable ? "solid" : "ghost"}
-              disabled={!sendable}
+              disabled={!sendable && !waiting}
+              aria-disabled={waiting || undefined}
               onPress={send}
               style={{ flexShrink: 0, ...rtl({ marginLeft: t.space["2xs"] }, dir) }}
             />
@@ -387,12 +397,12 @@ export function Composer({
           <span style={spacer} />
           {keyHint && sendKey === "enter" && (
             <span data-af-part="hint" style={css(hint, r.hint)}>
-              {s.parts("newLine", { keys: formatShortcut("Shift+Enter", os) })}
+              {s.parts("newLine", { keys: formatShortcut("Shift+Enter", shortcutOs) })}
             </span>
           )}
           {keyHint && sendKey === "mod-enter" && (
             <span data-af-part="hint" style={css(hint, r.hint)}>
-              {s.parts("modSend", { send: formatShortcut("Mod+Enter", os), newline: formatShortcut("Enter", os) })}
+              {s.parts("modSend", { send: formatShortcut("Mod+Enter", shortcutOs), newline: formatShortcut("Enter", shortcutOs) })}
             </span>
           )}
         </div>

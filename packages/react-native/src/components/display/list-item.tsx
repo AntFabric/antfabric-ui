@@ -49,7 +49,7 @@ export interface ListItemProps extends RootProps {
   /** A hairline under the row, for card-less lists. */
   divider?: boolean;
   role?: ListItemRole;
-  /** Called with `selected` as the tap leaves it: a tap toggles it. */
+  /** Called with `selected` as the tap leaves it: a tap toggles it on a selection row (role option or checkbox) only. */
   onSelectedChange?: (selected: boolean) => void;
   /** The row was tapped. Opening what the row stands for is the caller's. */
   onPress?: () => void;
@@ -93,7 +93,7 @@ export function ListItem({
   detail = "",
   count = 0,
   chevron = false,
-  selected = false,
+  selected,
   unread = false,
   disabled = false,
   destructive = false,
@@ -112,7 +112,7 @@ export function ListItem({
   const s = useStyles();
   const str = useStrings("list-item", strings);
   const press = usePress({ disabled });
-  const [on, setOn] = useControllable(selected, onSelectedChange);
+  const [on = false, setOn] = useControllable(selected, onSelectedChange);
   // A phone row has no fill and no hover; `selected` to the recipe is a filled row, which only the web draws.
   const r = useRecipe(recipes["list-item"], { variants: { leading, tile, unread, destructive, divider, selected: on && (role === "link" || role === "button") }, state: { on, pressed: press.pressed, focus: press.focused, disabled: press.disabled }, styles });
   const withSubtitle = subtitle ? str("withSubtitle", { title, subtitle }) : title;
@@ -143,7 +143,8 @@ export function ListItem({
       accessibilityState={role === "checkbox" ? { disabled: press.disabled, checked: on } : { disabled: press.disabled, selected: on }}
       disabled={press.disabled}
       onPress={() => {
-        setOn(!on);
+        // Only a selection row (an option, a checkbox) toggles; a link, button or menu row's `selected` is the app's.
+        if (role === "option" || role === "checkbox") setOn(!on);
         onPress?.();
       }}
       onLongPress={onLongPress ? () => onLongPress() : undefined}

@@ -1,5 +1,5 @@
 import { memo, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { recipes, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
@@ -100,7 +100,8 @@ function SidebarItemView({
   const s = useStrings("sidebar-item", strings);
   const ui = useInteraction();
   const dir = useDirection();
-  // The ⋮ is there for a pointer over the row and for keyboard focus in it, so a keyboard user reaches Move, Mute and Leave.
+  // The ⋮ is there for a pointer over the row and for keyboard focus in it, so a keyboard user reaches Move, Mute and Leave. Hidden, it takes
+  // no press: a tap on a touch screen (no hover first) lands on the row, not on an invisible ⋮.
   const [over, setOver] = useState(false);
   const [within, setWithin] = useState(false);
   const hasMenu = actionsVisible || !!onMenu;
@@ -110,8 +111,8 @@ function SidebarItemView({
     e.preventDefault();
     onMenu();
   };
-  const [on, setOn] = useControllable(active);
-  const open = selectedName ? selectedName === name : on;
+  // Current is the app's (or the surrounding section's): a press reports itself and never makes the row current on its own.
+  const open = selectedName ? selectedName === name : active;
   const dim = muted ? 0.35 : 0.55;
   const r = useRecipe(recipes["sidebar-item"], {
     variants: { active: open, unread: unread && !muted, muted },
@@ -120,7 +121,10 @@ function SidebarItemView({
   });
   const meta = (named: string) => <Icon part="metaIcon" name={named} size={r.metaIcon.width} style={r.metaIcon} />;
   // The row's one accessible name: '#design-crit, 3 mentions, muted, draft'. Each part that applies is added through `withDetail`.
+  // The face's sparkle and presence dot are said in words too: an agent, or someone away, is not only a colour.
+  const face = !avatar ? "" : agent ? s("agent") : presence === "active" ? s("presenceActive") : presence === "away" ? s("presenceAway") : presence === "dnd" ? s("presenceDnd") : presence === "offline" ? s("presenceOffline") : "";
   const details = [
+    face,
     description,
     mentions > 0 ? s("withMentions", { count: mentions }) : unread && !muted ? s("unread") : "",
     muted ? s("muted") : "",
@@ -150,11 +154,7 @@ function SidebarItemView({
         title={name}
         aria-label={said}
         aria-current={open ? "page" : undefined}
-        onClick={() => {
-          // The current page is not a toggle: pressing the row again leaves it current.
-          setOn(true);
-          onPress?.();
-        }}
+        onClick={() => onPress?.()}
         onKeyDown={asked}
         {...ui.handlers}
         style={css(
@@ -179,7 +179,7 @@ function SidebarItemView({
         {muted && meta("bell-off")}
         {mentions > 0 && <Badge count={mentions} label={s("mentions")} style={{ alignSelf: "center" }} />}
       </button>
-      {hasMenu && <IconButton icon="ellipsis-vertical" label={s("options", { name })} size="sm" style={css(rtl(menuAt, dir), { opacity: showMenu ? 1 : 0 })} onPress={() => onMenu?.()} />}
+      {hasMenu && <IconButton icon="ellipsis-vertical" label={s("options", { name })} size="sm" style={css(rtl(menuAt, dir), { opacity: showMenu ? 1 : 0 }, !showMenu && { pointerEvents: "none" })} onPress={() => onMenu?.()} />}
     </div>
   );
 }

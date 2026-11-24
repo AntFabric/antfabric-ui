@@ -33,7 +33,7 @@ const docs: ComponentDocs = {
     searchPlaceholder: {
       type: "string",
       default: "",
-      description: "The field's text. Empty uses the `searchPlaceholder` string (\"Search\"); a product says what it searches.",
+      description: "The field's text, and its accessible name (and the compact magnifier's), so what the field shows is what it is called. Empty uses the `searchPlaceholder` string (\"Search\") on the field and the `searchLabel` string as its name; a product says what it searches.",
     },
     searchKeys: {
       type: "string",
@@ -234,7 +234,7 @@ const docs: ComponentDocs = {
     {
       title: "Narrow window (under 768px)",
       platforms: ["web"],
-      handling: "Search collapses to its magnifier and 'Open in desktop app' to its icon, each keeping its full name as tooltip and accessible label. Back, Forward and History never collapse. At 320 CSS px (400% zoom on a laptop, WCAG 1.4.10) the bar still fits without horizontal scroll.",
+      handling: "Search collapses to its magnifier and 'Open in desktop app' to its icon, each keeping its full name as tooltip and accessible label, and Recent history leaves the bar. Back and Forward never collapse; `compact` does the same at any width. At 320 CSS px (400% zoom on a laptop, WCAG 1.4.10) the bar still fits without horizontal scroll.",
       example: {
         name: "Compact",
         props: {
@@ -242,6 +242,23 @@ const docs: ComponentDocs = {
         },
         width: 560,
       },
+    },
+    {
+      title: "A product's own placeholder",
+      platforms: ["web"],
+      handling: "`searchPlaceholder` is both the words on the field and its accessible name, and the compact magnifier's, so a speech user who says what they see reaches it (WCAG 2.5.3). Without it the field shows the `searchPlaceholder` string and is named by the `searchLabel` string.",
+      example: {
+        name: "Search messages and files",
+        props: {
+          searchPlaceholder: "Search messages and files",
+        },
+        width: 1100,
+      },
+    },
+    {
+      title: "Right-to-left",
+      platforms: ["web"],
+      handling: "In Arabic or Hebrew the bar mirrors: the sidebar button and history sit at the right, the ⋯ menu at the left, and the search field's text starts at its right edge. Back points right and Forward points left.",
     },
     {
       title: "Several AntFabric tabs open",

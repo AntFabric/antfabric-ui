@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
-import { Animated, PanResponder, Platform, Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { AccessibilityInfo, Animated, PanResponder, Platform, Text, View, findNodeHandle, type ViewStyle } from "react-native";
+import { recipes, useControllable, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { announce, useBackHandler } from "../../lib/a11y";
 import { Icon } from "../../lib/icon";
@@ -22,13 +22,14 @@ export interface UpdateBannerProps extends RootProps {
   appVersion: string;
   /** The Restart to apply? sheet is open. */
   confirm?: boolean;
-  /** Called with `stage` as Check again leaves it (checking). */
+  /** Reports the request Check again makes (checking). The card waits for the app to pass the new `stage`; it never moves it. */
   onStageChange?: (stage: UpdateBannerStage) => void;
   /** Open the store for a store-required version. */
   onApply?: () => void;
   /** Restart now: reload onto the downloaded update. */
   onRestart?: () => void;
-  onCheck?: () => void;
+  /** Check again: the button spins until the app answers with `stage` or `error`, or the promise settles. */
+  onCheck?: () => void | Promise<unknown>;
   /** Per-part styles over the theme: `{ root: {…}, card: {…}, versionRow: {…}, sheet: {…} }`. */
   styles?: PartStyles<"update-banner">;
   /** This card's built-in text (the version line, the notes, the buttons, the restart sheet) over the tree's and the English defaults. */
@@ -77,7 +78,7 @@ function useSwipeDown(onDismiss: () => void) {
 }
 
 export function UpdateBanner({
-  stage = "available",
+  stage: current = "available",
   version,
   error,
   appVersion,
@@ -96,8 +97,9 @@ export function UpdateBanner({
   const s = useStyles();
   const str = useStrings("update-banner", strings);
   const r = useRecipe(recipes["update-banner"], { styles });
-  // Check for updates moves the card to checking at once; Restart to apply opens the sheet and Later puts it away.
-  const [current, setStage] = useControllable(stage, onStageChange);
+  // Check again reports the request and spins until the app answers (the stage is expo-updates'); Restart to apply opens the sheet and
+  // Later puts it away, which is the card's own.
+  const { pending, run } = usePending([current, error]);
   const [confirm, setConfirm] = useControllable(confirmProp);
   const swipe = useSwipeDown(() => setConfirm(false));
   const busy = current === "checking" || current === "downloading" || current === "available";
@@ -110,6 +112,12 @@ export function UpdateBanner({
   }, [said]);
   // Android's back button puts the restart sheet away, as Later does.
   useBackHandler(() => setConfirm(false), confirm);
+  // A screen reader starts at the restart sheet's title when it opens, as it does in a Dialog.
+  const sheetTitle = useRef<Text>(null);
+  useEffect(() => {
+    const node = confirm && Platform.OS !== "web" && sheetTitle.current ? findNodeHandle(sheetTitle.current) : null;
+    if (node) AccessibilityInfo.setAccessibilityFocus(node);
+  }, [confirm]);
   return (
     <View {...rootProps(rest)} testID={partId(testID, "update-banner", "root")} style={[s.root, r.root.view, style]}>
       <View testID={partId(testID, "update-banner", "card")} style={r.card.view}>
@@ -120,7 +128,7 @@ export function UpdateBanner({
           <Text testID={partId(testID, "update-banner", "versionText")} maxFontSizeMultiplier={fontScale.content} style={[s.versionText, r.versionText.view, r.versionText.text]}>{str.parts("appVersion", { version: appVersion })}</Text>
         </View>
         {current === "failed" ? (
-          <Text testID={partId(testID, "update-banner", "error")} accessibilityRole="alert" maxFontSizeMultiplier={fontScale.content} style={[r.error.view, r.error.text]}>
+          <Text testID={partId(testID, "update-banner", "error")} maxFontSizeMultiplier={fontScale.content} style={[r.error.view, r.error.text]}>
             {error || str("errorDefault")}
           </Text>
         ) : null}
@@ -140,11 +148,17 @@ export function UpdateBanner({
             size="lg"
             variant="secondary"
             iconLeading="cloud-download"
-            loading={busy}
-            onPress={() => {
-              setStage("checking");
-              onCheck?.();
-            }}
+            loading={busy || pending}
+            onPress={() =>
+              run(
+                onStageChange || onCheck
+                  ? () => {
+                      onStageChange?.("checking");
+                      return onCheck?.();
+                    }
+                  : undefined,
+              )
+            }
           />
         ) : null}
         {current === "store-required" ? (
@@ -152,10 +166,10 @@ export function UpdateBanner({
         ) : null}
       </View>
       {confirm ? (
-        <Enter motion="slide-up" role="dialog" aria-modal accessibilityLabel={str("confirmTitle")} accessibilityViewIsModal>
+        <Enter motion="slide-up" role="dialog" aria-modal accessibilityLabel={str("confirmTitle")} accessibilityViewIsModal onAccessibilityEscape={() => setConfirm(false)}>
           <Animated.View testID={partId(testID, "update-banner", "sheet")} {...swipe.handlers} style={[s.sheet, r.sheet.view, { transform: [{ translateY: swipe.y }] }]}>
             <View testID={partId(testID, "update-banner", "grabber")} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden style={[s.grabber, r.grabber.view]} />
-            <Text testID={partId(testID, "update-banner", "sheetTitle")} accessibilityRole="header" maxFontSizeMultiplier={fontScale.content} style={[r.sheetTitle.view, r.sheetTitle.text]}>
+            <Text ref={sheetTitle} testID={partId(testID, "update-banner", "sheetTitle")} accessibilityRole="header" maxFontSizeMultiplier={fontScale.content} style={[r.sheetTitle.view, r.sheetTitle.text]}>
               {str("confirmTitle")}
             </Text>
             <Text testID={partId(testID, "update-banner", "sheetBody")} maxFontSizeMultiplier={fontScale.content} style={[s.sheetBody, r.sheetBody.view, r.sheetBody.text]}>

@@ -9,8 +9,8 @@
  * (`AntFabricRoot theme`, `ThemeProvider theme`).
  *
  * Only the brand family is overridable. Neutrals, status colours and identity colours (`identity.agent`
- * is Fabric, never a tenant) stay put. `fg.onBrand` is white, as the product's is,
- * unless a tenant's primary is too light for white.
+ * is Fabric, never a tenant) stay put. `fg.onBrand` is picked by contrast (`onBrandFor`): white while white reaches 4.5:1 on the
+ * primary, otherwise ink. AntFabric's own coral takes ink (white on #fe4632 is 3.42:1).
  */
 
 import { tokens } from "./tokens";
@@ -115,13 +115,24 @@ function fontValues(face: "sans" | "display", input: string | BrandFont, { stack
     out[`font.file${key}${token}` as (typeof BRAND_FONT_PATHS)[number]] = font.files?.[weight] ?? `${family}-${file}`;
 }
 
-type RGB = [number, number, number];
+/** A colour as 0..255 sRGB channels. */
+export type RGB = [number, number, number];
 
 function parse(hex: string, what: string): RGB {
   const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) throw new Error(`brand.${what} must be #rgb or #rrggbb, got "${hex}"`);
   const h = m[1]!.length === 3 ? [...m[1]!].map((c) => c + c).join("") : m[1]!;
   return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) as RGB;
+}
+
+/** `rgb()`/`rgba()`/`hsl()`/`hsla()` with numbers only, comma, space or slash between them (written so that nothing backtracks). */
+const COLOUR_FN = /^(?:rgba?|hsla?)\(\s*[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:%|deg|turn|rad|grad)?(?:(?:\s*[,/]\s*|\s+)[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:%|deg|turn|rad|grad)?)*\s*\)$/i;
+
+/** A hand-picked colour as given, when it is one both kits draw: hex, `rgb()`/`rgba()` or `hsl()`/`hsla()` with numbers only (React Native has no `oklch()`). */
+function colour(v: unknown, what: string): string {
+  const ok = typeof v === "string" && (/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(v.trim()) || COLOUR_FN.test(v.trim()));
+  if (!ok) throw new Error(`brand.${what} must be a colour (#hex, rgb() or hsl()), got "${String(v)}"`);
+  return v as string;
 }
 
 const hex = ([r, g, b]: RGB) => `#${[r, g, b].map((n) => Math.round(n).toString(16).padStart(2, "0")).join("")}`;
@@ -136,24 +147,42 @@ const mix = (c: RGB, to: RGB, amount: number): RGB => c.map((v, i) => v + (to[i]
 const BLACK: RGB = [0, 0, 0];
 const WHITE: RGB = [255, 255, 255];
 /** `fg.strong` in the light theme: the ink a light brand fill takes instead of white. */
-const INK: RGB = [14, 24, 40];
+const INK: RGB = parse(tokens.themes.light.fg.strong, "ink");
 
 const luminance = (c: RGB) => {
   const [r, g, b] = c.map((v) => v / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)) as RGB;
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 };
-const contrast = (a: RGB, b: RGB) => {
+
+/** WCAG 2's contrast ratio of two opaque colours (relative luminance), 1 to 21. */
+export const contrast = (a: RGB, b: RGB): number => {
   const [x, y] = [luminance(a), luminance(b)];
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
 };
 
+/** An opaque colour as written in a token: `#rgb`, `#rrggbb`, `rgb()`/`rgba()` or `hsl()`/`hsla()` with numbers (its alpha is ignored); `undefined` for anything else. */
+export function rgbOf(value: string): RGB | undefined {
+  const v = value.trim();
+  if (/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)) return parse(v, "colour");
+  const n = "([-+]?(?:\\d+(?:\\.\\d*)?|\\.\\d+))";
+  const m = new RegExp(`^(rgba?|hsla?)\\(\\s*${n}(deg|turn|rad|grad)?\\s*[,\\s]\\s*${n}%?\\s*[,\\s]\\s*${n}%?`, "i").exec(v);
+  if (!m) return undefined;
+  const [a, unit, b, c] = [Number(m[2]), m[3]?.toLowerCase(), Number(m[4]), Number(m[5])];
+  if (m[1]!.toLowerCase().startsWith("rgb")) return [a, b, c];
+  // hsl: the hue in degrees (or turns, radians, gradians), saturation and lightness in percent.
+  const h = ((unit === "turn" ? a * 360 : unit === "rad" ? (a * 180) / Math.PI : unit === "grad" ? a * 0.9 : a) % 360 + 360) % 360;
+  const [sat, light] = [Math.min(1, Math.max(0, b / 100)), Math.min(1, Math.max(0, c / 100))];
+  const k = (x: number) => (x + h / 30) % 12;
+  const f = (x: number) => light - sat * Math.min(light, 1 - light) * Math.max(-1, Math.min(k(x) - 3, 9 - k(x), 1));
+  return [f(0), f(8), f(4)].map((x) => Math.round(x * 255)) as RGB;
+}
+
 /**
- * Text on the brand fill. White, as the product's, while white reaches 3:1 on it (WCAG's level for large and
- * bold text, which the product's own coral relies on: white on #fe4632 is 3.4:1); below that, ink when ink
- * reads better. A yellow or pale-teal tenant gets ink; coral and darker brands keep white.
+ * Text on a brand fill, by contrast (WCAG 1.4.3, 4.5:1): white while white reaches 4.5:1 on it, otherwise whichever of white and ink reads
+ * better. A dark tenant keeps white; AntFabric's coral (white 3.42:1, ink 5.20:1) and a yellow or pale-teal tenant take ink. As hex.
  */
-function onBrand(p: RGB): RGB {
-  return contrast(WHITE, p) >= 3 || contrast(WHITE, p) >= contrast(INK, p) ? WHITE : INK;
+export function onBrandFor(fill: RGB): string {
+  return hex(contrast(WHITE, fill) >= 4.5 || contrast(WHITE, fill) >= contrast(INK, fill) ? WHITE : INK);
 }
 
 /**
@@ -166,6 +195,7 @@ function onBrand(p: RGB): RGB {
  *  - `surface.unread`    2.5% / 5%                                      :190
  *  - `brand.tint`        the hand-picked `soft`, else the same tint as `brand.soft`  :191
  *  - `accent.soft`       14% / 22% of `accent`                          :193
+ *  - `fg.onBrand`        white or ink by contrast on `primary` (`onBrandFor`); the product's is always white
  * The product has no hover, pressed, link or brand-border token (its phone presses with opacity), so
  * those are this repository's: `brand.hover` is `primary` 10% toward black, `brand.active` 25% toward
  * black on light and 60% toward white on dark (the default coral goes the same way: #c02616 and
@@ -189,7 +219,7 @@ export function brandValues(brand: Partial<BrandTokens>, theme: Scheme, target: 
     out["brand.soft"] = alpha(p, dark ? 0.22 : 0.12);
     out["brand.softHover"] = alpha(p, dark ? 0.32 : 0.2);
     out["fg.onBrandSoft"] = hex(p);
-    if (onBrand(p) === INK) out["fg.onBrand"] = hex(INK); // white is already the default; only a light brand changes it
+    out["fg.onBrand"] = onBrandFor(p);
     out["link.default"] = hex(dark ? mix(p, WHITE, 0.35) : active);
     out["border.brand"] = hex(dark ? mix(p, BLACK, 0.4) : mix(p, WHITE, 0.6));
     out["surface.unread"] = alpha(p, dark ? 0.05 : 0.025);
@@ -201,12 +231,12 @@ export function brandValues(brand: Partial<BrandTokens>, theme: Scheme, target: 
     out["accent.soft"] = alpha(a, dark ? 0.22 : 0.14);
   }
   if (brand.soft) {
-    out["brand.soft"] = brand.soft[theme];
+    out["brand.soft"] = colour(brand.soft[theme], `soft.${theme}`);
     out["brand.tint"] = brand.soft[theme];
   }
-  if (brand.softHover) out["brand.softHover"] = brand.softHover[theme];
-  if (brand.onSoft) out["fg.onBrandSoft"] = brand.onSoft[theme];
-  if (brand.tint) out["brand.tint"] = brand.tint[theme];
+  if (brand.softHover) out["brand.softHover"] = colour(brand.softHover[theme], `softHover.${theme}`);
+  if (brand.onSoft) out["fg.onBrandSoft"] = colour(brand.onSoft[theme], `onSoft.${theme}`);
+  if (brand.tint) out["brand.tint"] = colour(brand.tint[theme], `tint.${theme}`);
   if (brand.fonts?.sans !== undefined) fontValues("sans", brand.fonts.sans, target, out);
   if (brand.fonts?.display !== undefined) fontValues("display", brand.fonts.display, target, out);
   return out;

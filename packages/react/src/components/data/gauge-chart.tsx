@@ -2,8 +2,9 @@ import type { CSSProperties } from "react";
 import { type RootProps, rootProps } from "../../lib/root-props";
 import { Cell, Pie, PieChart } from "recharts";
 import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-core";
-import { GAUGE_GAP_DEG, GAUGE_HOLE, fmt, gaugeState, onHalfRing, summarizeGauge, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
+import { GAUGE_GAP_DEG, GAUGE_HOLE, fmt, gaugeState, meterIcon, meterShown, onHalfRing, summarizeGauge, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
 import { t } from "../../tokens";
+import { Icon } from "../../lib/icon";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, row, text } from "../../lib/style";
 import { ChartCard, type ChartHeadline } from "../../data/chart-card";
@@ -32,8 +33,10 @@ export interface GaugeChartProps extends RootProps<HTMLDivElement> {
   kind?: MeterKind;
   /** The shares of `max` where the fill turns to the caution colour and then the loss colour. Default Meter's for the kind. */
   thresholds?: MeterThresholds;
-  /** A format name, its options, or a function: what core's `fmt` takes. The value, the target, the ends, the summary and the table print through it. */
+  /** A format name, its options, or a function: what core's `fmt` takes. The value, the target, the ends, the summary and the table print through it; a percent format prints each as its share of `max`. */
   format?: FormatSpec;
+  /** An icon beside the value in the caution and critical states, so the state is not the ring's colour alone. On by default. The summary always says it. */
+  showState?: boolean;
   /** The half ring's width; its height is half. */
   size?: number;
   /** The title of the empty state when the value is not a number. */
@@ -51,7 +54,7 @@ export interface GaugeChartProps extends RootProps<HTMLDivElement> {
   style?: CSSProperties;
 }
 
-export function GaugeChart({ value, max = 1, target, title, subtitle = "", headline, label = "", kind = "score", thresholds, format = "percent", size, empty, emptyLine, loading = false, styles, strings, headingLevel, style, ...rest }: GaugeChartProps) {
+export function GaugeChart({ value, max = 1, target, title, subtitle = "", headline, label = "", kind = "score", thresholds, format = "percent", showState = true, size, empty, emptyLine, loading = false, styles, strings, headingLevel, style, ...rest }: GaugeChartProps) {
   const str = useStrings("gauge-chart", strings);
   const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   const locale = useLocale();
@@ -67,15 +70,20 @@ export function GaugeChart({ value, max = 1, target, title, subtitle = "", headl
   const over = tk.chart.tickOver;
   // The ring's flat edge is `over` above the bottom, so the tick has room to reach past the ring's top and ends.
   const cy = outer + over;
+  // Meter's state mark: an icon beside the number in caution and critical, and the state said after the value, so it is not the ring's colour alone.
+  const tone = g.known ? g.tone : "ok";
+  const icon = showState ? meterIcon(tone) : null;
   const summary = summarizeGauge({ label: title, value, max, target, caption: label, format, formatWords, locale }, {
     noValue: (v) => str("summaryNoValue", v),
     caption: (v) => str("summaryCaption", v),
     over: (v) => str("summaryOver", v),
     target: (v) => str("summaryTarget", v),
-    summary: (v) => str("summary", v),
+    summary: (v) => str("summary", { ...v, value: tone === "warning" ? str("stateWarning", { value: v.value }) : tone === "danger" ? str("stateDanger", { value: v.value }) : v.value }),
   });
   const tick = g.targetShare === null ? null : { a: onHalfRing(g.targetShare, w / 2, cy, inner - over), b: onHalfRing(g.targetShare, w / 2, cy, outer + over) };
   const hasTarget = g.targetShare !== null;
+  // Meter's reading: a percent format prints the share of `max` (58 of 100 is 58%), any other the value itself.
+  const shown = (v: number) => meterShown(v, max, format);
   return (
     <ChartCard
       headingLevel={headingLevel}
@@ -83,8 +91,8 @@ export function GaugeChart({ value, max = 1, target, title, subtitle = "", headl
       r={r} viewAsTable={str("viewAsTable")} viewAsChart={str("viewAsChart")}
       title={title}
       subtitle={subtitle}
-      headline={headline && { format, ...headline }}
-      table={!loading && g.known ? { data: [{ measure: title, value, ...(hasTarget ? { target } : {}) }], x: "measure", y: hasTarget ? ["value", "target"] : ["value"], format, labels: { value: str("value"), target: str("target") }, xLabel: str("measure") } : null}
+      headline={headline && { format, ...headline, value: headline.format === undefined ? shown(headline.value) : headline.value }}
+      table={!loading && g.known ? { data: [{ measure: title, value: shown(value), ...(hasTarget ? { target: shown(target!) } : {}) }], x: "measure", y: hasTarget ? ["value", "target"] : ["value"], format, labels: { value: str("value"), target: str("target") }, xLabel: str("measure") } : null}
       style={style}
     >
       <ChartFrame height={cy + over} grow label={loading ? str("loading", { title }) : summary} loading={loading} empty={!g.known} emptyTitle={empty ?? str("empty")} emptyLine={emptyLine ?? str("emptyLine")} loadingLabel={str("loadingChart")}>
@@ -120,14 +128,21 @@ export function GaugeChart({ value, max = 1, target, title, subtitle = "", headl
                 </svg>
               ) : null}
               <div aria-hidden data-af-part="center" style={css(box, { position: "absolute", left: 0, right: 0, top: 0, bottom: over, alignItems: "center", justifyContent: "flex-end", pointerEvents: "none", textAlign: "center", paddingBottom: t.space["3xs"] }, r.center)}>
-                <MetricValue value={value} format={format} size="lg" />
+                {icon ? (
+                  <span style={css(row, { gap: t.space["2xs"] })}>
+                    <Icon name={icon} size={t.icon.sizeMd} color={color} />
+                    <MetricValue value={shown(value)} format={format} size="lg" />
+                  </span>
+                ) : (
+                  <MetricValue value={shown(value)} format={format} size="lg" />
+                )}
                 {label ? <span data-af-part="centerLabel" style={css(text, { maxWidth: "70%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: t.chart.font }, r.centerLabel)}>{label}</span> : null}
               </div>
             </div>
             <div data-af-part="foot" style={css(row, partStyle(r, "foot", { justifyContent: "space-between", width: w, marginTop: t.space.xs, fontFamily: t.chart.font, fontVariantNumeric: "tabular-nums" }))}>
-              <span>{fmt(format, 0, formatWords, locale)}</span>
-              {hasTarget ? <span>{str.parts("targetValue", { value: fmt(format, target, formatWords, locale) })}</span> : null}
-              <span>{fmt(format, max, formatWords, locale)}</span>
+              <span>{fmt(format, shown(0), formatWords, locale)}</span>
+              {hasTarget ? <span>{str.parts("targetValue", { value: fmt(format, shown(target!), formatWords, locale) })}</span> : null}
+              <span>{fmt(format, shown(max), formatWords, locale)}</span>
             </div>
           </div>
         )}

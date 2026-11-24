@@ -131,6 +131,8 @@ export function Skeleton({
   const reduceMotion = useReducedMotion();
   useSweep(visible, reduceMotion);
   const name = label ?? str("loading");
+  // A one-line row has a small lead, as the web's does.
+  const leadSize = lines === 1 ? 20 : 36;
   // iOS has no live regions: the placeholder is spoken once, when it appears.
   useEffect(() => {
     if (visible) announce(name);
@@ -138,14 +140,17 @@ export function Skeleton({
   return (
     <Enter
       // Laid out but invisible until `visible`; then it fades in.
-      {...rootProps(rest)}
       testID={partId(testID, "skeleton", "root")}
       key={visible ? "on" : "off"}
       motion={visible ? "fade" : false}
-      accessible
+      // Invisible for its first moments: nothing is said, and nothing is there to find.
+      accessible={visible}
+      accessibilityElementsHidden={!visible}
+      importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
       role="status"
       accessibilityLabel={name}
       accessibilityState={{ busy: true }}
+      {...rootProps(rest)}
       style={[{ alignSelf: shape === "row" ? "stretch" : "flex-start", maxWidth: "100%" }, partStyle(r, "root", { view: !visible && { opacity: 0 } }).view, style]}
     >
       {shape !== "row" ? (
@@ -153,7 +158,7 @@ export function Skeleton({
       ) : (
         rows.map((spec, i) => (
           <View key={i} testID={partId(testID, "skeleton", "row")} importantForAccessibility="no-hide-descendants" style={[s.row, r.row.view]}>
-            {lead !== "none" ? <Shape part="lead" testID={testID} look={partStyle(r, "lead", { view: { width: 36, height: 36, ...(lead === "tile" && { borderRadius: lines === 1 ? 6 : 10 }) } })} /> : null}
+            {lead !== "none" ? <Shape part="lead" testID={testID} look={partStyle(r, "lead", { view: { width: leadSize, height: leadSize, ...(lead === "tile" && { borderRadius: lines === 1 ? 6 : 10 }) } })} /> : null}
             <View style={s.lines}>
               <View testID={partId(testID, "skeleton", "titleBox")} style={[s.titleBox, r.titleBox.view]}>
                 <Shape part="bar" testID={testID} look={partStyle(r, "bar", { view: { width: spec.title, height: 10 } })} />

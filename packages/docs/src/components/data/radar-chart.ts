@@ -37,6 +37,7 @@ const docs: ComponentDocs = {
     max: { type: "number", default: 100, description: "What a score at the outer ring is. A score past it is drawn on the ring and a score under zero at the centre; the tooltip and the table still say the real number." },
     format,
     labels,
+    marks: { type: "boolean", description: "Each series gets its own dash pattern and marker shape besides its colour, the line chart's (`seriesMark`): in its outline, at each axis and in the legend's key, so two series are never told apart by hue alone (WCAG 1.4.1). Left out, it is on for two or more series and off for one; `false` keeps plain outlines where the product labels the series another way." },
     height,
     empty,
     emptyLine,
@@ -78,6 +79,7 @@ const docs: ComponentDocs = {
         "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there.",
         "gifted-charts' radar applies one opacity to a polygon's fill and line alike, so each series is two polygons in `dataSet`: its fill at `FLAT_FILL`, then its line over it. Its grid and polygon gradients default on and share ids across charts, which draws the wrong colours, so `showGradient` is off on every one and the fills are the tokens'.",
         "gifted-charts' radar has no pointer of its own: the kit finds the axis under a finger from where it lands (core's `nearestAxis`) and draws the tooltip card, so a finger can read each axis as the web's pointer does.",
+        "With `marks`, each outline is dashed through the polygon config's `strokeDashArray`. gifted-charts' radar draws no markers, so the kit draws them in an svg over the plot, at the points the library draws (core's `radarPoint`: the same centre, outer ring and angles). They do not draw in with the polygons: they are there from the start.",
         "The polygons draw in unless the person reduces motion. Under react-native-web (the catalogue, `pnpm check`) gifted-charts' animation is off, because the values it animates with reach the DOM as text.",
       ],
       gestures: [
@@ -93,6 +95,7 @@ const docs: ComponentDocs = {
       "The figure is named by the sentence core's `summarize` writes from the rows, categories read as highest and lowest; it is heard, not printed: in the light theme most series colours sit under 3:1 against the card, so the tooltip and \"View as table\" give the scores without colour.",
       "\"View as table\" is the other way in, and the better one for exact numbers: one row per axis, one column per series, with real headers.",
       "The legend says what it toggles: each entry is a button that is pressed while the series is on, struck through when it is off. The last series showing cannot be turned off.",
+      "With `marks` (on by default for two or more series), a series is told apart by its outline's dash and the marker at each axis as well as its colour (the first solid with round markers, the next dashed with squares), and the legend's key draws the same.",
       "A radar is not read polygon by polygon: the summary and the table carry the scores, and the tooltip is never the only place a value is.",
     ],
   },

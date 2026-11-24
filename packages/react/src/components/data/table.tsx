@@ -14,6 +14,7 @@ import {
   nextSort,
   pageCountOf,
   pickState,
+  rowIds,
   sortRows,
   sparkRows,
   togglePage,
@@ -57,7 +58,7 @@ export interface TableProps extends RootProps<HTMLDivElement> {
   columns: TableColumn[];
   /** One object per row. The same rows can feed a chart, a stat and a table. */
   rows: Row[];
-  /** The field of each row that names it, for selection and for React's keys. Default `key`; the keys `selected` holds are its values as text. */
+  /** The field of each row that names it, for selection and for React's keys. Default `key`; the keys `selected` holds are its values as text. A row without the field is named by its index in `rows`. */
   rowKey?: string;
   /** The column the rows are ordered by and which way, or `null` for the order they came in. */
   sort?: TableSort | null;
@@ -378,7 +379,7 @@ export function Table({ columns, rows, rowKey = "key", sort, onSortChange, selec
   const count = pageCountOf(rowTotal, pageSize);
   const current = clampPage(at ?? 1, count);
   const shown = pageSize > 0 && !manual ? sorted.slice((current - 1) * pageSize, current * pageSize) : sorted;
-  const ids = shown.map((x) => String(x[rowKey]));
+  const ids = rowIds(shown, rows, rowKey);
   const { all, some } = pickState(ids, picked);
   const lead = columns[0];
   const actions = renderActions !== undefined;
@@ -517,12 +518,14 @@ export function Table({ columns, rows, rowKey = "key", sort, onSortChange, selec
     <div data-af-part="root" {...rootProps(rest)} ref={setRoot} style={css(box, { minHeight: 0 }, r.root, style)}>
       <div
         data-af-part="scroll"
+        data-af-scroll
         role="region"
         aria-label={label}
         tabIndex={0}
         onFocus={(e) => own(e) && ui.handlers.onFocus(e)}
         onBlur={(e) => own(e) && ui.handlers.onBlur()}
-        style={css(box, { overflow: "auto", outline: "none" }, maxHeight !== undefined && { maxHeight }, r.scroll)}
+        // Its browser outline is taken off by the kit's sheet (`[data-af-scroll]:focus`), not inline, so forced colours can draw one; the recipe's ring is the focus otherwise.
+        style={css(box, { overflow: "auto" }, maxHeight !== undefined && { maxHeight }, r.scroll)}
       >
         <table aria-busy={loading} style={grid}>
           <caption style={visuallyHidden}>{label}</caption>

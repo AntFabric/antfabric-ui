@@ -42,7 +42,7 @@ const docs: ComponentDocs = {
     agent: {
       type: "boolean",
       default: false,
-      description: "Marks an AI agent: a sparkle badge, so a person never mistakes an agent's message for a colleague's.",
+      description: "Marks an AI agent: a sparkle badge, so a person never mistakes an agent's message for a colleague's. Its accessible name says it too: 'Fabric, AI agent'.",
     },
     decorative: {
       type: "boolean",
@@ -91,6 +91,7 @@ const docs: ComponentDocs = {
       "Initials are hidden from screen readers — the name is the label.",
       "`decorative` removes the role and the name and hides the face from assistive tech (aria-hidden on web; hidden from VoiceOver and TalkBack on the phone): use it beside a visible name.",
       "Presence is announced in words, never by colour alone; dnd and away also differ in shape on the presence picker.",
+      "The agent sparkle is announced too: an agent's avatar is named '{name}, AI agent' (the `labelAgent` string), so a screen reader never takes an agent for a colleague. The sparkle takes the presence dot's place, so its presence is not read.",
     ],
   },
   examples: [

@@ -33,7 +33,7 @@ export interface SidebarSectionProps extends RootProps {
   unread?: number;
   /** The + action's name: 'Add channels', 'New message', 'Add to this section'. Default: the `add` string. */
   addLabel?: string;
-  /** Draws +. On a phone it is always there; the section's other actions are a long press on the header. */
+  /** Draws + (with `onAdd`). On a phone it is always there; the section's other actions are a long press on the header (with `onMenu`). */
   actionsVisible?: boolean;
   /** A hairline above the header, parting it from the section before. Off for the first section. */
   divided?: boolean;
@@ -75,8 +75,8 @@ function glyphOf(p: PartStyle) {
 export function SidebarSection({
   label,
   icon = "",
-  expanded = true,
-  selected = "",
+  expanded,
+  selected,
   unread = 0,
   addLabel = "",
   actionsVisible = true,
@@ -101,9 +101,9 @@ export function SidebarSection({
   const reduceMotion = useReducedMotion();
   // A phone has no hover, so there is none here.
   const r = useRecipe(recipes["sidebar-section"], { variants: { divided }, state: { focus: press.focused }, styles });
-  const [isOpen, setExpanded] = useControllable(expanded, onExpandedChange);
+  const [isOpen = true, setExpanded] = useControllable(expanded, onExpandedChange);
   const shut = !isOpen;
-  const [open, setOpen] = useControllable(selected, onSelectedChange);
+  const [open = "", setOpen] = useControllable(selected, onSelectedChange);
   const shown = items.filter((item) => !shut || (open ? item.key === open : item.active));
   const chevron = glyphOf(r.chevron);
   const star = glyphOf(r.starIcon);
@@ -118,7 +118,7 @@ export function SidebarSection({
   const rotate = turn.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "-90deg"] });
 
   return (
-    <View testID={partId(testID, "sidebar-section", "root")} {...rootProps(rest)} role="group" accessibilityLabel={label} style={[s.root, r.root.view, style]}>
+    <View testID={partId(testID, "sidebar-section", "root")} role="group" accessibilityLabel={label} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
       <View testID={partId(testID, "sidebar-section", "header")} style={[s.header, r.header.view]}>
         <Pressable
           testID={partId(testID, "sidebar-section", "toggle")}
@@ -127,7 +127,8 @@ export function SidebarSection({
           accessibilityHint={shut ? str("expandPhone", { label }) : str("collapsePhone", { label })}
           accessibilityState={{ expanded: !shut }}
           onPress={() => setExpanded(shut)}
-          onLongPress={() => onMenu?.()}
+          // Only with a handler: attached, a hold is taken by the long press and never becomes the press.
+          onLongPress={onMenu ? () => onMenu() : undefined}
           accessibilityActions={onMenu ? [{ name: "longpress", label: str("options", { label }) }] : undefined}
           onAccessibilityAction={(e) => e.nativeEvent.actionName === "longpress" && onMenu?.()}
           {...press.handlers}
@@ -142,15 +143,16 @@ export function SidebarSection({
           </Text>
           {shut && unread > 0 ? <Badge count={unread} label={str("unreadIn", { label })} style={s.badge} /> : null}
         </Pressable>
-        {actionsVisible ? (
+        {/* Drawn only when it fires something. */}
+        {actionsVisible && onAdd ? (
           <View style={s.actions}>
-            <IconButton icon="plus" label={addLabel || str("add")} size="sm" onPress={() => onAdd?.()} />
+            <IconButton icon="plus" label={addLabel || str("add")} size="sm" onPress={() => onAdd()} />
           </View>
         ) : null}
       </View>
       <View accessibilityRole="list">
         {shown.map(({ key, ...item }) => (
-          <SidebarItem key={key} {...item} selectedName={open ? (open === key ? item.name : NOT_OPEN) : ""} onPress={() => setOpen(key)} onLongPress={() => onItemLongPress?.(key)} />
+          <SidebarItem key={key} {...item} selectedName={open ? (open === key ? item.name : NOT_OPEN) : ""} onPress={() => setOpen(key)} onLongPress={onItemLongPress ? () => onItemLongPress(key) : undefined} />
         ))}
         {!shut && items.length === 0 && emptyText ? <Text testID={partId(testID, "sidebar-section", "emptyText")} maxFontSizeMultiplier={fontScale.content} style={[s.empty, r.emptyText.view, r.emptyText.text]}>{emptyText}</Text> : null}
       </View>

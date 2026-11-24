@@ -28,7 +28,9 @@ const { components } = await import("@antfabric/ui-docs");
 const { DefaultsProvider, SceneNode, Stage, Thing, kitComponent } = await import("../src/preview/kit");
 const { casesFor, defaultsFor, usedIds } = await import("../src/lib/library");
 const { foldIds, foldUseIds } = await import("./ids");
-const { normalise, roundCoords } = await import("./snapshot-hash");
+const { canonical, normalise, roundCoords } = await import("./snapshot-hash");
+// What Tab reaches, as the kit's focus trap reads it: the modal check below holds the trap to its own rule.
+const { focusables } = await import("../../../packages/react/src/lib/focus");
 const { createHash } = await import("node:crypto");
 const { writeFileSync } = await import("node:fs");
 
@@ -51,9 +53,9 @@ let errors = 0;
  */
 const { readFileSync } = await import("node:fs");
 const genericFile = new URL("../../../reports/generic.json", import.meta.url);
-const generic = JSON.parse(readFileSync(genericFile, "utf8")) as Record<string, unknown> & { focusTodo?: string[]; keysTodo?: string[] };
-const todo = { focus: new Set(generic.focusTodo ?? []), keys: new Set(generic.keysTodo ?? []) };
-const found = { focus: new Set<string>(), keys: new Set<string>() };
+const generic = JSON.parse(readFileSync(genericFile, "utf8")) as Record<string, unknown> & { focusTodo?: string[]; keysTodo?: string[]; controlTodo?: string[] };
+const todo = { focus: new Set(generic.focusTodo ?? []), keys: new Set(generic.keysTodo ?? []), control: new Set(generic.controlTodo ?? []) };
+const found = { focus: new Set<string>(), keys: new Set<string>(), control: new Set<string>() };
 /** The ids this run drew, so an entry for a component it did not draw is not called stale. */
 const drawn = new Set<string>();
 let steps = 0;
@@ -112,7 +114,7 @@ async function arrowsIn(host: HTMLElement): Promise<string[]> {
   for (const modal of host.querySelectorAll<HTMLElement>('[aria-modal="true"]')) {
     const role = modal.getAttribute("role") ?? "dialog";
     if (!modal.contains(document.activeElement)) stuck.push(`${role}: focus is not inside when it opens`);
-    const all = Array.from(modal.querySelectorAll<HTMLElement>('button:not(:disabled), [href], input:not(:disabled), textarea:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex="-1"])'));
+    const all = focusables(modal);
     if (all.length >= 2) {
       const last = all[all.length - 1]!;
       await act(async () => last.focus());
@@ -294,6 +296,486 @@ for (const doc of components) {
 }
 }
 
+/*
+ * Handler only keeps its own state (reports/api/conventions.md, rule 1): for each prop the docs declare `changes: "<p>"`, the component is
+ * mounted with `<p>` left out and only `on<P>Change`, and its controls are pressed one at a time (a text field typed into, a select changed),
+ * each sequence from a fresh mount and breadth first (every control at rest, then every control after a press that drew something new, as a
+ * trigger that opens a list), until a press fires the event. The same presses are then replayed on a mount with neither (which keeps its own
+ * state: the reference), and the two must draw the same state: roles, names, aria-checked/selected/pressed/expanded/current, field values
+ * and the markup. Why not compare with a mount given `<p>: next`: the presses before the one that fired (opening the list) would be missing
+ * from it. A press that fires the event without moving the reference (choosing what is already chosen) does not count, and the search goes
+ * on; a prop no press changes (an overlay the app opens, a stage the app sets) is skipped. One OS per platform, the desktop only for what the
+ * web does not draw (one kit file), `antfabric` only. Failures are `controlTodo` in reports/generic.json, held as focusTodo is.
+ */
+const PRESSABLE = 'button:not(:disabled), [role="button"], [role="tab"], [role="option"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [role="switch"], [role="checkbox"], [role="radio"], [role="link"], a[href], input:not(:disabled), textarea:not(:disabled), select:not(:disabled), [data-af-press], [tabindex="0"]';
+const SIGNED = 'button, a, input, textarea, select, [role], [aria-checked], [aria-selected], [aria-pressed], [aria-expanded], [aria-current]';
+const STATE_ATTRS = ["role", "aria-label", "aria-checked", "aria-selected", "aria-pressed", "aria-expanded", "aria-current"];
+const pressablesOf = (host: HTMLElement) => Array.from(host.querySelectorAll<HTMLElement>(PRESSABLE)).filter((el) => el.getAttribute("aria-disabled") !== "true");
+/**
+ * What the person can see and a screen reader can read: each control's role, name, aria-checked/selected/pressed/expanded/current and field
+ * value, then the whole markup with generated ids folded (the phone's kit says a switch is on by its look, which only the markup carries).
+ */
+function stateOf(host: HTMLElement): string {
+  const rows = Array.from(host.querySelectorAll<HTMLElement>(SIGNED)).map((el) => {
+    const field = el as HTMLInputElement;
+    const value = /^(?:INPUT|TEXTAREA|SELECT)$/.test(el.tagName) ? `=${field.value}${field.type === "checkbox" || field.type === "radio" ? (field.checked ? "+" : "-") : ""}` : "";
+    return `${el.tagName}${STATE_ATTRS.map((a) => `|${el.getAttribute(a) ?? ""}`).join("")}${value}|${(el.textContent ?? "").trim().slice(0, 60)}`;
+  });
+  return `${rows.join("\n")}\n${foldIds(foldUseIds(host.innerHTML))}`;
+}
+/** A value a field does not hold yet, of a kind its type accepts. */
+const typedFor = (el: HTMLInputElement | HTMLTextAreaElement) => {
+  const kind = el instanceof HTMLInputElement ? el.type : "text";
+  const pick = kind === "date" ? "2026-12-01" : kind === "time" ? "09:30" : kind === "number" || kind === "range" ? "3" : "Fabric";
+  return el.value === pick ? `${pick}2` : pick;
+};
+/** Press, type into or change one control, as a person would (React's `onChange` reads the value through the native setter and `input`). */
+async function activate(el: HTMLElement) {
+  await act(async () => {
+    if (el instanceof HTMLSelectElement) {
+      const other = Array.from(el.options).find((o) => o.value !== el.value);
+      if (!other) return;
+      Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")!.set!.call(el, other.value);
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+    } else if ((el instanceof HTMLInputElement && !/^(?:checkbox|radio|button|submit|reset|file)$/.test(el.type)) || el instanceof HTMLTextAreaElement) {
+      const proto = el instanceof HTMLInputElement ? HTMLInputElement.prototype : HTMLTextAreaElement.prototype;
+      Object.getOwnPropertyDescriptor(proto, "value")!.set!.call(el, typedFor(el));
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    } else el.click();
+  });
+}
+// A link pressed in the probe must not navigate the document away.
+document.addEventListener("click", (e) => {
+  if ((e.target as Element | null)?.closest?.("a[href]")) e.preventDefault();
+}, true);
+
+let controlProbed = 0;
+let controlMoved = 0;
+let controlMounts = 0;
+const PROBE_OS: Record<import("@antfabric/ui-core").Platform, OSPick> = { web: { os: "browser" }, desktop: { os: "mac", osVersion: 26 }, mobile: { os: "ios", osVersion: 26 } };
+/** Presses before the one that is tried (a trigger that opens a list, then a row of it), and mounts per prop. */
+const MAX_PREFIX = 2;
+const MAX_MOUNTS = 60;
+for (const doc of components) {
+  if (only.length && !only.includes(doc.id)) continue;
+  for (const platform of PLATFORMS) {
+    if (doc.platforms[platform].status === "not-applicable" || !kitComponent(doc.id, platform)) continue;
+    const applies = (d?: { platforms?: import("@antfabric/ui-core").Platform[] }) => !d?.platforms || d.platforms.includes(platform);
+    const defaults = defaultsFor(usedIds(doc), platform);
+    /**
+     * Mounts the component on its own and presses `presses` in turn (each an index into its pressable controls, read again after every press).
+     * Returns the state at rest and after each press, how many controls the last state has, and whether the last press called `calls`' spy.
+     */
+    const run = async (props: Record<string, unknown>, presses: number[], calls?: unknown[]) => {
+      controlMounts++;
+      const host = document.createElement("div");
+      document.body.appendChild(host);
+      const root = createRoot(host);
+      const states: string[] = [];
+      let lastFired = false;
+      let count = 0;
+      try {
+        await act(async () => root.render(createElement(DefaultsProvider, { value: defaults }, createElement(Stage, { platform, ...PROBE_OS[platform], scheme: "light", theme: antfabric, children: createElement(Thing, { id: doc.id, platform, props }) }))));
+        states.push(stateOf(host));
+        for (const i of presses) {
+          const el = pressablesOf(host)[i];
+          if (!el) break;
+          const before = calls?.length ?? 0;
+          await activate(el);
+          lastFired = (calls?.length ?? 0) > before;
+          states.push(stateOf(host));
+        }
+        count = pressablesOf(host).length;
+      } finally {
+        await act(async () => root.unmount());
+        host.remove();
+      }
+      return { states, count, lastFired, complete: states.length === presses.length + 1 };
+    };
+    for (const [event, d] of Object.entries(doc.props)) {
+      const prop = d.changes;
+      if (!prop || !applies(d) || !applies(doc.props[prop])) continue;
+      // The desktop draws the web's kit file: probed there only for what the web does not draw.
+      const onWeb = (x?: { platforms?: import("@antfabric/ui-core").Platform[] }) => !x?.platforms || x.platforms.includes("web");
+      if (platform === "desktop" && doc.platforms.web.status !== "not-applicable" && kitComponent(doc.id, "web") && onWeb(d) && onWeb(doc.props[prop])) continue;
+      drawn.add(doc.id);
+      controlProbed++;
+      const quiet = logged.length;
+      const calls: unknown[] = [];
+      const handled = { [prop]: undefined, [event]: (next: unknown) => void calls.push(next) };
+      const reference = { [prop]: undefined };
+      try {
+        // Breadth first over press sequences, each from a fresh mount: every control at rest, then every control after each press that drew
+        // something new (a trigger that opened a list), and so on. The first press that fires the event and moves the reference decides.
+        const frontier: number[][] = [[]];
+        const seen = new Set<string>();
+        let mounts = 0;
+        let done = false;
+        for (let f = 0; f < frontier.length && !done && mounts < MAX_MOUNTS; f++) {
+          const prefix = frontier[f]!;
+          const base = await run(handled, prefix, calls);
+          mounts++;
+          if (!base.complete) continue;
+          seen.add(base.states.at(-1)!);
+          for (let i = 0; i < base.count && !done && mounts < MAX_MOUNTS; i++) {
+            const presses = [...prefix, i];
+            const n = presses.length;
+            const h = await run(handled, presses, calls);
+            mounts++;
+            if (!h.complete) continue;
+            if (h.lastFired) {
+              const r = await run(reference, presses);
+              mounts++;
+              // Fired without moving the reference (it chose what was already chosen): keep looking.
+              if (r.complete && r.states[n] !== r.states[n - 1]) {
+                done = true;
+                controlMoved++;
+                if (h.states[n] !== r.states[n]) found.control.add(`${doc.id}/${platform}: ${prop} does not move with only ${event}`);
+                continue;
+              }
+            }
+            if (prefix.length < MAX_PREFIX && !seen.has(h.states[n]!)) {
+              seen.add(h.states[n]!);
+              frontier.push(presses);
+            }
+          }
+        }
+      } catch (e) {
+        logged.push(`control probe: ${(e as Error).message}`);
+      }
+      logged.length = quiet;
+    }
+  }
+}
+
+/*
+ * The app drives the state: a component never shows the result of a request before the app confirms it. Each case mounts a component with
+ * its events as spies and walks a script of steps; every step is checked against a fresh mount of the props the app has passed by then.
+ *   press      the control (its exact name or text, else the first whose name starts with or holds it, or an index into the pressables).
+ *              `expect: "pending"`: something is busy (aria-busy, or a control went disabled) and, given `result`, the drawing is not the
+ *              result's. `expect: "unchanged"`: the drawing is a fresh mount's of the same props (pure UI state aside, nothing moved).
+ *              `calls`: that event fired.
+ *   answer     the app passes these props: the drawing must be a fresh mount's of them (pending gone, nothing kept from before).
+ *   settle     the spies' promises settle with the props unchanged (`promise: true` makes every spy return one): back to a fresh mount's.
+ * One OS per platform, `antfabric` only. Failures are `pendingTodo` in reports/generic.json, held as focusTodo is.
+ */
+type PendingStep =
+  | { press: string | number; expect?: "pending" | "unchanged"; result?: Record<string, unknown>; calls?: string }
+  | { answer: Record<string, unknown> }
+  | { settle: true };
+interface PendingCase {
+  id: string;
+  platforms: import("@antfabric/ui-core").Platform[];
+  props: Record<string, unknown>;
+  events: string[];
+  promise?: boolean;
+  steps: PendingStep[];
+}
+const PENDING_CASES: PendingCase[] = [
+  // dialog: the CTA spins until the app answers, Cancel stays live, and a failure with the same words comes back through the promise.
+  { id: "dialog", platforms: ["web", "mobile"], props: {}, events: ["onConfirm", "onCancel"], steps: [{ press: "Delete task", expect: "pending" }, { press: "Cancel", calls: "onCancel" }, { answer: { error: "The server refused: try again." } }] },
+  { id: "dialog", platforms: ["web", "mobile"], props: { error: "The server refused: try again." }, events: ["onConfirm"], promise: true, steps: [{ press: "Delete task", expect: "pending" }, { settle: true }] },
+  // session-state: never waiting, or unlocked, before the app says so.
+  { id: "session-state", platforms: ["web", "mobile"], props: { state: "expired" }, events: ["onSignIn"], steps: [{ press: 0, expect: "pending", result: { state: "waiting" } }, { answer: { state: "waiting" } }] },
+  { id: "session-state", platforms: ["web", "mobile"], props: { state: "expired" }, events: ["onSignIn"], promise: true, steps: [{ press: 0, expect: "pending", result: { state: "waiting" } }, { settle: true }] },
+  { id: "session-state", platforms: ["mobile"], props: { state: "locked" }, events: ["onUnlock"], promise: true, steps: [{ press: 0, expect: "pending", result: { state: "locked", unlocked: true } }, { settle: true }] },
+  // update-banner: Retry and Check again spin; the stage is the updater's.
+  { id: "update-banner", platforms: ["desktop"], props: { stage: "failed" }, events: ["onStageChange", "onApply"], steps: [{ press: 0, expect: "pending", result: { stage: "downloading" } }, { answer: { stage: "downloading" } }] },
+  { id: "update-banner", platforms: ["desktop"], props: { stage: "failed" }, events: ["onApply"], promise: true, steps: [{ press: 0, expect: "pending", result: { stage: "downloading" } }, { settle: true }] },
+  { id: "update-banner", platforms: ["mobile"], props: { stage: "latest" }, events: ["onCheck"], promise: true, steps: [{ press: 0, expect: "pending", result: { stage: "checking" } }, { settle: true }] },
+  // permission-prompt: on only when the OS says so.
+  { id: "permission-prompt", platforms: ["web", "mobile"], props: { permission: "default" }, events: ["onAllow"], steps: [{ press: 0, expect: "pending", result: { permission: "granted" } }, { answer: { permission: "denied" } }] },
+  { id: "permission-prompt", platforms: ["web", "mobile"], props: { permission: "default" }, events: ["onAllow"], promise: true, steps: [{ press: 0, expect: "pending", result: { permission: "granted" } }, { settle: true }] },
+  // notification-item: approved only when the server says so.
+  { id: "notification-item", platforms: ["web", "mobile"], props: { approval: "pending" }, events: ["onApprove", "onDecline"], steps: [{ press: "Approve", expect: "pending", result: { approval: "approved" } }, { answer: { approval: "approved" } }] },
+  { id: "notification-item", platforms: ["web", "mobile"], props: { approval: "pending" }, events: ["onApprove", "onDecline"], promise: true, steps: [{ press: "Decline", expect: "pending", result: { approval: "declined" } }, { settle: true }] },
+  // message and attachment-card: a retry that fails again keeps Retry and Delete.
+  { id: "message", platforms: ["web", "mobile"], props: { status: "failed" }, events: ["onStatusChange", "onRetry"], steps: [{ press: "Retry", expect: "pending", result: { status: "sending" } }, { answer: { status: "sending" } }] },
+  { id: "message", platforms: ["web", "mobile"], props: { status: "failed" }, events: ["onRetry"], promise: true, steps: [{ press: "Retry", expect: "pending", result: { status: "sending" } }, { settle: true }] },
+  { id: "attachment-card", platforms: ["web", "mobile"], props: { status: "failed" }, events: ["onRetry"], promise: true, steps: [{ press: "Retry", expect: "pending", result: { status: "uploading" } }, { settle: true }] },
+  // attachment-card's voice note: Play reports itself, so the app can start the audio.
+  { id: "attachment-card", platforms: ["web", "mobile"], props: { kind: "voice" }, events: ["onPlayingChange"], steps: [{ press: 0, calls: "onPlayingChange" }] },
+  // reaction-pill, controlled: busy until the app answers; a rejected reaction stays as it was.
+  { id: "reaction-pill", platforms: ["web", "mobile"], props: { mine: false, count: 2 }, events: ["onMineChange"], steps: [{ press: 0, expect: "pending", result: { mine: true, count: 3 } }, { answer: { mine: true, count: 3 } }] },
+  { id: "reaction-pill", platforms: ["web", "mobile"], props: { mine: false, count: 2 }, events: ["onMineChange"], promise: true, steps: [{ press: 0, expect: "pending", result: { mine: true, count: 3 } }, { settle: true }] },
+  // ...and in a message, whose pills are the server's reactions: a rejected reaction stays as it was.
+  { id: "message", platforms: ["web", "mobile"], props: {}, events: ["onReact"], promise: true, steps: [{ press: "🎉", expect: "pending" }, { settle: true }] },
+  // in-app-banner: one dismissal puts away one notification, not the next.
+  { id: "in-app-banner", platforms: ["web"], props: {}, events: ["onDismiss"], steps: [{ press: "Dismiss", calls: "onDismiss" }, { answer: { title: "Marcus Chen", body: "Can you look at the release notes before 3?" } }] },
+  { id: "in-app-banner", platforms: ["mobile"], props: {}, events: ["onDismiss"], steps: [{ press: 1, calls: "onDismiss" }, { answer: { title: "Marcus Chen", body: "Can you look at the release notes before 3?" } }] },
+  // sidebar: a row never keeps its own current; the section's `selected` decides, back to the items' own when it is "".
+  { id: "sidebar-section", platforms: ["web", "mobile"], props: { selected: "" }, events: ["onSelectedChange"], steps: [{ press: "*1", calls: "onSelectedChange" }, { answer: { selected: "*1" } }, { press: "*2", calls: "onSelectedChange" }, { answer: { selected: "*2" } }, { answer: { selected: "" } }] },
+  { id: "sidebar-item", platforms: ["web", "mobile"], props: { active: false }, events: ["onPress"], steps: [{ press: 0, expect: "unchanged", calls: "onPress" }] },
+  // question-panel: Sending… comes back to Submit when the send settles with nothing changed.
+  { id: "question-panel", platforms: ["web", "mobile"], props: { value: "deny", sending: false }, events: ["onSubmit"], steps: [{ press: "Submit", expect: "pending" }, { answer: { sending: true } }, { answer: { sending: false } }] },
+  { id: "question-panel", platforms: ["web", "mobile"], props: { value: "deny", sending: false }, events: ["onSubmit"], promise: true, steps: [{ press: "Submit", expect: "pending" }, { settle: true }] },
+  // list-item (H7): only a selection row toggles; a link, button or menu row is never current on its own.
+  { id: "list-item", platforms: ["web", "mobile"], props: { role: "link", selected: false }, events: ["onPress"], steps: [{ press: 0, expect: "unchanged", calls: "onPress" }] },
+  { id: "list-item", platforms: ["web", "mobile"], props: { role: "button", selected: false }, events: ["onPress"], steps: [{ press: 0, expect: "unchanged", calls: "onPress" }] },
+  { id: "list-item", platforms: ["web", "mobile"], props: { role: "menuitem", selected: false }, events: ["onPress"], steps: [{ press: 0, expect: "unchanged", calls: "onPress" }] },
+  // thread-summary (M24): opening is not following.
+  { id: "thread-summary", platforms: ["web", "mobile"], props: { following: false }, events: ["onPress"], steps: [{ press: 0, expect: "unchanged", calls: "onPress" }] },
+  // toast (M27): the action reports the dismissal too, so the app unmounts it.
+  { id: "toast", platforms: ["web", "mobile"], props: { actionLabel: "Undo" }, events: ["onAction", "onDismiss"], steps: [{ press: "Undo", calls: "onDismiss" }] },
+];
+{
+  const generic2 = generic as { pendingTodo?: string[] };
+  const pendingTodo = new Set(generic2.pendingTodo ?? []);
+  const pendingFound = new Set<string>();
+  let pendingSteps = 0;
+  const nameOfEl = (el: HTMLElement) => el.getAttribute("aria-label") ?? (el.textContent ?? "").trim();
+  const find = (host: HTMLElement, target: string | number) => {
+    const all = pressablesOf(host);
+    if (typeof target === "number") return all[target];
+    return (
+      all.find((el) => nameOfEl(el) === target || (el.textContent ?? "").trim() === target) ??
+      all.find((el) => nameOfEl(el).startsWith(target)) ??
+      all.find((el) => nameOfEl(el).includes(target))
+    );
+  };
+  const busyIn = (host: HTMLElement) => !!host.querySelector('[aria-busy="true"]');
+  /** What is drawn once focus has left: where focus went (a moved focus, a row's actions shown while focus is inside) is not the app's. */
+  const drawnNow = async (host: HTMLElement) => {
+    await act(async () => (document.activeElement as HTMLElement | null)?.blur?.());
+    return canonical(stateOf(host));
+  };
+  /** With AF_PENDING_DEBUG, the first lines where two drawings part. */
+  const differ = (a: string, b: string) => {
+    if (a === b) return false;
+    if (process.env.AF_PENDING_DEBUG) {
+      const x = a.split("\n"), y = b.split("\n");
+      const i = x.findIndex((l, n) => l !== y[n]);
+      const l = x[i] ?? "", m = y[i] ?? "";
+      let j = 0;
+      while (j < l.length && l[j] === m[j]) j++;
+      keep.error(`    drawn:     …${l.slice(Math.max(0, j - 150), j + 250)}\n    reference: …${m.slice(Math.max(0, j - 150), j + 250)}`);
+    }
+    return true;
+  };
+  for (const c of PENDING_CASES) {
+    if (only.length && !only.includes(c.id)) continue;
+    const doc = components.find((d) => d.id === c.id);
+    if (!doc) {
+      errors++;
+      keep.error(`  ✗ pending probe: no component "${c.id}"`);
+      continue;
+    }
+    for (const platform of c.platforms) {
+      if (!kitComponent(c.id, platform)) continue;
+      drawn.add(c.id);
+      const defaults = defaultsFor(usedIds(doc), platform);
+      const at = `${c.id}/${platform}`;
+      const quiet = logged.length;
+      const draw = (props: Record<string, unknown>) =>
+        createElement(DefaultsProvider, { value: defaults }, createElement(Stage, { platform, ...PROBE_OS[platform], scheme: "light", theme: antfabric, children: createElement(Thing, { id: c.id, platform, props }) }));
+      /**
+       * The reference a step is held to: a mount given the same props in turn (`history`), with nothing pressed. Updated the same way as
+       * the probed mount, so what happy-dom does on an update (it keeps a `background: var(…)` that is set to `none`) is in both.
+       */
+      const fresh = async (...history: Record<string, unknown>[]) => {
+        const host = document.createElement("div");
+        document.body.appendChild(host);
+        const root = createRoot(host);
+        try {
+          for (const props of history) await act(async () => root.render(draw(props)));
+          return await drawnNow(host);
+        } finally {
+          await act(async () => root.unmount());
+          host.remove();
+        }
+      };
+      // A sidebar section's rows: `*1` is the first item, its key in an answer and its name in a press.
+      const item = (v: unknown) => (typeof v === "string" && /^\*\d+$/.test(v) ? ((doc.props.items?.sample ?? doc.props.items?.default) as { key: string; name: string }[] | undefined)?.[Number(v.slice(1)) - 1] : undefined);
+      const resolve = (props: Record<string, unknown>) => Object.fromEntries(Object.entries(props).map(([k, v]) => [k, item(v)?.key ?? v]));
+      const calls: Record<string, number> = {};
+      const settles: (() => void)[] = [];
+      const spies = Object.fromEntries(
+        c.events.map((e) => [
+          e,
+          () => {
+            calls[e] = (calls[e] ?? 0) + 1;
+            return c.promise ? new Promise<void>((done) => settles.push(done)) : undefined;
+          },
+        ]),
+      );
+      let props = { ...c.props };
+      const history = [props];
+      const host = document.createElement("div");
+      document.body.appendChild(host);
+      const root = createRoot(host);
+      const fail = (what: string) => pendingFound.add(`${at}: ${what}`);
+      try {
+        await act(async () => root.render(draw({ ...props, ...spies })));
+        for (const step of c.steps) {
+          pendingSteps++;
+          if ("press" in step) {
+            const el = find(host, item(step.press)?.name ?? step.press);
+            if (!el) {
+              fail(`no control "${step.press}" to press (${pressablesOf(host).map(nameOfEl).join(" | ").slice(0, 200)})`);
+              break;
+            }
+            const locked = () => host.querySelectorAll('[disabled], [aria-disabled="true"]').length;
+            const before = locked();
+            const fired = { ...calls };
+            await activate(el);
+            const now = await drawnNow(host);
+            if (step.calls && (calls[step.calls] ?? 0) === (fired[step.calls] ?? 0)) fail(`pressing "${step.press}" does not call ${step.calls}`);
+            if (step.expect === "pending" && !busyIn(host) && locked() <= before) fail(`pressing "${step.press}" shows no pending state (aria-busy or a disabled control)`);
+            if (step.expect === "pending" && step.result && !differ(now, await fresh(resolve({ ...props, ...step.result })))) fail(`pressing "${step.press}" shows the result before the app answers`);
+            if (step.expect === "unchanged" && differ(now, await fresh(...history))) fail(`pressing "${step.press}" changes what the app passed`);
+          } else if ("answer" in step) {
+            props = { ...props, ...resolve(step.answer) };
+            history.push(props);
+            await act(async () => root.render(draw({ ...props, ...spies })));
+            if (differ(await drawnNow(host), await fresh(...history))) fail(`after the answer ${JSON.stringify(step.answer)} it does not draw what the app passed`);
+          } else {
+            await act(async () => {
+              for (const done of settles.splice(0)) done();
+              await Promise.resolve();
+            });
+            if (differ(await drawnNow(host), await fresh(...history))) fail("after its request settled with the props unchanged it does not return to them");
+          }
+        }
+      } catch (e) {
+        fail(`threw: ${(e as Error).message}`);
+      } finally {
+        await act(async () => root.unmount());
+        host.remove();
+      }
+      logged.length = quiet;
+    }
+  }
+  if (process.env.AF_TODO_WRITE) {
+    generic2.pendingTodo = [...pendingFound].sort();
+  } else {
+    for (const f of pendingFound) if (!pendingTodo.has(f)) {
+      errors++;
+      keep.error(`  ✗ ${f} (not in pendingTodo in reports/generic.json)`);
+    }
+    for (const t of pendingTodo) if (drawn.has(t.split("/")[0]!) && !pendingFound.has(t)) {
+      errors++;
+      keep.error(`  ✗ ${t}: passes now; take it off pendingTodo in reports/generic.json`);
+    }
+  }
+  console.log(`the app drives the state: ${PENDING_CASES.length} scripts, ${pendingSteps} steps, ${pendingFound.size} failing`);
+}
+
+/*
+ * Focus hand-off (AUTHORING.md, "Keyboard and focus"): a control pressed from the keyboard that unmounts, disables or goes inert, or whose part
+ * goes away with it, hands focus on: to what replaces it, the row or list it was in, the trigger, or the nearest control that stays. Each case
+ * draws the component on a page between two buttons (Before, After), focuses Before (an overlay's opener), mounts the component, focuses the
+ * control by its name and presses it as a keyboard does (Enter on a button is its click; `key` presses that key on it instead), then passes
+ * the app's answer if there is one. Focus must not have fallen to the page: onto the body, or onto an element that is gone, disabled, inert
+ * or hidden from assistive tech. Failures are `focusTodo` lines, held as the focus ring's are.
+ */
+interface HandoffCase {
+  id: string;
+  platform: "web" | "desktop";
+  props: Record<string, unknown>;
+  /** Events given as spies, so a control whose prop is controlled waits for `answer`. */
+  events?: string[];
+  press: string | number;
+  key?: string;
+  answer?: Record<string, unknown>;
+}
+const HANDOFF_CASES: HandoffCase[] = [
+  // Submit spins as Button's `loading`: blocked, still focusable.
+  { id: "question-panel", platform: "web", props: { value: "deny", sending: false }, events: ["onSubmit"], press: "Submit" },
+  // A dismissed toast or banner goes inert, then the app unmounts it: focus moves to the nearest control that stays.
+  { id: "toast", platform: "web", props: { dismissible: true, actionLabel: "" }, press: "Dismiss" },
+  { id: "toast", platform: "web", props: { dismissible: true, actionLabel: "Undo" }, press: "Undo" },
+  { id: "inline-banner", platform: "web", props: { dismissible: true }, press: "Dismiss" },
+  { id: "in-app-banner", platform: "web", props: {}, press: "Dismiss" },
+  // A sole reaction taken back: the pill goes, focus goes to the next control.
+  { id: "reaction-pill", platform: "web", props: { mine: true, count: 1 }, events: ["onMineChange"], press: 0, answer: { mine: false, count: 0 } },
+  // Resume goes when notifications resume: the pill (or the menu's first row) keeps focus; the picker's Pause goes with the picker.
+  { id: "notification-schedule", platform: "web", props: { surface: "pill", paused: true, until: "9:00" }, press: "Resume" },
+  { id: "notification-schedule", platform: "web", props: { surface: "menu", paused: true, until: "9:00" }, press: "Resume" },
+  { id: "notification-schedule", platform: "web", props: { surface: "menu", paused: false, custom: true }, press: "Pause" },
+  // Reply becomes the field.
+  { id: "os-notification", platform: "desktop", props: { expanded: true, reply: "none" }, press: "Reply" },
+  // Install becomes the progress card (expanded) or a busy rail icon (folded).
+  { id: "update-banner", platform: "desktop", props: { stage: "available" }, events: ["onStageChange", "onApply"], press: 0, answer: { stage: "downloading" } },
+  { id: "update-banner", platform: "desktop", props: { stage: "available", expanded: false }, events: ["onStageChange", "onApply"], press: 0, answer: { stage: "downloading" } },
+  // Esc from inside the card closes it: focus goes back to its trigger.
+  { id: "hover-card", platform: "web", props: { open: true }, press: "Message", key: "Escape" },
+  // The sheet's ✕ slides it away: focus goes back to its opener.
+  { id: "bottom-sheet", platform: "web", props: {}, press: "Close" },
+];
+{
+  let handoffSteps = 0;
+  const nameOfEl = (el: HTMLElement) => el.getAttribute("aria-label") ?? (el.textContent ?? "").trim();
+  const fell = () => {
+    const at = document.activeElement as HTMLElement | null;
+    return !at || at === document.body || !at.isConnected || (at as HTMLButtonElement).disabled === true || !!at.closest('[inert], [hidden], [aria-hidden="true"]');
+  };
+  for (const c of HANDOFF_CASES) {
+    if (only.length && !only.includes(c.id)) continue;
+    const doc = components.find((d) => d.id === c.id);
+    if (!doc || !kitComponent(c.id, c.platform)) {
+      errors++;
+      keep.error(`  ✗ hand-off probe: no component "${c.id}" on ${c.platform}`);
+      continue;
+    }
+    drawn.add(c.id);
+    handoffSteps++;
+    const at = `${c.id}/${c.platform}`;
+    const quiet = logged.length;
+    const spies = Object.fromEntries((c.events ?? []).map((e) => [e, () => undefined]));
+    const defaults = defaultsFor(usedIds(doc), c.platform);
+    const page = (props: Record<string, unknown> | null) =>
+      createElement(DefaultsProvider, { value: defaults }, createElement(Stage, {
+        platform: c.platform,
+        ...PROBE_OS[c.platform],
+        scheme: "light",
+        theme: antfabric,
+        children: [
+          createElement("button", { key: "before", type: "button", "data-probe": "before" }, "Before"),
+          props && createElement(Thing, { key: "thing", id: c.id, platform: c.platform, props: { ...props, ...spies } }),
+          createElement("button", { key: "after", type: "button", "data-probe": "after" }, "After"),
+        ],
+      }));
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    try {
+      await act(async () => root.render(page(null)));
+      await act(async () => host.querySelector<HTMLElement>('[data-probe="before"]')?.focus());
+      await act(async () => root.render(page(c.props)));
+      const all = pressablesOf(host).filter((el) => !el.hasAttribute("data-probe"));
+      const el =
+        typeof c.press === "number"
+          ? all[c.press]
+          : (all.find((e) => nameOfEl(e) === c.press) ?? all.find((e) => nameOfEl(e).startsWith(c.press as string)) ?? all.find((e) => nameOfEl(e).includes(c.press as string)));
+      if (!el) found.focus.add(`${at}: no control "${c.press}" to press (${all.map(nameOfEl).join(" | ").slice(0, 160)})`);
+      else {
+        const named = typeof c.press === "number" ? nameOfEl(el) : c.press;
+        await act(async () => el.focus());
+        if (document.activeElement !== el) found.focus.add(`${at}: "${named}" does not take focus`);
+        else {
+          await act(async () => {
+            if (c.key) el.dispatchEvent(new KeyboardEvent("keydown", { key: c.key, bubbles: true, cancelable: true }));
+            else el.click();
+          });
+          if (c.answer) await act(async () => root.render(page({ ...c.props, ...c.answer })));
+          if (fell()) found.focus.add(`${at}: focus falls to the page after ${c.key ? `${c.key} on` : "pressing"} "${named}"${c.answer ? ` and the answer ${JSON.stringify(c.answer)}` : ""}`);
+          else if (process.env.AF_HANDOFF_DEBUG) {
+            const to = document.activeElement as HTMLElement;
+            keep.error(`    ${at} "${named}" → ${to.tagName.toLowerCase()} ${to.getAttribute("data-af-part") ?? to.getAttribute("data-probe") ?? ""} "${nameOfEl(to).slice(0, 50)}"`);
+          }
+        }
+      }
+    } catch (e) {
+      found.focus.add(`${at}: the hand-off probe threw: ${(e as Error).message.split("\n")[0]}`);
+    } finally {
+      await act(async () => root.unmount());
+      host.remove();
+    }
+    logged.length = quiet;
+  }
+  console.log(`focus hand-off: ${handoffSteps} presses probed`);
+}
+
 // `styles` on the web: a longhand the recipe also writes as a shorthand (`styles.root.backgroundColor` beside the recipe's `background`) must stay
 // through every state, and updating the recipe's value must not warn of the two fighting. Button is mounted with it and driven like a pointer would.
 {
@@ -363,15 +845,385 @@ for (const doc of components) {
   host.remove();
 }
 
+// A toast that leaves the region keeps the ones after it mounted: the second toast's node (and so its timer and its focus) survives the
+// first one going. Keyed by place, every toast after the one that left was a new node.
+if (!only.length || only.includes("toast-region")) {
+  const ReactKit = await import("@antfabric/ui-react");
+  const host = document.createElement("div");
+  document.body.appendChild(host);
+  const root = createRoot(host);
+  const toast = (key: string, message: string) => createElement(ReactKit.Toast, { key, message, duration: 6000 });
+  const region = (children: ReturnType<typeof createElement>[]) => createElement(Stage, { platform: "web", os: "browser", scheme: "light", theme: antfabric, children: createElement(ReactKit.ToastRegion, { children }) });
+  const quiet = logged.length;
+  await act(async () => root.render(region([toast("role", "Role saved."), toast("invite", "Grace Hopper was invited.")])));
+  const second = Array.from(host.querySelectorAll('[data-af-part="message"]')).find((el) => el.textContent === "Grace Hopper was invited.");
+  await act(async () => root.render(region([toast("invite", "Grace Hopper was invited.")])));
+  const after = Array.from(host.querySelectorAll('[data-af-part="message"]')).find((el) => el.textContent === "Grace Hopper was invited.");
+  if (!second || second !== after) {
+    errors++;
+    keep.error("  ✗ toast-region/web: removing the first toast remounted the second (its timer restarts and it is announced again)");
+  }
+  await act(async () => root.unmount());
+  host.remove();
+  logged.length = quiet;
+}
+
+/*
+ * The web root once mounted, and what a consumer's own tests run it in. Each failure is an error:
+ *   - a theme's sheet is in <head> once while any root draws it, and gone when the last one unmounts (a live colour picker made one per colour);
+ *   - a chart under an AntFabricProvider nested (to scope strings) in a dark root is drawn as under the root itself, not light;
+ *   - with no `matchMedia` (jsdom: Jest, Vitest) a control that reads the pointer mounts;
+ *   - hover ends when a control is disabled, so it is not hovered when enabled again;
+ *   - focus a pointer gave (no `:focus-visible`) draws the ring once a key is pressed, not on a shortcut with a modifier, not after blur.
+ */
+{
+  const ReactKit = await import("@antfabric/ui-react");
+  const ReactData = await import("@antfabric/ui-react/data");
+  const { useInteraction } = await import("../../../packages/react/src/lib/interaction");
+  const fail = (m: string) => {
+    errors++;
+    keep.error(`  ✗ ${m}`);
+  };
+  const mount = async () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    return {
+      host,
+      render: (el: ReturnType<typeof createElement>) => act(async () => root.render(el)),
+      done: async () => {
+        await act(async () => root.unmount());
+        host.remove();
+      },
+    };
+  };
+  logged.length = 0;
+
+  const [a, b] = [defineTheme({ name: "Sheet A", brand: { primary: "#0f766e" } }), defineTheme({ name: "Sheet B", brand: { primary: "#b45309" } })];
+  const sheets = (id: string) => [...document.head.querySelectorAll("style[data-href]")].filter((s) => (s.getAttribute("data-href") ?? "").split(" ").includes(`antfabric-ui-${id}`)).length;
+  const roots: Awaited<ReturnType<typeof mount>>[] = [];
+  for (const theme of [a, a, b]) {
+    const m = await mount();
+    await m.render(createElement(ReactKit.AntFabricRoot, { theme, css: "theme", children: "x" }));
+    roots.push(m);
+  }
+  const counts = () => `${sheets(a.id)}/${sheets(b.id)}`;
+  if (counts() !== "1/1") fail(`two roots in theme A and one in B leave ${counts()} sheets (A/B) in <head>, not 1/1`);
+  await roots[0]!.done();
+  if (counts() !== "1/1") fail(`one of two roots in theme A unmounted leaves ${counts()} sheets (A/B), not 1/1`);
+  await roots[1]!.done();
+  if (counts() !== "0/1") fail(`the last root in theme A unmounted leaves ${counts()} sheets (A/B), not 0/1`);
+  await roots[2]!.done();
+  if (counts() !== "0/0") fail(`every root unmounted leaves ${counts()} sheets (A/B), not 0/0`);
+
+  const sparkline = (scheme: "light" | "dark", nested: boolean) => {
+    const chart = createElement(ReactData.Sparkline, { data: [{ v: 1 }, { v: 3 }, { v: 2 }], y: "v", label: "Trend" });
+    return createElement(ReactKit.AntFabricRoot, { scheme, theme: antfabric, children: nested ? createElement(ReactKit.AntFabricProvider, { strings: { "text-field": { required: "Obligatoire" } }, children: chart }) : chart });
+  };
+  const drawn: string[] = [];
+  for (const [scheme, nested] of [["dark", true], ["dark", false], ["light", false]] as const) {
+    const m = await mount();
+    await m.render(sparkline(scheme, nested));
+    drawn.push(foldIds(m.host.querySelector("svg")?.outerHTML ?? ""));
+    await m.done();
+  }
+  if (!drawn[0] || drawn[1] === drawn[2]) fail("the nested-provider probe draws no chart, or one that is the same in light and dark (it proves nothing)");
+  else if (drawn[0] !== drawn[1]) fail("a Sparkline under an AntFabricProvider nested in a dark AntFabricRoot is not drawn as under the root itself");
+
+  const media = globalThis.matchMedia;
+  delete (globalThis as { matchMedia?: unknown }).matchMedia;
+  try {
+    const m = await mount();
+    await m.render(createElement(Stage, { platform: "web", os: "browser", scheme: "light", theme: antfabric, children: createElement(ReactKit.IconButton, { icon: "x", label: "Close" }) }));
+    if (!m.host.querySelector("button")) fail("IconButton drew no button where there is no matchMedia");
+    await m.done();
+  } catch (e) {
+    fail(`IconButton throws where there is no matchMedia (jsdom): ${(e as Error).message}`);
+  } finally {
+    globalThis.matchMedia = media;
+  }
+
+  const Probe = ({ disabled }: { disabled?: boolean }) => {
+    const i = useInteraction({ disabled });
+    return createElement("button", { ...i.handlers, "data-hovered": String(i.hovered), "data-focused": String(i.focused) });
+  };
+  {
+    const m = await mount();
+    await m.render(createElement(Probe));
+    const el = m.host.querySelector("button")!;
+    await act(async () => void el.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, pointerId: 1, pointerType: "mouse" })));
+    await act(async () => void el.dispatchEvent(new PointerEvent("pointerenter", { bubbles: false, pointerId: 1, pointerType: "mouse" })));
+    const hoveredFirst = el.getAttribute("data-hovered");
+    await m.render(createElement(Probe, { disabled: true }));
+    await m.render(createElement(Probe, { disabled: false }));
+    if (hoveredFirst !== "true") fail("the hover probe could not hover its button (it proves nothing)");
+    else if (el.getAttribute("data-hovered") !== "false") fail("useInteraction is still hovered after disabled, then enabled again, with no pointer over it");
+
+    // A pointer's focus: this one element answers `:focus-visible` with no, as a browser does after a click.
+    const matches = el.matches.bind(el);
+    el.matches = (s: string) => (s === ":focus-visible" ? false : matches(s));
+    const key = (init: KeyboardEventInit) => act(async () => void el.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, ...init })));
+    await act(async () => el.focus());
+    const afterClick = el.getAttribute("data-focused");
+    await key({ metaKey: true });
+    const afterShortcut = el.getAttribute("data-focused");
+    await key({});
+    const afterKey = el.getAttribute("data-focused");
+    await act(async () => el.blur());
+    await key({});
+    const afterBlur = el.getAttribute("data-focused");
+    if (`${afterClick} ${afterShortcut} ${afterKey} ${afterBlur}` !== "false false true false")
+      fail(`useInteraction focused after a click, ⌘ a key, a key, blur and a key is ${afterClick} ${afterShortcut} ${afterKey} ${afterBlur}, not false false true false`);
+    await m.done();
+  }
+  for (const l of logged) fail(`web root probes warned: ${l.split("\n")[0]!.slice(0, 200)}`);
+  logged.length = 0;
+}
+
+/*
+ * Keys across layers, on the web (the desktop draws the same kit file), in the setups a single component never shows: an Escape meant for a
+ * Select inside a modal Dialog closes the Select and leaves the Dialog; Tab and Shift+Tab stay inside a modal whose controls are a roving
+ * group (a Sheet holding only a RadioGroup, the CommandPalette from its field); an Enter that commits an IME composition submits nothing.
+ * Tab is pressed as a browser presses it: the keydown first, and when nothing prevented it, focus moves to the next element in the
+ * browser's own order (`tabOrder`, kept apart from the kit's `focusables` so a wrong rule there shows). Failures are `keysTodo` lines.
+ */
+{
+  const Kit = await import("@antfabric/ui-react");
+  const want = (id: string) => !only.length || only.includes(id);
+  /** What a browser's Tab reaches: an enabled control or `tabindex`, at 0 or more, not hidden, not inert. */
+  const tabOrder = () =>
+    Array.from(document.querySelectorAll<HTMLElement>("button, [href], input, select, textarea, [tabindex]")).filter(
+      (el) => el.tabIndex >= 0 && !(el as HTMLButtonElement).disabled && !(el instanceof HTMLInputElement && el.type === "hidden") && !el.closest("[hidden], [inert]"),
+    );
+  const press = async (key: string, init: KeyboardEventInit = {}) => {
+    const ev = new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true, ...init });
+    await act(async () => void (document.activeElement ?? document.body).dispatchEvent(ev));
+    return ev;
+  };
+  const pressTab = async (shift: boolean) => {
+    const at = document.activeElement as HTMLElement | null;
+    if ((await press("Tab", { shiftKey: shift })).defaultPrevented) return;
+    const order = tabOrder();
+    const from = at && at !== document.body ? at : null;
+    const next = shift
+      ? [...order].reverse().find((el) => !from || el !== from && from.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING)
+      : order.find((el) => !from || from.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING);
+    await act(async () => (next ? next.focus() : from?.blur()));
+  };
+  /** Tab, then Shift+Tab, from `start` round the modal and past: focus never leaves it. */
+  const trapLeaks = async (modal: HTMLElement, start: HTMLElement) => {
+    const out: string[] = [];
+    for (const shift of [false, true]) {
+      await act(async () => start.focus());
+      const turns = tabOrder().filter((el) => modal.contains(el)).length + 2;
+      for (let i = 0; i < turns; i++) {
+        await pressTab(shift);
+        if (!modal.contains(document.activeElement)) {
+          out.push(`${shift ? "Shift+Tab" : "Tab"} from ${start.getAttribute("role") ?? start.tagName.toLowerCase()} leaves the modal`);
+          break;
+        }
+      }
+    }
+    return out;
+  };
+  const mountWeb = async (children: ReturnType<typeof createElement>, id?: string) => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    const doc = id ? components.find((d) => d.id === id) : undefined;
+    const stage = createElement(Stage, { platform: "web", os: "browser", scheme: "light", theme: antfabric, children });
+    await act(async () => root.render(doc ? createElement(DefaultsProvider, { value: defaultsFor(usedIds(doc), "web") }, stage) : stage));
+    return {
+      host,
+      done: async () => {
+        await act(async () => root.unmount());
+        host.remove();
+      },
+    };
+  };
+  const quiet = logged.length;
+  try {
+    if (want("select")) {
+      drawn.add("select");
+      const cancels: unknown[] = [];
+      const items = [
+        { key: "platform", label: "Platform" },
+        { key: "mobile", label: "Mobile" },
+      ];
+      const m = await mountWeb(createElement(Kit.Dialog, { modal: true, kind: "form", title: "Move AF-1182", onCancel: () => cancels.push(1), children: createElement(Kit.Select, { label: "Project", items, value: "platform" }) }));
+      const trigger = m.host.querySelector<HTMLElement>('[role="combobox"]');
+      if (!trigger) found.keys.add("select/web: no Select drawn in the modal Dialog probe");
+      else {
+        await act(async () => trigger.click());
+        await act(async () => trigger.focus());
+        await press("Escape");
+        if (trigger.getAttribute("aria-expanded") !== "false") found.keys.add("select/web: Escape on an open Select in a modal Dialog does not close the Select");
+        if (cancels.length) found.keys.add("select/web: Escape on an open Select in a modal Dialog cancels the Dialog");
+        // The same key again, the Select closed: now the Dialog's.
+        else if ((await press("Escape"), cancels.length !== 1)) found.keys.add("select/web: Escape on a closed Select in a modal Dialog does not cancel the Dialog");
+      }
+      await m.done();
+    }
+    if (want("sheet")) {
+      drawn.add("sheet");
+      const options = [
+        { key: "all", label: "All new messages" },
+        { key: "mentions", label: "Mentions and replies" },
+        { key: "none", label: "Nothing" },
+      ];
+      const m = await mountWeb(createElement(Kit.Sheet, { open: true, showClose: false, title: "Notify me about", children: createElement(Kit.RadioGroup, { label: "Notify me about", hideLabel: true, options, value: "mentions" }) }));
+      const modal = m.host.querySelector<HTMLElement>('[aria-modal="true"]');
+      const radio = m.host.querySelector<HTMLElement>('[role="radio"][aria-checked="true"]');
+      if (!modal || !radio) found.keys.add("sheet/web: no modal RadioGroup drawn in the trap probe");
+      else for (const leak of await trapLeaks(modal, radio)) found.keys.add(`sheet/web: holding only a RadioGroup, ${leak}`);
+      await m.done();
+    }
+    if (want("command-palette")) {
+      drawn.add("command-palette");
+      const m = await mountWeb(createElement(Thing, { id: "command-palette", platform: "web" }), "command-palette");
+      const modal = m.host.querySelector<HTMLElement>('[aria-modal="true"]');
+      const field = modal?.querySelector<HTMLElement>("input");
+      if (!modal || !field) found.keys.add("command-palette/web: no field drawn in the trap probe");
+      else for (const leak of await trapLeaks(modal, field)) found.keys.add(`command-palette/web: ${leak}`);
+      await m.done();
+    }
+    // Enter while an IME composes commits the candidate; plain Enter after it submits (the probe's control).
+    const composing: [string, (spy: unknown[]) => ReturnType<typeof createElement>][] = [
+      ["search-field", (spy) => createElement(Kit.SearchField, { placeholder: "Search messages", value: "デプロイ", onSubmit: () => spy.push(1) })],
+      ["question-panel", (spy) => createElement(Kit.QuestionPanel, { title: "What should the release be called?", field: true, typed: "春のリリース", onSubmit: (a: string) => void spy.push(a) })],
+    ];
+    for (const [id, draw] of composing) {
+      if (!want(id)) continue;
+      drawn.add(id);
+      const spy: unknown[] = [];
+      const m = await mountWeb(draw(spy));
+      const field = m.host.querySelector<HTMLElement>("input, textarea");
+      if (!field) found.keys.add(`${id}/web: no field drawn in the IME probe`);
+      else {
+        await act(async () => field.focus());
+        await press("Enter", { isComposing: true });
+        if (spy.length) found.keys.add(`${id}/web: Enter during IME composition submits`);
+        else if ((await press("Enter"), !spy.length)) found.keys.add(`${id}/web: Enter does not submit (the IME probe proves nothing)`);
+      }
+      await m.done();
+    }
+    // A link row takes Space, as every other row does.
+    if (want("menu")) {
+      drawn.add("menu");
+      const chosen: unknown[] = [];
+      const items = [
+        { label: "Open in a new window", href: "/channels/platform-eng" },
+        { label: "Copy link" },
+      ];
+      const m = await mountWeb(createElement(Kit.Menu, { label: "Message actions", items, onSelect: (item: unknown) => void chosen.push(item) }));
+      const link = m.host.querySelector<HTMLElement>('a[role="menuitem"]');
+      if (!link) found.keys.add("menu/web: no link row drawn in the Space probe");
+      else {
+        await act(async () => link.focus());
+        const ev = await press(" ");
+        if (chosen.length !== 1) found.keys.add("menu/web: Space on a link row does not choose it");
+        else if (!ev.defaultPrevented) found.keys.add("menu/web: Space on a link row is left to scroll the page");
+      }
+      await m.done();
+    }
+    // The quick reactions are a stop of the menu's arrows: ↑ from the first row, ← → across, ↓ back; Tab closes; + reports itself.
+    if (want("context-menu")) {
+      drawn.add("context-menu");
+      const closed: unknown[] = [];
+      const more: unknown[] = [];
+      const items = [{ label: "Reply in thread" }, { label: "Copy text" }];
+      const m = await mountWeb(createElement(Kit.ContextMenu, { quickReactions: ["👍", "🎉"], items, onClose: () => closed.push(1), onMoreReactions: () => more.push(1) }));
+      const group = m.host.querySelector<HTMLElement>('[role="group"]');
+      const rows = Array.from(m.host.querySelectorAll<HTMLElement>('[role="menuitem"]'));
+      const reactions = Array.from(group?.querySelectorAll<HTMLElement>("button") ?? []);
+      if (!group || rows.length !== 2 || reactions.length !== 3) found.keys.add("context-menu/web: no quick reactions and rows drawn in the arrows probe");
+      else {
+        await act(async () => rows[0]!.focus());
+        await press("ArrowUp");
+        if (document.activeElement !== reactions[0]) found.keys.add("context-menu/web: ↑ from the first row does not reach the quick reactions");
+        else {
+          await press("ArrowRight");
+          if (document.activeElement !== reactions[1]) found.keys.add("context-menu/web: → does not move across the quick reactions");
+          await press("ArrowDown");
+          if (document.activeElement !== rows[0]) found.keys.add("context-menu/web: ↓ from the quick reactions does not go back to the first row");
+        }
+        await act(async () => rows[1]!.focus());
+        await press("ArrowDown");
+        if (document.activeElement !== reactions[0]) found.keys.add("context-menu/web: ↓ from the last row does not reach the quick reactions");
+        await act(async () => reactions[2]!.click());
+        if (more.length !== 1) found.keys.add("context-menu/web: + does not call onMoreReactions");
+        await act(async () => reactions[0]!.focus());
+        await press("Tab");
+        if (closed.length !== 1) found.keys.add("context-menu/web: Tab from the quick reactions does not close the menu");
+      }
+      await m.done();
+    }
+    // A click inside a layer opened from the panel (an inner modal Dialog) is not a press on the popover's trigger.
+    if (want("popover")) {
+      drawn.add("popover");
+      const changes: unknown[] = [];
+      const inner = createElement(Kit.Dialog, { modal: true, kind: "form", title: "Save this filter", body: "Name it to find it again." });
+      const m = await mountWeb(createElement(Kit.Popover, { open: true, label: "Filters", onOpenChange: (open: boolean) => void changes.push(open), content: inner, children: createElement("button", { type: "button" }, "Filters") }));
+      const dialog = Array.from(document.querySelectorAll<HTMLElement>('[role="dialog"], [role="alertdialog"]')).find((el) => el.getAttribute("aria-modal") === "true");
+      if (!dialog) found.keys.add("popover/web: no inner modal Dialog drawn in the nested-layer probe");
+      else {
+        await act(async () => dialog.click());
+        if (changes.length) found.keys.add(`popover/web: a click inside a Dialog opened from the panel calls onOpenChange(${String(changes[0])})`);
+      }
+      await m.done();
+    }
+    // A press on the scrim cancels only with the primary button, down and up on the scrim (L15).
+    if (want("dialog")) {
+      drawn.add("dialog");
+      const cancels: unknown[] = [];
+      const m = await mountWeb(createElement(Kit.Dialog, { modal: true, kind: "form", title: "Move AF-1182", body: "Pick a project.", onCancel: () => cancels.push(1) }));
+      const panel = Array.from(document.querySelectorAll<HTMLElement>('[aria-modal="true"]')).at(-1);
+      const scrim = panel?.closest<HTMLElement>('[data-af-part="root"]');
+      if (!panel || !scrim) found.keys.add("dialog/web: no scrim drawn in the scrim-press probe");
+      else {
+        const fire = async (el: HTMLElement, type: string, button: number) => act(async () => void el.dispatchEvent(new PointerEvent(type, { bubbles: true, button, pointerId: 1, pointerType: "mouse" })));
+        await fire(scrim, "pointerdown", 2);
+        await fire(scrim, "pointerup", 2);
+        if (cancels.length) found.keys.add("dialog/web: a right-click on the scrim cancels");
+        await fire(scrim, "pointerdown", 0);
+        await fire(panel, "pointerup", 0);
+        if (cancels.length) found.keys.add("dialog/web: a press from the scrim that ends in the panel cancels");
+        await fire(scrim, "pointerdown", 0);
+        await fire(scrim, "pointerup", 0);
+        if (cancels.length !== 1) found.keys.add("dialog/web: a primary press on the scrim does not cancel");
+      }
+      await m.done();
+    }
+    // A value no tab has chooses none, and the first enabled tab is the strip's tab stop.
+    if (want("tabs")) {
+      drawn.add("tabs");
+      const items = [
+        { key: "messages", label: "Messages", disabled: true },
+        { key: "pinned", label: "Pinned" },
+      ];
+      const m = await mountWeb(createElement(Kit.Tabs, { items, value: "thread" }));
+      const tabs = Array.from(m.host.querySelectorAll<HTMLElement>('[role="tab"]'));
+      if (tabs.some((el) => el.getAttribute("aria-selected") === "true")) found.keys.add("tabs/web: a value no tab has selects a tab");
+      const stops = tabs.filter((el) => el.tabIndex === 0);
+      if (stops.length !== 1 || stops[0] !== tabs[1]) found.keys.add("tabs/web: with none chosen, the first enabled tab is not the one tab stop");
+      await m.done();
+    }
+  } catch (e) {
+    errors++;
+    keep.error(`  ✗ layered keys probe: ${(e as Error).message}`);
+  }
+  logged.length = quiet;
+}
+
 console.error = keep.error;
 console.warn = keep.warn;
 
 // The focus and keyboard lists: a failure not listed is new; a listed one that passes (for a component this run drew) must come off.
 if (process.env.AF_TODO_WRITE) {
-  writeFileSync(genericFile, JSON.stringify({ ...generic, focusTodo: [...found.focus].sort(), keysTodo: [...found.keys].sort() }, null, 2) + "\n");
-  console.log(`wrote focusTodo (${found.focus.size}) and keysTodo (${found.keys.size}) to reports/generic.json`);
+  writeFileSync(genericFile, JSON.stringify({ ...generic, focusTodo: [...found.focus].sort(), keysTodo: [...found.keys].sort(), controlTodo: [...found.control].sort() }, null, 2) + "\n");
+  console.log(`wrote focusTodo (${found.focus.size}), keysTodo (${found.keys.size}) and controlTodo (${found.control.size}) to reports/generic.json`);
 } else {
-  for (const [list, what] of [["focus", "focusTodo"], ["keys", "keysTodo"]] as const) {
+  for (const [list, what] of [["focus", "focusTodo"], ["keys", "keysTodo"], ["control", "controlTodo"]] as const) {
     for (const f of found[list]) if (!todo[list].has(f)) {
       errors++;
       keep.error(`  ✗ ${f} (not in ${what} in reports/generic.json)`);
@@ -388,6 +1240,7 @@ if (process.env.AF_MOUNTED_OUT) {
   writeFileSync(process.env.AF_MOUNTED_OUT, JSON.stringify(out));
 }
 console.log(`re-rendered through ${steps} updates${charts ? `; ${charts} charts mounted twice, one markup each` : ""}`);
+if (controlProbed) console.log(`handler only: ${controlProbed} changeable props probed (${controlMounts} mounts), ${controlMoved} moved by a press, ${found.control.size} held at their default`);
 console.log(errors ? `✗ ${errors} warning(s) on update` : "✓ no warnings on update");
 await GlobalRegistrator.unregister();
 process.exit(errors ? 1 : 0);

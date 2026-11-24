@@ -75,6 +75,15 @@ const docs: ComponentDocs = {
   ],
   edgeCases: [
     {
+      title: "Only thinking, no steps yet, on the web",
+      platforms: ["web", "desktop"],
+      handling: "The lattice, the word and the clock are drawing only; the row also holds the sentence it announces (\"Fabric is thinking\") as plain hidden text, so a reader moving through the page finds what the agent is doing, not an empty row.",
+      example: {
+        name: "No steps",
+        props: { steps: [], agentName: "Fabric" },
+      },
+    },
+    {
       title: "A long turn",
       platforms: ["web", "desktop", "mobile"],
       handling: "The clock reads seconds to a tenth under a minute, then minutes and seconds (1m 05s). Past five steps (three on the phone) the oldest are counted as \"+N earlier\".",

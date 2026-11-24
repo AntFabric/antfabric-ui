@@ -2,6 +2,7 @@ import { useEffect, useRef, type CSSProperties } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { announce } from "../../lib/announce";
+import { focusDropped, focusables } from "../../lib/focus";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
@@ -83,14 +84,14 @@ const resume: CSSProperties = { ...pressable, flexShrink: 0, whiteSpace: "nowrap
 
 export function NotificationSchedule({
   surface = "menu",
-  paused = false,
+  paused,
   until = "",
   quietHours = "",
   options = [],
   note = "",
   custom = false,
-  customDate = "",
-  customTime = "",
+  customDate,
+  customTime,
   onCustomDateChange,
   onCustomTimeChange,
   onPause,
@@ -103,12 +104,12 @@ export function NotificationSchedule({
 }: NotificationScheduleProps) {
   const s = useStrings("notification-schedule", strings);
   // A choice shows its result at once; the app's next props (from the server) take over when they come.
-  const [isPaused, setPaused] = useControllable(paused, onPausedChange);
+  const [isPaused = false, setPaused] = useControllable(paused, onPausedChange);
   const [end, setEnd] = useControllable(until);
   const [picking, setPicking] = useControllable(custom);
   // What is typed in the picker is what Pause uses, and is reported as it changes.
-  const [date, setDate] = useControllable(customDate, onCustomDateChange);
-  const [time, setTime] = useControllable(customTime, onCustomTimeChange);
+  const [date = "", setDate] = useControllable(customDate, onCustomDateChange);
+  const [time = "", setTime] = useControllable(customTime, onCustomTimeChange);
   const pause = (key: string, at: string) => {
     if (!isPaused) setPaused(true);
     setEnd(at);
@@ -122,19 +123,29 @@ export function NotificationSchedule({
     onResume?.();
   };
   const r = useRecipe(recipes["notification-schedule"], { variants: { paused: isPaused }, styles });
-  // The paused line in the menu arrives holding its text, which is not read: it is said when a pause starts or its end moves. (The pill
-  // is a status that stays on the page, so its own text change is read.)
-  const said = surface === "menu" && isPaused ? s("status", { until: end }) : "";
+  // The paused line arrives holding its text, which is not read: it is said when a pause starts, its end moves or it is resumed (not on
+  // first draw). The pill is plain text too.
+  const said = isPaused ? s("status", { until: end }) : s("on");
   const was = useRef(said);
   useEffect(() => {
     if (said && said !== was.current) announce(said);
     was.current = said;
   }, [said]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Resume goes when notifications resume, and the picker's Pause goes with the picker: focus, fallen to the page, moves to the menu's
+  // first control (Resume in the paused line, else the first row) or, on the pill, to the pill.
+  const holder = useRef<HTMLDivElement>(null);
+  const step = `${isPaused} ${picking}`;
+  const stepWas = useRef(step);
+  useEffect(() => {
+    if (stepWas.current === step) return;
+    stepWas.current = step;
+    if (focusDropped()) (focusables(holder.current)[0] ?? holder.current)?.focus({ preventScroll: true });
+  }, [step]);
 
   return (
     <div key={surface} data-af-part="root" {...rootProps(rest)} style={css(box, { alignSelf: "flex-start" }, partStyle(r, "root", enter(surface === "menu" ? "pop" : "fade")), style)}>
       {surface === "menu" ? (
-        <div role="group" aria-label={s("pause")} data-af-part="menu" style={css(menu, r.menu)}>
+        <div ref={holder} role="group" aria-label={s("pause")} data-af-part="menu" style={css(menu, r.menu)}>
           <span data-af-part="heading" style={css(heading, r.heading)}>
             {s("pause")}
           </span>
@@ -155,7 +166,7 @@ export function NotificationSchedule({
             <div style={css(row, { gap: t.space.xs, padding: `${t.space.xs} ${t.space.sm}` }, enter("fade"))}>
               <Field label={s("pauseUntilDate")} value={date} onValue={setDate} styles={styles} />
               <Field label={s("pauseUntilTime")} value={time} onValue={setTime} styles={styles} />
-              <Button label={s("pauseButton")} size="sm" variant="ink" onPress={() => pause(picker?.key ?? "custom", picker?.until ?? s("untilCustom", { date, time }))} />
+              <Button label={s("pauseButton")} size="sm" variant="ink" disabled={!picker?.until && (!date.trim() || !time.trim())} onPress={() => pause(picker?.key ?? "custom", picker?.until ?? s("untilCustom", { date, time }))} />
             </div>
           )}
           {(note || quietHours) && <div aria-hidden data-af-part="divider" style={css(divider, r.divider)} />}
@@ -170,7 +181,7 @@ export function NotificationSchedule({
           )}
         </div>
       ) : (
-        <div role="status" aria-label={isPaused ? s("status", { until: end }) : s("on")} data-af-part="pill" style={css(pill, r.pill)}>
+        <div ref={holder} tabIndex={-1} role="group" aria-label={isPaused ? s("status", { until: end }) : s("on")} data-af-part="pill" style={css(pill, r.pill)}>
           <Icon part="pillIcon" name={isPaused ? "moon" : "bell"} size={r.pillIcon.width} style={r.pillIcon} />
           <span data-af-part="pillText" style={css(text, truncate(1), r.pillText)}>
             {isPaused ? s("status", { until: end }) : s("on")}

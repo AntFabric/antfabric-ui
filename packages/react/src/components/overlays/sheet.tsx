@@ -5,11 +5,12 @@ import { useOverlayFocus } from "../../lib/focus";
 import { OverlayLayer, useLayerHost, useLayerStack } from "../../lib/layer";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, row, text, truncate } from "../../lib/style";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { IconButton } from "../actions/icon-button";
 
 export type SheetSide = "start" | "end";
 
+/** `id`, `aria-*` and `ref` name the dialog (the panel); `className` and `data-*` go on the root, the scrim (`splitRootProps`). */
 export interface SheetProps extends RootProps<HTMLDivElement> {
   /** The sheet is showing. ✕, Esc and a press on the scrim close it (unless `dismissible` is off). */
   open?: boolean;
@@ -47,7 +48,7 @@ export interface SheetProps extends RootProps<HTMLDivElement> {
  * in a stage the size of a small window.
  */
 export function Sheet({
-  open = false,
+  open,
   onOpenChange,
   side = "end",
   width = 0,
@@ -65,7 +66,7 @@ export function Sheet({
 }: SheetProps) {
   const s = useStrings("sheet", strings);
   const r = useRecipe(recipes.sheet, { styles });
-  const [shown, setShown] = useControllable(open, onOpenChange);
+  const [shown = false, setShown] = useControllable(open, onOpenChange);
   const marker = useRef<HTMLSpanElement | null>(null);
   const layer = useLayerHost(marker, shown);
   const floating = shown && !layer.inPlace && !!layer.host;
@@ -127,13 +128,16 @@ interface PanelProps {
 function SheetPanel({ side, width, title, subtitle, footer, showClose, label, closeLabel, dismissible, floating, r, rootRest, style, onClose, children }: PanelProps) {
   const id = useId();
   const close = () => dismissible && onClose();
-  const focus = useOverlayFocus<HTMLDivElement>({ trap: true, onEscape: dismissible ? onClose : undefined, initial: "first" });
+  // In the layer, Esc is the stack's (after the controls inside, to the top overlay only); drawn in place, the panel's own.
+  const focus = useOverlayFocus<HTMLDivElement>({ trap: true, onEscape: dismissible && !floating ? onClose : undefined, initial: "first" });
   useLayerStack(floating, () => [focus.ref.current], { onEscape: close, onOutside: close });
   const end = side === "end";
+  const pass = splitRootProps(rootRest);
+  const { ref, ...named } = pass.control as Pick<RootProps<HTMLDivElement>, "ref"> & Record<string, unknown>;
   return (
     <div
       data-af-part="root"
-      {...rootProps(rootRest)}
+      {...pass.root}
       style={css(
         row,
         { alignItems: "stretch", justifyContent: end ? "flex-end" : "flex-start", ...enter("fade") },
@@ -145,13 +149,17 @@ function SheetPanel({ side, width, title, subtitle, footer, showClose, label, cl
       )}
     >
       <div
-        ref={focus.ref}
+        ref={(el) => {
+          focus.ref.current = el;
+          setRef(ref, el);
+        }}
         role="dialog"
         aria-modal
         aria-labelledby={title ? `${id}-title` : undefined}
         aria-label={title ? undefined : label}
         tabIndex={-1}
         onKeyDown={focus.onKeyDown}
+        {...named}
         data-af-part="panel"
         style={css(box, { height: "100%", maxWidth: "100%", outline: "none", ...enter(end ? "slide-left" : "slide-right") }, partStyle(r, "panel", width ? { width } : undefined))}
       >

@@ -48,6 +48,12 @@ const docs: ComponentDocs = {
       platforms: ["web", "desktop"],
       description: "The ~248px assistant rails and the sidebar: less padding and a narrower measure. Same drawing, same type ramp.",
     },
+    headingLevel: {
+      type: "number",
+      default: 2,
+      platforms: ["web", "desktop"],
+      description: "The title's heading level, 1 to 6, so it keeps the page's heading order: an empty pane under the page's h1 is an h2, an empty section inside an h2 an h3. The phone has one kind of header.",
+    },
     onAction: {
       type: "event",
     },
@@ -55,11 +61,11 @@ const docs: ComponentDocs = {
   platforms: {
     web: {
       status: "ready",
-      base: "A centred flex column with enter(\"fade\"): the 160 × 116 drawing as absolutely placed boxes over `t`, or a glyph in a disc; an <h2> title; the kit's Button (secondary, lg)",
+      base: "A centred flex column with enter(\"fade\"): the 160 × 116 drawing as absolutely placed boxes over `t`, or a glyph in a disc; an <h2> title (`headingLevel` picks h1 to h6); the kit's Button (secondary, lg)",
       import: "import { EmptyState } from \"@antfabric/ui-react\"",
       notes: [
         "Search empties are announced through the search field's own live region (\"No matches\"), not by this component.",
-        "The title is an h2 inside the pane's landmark, so a screen-reader user can jump to it.",
+        "The title is a heading inside the pane's landmark (h2 unless `headingLevel` says otherwise), so a screen-reader user can jump to it.",
       ],
     },
     desktop: {
@@ -288,6 +294,15 @@ const docs: ComponentDocs = {
           line: "No conversation matches “quarterly business review deck for the…”.",
         },
         width: 320,
+      },
+    },
+    {
+      title: "Inside a section that has its own heading",
+      platforms: ["web", "desktop"],
+      handling: "Pass `headingLevel` one below the section's heading (3 under an h2), so the outline a screen reader walks stays in order; the title looks the same at every level.",
+      example: {
+        name: "Under an h2",
+        props: { title: "No tasks due today", headingLevel: 3, art: "tasks" },
       },
     },
     {

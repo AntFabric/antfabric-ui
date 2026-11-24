@@ -1,7 +1,7 @@
 /**
  * react-native-svg in the browser and in Node: each element as the DOM's own, the way lucide-react-native is lucide-react
  * here. Every element the phone kit and react-native-gifted-charts draw with is mapped (Svg, G, Rect, Circle, Line, Path,
- * Polygon, Text, TSpan, Defs, LinearGradient, RadialGradient, Stop, ClipPath, Mask, Use, ForeignObject), with the props a
+ * Polygon, Text, TSpan, Defs, LinearGradient, RadialGradient, Stop, ClipPath, Pattern, Mask, Use, ForeignObject), with the props a
  * browser does not know turned into ones it does: `testID` is `data-testid`, as React Native Web writes it, so a recipe part
  * drawn this way is found; `onPress` / `onPressIn` / `onPressOut` are pointer events; `translateX` / `translateY` (and `x` /
  * `y` on a `G`) are a `transform`; `collapsable` (which React Native's `Animated` puts on what it wraps: gifted-charts' radar animates a Polygon) is dropped.
@@ -68,6 +68,7 @@ export const LinearGradient = element("linearGradient");
 export const RadialGradient = element("radialGradient");
 export const Stop = element("stop");
 export const ClipPath = element("clipPath");
+export const Pattern = element("pattern");
 export const Mask = element("mask");
 export const Use = element("use");
 export const ForeignObject = element("foreignObject");

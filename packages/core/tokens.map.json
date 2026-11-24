@@ -251,7 +251,7 @@
   },
   "chart.other": {
     "source": "proposal",
-    "note": "proposal: the value of chart.previous in each theme; the grey a donut's folded Other segment is drawn in"
+    "note": "B10: a grey that holds 3:1 on the card: primitives charcoal.450 in light (was #b9bec7, 1.87:1); the dark grey already held it"
   },
   "chart.partMinW": {
     "source": "proposal",
@@ -267,7 +267,7 @@
   },
   "chart.previous": {
     "source": "proposal",
-    "note": "the reference dashboard's light blue for the last period (10 November 2026); a deep muted blue in dark"
+    "note": "B10: the reference's last-period blue, deepened (light, was #c6e1ff, 1.34:1) and lightened (dark, was #33507a, 1.96:1) in OKLCH to 3:1 on the card; low chroma on purpose, beside series1"
   },
   "chart.previousW": {
     "source": "proposal",
@@ -307,7 +307,7 @@
   },
   "chart.series2": {
     "source": "proposal",
-    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+    "note": "B10: the reference's orange darkened in OKLCH (same hue) to 3:1 on the light card (was #ee8a0a, 2.54:1); the dark value is the reference's"
   },
   "chart.series3": {
     "source": "proposal",
@@ -315,7 +315,7 @@
   },
   "chart.series4": {
     "source": "proposal",
-    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+    "note": "B10: the reference's teal darkened in OKLCH (same hue) to 3:1 on the light card (was #00b48a, 2.66:1); the dark value is the reference's"
   },
   "chart.series5": {
     "source": "proposal",
@@ -323,11 +323,11 @@
   },
   "chart.series6": {
     "source": "proposal",
-    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+    "note": "B10: the reference's amber darkened in OKLCH (same hue) to 3:1 on the light card (was #c99a00, 2.59:1); the dark value is the reference's"
   },
   "chart.series7": {
     "source": "proposal",
-    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+    "note": "B10: the reference's sky blue darkened in OKLCH (same hue) to 3:1 on the light card (was #4aa3ff, 2.63:1); the dark value is the reference's"
   },
   "chart.series8": {
     "source": "proposal",
@@ -451,7 +451,7 @@
   },
   "chip.removeSize": {
     "source": "unmapped",
-    "note": "ours: a chip's remove cross, 20 on web and desktop, 24 on the phone"
+    "note": "ours: a chip's remove cross, 24 on every platform (B10: web and desktop were 20, under WCAG 2.2's 24px target)"
   },
   "choice.dotSize": {
     "source": "unmapped",
@@ -498,7 +498,8 @@
     "mobile": "mobile:control.iconHeight"
   },
   "control.hIconSm": {
-    "source": "--control-h-icon-sm"
+    "source": "--control-h-icon-sm",
+    "note": "B10: 24 on the desktop where the product's is 20, WCAG 2.2's minimum target (2.5.8), as the web already was"
   },
   "control.hInput": {
     "source": "--control-h-input"
@@ -588,7 +589,7 @@
   },
   "data.positive": {
     "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "note": "B10: the reference's change-badge green darkened in OKLCH to 3:1 on the light card (was #12b76a, 2.62:1); the soft fill and ink are unchanged"
   },
   "data.positiveSoft": {
     "source": "proposal",
@@ -596,7 +597,7 @@
   },
   "data.warning": {
     "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "note": "B10: the reference's amber darkened in OKLCH to 3:1 on the light card (was #f79009, 2.35:1); the soft fill and ink are unchanged"
   },
   "data.warningSoft": {
     "source": "proposal",
@@ -684,7 +685,8 @@
     "mobile": "mobile:palette.textMuted"
   },
   "fg.onBrand": {
-    "source": "--fg-on-brand"
+    "source": "proposal",
+    "note": "B10 (owner decision): picked by contrast on brand.default (onBrandFor in brand.ts): ink on AntFabric's coral, where the product's --fg-on-brand is white (3.42:1, under WCAG 1.4.3's 4.5:1)"
   },
   "fg.onBrandSoft": {
     "source": "--fg-on-brand-soft",
@@ -1144,6 +1146,10 @@
   "os.notificationFg": {
     "source": "unmapped",
     "note": "colour of the operating system's own chrome (traffic lights, notification banners, the iOS badge, the island) that the shell and notification components imitate; neither the product nor the phone tokenises it"
+  },
+  "os.onFill": {
+    "source": "unmapped",
+    "note": "ours (B10): the white an OS draws on its own fills (the macOS menu highlight, the red badge, the Windows close button, a tray menu's hovered row, the home and lock screens), split off fg.onBrand when fg.onBrand turned to ink on coral"
   },
   "os.statusFg": {
     "source": "unmapped",

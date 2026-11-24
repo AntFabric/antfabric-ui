@@ -33,12 +33,12 @@ const useStyles = createStyles((t) => ({
   track: { flexShrink: 0, flexDirection: "row", alignItems: "center", justifyContent: "flex-start", overflow: "visible" },
 }));
 
-export function Switch({ checked = false, label, description = "", icon = "", hideLabel = false, disabled = false, onCheckedChange, styles, style, testID, ...rest }: SwitchProps) {
+export function Switch({ checked, label, description = "", icon = "", hideLabel = false, disabled = false, onCheckedChange, styles, style, testID, ...rest }: SwitchProps) {
   const { t } = useTheme();
   const form = useFormField();
   const s = useStyles();
   const press = usePress({ disabled });
-  const [on, setOn] = useControllable(checked, onCheckedChange);
+  const [on = false, setOn] = useControllable(checked, onCheckedChange);
   // Each OS's own shape is in the tokens: UISwitch's 51×31 pill on iOS, Material's thin track under a bigger thumb on Android.
   const r = useRecipe(recipes.switch, { state: { on, focus: press.focused, disabled: press.disabled }, styles });
   // The icon's size is its width and height (`size`); what else `styles.icon` sets goes on the glyph.

@@ -74,11 +74,12 @@ export const notificationItem = defineRecipe({
     actions: { on: ["web", "desktop"], base: { radius: "$radius.control", bg: "$surface.raised", shadow: "$shadow.hairline" } },
     rowAction: {
       on: ["web", "desktop"],
-      base: { radius: "$radius.control", borderWidth: "$border.wHairline", borderColor: "$border.subtle", bg: "$surface.raised", fg: "$fg.muted", size: "$text.micro" },
+      // At least 24px tall, WCAG 2.2's minimum target (2.5.8): the micro label and its padding alone were 22.
+      base: { minHeight: "$control.hit", radius: "$radius.control", borderWidth: "$border.wHairline", borderColor: "$border.subtle", bg: "$surface.raised", fg: "$fg.muted", size: "$text.micro" },
       states: { hover: { bg: "$hover.surface", fg: "$fg.strong" }, focus: { shadow: "$shadow.focus" } },
     },
     swipeAction: { on: ["mobile"], base: { bg: "$surface.inverse", fg: "$fg.onInverse" } },
-    swipeDanger: { on: ["mobile"], base: { bg: "$danger.solid", fg: "$fg.onBrand" }, states: { pressed: { bg: "$danger.solidHover" } } },
+    swipeDanger: { on: ["mobile"], base: { bg: "$danger.solid", fg: "$danger.fg" }, states: { pressed: { bg: "$danger.solidHover" } } },
     swipeIcon: { on: ["mobile"], base: { square: "$icon.size" } },
     swipeLabel: { on: ["mobile"], base: { size: "$text.caption", weight: "$font.weightSemibold" } },
   },

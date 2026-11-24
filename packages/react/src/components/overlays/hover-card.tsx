@@ -2,6 +2,8 @@ import { useEffect, useId, useRef, type CSSProperties, type FocusEvent, type Key
 import { MOTION, recipes, useControllable, useDirection, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
+import { useLayerStack } from "../../lib/layer";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, pressable, row, rtl, text, truncate } from "../../lib/style";
 import { rootProps, type RootProps } from "../../lib/root-props";
@@ -100,7 +102,7 @@ export function HoverCard({
   placement = "down",
   showTrigger = true,
   children,
-  open = false,
+  open,
   onOpenChange,
   onMessage,
   onViewProfile,
@@ -114,7 +116,7 @@ export function HoverCard({
   const s = useStrings("hover-card", strings);
   const dir = useDirection();
   const panel = useId();
-  const [isOpen, setIsOpen] = useControllable(open, onOpenChange);
+  const [isOpen = false, setIsOpen] = useControllable(open, onOpenChange);
   const host = useRef<HTMLDivElement | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const floating = children !== undefined && children !== null && children !== false;
@@ -128,10 +130,12 @@ export function HoverCard({
     if (isOpen) setIsOpen(false);
   };
   useEffect(() => () => clearTimeout(timer.current), []);
-  // Your own trigger (`children`) is described by the card while it is open.
+  // The trigger: yours (`children`), or the kit's name button. Outside the card.
+  const trigger = () => Array.from(host.current?.querySelectorAll<HTMLElement>(TARGET) ?? []).find((n) => !n.closest('[data-af-part="panel"]'));
+  // Your own trigger is described by the card while it is open.
   useEffect(() => {
     if (!floating || !isOpen) return;
-    const el = Array.from(host.current?.querySelectorAll<HTMLElement>(TARGET) ?? []).find((n) => !n.closest('[data-af-part="panel"]'));
+    const el = trigger();
     if (!el) return;
     const had = el.getAttribute("aria-describedby");
     el.setAttribute("aria-describedby", [had, panel].filter(Boolean).join(" "));
@@ -145,12 +149,26 @@ export function HoverCard({
   const ink: AvatarIdentity = deleted ? "ink" : identity;
   const hasPresence = agent || presence !== "unknown";
   const status = [statusEmoji, statusText].filter(Boolean).join(" ") + (statusUntil ? ` · ${statusUntil}` : "");
-  // Esc closes the card and stops there, so the dialog or panel behind stays open.
-  const keyboard = (e: KeyboardEvent) => {
-    if (e.key !== "Escape") return;
-    e.stopPropagation();
+  // Esc closes an open card and stops there, so the dialog or panel behind stays open: from inside it, and from anywhere while it is the
+  // top layer (one opened by hover). A closed card leaves the key alone.
+  // Closed with focus inside the card (Esc on its Message button), focus goes back to the trigger rather than to the page. Focusing the
+  // trigger from the keyboard would open the card again: `returning` keeps it closed.
+  const returning = useRef(false);
+  const close = () => {
+    const back = host.current?.querySelector('[data-af-part="panel"]')?.contains(document.activeElement) ? trigger() : undefined;
     hide();
     onClose?.();
+    if (!back) return;
+    returning.current = true;
+    back.focus({ preventScroll: true });
+    returning.current = false;
+  };
+  useLayerStack(isOpen, () => [host.current], { onEscape: close });
+  const keyboard = (e: KeyboardEvent) => {
+    if (e.key !== "Escape" || !isOpen || e.defaultPrevented || isComposing(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    close();
   };
   const enterPointer = (e: PointerEvent) => {
     // Only where hover exists: a tap on a phone or a tablet never flashes one.
@@ -158,7 +176,7 @@ export function HoverCard({
     show(false);
   };
   const focused = (e: FocusEvent) => {
-    if ((e.target as HTMLElement).matches?.(":focus-visible")) show(true);
+    if (!returning.current && (e.target as HTMLElement).matches?.(":focus-visible")) show(true);
   };
   const blurred = (e: FocusEvent) => {
     if (!host.current?.contains(e.relatedTarget as Node | null)) hide();

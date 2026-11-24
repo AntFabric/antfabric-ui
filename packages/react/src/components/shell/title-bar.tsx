@@ -1,11 +1,11 @@
 import type { CSSProperties, ReactNode } from "react";
-import { formatShortcut, recipes, useControllable, useStrings, type IconActionItem, type KitStrings } from "@antfabric/ui-core";
+import { formatShortcut, recipes, useControllable, useDirection, useStrings, type IconActionItem, type KitStrings } from "@antfabric/ui-core";
 import { usePlatform } from "../../platform";
 import { t } from "../../tokens";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { box, css, glass, pressable, row, text, truncate } from "../../lib/style";
+import { box, css, glass, pressable, row, rtl, text, truncate } from "../../lib/style";
 import { IconButton } from "../actions/icon-button";
 import { Kbd } from "../display/kbd";
 import { rootProps, type RootProps } from "../../lib/root-props";
@@ -96,6 +96,7 @@ const search: CSSProperties = {
 
 function Search({ placeholder, keys, label, hint, onPress, styles }: { placeholder: string; keys: string; label: string; hint: string; onPress: () => void; styles?: PartStyles<"title-bar"> }) {
   const { glass: isGlass } = usePlatform();
+  const dir = useDirection();
   const ui = useInteraction();
   const r = useRecipe(recipes["title-bar"], { state: { hover: ui.hovered, focus: ui.focused }, styles });
   return (
@@ -109,7 +110,7 @@ function Search({ placeholder, keys, label, hint, onPress, styles }: { placehold
       onClick={() => onPress()}
       {...ui.handlers}
       style={css(
-        search,
+        rtl(search, dir),
         partStyle(
           r,
           "search",
@@ -120,7 +121,7 @@ function Search({ placeholder, keys, label, hint, onPress, styles }: { placehold
       )}
     >
       <Icon part="searchIcon" name="search" size={r.searchIcon.width} style={r.searchIcon} />
-      <span style={css(text, truncate(1), { flex: 1, textAlign: "left" })}>{placeholder}</span>
+      <span style={rtl(css(text, truncate(1), { flex: 1, textAlign: "left" }), dir)}>{placeholder}</span>
       <Kbd keys={keys} style={{ alignSelf: "center" }} />
     </button>
   );
@@ -167,8 +168,8 @@ export function TitleBar({
   fullscreen = false,
   maximized = false,
   focused = true,
-  menuOpen = false,
-  sidebarExpanded = false,
+  menuOpen,
+  sidebarExpanded,
   actions = [],
   trailing,
   onSidebarExpandedChange,
@@ -187,13 +188,17 @@ export function TitleBar({
   ...rest
 }: TitleBarProps) {
   const s = useStrings("title-bar", strings);
-  const { os, glass: isGlass } = usePlatform();
+  const { os, glass: isGlass, shortcutOs } = usePlatform();
+  // macOS moves the lights to the right and Windows its caption buttons to the left in a right-to-left tree: the insets follow them.
+  const dir = useDirection();
   const r = useRecipe(recipes["title-bar"], { variants: { focused }, styles });
-  const [open, setOpen] = useControllable(menuOpen, onMenuOpenChange);
-  const [sidebar, setSidebar] = useControllable(sidebarExpanded, onSidebarExpandedChange);
+  const [open = false, setOpen] = useControllable(menuOpen, onMenuOpenChange);
+  const [sidebar = false, setSidebar] = useControllable(sidebarExpanded, onSidebarExpandedChange);
   const caption: Caption | null = os === "windows" ? "windows" : os === "linux" ? "linux" : null;
   const restore = os === "windows" ? s("restoreDown") : s("restore");
   const placeholder = searchPlaceholder || s("searchPlaceholder");
+  // A product's own placeholder says what the field searches, so it is the name too: the words on the field are in its name (WCAG 2.5.3).
+  const searchName = searchPlaceholder || s("searchLabel");
   const light = (part: "lightClose" | "lightMin" | "lightMax"): CSSProperties =>
     css({ flexShrink: 0, borderWidth: "0.5px", borderStyle: "solid", borderColor: t.os.macLightEdge, boxSizing: "border-box" }, r[part]);
   return (
@@ -203,7 +208,7 @@ export function TitleBar({
       data-af-part="root"
       {...drag}
       {...rootProps(rest)}
-      style={css(root, partStyle(r, "root", ROOT_OS[os], isGlass && { background: "transparent", borderBottomWidth: 0 }), style)}
+      style={css(rtl(root, dir), partStyle(r, "root", rtl(ROOT_OS[os] ?? {}, dir), isGlass && { background: "transparent", borderBottomWidth: 0 }), style)}
     >
       <div {...drag} style={side}>
         {os === "mac" && !fullscreen && (
@@ -221,7 +226,7 @@ export function TitleBar({
             shape={caption === "linux" ? "circle" : "square"}
             open={open}
             onPress={() => setOpen(!open)}
-            style={{ marginRight: t.space["2xs"] }}
+            style={rtl({ marginRight: t.space["2xs"] }, dir)}
           />
         )}
         {/* The nav rail's own toggle lives here, outside the rail, where shadcn's sidebar puts its trigger. */}
@@ -238,8 +243,8 @@ export function TitleBar({
           aria-label={s("history")}
           style={css(row, { gap: t.space["3xs"] }, isGlass && css(glass(), { borderRadius: t.radius.pill, paddingInline: t.space["3xs"] }))}
         >
-          <IconButton icon="arrow-left" label={s("back")} size="sm" disabled={!canGoBack} onPress={() => onBack?.()} />
-          <IconButton icon="arrow-right" label={s("forward")} size="sm" disabled={!canGoForward} onPress={() => onForward?.()} />
+          <IconButton icon={dir === "rtl" ? "arrow-right" : "arrow-left"} label={s("back")} size="sm" disabled={!canGoBack} onPress={() => onBack?.()} />
+          <IconButton icon={dir === "rtl" ? "arrow-left" : "arrow-right"} label={s("forward")} size="sm" disabled={!canGoForward} onPress={() => onForward?.()} />
           {history ? <IconButton icon="clock" label={s("recentHistory")} size="sm" onPress={() => onHistory?.()} /> : null}
         </div>
       </div>
@@ -248,27 +253,27 @@ export function TitleBar({
           <Search
             placeholder={placeholder}
             keys={searchKeys}
-            label={s("searchLabel")}
-            hint={s("searchHint", { placeholder, keys: formatShortcut(searchKeys, os) })}
+            label={searchName}
+            hint={s("searchHint", { placeholder, keys: formatShortcut(searchKeys, shortcutOs) })}
             onPress={() => onSearch?.()}
             styles={styles}
           />
         ) : null}
       </div>
       <div {...drag} style={css(side, { justifyContent: "flex-end" })}>
-        {trailing ? <div data-af-part="trailing" style={css(row, { marginRight: t.space["2xs"], whiteSpace: "nowrap" }, r.trailing)}>{trailing}</div> : null}
+        {trailing ? <div data-af-part="trailing" style={css(row, rtl({ marginRight: t.space["2xs"] }, dir), { whiteSpace: "nowrap" }, r.trailing)}>{trailing}</div> : null}
         {actions.map((a) => (
           <IconButton key={a.key} icon={a.icon} label={a.label} size="sm" badge={a.badge} disabled={a.disabled} onPress={() => onAction?.(a)} />
         ))}
         {caption === "windows" && (
-          <div data-af-part="captions" style={css(box, { flexDirection: "row", alignSelf: "stretch", marginLeft: t.space.sm }, r.captions)}>
+          <div data-af-part="captions" style={css(box, { flexDirection: "row", alignSelf: "stretch" }, rtl({ marginLeft: t.space.sm }, dir), r.captions)}>
             <CaptionButton kind="windows" label={s("minimise")} icon="minus" onPress={() => onMinimize?.()} styles={styles} />
             <CaptionButton kind="windows" label={maximized ? restore : s("maximise")} icon={maximized ? "copy" : "square"} onPress={() => onMaximize?.()} styles={styles} />
             <CaptionButton kind="windows" label={s("close")} icon="x" close onPress={() => onClose?.()} styles={styles} />
           </div>
         )}
         {caption === "linux" && (
-          <div data-af-part="captions" style={css(row, { gap: t.space.md, marginLeft: t.space.md }, r.captions)}>
+          <div data-af-part="captions" style={css(row, { gap: t.space.md }, rtl({ marginLeft: t.space.md }, dir), r.captions)}>
             <CaptionButton kind="linux" label={s("minimise")} icon="minus" onPress={() => onMinimize?.()} styles={styles} />
             <CaptionButton kind="linux" label={maximized ? restore : s("maximise")} icon={maximized ? "copy" : "square"} onPress={() => onMaximize?.()} styles={styles} />
             <CaptionButton kind="linux" label={s("close")} icon="x" onPress={() => onClose?.()} styles={styles} />

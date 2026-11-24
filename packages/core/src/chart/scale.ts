@@ -68,9 +68,14 @@ export interface ScaleOptions {
 
 /**
  * Round ticks over a domain (steps of 1, 2, 2.5, 5 and 10 times a power of ten). A domain of one value is widened to a range
- * around it, and neither that nor `pad` carries a side across zero: a line of positive values never gets a negative axis.
+ * around it, and neither that nor `pad` carries a side across zero: a line of positive values never gets a negative axis. A side that is
+ * not a number takes the other's value (neither is 0 to 1), and a `count` that is not above zero is 4.
  */
 export function niceScale([lo, hi]: [number, number], { count = 4, pad = 0 }: ScaleOptions = {}): Scale {
+  if (!Number.isFinite(lo) || !Number.isFinite(hi)) lo = hi = Number.isFinite(lo) ? lo : Number.isFinite(hi) ? hi : 0;
+  if (lo > hi) [lo, hi] = [hi, lo];
+  // At most 1,000 intervals, so the ticks are always a short list.
+  const n = Number.isFinite(count) && count > 0 ? Math.min(count, 1000) : 4;
   const out = (v: number, to: "lo" | "hi") => (to === "lo" ? (lo >= 0 ? Math.max(0, v) : v) : hi <= 0 ? Math.min(0, v) : v);
   if (pad && hi > lo) {
     const p = (hi - lo) * pad;
@@ -81,12 +86,15 @@ export function niceScale([lo, hi]: [number, number], { count = 4, pad = 0 }: Sc
     // All zero has nothing to stay on one side of: it reads 0 to 1.
     [lo, hi] = lo === 0 ? [0, 1] : [out(lo - w, "lo"), out(hi + w, "hi")];
   }
-  const raw = (hi - lo) / count;
+  // A tick is rounded to 12 significant digits (to drop float noise), so a step finer than that at the domain's magnitude (a decade up, where
+  // the last tick may land) would print one tick twice, or near 1e16 not move at all: the step is never finer.
+  const least = 10 ** (Math.floor(Math.log10(Math.max(Math.abs(lo), Math.abs(hi)))) - 10);
+  const raw = Math.max((hi - lo) / n, least);
   const mag = 10 ** Math.floor(Math.log10(raw));
   const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw - 1e-12)!;
   const min = Math.floor(lo / step + 1e-9) * step;
   const max = Math.ceil(hi / step - 1e-9) * step;
-  const ticks: number[] = [];
-  for (let v = min; v <= max + step / 2; v += step) ticks.push(+v.toPrecision(12));
+  // Counted by index, not by adding the step up, which can stop moving when the step is small against the value.
+  const ticks = Array.from({ length: Math.round((max - min) / step) + 1 }, (_, i) => +(min + i * step).toPrecision(12));
   return { min: ticks[0]!, max: ticks[ticks.length - 1]!, step, ticks };
 }

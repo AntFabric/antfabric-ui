@@ -3,7 +3,7 @@ import { recipes, useLocale, useStrings, type KitStrings } from "@antfabric/ui-c
 import { Icon } from "../../lib/icon";
 import { type RootProps, partId, rootProps } from "../../lib/root-props";
 import { fontScale } from "../../lib/type";
-import { meterReading, meterTone, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
+import { meterReading, meterIcon, meterTone, type FormatSpec, type MeterKind, type MeterThresholds, type FormatWords } from "@antfabric/ui-core/chart";
 import { createStyles, useTheme } from "../../theme";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 
@@ -24,7 +24,7 @@ export interface MeterProps extends RootProps {
   thresholds?: MeterThresholds;
   /** Just a short track with the value beside it, for a row of a list that already names what it is. The label stays the track's accessible name. */
   compact?: boolean;
-  /** An icon beside the value in the caution and critical states, so the state is not the fill's colour alone. The spoken value always says it. */
+  /** An icon beside the value in the caution and critical states, so the state is not the fill's colour alone. On by default. The spoken value always says it. */
   showState?: boolean;
   /** Per-part styles over the theme: `{ root: {…}, head: {…}, label: {…}, value: {…}, track: {…}, fill: {…} }`. */
   styles?: PartStyles<"meter">;
@@ -44,7 +44,7 @@ const useStyles = createStyles((t) => ({
   mark: { marginRight: t.space["2xs"] },
 }));
 
-export function Meter({ value, max = 1, label, kind = "usage", format = "percent", thresholds, compact = false, showState = false, styles, strings, testID, style, ...rest }: MeterProps) {
+export function Meter({ value, max = 1, label, kind = "usage", format = "percent", thresholds, compact = false, showState = true, styles, strings, testID, style, ...rest }: MeterProps) {
   const s = useStyles();
   const { t } = useTheme();
   const r = useRecipe(recipes.meter, { variants: { kind }, styles });
@@ -53,7 +53,8 @@ export function Meter({ value, max = 1, label, kind = "usage", format = "percent
   const locale = useLocale();
   const known = Number.isFinite(value) && Number.isFinite(max) && max > 0;
   const share = known ? value / max : 0;
-  const tone = meterTone(kind, share, thresholds);
+  // No value has no state: an empty score is not critical, in the fill, the icon or the words.
+  const tone = known ? meterTone(kind, share, thresholds) : "ok";
   const reading = meterReading(value, max, formatWords, format, locale);
   const shown = reading.kind === "unavailable" ? str("unavailable") : reading.kind === "of" ? str("valueOfMax", { value: reading.value, max: reading.max }) : reading.value;
   const fill = tone === "warning" ? t.data.warning : tone === "danger" ? t.data.negative : null;
@@ -62,17 +63,18 @@ export function Meter({ value, max = 1, label, kind = "usage", format = "percent
   const track = partStyle(r, "track", { view: compact && { width: t.kpi.meterCompactW, flexShrink: 0 } });
   const bar = partStyle(r, "fill", { view: [{ width: `${Math.min(1, Math.max(0, share)) * 100}%` }, fill !== null && { backgroundColor: fill }] });
   const said = tone === "warning" ? str("stateWarning", { value: shown }) : tone === "danger" ? str("stateDanger", { value: shown }) : shown;
-  const mark = showState && tone !== "ok" ? <Icon name={tone === "danger" ? "circle-alert" : "triangle-alert"} size={t.icon.sizeMd} color={fill ?? t.fg.body} style={s.mark} /> : null;
+  const icon = meterIcon(tone);
+  const mark = showState && icon ? <Icon name={icon} size={t.icon.sizeMd} color={fill ?? t.fg.body} style={s.mark} /> : null;
   const readout = <Text testID={partId(testID, "meter", "value")} maxFontSizeMultiplier={fontScale.chrome} style={[value$.view, value$.text]}>{shown}</Text>;
   const valueText = mark ? <View style={s.valueRow}>{mark}{readout}</View> : readout;
   return (
     <View
       testID={partId(testID, "meter", "root")}
-      {...rootProps(rest)}
       accessible
       accessibilityRole="progressbar"
       accessibilityLabel={label}
       accessibilityValue={known ? { min: 0, max, now: Math.min(max, Math.max(0, value)), text: said } : { text: shown }}
+      {...rootProps(rest)}
       style={[s.root, root.view, style]}
     >
       {!compact ? (

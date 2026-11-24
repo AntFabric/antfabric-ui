@@ -22,7 +22,7 @@ export interface TabsItem {
 
 export interface TabsProps extends RootProps<HTMLDivElement> {
   items: TabsItem[];
-  /** The chosen tab's key. Empty chooses the first. */
+  /** The chosen tab's key. Empty, or a key no tab has, chooses none: no bar, and Tab lands on the first enabled tab. */
   value?: string;
   /** The tabs share the width between them. */
   full?: boolean;
@@ -40,7 +40,7 @@ export interface TabsProps extends RootProps<HTMLDivElement> {
   style?: CSSProperties;
 }
 
-function Tab({ item, id, controls, on, full, styles, strings, onPress }: { item: TabsItem; id: string; controls?: string; on: boolean; full: boolean; styles?: PartStyles<"tabs">; strings?: Partial<KitStrings["tabs"]>; onPress: () => void }) {
+function Tab({ item, id, controls, on, tabbable, full, styles, strings, onPress }: { item: TabsItem; id: string; controls?: string; on: boolean; tabbable: boolean; full: boolean; styles?: PartStyles<"tabs">; strings?: Partial<KitStrings["tabs"]>; onPress: () => void }) {
   const s = useStrings("tabs", strings);
   const ui = useInteraction({ disabled: item.disabled });
   const n = item.badge ?? 0;
@@ -59,8 +59,8 @@ function Tab({ item, id, controls, on, full, styles, strings, onPress }: { item:
       aria-disabled={item.disabled || undefined}
       aria-label={n > 0 ? (item.badgeMore ? s("labelWithCountMore", { label: item.label, count: n }) : s("labelWithCount", { label: item.label, count: n })) : item.label}
       title={item.title}
-      // Only the chosen tab is a Tab stop; the arrows move between the rest.
-      tabIndex={on ? 0 : -1}
+      // Only one tab is a Tab stop (the chosen one, else the first enabled); the arrows move between the rest.
+      tabIndex={tabbable ? 0 : -1}
       onClick={() => !item.disabled && onPress()}
       {...ui.handlers}
       style={css(
@@ -96,11 +96,14 @@ function Tab({ item, id, controls, on, full, styles, strings, onPress }: { item:
   );
 }
 
-export function Tabs({ items, value = "", full = false, rule = true, label, panels = false, onValueChange, styles, strings, style, ref, ...rest }: TabsProps) {
-  const [chosen, setChosen] = useControllable(value, onValueChange);
+export function Tabs({ items, value, full = false, rule = true, label, panels = false, onValueChange, styles, strings, style, ref, ...rest }: TabsProps) {
+  const [chosen = "", setChosen] = useControllable(value, onValueChange);
   const made = useId();
   const base = rest.id ?? made;
-  const current = items.some((i) => i.key === chosen) ? chosen : items[0]?.key;
+  // A value that matches no tab chooses none (a strip whose panel is closed): nothing is chosen for the app, a disabled tab least of all.
+  const current = items.some((i) => i.key === chosen) ? chosen : undefined;
+  // One tab stop: the chosen tab, else the first enabled one, so the strip is reachable with none chosen.
+  const stop = current ?? items.find((i) => !i.disabled)?.key;
   // Arrows follow the tree's direction (the tab before is on the right in rtl) and skip disabled tabs; moving selects.
   const keys = useRovingKeys<HTMLDivElement>({
     items: '[role="tab"]',
@@ -157,6 +160,7 @@ export function Tabs({ items, value = "", full = false, rule = true, label, pane
           id={`${base}-tab-${item.key}`}
           controls={panels ? `${base}-panel-${item.key}` : undefined}
           on={item.key === current}
+          tabbable={item.key === stop}
           full={full}
           styles={styles}
           strings={strings}

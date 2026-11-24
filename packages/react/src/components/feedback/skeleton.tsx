@@ -93,10 +93,12 @@ export function Skeleton({
   return (
     <div
       data-af-part="root"
-      {...rootProps(rest)}
       role="group"
       aria-busy
       aria-label={name}
+      // Invisible for its first moments: nothing is said, and nothing is there to find.
+      aria-hidden={!visible || undefined}
+      {...rootProps(rest)}
       style={css(
         box,
         { alignSelf: shape === "row" ? "stretch" : "flex-start", maxWidth: "100%", transition: "opacity 160ms ease-out" },

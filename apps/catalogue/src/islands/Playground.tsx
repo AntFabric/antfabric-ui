@@ -46,6 +46,9 @@ const short = (v: unknown) => {
  * being used: an event it fires is logged under the preview, and an event that reports a prop's new
  * value (`changes`) moves that prop's control too.
  */
+/** How long the playground, standing in for the app, takes to answer a request a component makes (`usePending`). */
+const ANSWER_MS = 900;
+
 export default function Playground({ doc, platform, initial, width, iconChoices, defaults }: PlaygroundProps) {
   const prefs = usePrefs();
   const { os, osVersion } = osOf(prefs, platform);
@@ -66,6 +69,9 @@ export default function Playground({ doc, platform, initial, width, iconChoices,
           (...args: unknown[]) => {
             setLog((l) => [{ n: ++n + Date.now(), name, args }, ...l].slice(0, 3));
             if (d.changes) setValues((v) => ({ ...v, [d.changes!]: args[0] }));
+            // The playground is the app, and it answers every request after a beat without changing anything: a component waiting on
+            // it (Approve, Retry, Sign in) shows its pending state, then comes back to the state its props still say.
+            return new Promise<void>((done) => setTimeout(done, ANSWER_MS));
           },
         ]),
     );

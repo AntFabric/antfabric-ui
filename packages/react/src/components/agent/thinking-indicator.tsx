@@ -4,7 +4,7 @@ import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { box, css, pressable, row, rtl, text } from "../../lib/style";
+import { box, css, pressable, row, rtl, text, visuallyHidden } from "../../lib/style";
 import { announce } from "../../lib/announce";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { AgentSteps } from "./agent-steps";
@@ -58,9 +58,9 @@ function useStill(): boolean {
   return still;
 }
 
-export function ThinkingIndicator({ steps = [], agentName = "", words = [], since = 0, expanded = true, onExpandedChange, strings, styles, style, ...rest }: ThinkingIndicatorProps) {
+export function ThinkingIndicator({ steps = [], agentName = "", words = [], since = 0, expanded, onExpandedChange, strings, styles, style, ...rest }: ThinkingIndicatorProps) {
   const s = useStrings("thinking-indicator", strings);
-  const [unfolded, setUnfolded] = useControllable(expanded, onExpandedChange);
+  const [unfolded = true, setUnfolded] = useControllable(expanded, onExpandedChange);
   const still = useStill();
   const dir = useDirection();
   const [mood, setMood] = useState(0);
@@ -164,6 +164,8 @@ export function ThinkingIndicator({ steps = [], agentName = "", words = [], sinc
       ) : (
         <div data-af-part="head" style={css(row, { display: "inline-flex" }, r.head)}>
           {head}
+          {/* What the drawing says, for a reader moving through the page: plain text, not a live region (the change is announced). */}
+          <span style={visuallyHidden}>{announcement}</span>
         </div>
       )}
       {hasTrace && (

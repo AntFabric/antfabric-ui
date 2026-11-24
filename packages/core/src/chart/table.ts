@@ -30,13 +30,19 @@ export interface ChartTableInput {
   xLabel?: string;
 }
 
-/** The category first, then each value field: the same rows, each with a `key` (a Table's default `rowKey`). */
-export function chartTable({ data, x, y, format, xFormat, formats = {}, labels = {}, xLabel }: ChartTableInput): { columns: ChartTableColumn[]; rows: (Row & { key: string })[] } {
+/**
+ * The category first, then each value field: the same rows, each named `row-N` in `rowKey` (pass it to the Table). `rowKey` is `key`, a Table's
+ * default, unless the data has a `key` field of its own, which is kept as it is: then it is `_key` (or `__key`, and so on), a field no row has.
+ */
+export function chartTable({ data, x, y, format, xFormat, formats = {}, labels = {}, xLabel }: ChartTableInput): { columns: ChartTableColumn[]; rows: Row[]; rowKey: string } {
+  let rowKey = "key";
+  while (data.some((r) => rowKey in r)) rowKey = `_${rowKey}`;
   return {
+    rowKey,
     columns: [
       { key: x, label: xLabel ?? x[0]!.toUpperCase() + x.slice(1), cell: "text", format: xFormat, priority: 1 },
       ...[y].flat().map((f, i): ChartTableColumn => ({ key: f, label: labels[f] ?? f, cell: "number", format: formats[f] ?? format, align: "end", priority: i + 2 })),
     ],
-    rows: data.map((r, i) => ({ ...r, key: `row-${i}` })),
+    rows: data.map((r, i) => ({ ...r, [rowKey]: `row-${i}` })),
   };
 }

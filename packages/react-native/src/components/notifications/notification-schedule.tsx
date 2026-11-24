@@ -93,14 +93,14 @@ const useStyles = createStyles((t) => ({
 
 export function NotificationSchedule({
   surface = "menu",
-  paused = false,
+  paused,
   until = "",
   quietHours = "",
   options = [],
   note = "",
   custom = false,
-  customDate = "",
-  customTime = "",
+  customDate,
+  customTime,
   onCustomDateChange,
   onCustomTimeChange,
   onPause,
@@ -115,12 +115,12 @@ export function NotificationSchedule({
   const s = useStyles();
   const str = useStrings("notification-schedule", strings);
   // A choice shows its result at once; the app's next props (from the server) take over when they come.
-  const [isPaused, setPaused] = useControllable(paused, onPausedChange);
+  const [isPaused = false, setPaused] = useControllable(paused, onPausedChange);
   const [end, setEnd] = useControllable(until);
   const [picking, setPicking] = useControllable(custom);
   // What is typed in the picker is what Pause uses, and is reported as it changes.
-  const [date, setDate] = useControllable(customDate, onCustomDateChange);
-  const [time, setTime] = useControllable(customTime, onCustomTimeChange);
+  const [date = "", setDate] = useControllable(customDate, onCustomDateChange);
+  const [time = "", setTime] = useControllable(customTime, onCustomTimeChange);
   const pause = (key: string, at: string) => {
     if (!isPaused) setPaused(true);
     setEnd(at);
@@ -143,8 +143,8 @@ export function NotificationSchedule({
   const { width: noteIconSize, height: _nh, ...noteIconRest } = r.noteIcon.view;
   const { width: pillIconSize, height: _ph, ...pillIconRest } = r.pillIcon.view;
   const status = isPaused ? str("status", { until: end }) : str("on");
-  // iOS has no live regions: a pause starting or its end moving is spoken (not on first draw).
-  const said = isPaused ? status : "";
+  // iOS has no live regions: a pause starting, its end moving or a resume is spoken (not on first draw).
+  const said = status;
   const was = useRef(said);
   useEffect(() => {
     if (said && said !== was.current) announce(said);
@@ -176,7 +176,7 @@ export function NotificationSchedule({
             <Enter motion="fade" style={s.customRow}>
               <Field testID={testID} label={str("pauseUntilDate")} value={date} onValue={setDate} styles={styles} />
               <Field testID={testID} label={str("pauseUntilTime")} value={time} onValue={setTime} styles={styles} />
-              <Button label={str("pauseButton")} size="sm" variant="ink" onPress={() => pause(picker?.key ?? "custom", picker?.until ?? str("untilCustom", { date, time }))} />
+              <Button label={str("pauseButton")} size="sm" variant="ink" disabled={!picker?.until && (!date.trim() || !time.trim())} onPress={() => pause(picker?.key ?? "custom", picker?.until ?? str("untilCustom", { date, time }))} />
             </Enter>
           ) : null}
           {note || quietHours ? <View testID={partId(testID, "notification-schedule", "divider")} accessibilityElementsHidden importantForAccessibility="no" style={[s.divider, r.divider.view]} /> : null}
@@ -197,7 +197,7 @@ export function NotificationSchedule({
           ) : null}
         </View>
       ) : (
-        <View testID={partId(testID, "notification-schedule", "pill")} role="status" accessibilityLabel={status} style={[s.pill, r.pill.view]}>
+        <View testID={partId(testID, "notification-schedule", "pill")} accessibilityLabel={status} style={[s.pill, r.pill.view]}>
           <Icon testID={partId(testID, "notification-schedule", "pillIcon")} name={isPaused ? "moon" : "bell"} size={pillIconSize as number} color={r.pillIcon.text.color} style={Object.keys(pillIconRest).length ? pillIconRest : undefined} />
           <Text testID={partId(testID, "notification-schedule", "pillText")} numberOfLines={1} maxFontSizeMultiplier={fontScale.content} style={[pillText.view, pillText.text]}>
             {status}

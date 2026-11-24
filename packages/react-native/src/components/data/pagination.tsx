@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { Text, View, type ViewStyle } from "react-native";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { clampPage, pageCountOf, pageRange, pageSlots } from "@antfabric/ui-core/chart";
 import { createStyles } from "../../theme";
+import { useAnnounce } from "../../lib/a11y";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { partId, rootProps, type RootProps } from "../../lib/root-props";
 import { Button } from "../actions/button";
@@ -47,13 +49,13 @@ const useStyles = createStyles((t) => ({
   choice: { flex: 1 },
 }));
 
-export function Pagination({ page, total, pageCount, pageSize = 10, pageSizes, jump = false, compact = false, onPageChange, onPageSizeChange, styles, strings, style, testID, ...rest }: PaginationProps) {
+export function Pagination({ page, total, pageCount, pageSize, pageSizes, jump = false, compact = false, onPageChange, onPageSizeChange, styles, strings, style, testID, ...rest }: PaginationProps) {
   const s = useStyles();
   const r = useRecipe(recipes.pagination, { styles });
   const str = useStrings("pagination", strings);
   const id = (part: string) => partId(testID, "pagination", part);
   const [current, setCurrent] = useControllable(page, onPageChange);
-  const [size, setSize] = useControllable(pageSize, onPageSizeChange);
+  const [size = 10, setSize] = useControllable(pageSize, onPageSizeChange);
   const count = pageCount ?? pageCountOf(total ?? 0, size);
   const at = clampPage(current ?? 1, count);
   const go = (n: number) => {
@@ -63,10 +65,16 @@ export function Pagination({ page, total, pageCount, pageSize = 10, pageSizes, j
   const { from, to } = pageRange(at, size, total ?? 0);
   const range = { from, to, total: total ?? 0 };
   const summary = total === undefined ? str("pageOf", { page: at, count }) : compact ? str("rangeOf", range) : str("showing", range);
+  // The summary is said when it changes (iOS has no live regions), not on first draw.
+  useAnnounce(summary);
   const sizes = pageSizes && pageSizes.length > 0 ? (pageSizes.includes(size) ? pageSizes : [size, ...pageSizes].sort((a, b) => a - b)) : null;
+  // One item a page, built again only when the count changes.
+  const pages = useMemo(() => (jump ? Array.from({ length: count }, (_, i) => ({ key: String(i + 1), label: String(i + 1) })) : []), [jump, count]);
+  // With the choices above it, the pager sits in a wrapper, which is then the root the pass-through names.
+  const alone = !sizes && !(jump && count > 1);
   const pager = (
-    <View testID={id("root")} {...rootProps(rest)} style={[s.root, r.root.view, style]}>
-      <Text testID={id("summary")} accessibilityLiveRegion="polite" style={[r.summary.view, s.summary, r.summary.text]}>{summary}</Text>
+    <View testID={id("root")} {...(alone ? rootProps(rest) : null)} style={[s.root, r.root.view, style]}>
+      <Text testID={id("summary")} style={[r.summary.view, s.summary, r.summary.text]}>{summary}</Text>
       <View testID={id("pages")} style={[s.pages, r.pages.view]}>
         <IconButton icon="chevron-left" label={str("previous")} variant="outline" shape="square" size="sm" disabled={at <= 1} onPress={() => go(at - 1)} />
         {compact
@@ -85,9 +93,9 @@ export function Pagination({ page, total, pageCount, pageSize = 10, pageSizes, j
       </View>
     </View>
   );
-  if (!sizes && !(jump && count > 1)) return pager;
+  if (alone) return pager;
   return (
-    <View style={s.outer}>
+    <View {...rootProps(rest)} style={s.outer}>
       <View style={s.choices}>
         {sizes ? (
           <View style={s.choice}>
@@ -108,7 +116,7 @@ export function Pagination({ page, total, pageCount, pageSize = 10, pageSizes, j
               label={str("goToPage")}
               value={String(at)}
               searchable={count > SEARCHABLE_AFTER}
-              items={Array.from({ length: count }, (_, i) => ({ key: String(i + 1), label: String(i + 1) }))}
+              items={pages}
               onValueChange={(key) => go(Number(key))}
             />
           </View>

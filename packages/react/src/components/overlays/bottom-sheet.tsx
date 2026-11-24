@@ -1,14 +1,15 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, Ref } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
 import { box, css, enter, row, text, truncate } from "../../lib/style";
 import { useOverlayFocus } from "../../lib/focus";
 import { useInteraction } from "../../lib/interaction";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { Button } from "../actions/button";
 import { IconButton } from "../actions/icon-button";
 
+/** `id`, `aria-*` and `ref` name the dialog (the panel); `className` and `data-*` go on the root, the scrim (`splitRootProps`). */
 export interface BottomSheetProps extends RootProps<HTMLDivElement> {
   /** Empty draws no title row: the handle and the content only. */
   title?: string;
@@ -29,8 +30,10 @@ export interface BottomSheetProps extends RootProps<HTMLDivElement> {
   dragging?: boolean;
   /** Dismissed: the panel slides back down and the scrim clears. The close button sets it. */
   closed?: boolean;
-  /** The person asked to close: ×, the handle, Esc. */
+  /** The person asked to close: ×, the handle, a press on the scrim, Esc. */
   onClose?: () => void;
+  /** ×, the handle, a press on the scrim and Esc close it. Off for a sheet that must be answered from inside: there is no ×, and none of them do anything. */
+  dismissible?: boolean;
   /** The sheet has finished leaving. */
   onDismiss?: () => void;
   /** Per-part styles over the theme: `{ panel: {…}, handle: {…}, title: {…} }`. */
@@ -54,6 +57,7 @@ export function BottomSheet({
   keyboard = false,
   dragging = false,
   closed = false,
+  dismissible = true,
   onPrimary,
   onClose,
   onDismiss,
@@ -67,39 +71,39 @@ export function BottomSheet({
   const handleUi = useInteraction();
   const r = useRecipe(recipes["bottom-sheet"], { variants: { dragging, closed: gone, largeTitle }, state: { focus: handleUi.focused }, styles });
   const close = () => {
+    if (!dismissible) return;
     setGone(true);
     onClose?.();
   };
-  // Focus moves in when the sheet mounts (not when it is drawn already dismissed), Tab stays inside, Esc closes, and focus returns to the opener.
-  const focus = useOverlayFocus<HTMLDivElement>({ initial: gone ? false : "first", trap: true, onEscape: close });
+  // Focus moves in when the sheet mounts (not when it is drawn already dismissed), Tab stays inside, Esc closes, and focus returns to the
+  // opener when it is dismissed (while it slides away, before the app unmounts it).
+  const focus = useOverlayFocus<HTMLDivElement>({ initial: gone ? false : "first", trap: true, onEscape: close, open: !gone });
+  const pass = splitRootProps(rest);
+  const { ref, ...named } = pass.control as { ref?: Ref<HTMLDivElement> } & Record<string, unknown>;
   // The handle is 5px tall, so a transparent box centred on it reaches the target size without drawing more: a click on it is a click on the handle.
   const height = r.handle.height;
   const handleH = typeof height === "number" ? `${height}px` : (height as string);
   return (
     <div
       data-af-part="root"
-      {...rootProps(rest)}
-      style={css(
-        box,
-        {
-          alignSelf: "flex-start",
-          width: 375, /* structural: stage: a 375pt phone frame for the sheet demo */
-          maxWidth: "100%",
-          paddingTop: 96, /* structural: stage: room above the sheet in the demo frame */
-          justifyContent: "flex-end",
-          overflow: "hidden",
-        },
-        partStyle(r, "root", tall && { height: 740, paddingTop: 119 }), /* structural: stage: the tall demo frame and its top room */
-        style,
-      )}
+      {...pass.root}
+      // A press on the scrim above the panel closes it; the keyboard has Esc and the handle.
+      onClick={(e) => e.target === e.currentTarget && close()}
+      // It fills what it is given (the viewport, the host's layer): the panel sits at the foot and the scrim above it is the backdrop.
+      style={css(box, partStyle(r, "root", { flexGrow: 1, alignSelf: "stretch", justifyContent: "flex-end", overflow: "hidden" }), style)}
     >
       <div
-        ref={focus.ref}
+        ref={(el) => {
+          focus.ref.current = el;
+          setRef(ref, el);
+        }}
         role="dialog"
         aria-modal
         data-af-part="panel"
         aria-label={title || undefined}
         aria-hidden={gone || undefined}
+        {...named}
+        inert={gone || undefined}
         onKeyDown={focus.onKeyDown}
         onTransitionEnd={(e) => {
           if (gone && e.target === e.currentTarget && e.propertyName === "transform") onDismiss?.();
@@ -127,6 +131,9 @@ export function BottomSheet({
           data-af-part="handle"
           data-af-press
           aria-label={s("dismiss")}
+          // Not dismissible, the handle is only a picture of one.
+          disabled={!dismissible}
+          aria-hidden={!dismissible || undefined}
           onClick={() => close()}
           onFocus={handleUi.handlers.onFocus}
           onBlur={handleUi.handlers.onBlur}
@@ -139,7 +146,7 @@ export function BottomSheet({
             <h2 data-af-part="title" style={css(text, { flexShrink: 1 }, partStyle(r, "title", largeTitle && truncate(1)))}>
               {title}
             </h2>
-            {showClose && <IconButton icon="x" label={s("close")} onPress={() => close()} />}
+            {showClose && dismissible && <IconButton icon="x" label={s("close")} onPress={() => close()} />}
           </div>
         )}
         <div data-af-scroll style={css(box, { flexShrink: 1, gap: t.space["2xs"], overflowY: "auto" }, tall && { flexGrow: 1, flexBasis: 0 })}>

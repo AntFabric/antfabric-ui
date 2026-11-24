@@ -1,5 +1,66 @@
 # @antfabric/ui-core
 
+## 1.1.0
+
+1.1.0 fixes the 1.0 component review (`reports/audit/2026-11-23-component-review.md`). It removes nothing, but several components change behaviour (see "Changed" below, and MIGRATION.md, "1.0 → 1.1").
+
+### Changed (behaviour)
+
+- **`fg.onBrand` is picked by contrast for every theme** (H14): white where white reaches 4.5:1 on `brand.default`, otherwise ink (`fg.strong`'s `#0e1828`). AntFabric's coral takes ink (white was 3.42:1), so **AntFabric's primary buttons, brand badges, ticked checkboxes and other brand fills now draw dark ink**. `brandValues` always writes `fg.onBrand`; `defineTheme` derives it in each scheme where a theme's `brand` or `tokens` set `brand.default`, unless its own `tokens` set `fg.onBrand`. A theme that wants white on a brand fill sets `fg.onBrand` itself.
+- **OS imitations no longer read `fg.onBrand`.** The text an OS imitation draws on its own fills (the macOS menu highlight, the red badge, the Windows close button, a tray menu's hovered row, the lock and home screens) reads the new token `os.onFill`, and the danger swipe and toast's error mark read `danger.fg`, so they stay white whatever `fg.onBrand` is.
+- **Light-scheme chart and data colours hold 3:1 on the card** (WCAG 1.4.11, M42), each darkened in OKLCH on its own hue: `chart.series2` #d67b04, `series4` #0aa57f, `series6` #b78c01, `series7` #3b95f0, `chart.previous` #7b94b0 (and #506f9b in dark), `chart.other` charcoal.450, `data.positive` #02a860, `data.warning` #d77c03. `chart.track` is a ground, not a mark, and keeps its value.
+- **24px pointer targets on web and desktop** (WCAG 2.5.8; M10, M50, L53): `control.hIconSm` is 24 on the desktop (was 20; IconButton `sm`, Toast's close, ProgressBar's header) and `chip.removeSize` is 24 on web and desktop (was 20). The `checkbox` recipe's root is at least `control.hit` square, and `notification-item`'s `rowAction` at least `control.hit` tall, on web and desktop (`neutral` had these; they moved into the schema).
+- **`defineTheme` is stricter** (H10, L73). It rejects a value holding a control character (a newline, tab or carriage return), `@`, `!`, or a function that loads a resource (`url(`, `image(`, `image-set(`, `-webkit-image-set(`, `src(`, `element(`, `cross-fade(`); a brand `soft`, `softHover`, `onSoft` or `tint` must be a colour (hex, `rgb()` or `hsl()`); and `resolveTokens` for the phone throws on a theme that gives a size the phone reads as a number in `rem`, `em`, `%` (other than `50%`) or `calc()`. A theme that passed before and holds one of these now throws when it is built.
+- **`useControllable(value, onChange)`: a value left out (`undefined`) keeps the component's own state** even when the handler is passed, as its comment always said; only the value and the handler together make it controlled. Every component with a changeable prop follows (see the kits' changelogs). An array or plain-object value is compared by its items when deciding whether the caller passed a new one, so an inline `selected={["a"]}` or `sort={{ … }}` without its handler no longer resets the person's change on every parent render.
+- **`fmt` prints what it is given more strictly.**
+  - The `date`, `month` and `day` formats take an ISO string as well as a Date or a timestamp, and print `unavailable` for anything that is not a date instead of throwing `Invalid time value`. A date-only string (`"2026-03-01"`) is a calendar day: it prints as that day in every zone, so a Table cell no longer shows Feb 28 west of UTC and the server and the browser agree; a full date-time is still the instant it names, in `timeZone` or the viewer's zone.
+  - `currency` honours `digits` (`{ type: "currency", digits: 2 }` prints `$19.99`); the default stays whole units.
+  - Text a number format cannot read (`"abc"`, `""`) prints `unavailable` instead of `NaN`. `points` takes its sign from the rounded number (no `-0.0 pts`), and a negative `duration` is signed once (`-2m 30s`).
+  - `whenOf` now lives in `format.ts` (still exported from `@antfabric/ui-core/chart`) and returns `undefined` for an invalid Date, so a Table sorts it last.
+- **`summarizeGauge` with a percent format prints each value as its share of `max`** (58 of 100 is 58%), through the new `meterShown(value, max, format)` that `meterReading` also uses.
+- **`summarize`:** numeric text (`"120"`) counts as its number, `NaN` and other text are gaps, and a series from 0 says the direction it went (0 to -5 "fell", not "rose").
+- **`chartTable` keeps a data field named `key`:** it returns `rowKey`, the field the rows are named by (`key`, or `_key` when the data has a `key`). Pass it to the Table.
+- **Strings.**
+  - `in-app-banner`: `open` and `openIn` give way to `titleIn`, `withBody`, `leadBody` and `toOpen` (with the common `withDetail`). A product that overrode `open` or `openIn` moves its text to these.
+  - `connection-banner.tryNowLabel` and `update-banner.installLabel`, `restartLabel` and `retryLabel` are now descriptions, not names (their doc comments say so; the English text is unchanged; L16, L18).
+  - AttachmentCard's `removePreview` is read by the phone too (it drew no Remove preview before). `workspace-switcher.newMessages` is read by both kits now.
+- **Icons in items.** An item's `icon` (`MenuItem`, `NavItem`, `ActionItem`, `IconActionItem`) is an `IconName`: a lucide name or the icon component. Code that reads `icon` as a string narrows it first (H13).
+
+### Added
+
+- `usePending(answer)` (re-exported by both kits): `const { pending, run } = usePending([status, error])`, then `run(onRetry)`. `run` sets `pending` and calls the handler; pending clears when the promise the handler returns settles (either way) or when a value in `answer` changes, compared as `useControllable` compares (a re-render with equal props is not an answer). A press while pending does nothing, and with no handler nothing is pending. The kits use it so a component never shows the result of a request before the app confirms it (S2). MIGRATION.md, "1.0 → 1.1: the app drives the state".
+- Types `IconComponent` and `IconName` (H13).
+- Token `os.onFill` (white in both themes), see Changed.
+- `rowIds(shown, rows, rowKey)`: a row without the field is named by its index in `rows`. `meterShown(value, max, format)`. `meterIcon`, Meter's state icon, shared with GaugeChart (M45).
+- `SERIES_MARKS` entries carry a `texture` (`MarkTexture`), drawn with `texturePath` and `TEXTURE`; `radarPoint` places a value on the phone's radar (M46).
+- `segmentsOf` and `goalsOf` give each item a `key` (`keysOf`: the label, then `label#2` for a repeat). `summarizeSegments` and `totalOf` take segments without one (L66).
+- `moved` takes a `locale`, so a spoken change matches the printed one (`11,3 %`; L62).
+- `exceptZero` and `shortNumber` are exported: where `Intl.NumberFormat` lacks `signDisplay` or `notation: "compact"` (Hermes may), the signed percent and the compact formats fall back to them, probed once. `points` no longer needs either option (L59).
+- Strings: `mobile-header.online` ("Back online", said when the phone header's connection line goes away; a product that overrides the header's strings may add it; L55), `tab-bar.show` ("Show tabs", the squeezed TabBar disc's name when no tab is open; M33), `avatar.labelAgent`, `sidebar-item` `agent` and the presence words, `nav-rail` `profileWithPresence` and the presence words, an empty `popover` group so the phone's Popover takes `strings` for its backdrop's name (`common`'s `close`), and the `in-app-banner` keys above.
+- Recipes: AttachmentCard has a `chipOpen` part (the ready staged chip's open target: gap, radius and its focus ring), which `styles.chipOpen` reaches in both kits. `tab-bar` `action` and `os-notification` `action` gain a `disabled` state (`opacity.disabled`).
+- `usePlatform().shortcutOs` is the web kit's (see `@antfabric/ui-react`); `formatShortcut(keys, "browser")` still reads as Ctrl, since a server render cannot know the visitor's machine (L73).
+
+### Fixed
+
+State
+- `useControllable` compares an array or plain-object value by its items (see Changed).
+
+Packaging
+- The types resolve under `moduleResolution: node16` and `nodenext`: the `.d.ts` files' relative imports name their `.js` (H11).
+- Each `.js` file ships with its source map (L72).
+- Core carries no `"use client"`. Under the `react-server` condition `./dtcg` and `./antfabric` load; the root and `./chart` do not yet (they call `createContext` and import `useState` when they load), so a Next.js layout builds its theme in a `"use client"` file (CONSUMING.md section 3).
+
+Keyboard and focus
+- `formatShortcut` reads the plus key: `"Mod++"` (or `"Shift+Plus"`) is `⌘+` on a Mac and `Ctrl+Plus` elsewhere. Before, it threw on the Mac, which crashed the render of any menu item or button with that shortcut (M52).
+- `kitCss`: `[data-af-scroll]:focus{outline:none}`, so a keyboard-reached scroll region keeps the forced-colours outline. It also documents that a field's outline is taken off by `[data-af-input]:focus`, never inline, so the forced-colours outline reaches a focused field (H15).
+
+Theming and contrast
+- `pnpm check tokens` measures contrast for `antfabric`, `neutral` and two brand probes in both schemes; `reports/generic.json` `contrastTodo` lists the six pairs that still fall short (brand hover and pressed under ink, the translucent focus halo).
+
+Data and text
+- `niceScale`: a small range at a large magnitude (near 1e12 to 1e16) no longer loops forever or repeats ticks: the step is never finer than the 12 significant digits a tick is rounded to. A side that is `NaN` or infinite takes the other's value, a reversed domain is turned round, and a `count` that is not above zero is 4 (at most 1,000).
+- `initials` keeps the first character whole as a person sees it (`Intl.Segmenter`, or `Array.from` where there is none): `"🦊 Fox"` is `🦊F`, a ZWJ family or a flag stays one glyph. Before, an emoji was cut in half and drew `�` (L39).
+
 ## 1.0.0
 
 The first release on npm. The packages are renamed from `@antfabric-ui/core`, `react` and `react-native` to `@antfabric/ui-core`, `@antfabric/ui-react` and `@antfabric/ui-react-native`, in the `antfabric` npm organisation: rename the imports. It holds everything in the earlier internal 1.0.0 and 1.1.0 (below, from the old internal registry), plus:

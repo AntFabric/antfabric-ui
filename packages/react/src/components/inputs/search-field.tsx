@@ -1,21 +1,23 @@
-import { useRef, type CSSProperties } from "react";
+import { useRef, type CSSProperties, type Ref } from "react";
 import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon, Spinner } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { partStyle, useRecipe, type PartStyles } from "../../lib/recipe";
-import { rootProps, type RootProps } from "../../lib/root-props";
+import { setRef, splitRootProps, type RootProps } from "../../lib/root-props";
 import { css, input, pressable, row, text, truncate } from "../../lib/style";
 import { IconButton } from "../actions/icon-button";
 import { Kbd } from "../display/kbd";
 import { joinIds, useFormField } from "./form-field";
 
-export interface SearchFieldProps extends RootProps<HTMLDivElement> {
+/** `id`, `aria-*` and `ref` name the input (the launcher button with `launcher`); `className` and `data-*` go on the root (`splitRootProps`). */
+export interface SearchFieldProps extends RootProps<HTMLInputElement | HTMLButtonElement> {
   /** What is in the box. The field reports every change, and the ✕ through onClear. */
   value?: string;
   /** Say what is searched, not "Search" — the field is the only hint of what a screen holds. */
   placeholder?: string;
-  /** Accessible name when it should differ from the placeholder. Falls back to the placeholder. */
+  /** Accessible name when it should differ from the placeholder. Falls back to a FormField's label, then the placeholder. */
   label?: string;
   /** A key that focuses or opens this search, written once as Mod+K or /. Shown on hover and focus while the field is empty. */
   shortcut?: string;
@@ -52,7 +54,7 @@ const root: CSSProperties = {
 const focusOffset: CSSProperties = { outlineOffset: -2 };
 
 export function SearchField({
-  value = "",
+  value,
   placeholder = "",
   label = "",
   shortcut = "",
@@ -73,12 +75,14 @@ export function SearchField({
   const s = useStrings("search-field", strings);
   const form = useFormField();
   const ui = useInteraction({ disabled });
-  const [query, setQuery] = useControllable(value, onValueChange);
+  const [query = "", setQuery] = useControllable(value, onValueChange);
   const name = label || placeholder;
-  // Inside a FormField, with no name of its own, the field's label names it.
-  const named = name ? { "aria-label": name } : form ? { "aria-labelledby": form.labelId } : {};
+  // Its own label first; inside a FormField the field's visible label beats the placeholder (WCAG 2.5.3); else the placeholder.
+  const named = label ? { "aria-label": label } : form ? { "aria-labelledby": form.labelId } : placeholder ? { "aria-label": placeholder } : {};
   const isFocused = focused || ui.focused;
   const inputRef = useRef<HTMLInputElement>(null);
+  const pass = splitRootProps(rest);
+  const { ref, ...control } = pass.control as { ref?: Ref<HTMLInputElement | HTMLButtonElement> } & Record<string, unknown>;
   const clear = () => {
     setQuery("");
     onClear?.();
@@ -90,7 +94,7 @@ export function SearchField({
     <div
       data-af-part="root"
       {...ui.handlers}
-      {...rootProps(rest)}
+      {...pass.root}
       style={css(root, partStyle(r, "root", isFocused && focusOffset, launcher && { cursor: "pointer" }, ui.disabled && { cursor: "not-allowed" }), style)}
     >
       {busy ? <Spinner part="spinner" label={s("loading")} style={r.spinner} /> : <Icon part="icon" name="search" style={r.icon} />}
@@ -100,8 +104,10 @@ export function SearchField({
         </span>
       ) : (
         <input
-          ref={inputRef}
-          id={form?.id}
+          ref={(el) => {
+            inputRef.current = el;
+            setRef(ref, el);
+          }}
           data-af-input
           type="text"
           role="searchbox"
@@ -109,19 +115,26 @@ export function SearchField({
           aria-busy={busy || undefined}
           aria-invalid={form?.invalid || undefined}
           aria-required={form?.required || undefined}
-          aria-describedby={joinIds(form?.describedBy)}
           placeholder={placeholder}
           value={query}
           disabled={ui.disabled}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => {
+            // An IME's Enter commits its candidate and its Escape cancels it: neither submits nor clears.
+            if (isComposing(e)) return;
             if (e.key === "Enter") onSubmit?.();
-            // Escape clears first, and blurs on the second press.
+            // Escape clears first, and stops there (the overlay around the field stays); the second press blurs and goes on to it.
             if (e.key === "Escape") {
-              if (query) clear();
-              else e.currentTarget.blur();
+              if (query) {
+                e.preventDefault();
+                e.stopPropagation();
+                clear();
+              } else e.currentTarget.blur();
             }
           }}
+          {...control}
+          id={form?.id ?? (control.id as string | undefined)}
+          aria-describedby={joinIds(form?.describedBy, control["aria-describedby"] as string | undefined)}
           data-af-part="input"
           style={css(input, { flexGrow: 1, alignSelf: "stretch" }, r.input)}
         />
@@ -138,6 +151,8 @@ export function SearchField({
           aria-haspopup="dialog"
           disabled={ui.disabled}
           onClick={() => onPress?.()}
+          {...control}
+          ref={(el) => setRef(ref, el)}
           data-af-part="launcher"
           style={css(pressable, { position: "absolute", borderRadius: "inherit", zIndex: 1 }, partStyle(r, "launcher", ui.disabled && { cursor: "not-allowed" }))}
         />

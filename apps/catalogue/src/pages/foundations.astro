@@ -113,7 +113,7 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
     <div class="code"><pre>{brandUse}</pre></div>
     <p class="sub" style="margin-top:12px">
       A brand sets only these tokens: {BRAND_PATHS.map((p, i) => <><code class="mono">{p}</code>{i < BRAND_PATHS.length - 1 ? ", " : "."}</>)}
-      Neutrals, status colours and the identity colours (<code class="mono">identity.agent</code> is Fabric, never a tenant) stay as they are; <code class="mono">fg.onBrand</code> follows the primary, white while white reads on it and ink on a light one. A theme's sheet is scoped by <code class="mono">data-af-theme-id</code>, so several themes can sit on one page; a host that skips <code class="mono">AntFabricRoot</code> writes that attribute and <code class="mono">themeCss(theme)</code> itself.
+      Neutrals, status colours and the identity colours (<code class="mono">identity.agent</code> is Fabric, never a tenant) stay as they are; <code class="mono">fg.onBrand</code> follows the primary by contrast: white while white reaches 4.5:1 on it, ink otherwise (AntFabric's own coral takes ink). A theme's sheet is scoped by <code class="mono">data-af-theme-id</code>, so several themes can sit on one page; a host that skips <code class="mono">AntFabricRoot</code> writes that attribute and <code class="mono">themeCss(theme)</code> itself.
     </p>
   </section>
 

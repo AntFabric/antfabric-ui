@@ -66,7 +66,7 @@ const docs: ComponentDocs = {
     rowKey: {
       type: "string",
       default: "key",
-      description: "The field of each row that names it, for selection and for React's keys. The keys `selected` holds are its values as text.",
+      description: "The field of each row that names it, for selection and for React's keys. The keys `selected` holds are its values as text. A row without the field is named by its index in `rows`.",
     },
     sort: {
       type: "object",
@@ -224,7 +224,7 @@ const docs: ComponentDocs = {
       import: "import { Table } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "One card per row. The column with the lowest `priority` is the card's title, a `badge` column among the next three sits beside it, and the rest are label and value lines. A column with no priority is left off the card; when none has one, the columns' order is the priority.",
-        "Sorting is the sort bar above the cards: the Select picks a column (the same first direction as the header's first press) and the arrow button beside it reverses the direction. \"As listed\" clears the sort.",
+        "Sorting is the sort bar above the cards: the Select picks a column (the same first direction as the header's first press) and the arrow button beside it reverses the direction. \"As listed\" clears the sort. With no sortable column the bar has no Select, and with neither a sort nor `selectable` there is no bar.",
         "A card's height is its content, and `table.rowH` (52pt) is the least a one-line card is.",
         "`dense` and `maxHeight` have no meaning here and are not props on the phone.",
         "The card shows the title and three more columns, lowest `priority` first; the other columns are not dropped: the card's details button opens them in place as more label and value lines (`expanded`).",

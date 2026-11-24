@@ -103,11 +103,11 @@ function Action({ label, name, destructive, onPress, styles }: Pick<SwipeRowProp
   );
 }
 
-export function SwipeRow({ open = false, unread = false, dense = false, title, body = "", time = "", icon, actions = [], onOpenChange, onPress, onAction, strings, styles, style, testID, ...rest }: SwipeRowProps) {
+export function SwipeRow({ open, unread = false, dense = false, title, body = "", time = "", icon, actions = [], onOpenChange, onPress, onAction, strings, styles, style, testID, ...rest }: SwipeRowProps) {
   const str = useStrings("swipe-row", strings);
   const { t, os } = useTheme();
   const s = useStyles();
-  const [openNow, setOpen] = useControllable(open, onOpenChange);
+  const [openNow = false, setOpen] = useControllable(open, onOpenChange);
   const tinted = !dense && unread;
   const r = useRecipe(recipes["swipe-row"], { state: { on: tinted }, styles });
   const shown = actions.filter((a) => !a.unreadOnly || unread);
@@ -173,6 +173,9 @@ export function SwipeRow({ open = false, unread = false, dense = false, title, b
         },
         onPanResponderGrant: () => {
           setMoving(true);
+          // Where the row rests (open or closed) at once: on the native driver the stopped value comes back a frame later, and a move
+          // read before it would start from a stale place and jump. The callback then refines it for a row caught mid-snap.
+          state.current.start = at.current ? -state.current.width : 0;
           x.stopAnimation((v) => (state.current.start = v));
         },
         onPanResponderMove: (_, g) => {

@@ -1,5 +1,5 @@
 import { Pressable, Text, View, type ViewStyle } from "react-native";
-import { cap, recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { cap, recipes, useControllable, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { Icon } from "../../lib/icon";
 import { hitSlopTo } from "../../lib/a11y";
@@ -23,8 +23,11 @@ export interface ReactionPillProps extends RootProps {
   variant?: ReactionPillVariant;
   /** The message is still sending or failed: no server id to react to. */
   disabled?: boolean;
-  /** Called with `mine` as the tap leaves it: flipped (a reaction only). */
-  onMineChange?: (mine: boolean) => void;
+  /**
+   * Called with `mine` as the tap leaves it: flipped (a reaction only). Given `mine` too, it reports the request: the pill is busy until
+   * the app passes the new `mine` or `count` (or the returned promise settles), and never shows the reaction before then.
+   */
+  onMineChange?: (mine: boolean) => void | Promise<unknown>;
   /** The pill was tapped: a reaction flips `mine`, add opens the emoji picker. */
   onPress?: () => void;
   /** Opens the Reactions sheet: who reacted, per emoji. */
@@ -44,13 +47,29 @@ const useStyles = createStyles((t) => ({
   count: { fontVariant: ["tabular-nums"] },
 }));
 
-export function ReactionPill({ emoji, count = 1, mine = false, variant = "reaction", disabled = false, onMineChange, onPress, onLongPress, strings, styles, style, testID, ...rest }: ReactionPillProps) {
+export function ReactionPill({ emoji, count = 1, mine: mineProp, variant = "reaction", disabled = false, onMineChange, onPress, onLongPress, strings, styles, style, testID, ...rest }: ReactionPillProps) {
   const { t } = useTheme();
   const s = useStyles();
   const str = useStrings("reaction-pill", strings);
   const press = usePress({ disabled });
-  const [on, setOn] = useControllable(mine, onMineChange);
-  // Uncontrolled, a tap moves the count with `mine` (optimistic); controlled, the caller's count is the truth.
+  const [on = false, setOn] = useControllable(mineProp, onMineChange);
+  const mine = mineProp ?? false;
+  // Controlled, a tap is a request: busy until the app answers with `mine` or `count`, which are the truth. Uncontrolled, a tap moves the
+  // count with `mine` on its own.
+  const controlled = mineProp !== undefined && onMineChange !== undefined;
+  const { pending, run } = usePending([mineProp, count]);
+  const toggle = () => {
+    if (!controlled) {
+      setOn(!on);
+      onPress?.();
+      return;
+    }
+    run(() => {
+      const out = onMineChange?.(!on);
+      onPress?.();
+      return out;
+    });
+  };
   const n = count + (on === mine ? 0 : on ? 1 : -1);
   const add = variant === "add";
   const r = useRecipe(recipes["reaction-pill"], { variants: { variant }, state: { on: on && !add, pressed: press.pressed, focus: press.focused, disabled: press.disabled }, styles });
@@ -70,12 +89,9 @@ export function ReactionPill({ emoji, count = 1, mine = false, variant = "reacti
             hitSlop={hitSlopTo(t.control.hit, t.control.hIconSm, 0)}
             accessibilityRole="button"
             accessibilityLabel={str("labelPhone", { emoji, count: n, mine: on ? str("youReacted") : "" })}
-            accessibilityState={{ disabled: press.disabled, selected: on }}
-            disabled={press.disabled}
-            onPress={() => {
-              setOn(!on);
-              onPress?.();
-            }}
+            accessibilityState={{ disabled: press.disabled, selected: on, busy: pending }}
+            disabled={press.disabled || pending}
+            onPress={() => toggle()}
             onLongPress={() => onLongPress?.()}
             {...press.handlers}
             style={box}

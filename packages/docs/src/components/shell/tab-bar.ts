@@ -24,7 +24,7 @@ const docs: ComponentDocs = {
     expanded: {
       type: "boolean",
       default: true,
-      description: "The tabs are shown. Left (false) is the bar squeezed by scrolling down: a 42pt circle with the current tab's icon. Scrolling up or a tap opens it again.",
+      description: "The tabs are shown. Left (false) is the bar squeezed by scrolling down: a 42pt circle (a 44pt touch area) with the current tab's icon, or a chevron when no tab is open. Scrolling up or a tap opens it again.",
     },
     keyboardUp: {
       type: "boolean",
@@ -40,7 +40,7 @@ const docs: ComponentDocs = {
     action: {
       type: "object",
       sample: TAB_BAR_ACTION,
-      description: "ActionItem: { key, label, icon?, badge?, disabled? }. The floating round button beside the bar; its `label` is its accessible name. Leave it out for none.",
+      description: "ActionItem: { key, label, icon?, badge?, disabled? }. The floating round button beside the bar; its `label` is its accessible name, with the `badge` count after it ('Fabric, 2 new'). `badge` draws a count on its corner; `disabled` dims it and takes no press. Leave it out for none.",
     },
     onActiveChange: {
       type: "event",
@@ -166,6 +166,22 @@ const docs: ComponentDocs = {
   ],
   states: ["pressed"],
   edgeCases: [
+    {
+      title: "The floating action, busy or waiting",
+      platforms: ["mobile"],
+      handling: "The action is an ActionItem like any other: a `badge` draws its count on the button's corner and is read with its name ('Fabric, 2 new'); `disabled` dims it, takes no press and is announced as dimmed, for a moment the app cannot start what it opens.",
+      example: {
+        name: "Action with a count",
+        props: {
+          action: {
+            key: "fabric",
+            icon: "sparkles",
+            label: "Fabric",
+            badge: 2,
+          },
+        },
+      },
+    },
     {
       title: "Badge counts",
       platforms: ["mobile"],

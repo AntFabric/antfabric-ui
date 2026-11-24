@@ -82,7 +82,7 @@ const docs: ComponentDocs = {
       type: "array",
       default: [],
       sample: OS_NOTIFICATION_ACTIONS,
-      description: "The banner's buttons, at most two: `{ key, label, icon?, reply?, rest? }`. The one with `reply` opens the inline reply and its text comes back with the press (Windows always shows that field). `rest` marks the ones the OS shows before the banner is expanded: Windows always, the browser once expanded; macOS and GNOME show them all when expanded, and iOS lists them in the long-press menu with their `icon`.",
+      description: "The banner's buttons, at most two: `{ key, label, icon?, reply?, rest?, disabled? }`. `disabled` dims a button and it takes no press; `badge` is not drawn (an OS banner's buttons carry no count). The one with `reply` opens the inline reply and its text comes back with the press (Windows always shows that field); in the browser, which has no inline reply, it reports the press with no text and the app opens the conversation. `rest` marks the ones the OS shows before the banner is expanded: Windows always, the browser once expanded; macOS and GNOME show them all when expanded, and iOS lists them in the long-press menu with their `icon`.",
     },
     preview: {
       type: "boolean",
@@ -369,6 +369,22 @@ const docs: ComponentDocs = {
     },
   ],
   edgeCases: [
+    {
+      title: "Reply in a browser",
+      platforms: ["web"],
+      handling: "A browser notification has no inline reply. A reply action marked `rest` is still drawn once the banner is expanded, and pressing it reports `onAction(action)` with no text, so the app opens the conversation with the reply box focused, instead of a button that does nothing.",
+      example: {
+        name: "Reply at rest in the browser",
+        platforms: ["web"],
+        props: {
+          expanded: true,
+          actions: [
+            { key: "reply", label: "Reply", icon: "reply", reply: true, rest: true },
+            { key: "read", label: "Mark as read", icon: "circle-check", rest: true },
+          ],
+        },
+      },
+    },
     {
       title: "Previews hidden (our setting or the lock screen)",
       platforms: ["web", "desktop", "mobile"],

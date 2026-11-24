@@ -70,10 +70,10 @@ export function MessageDivider({ kind = "date", label = "", sticky = false, expa
   return (
     <div
       data-af-part="root"
-      {...rootProps(rest)}
       role={sticky ? undefined : date ? "heading" : "separator"}
       aria-level={date && !sticky ? level : undefined}
       aria-label={sticky ? undefined : isNew ? s("newMessages") : shown}
+      {...rootProps(rest)}
       style={css(
         row,
         partStyle(

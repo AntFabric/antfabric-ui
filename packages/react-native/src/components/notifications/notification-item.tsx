@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, PanResponder, Platform, Pressable, Text, View, type ViewStyle } from "react-native";
-import { recipes, useControllable, useStrings, type KitStrings } from "@antfabric/ui-core";
+import { recipes, useControllable, usePending, useStrings, type KitStrings } from "@antfabric/ui-core";
 import { createStyles, useTheme } from "../../theme";
 import { announce } from "../../lib/a11y";
 import { Icon, type IconName } from "../../lib/icon";
@@ -47,8 +47,10 @@ export interface NotificationItemProps extends RootProps {
   onOpen?: () => void;
   onMarkRead?: () => void;
   onClear?: () => void;
-  onApprove?: () => void;
-  onDecline?: () => void;
+  /** Reports the request; Approve spins until the app answers with `approval` (or the returned promise settles). */
+  onApprove?: () => void | Promise<unknown>;
+  /** Reports the request; Decline spins until the app answers with `approval` (or the returned promise settles). */
+  onDecline?: () => void | Promise<unknown>;
   /** This row's built-in text (its accessible name, Approve and Decline, the outcome line, the swipe actions) over the tree's and the English defaults. */
   strings?: Partial<KitStrings["notification-item"]>;
   /** Per-part styles over the theme: `{ root: {…}, title: {…} }`. */
@@ -111,10 +113,15 @@ export function NotificationItem({
   const s = useStyles();
   const str = useStrings("notification-item", strings);
   const press = usePress();
-  // What a tap or swipe changes shows at once; the app's next props (from the server) take over when they come.
+  // Read and revealed are the row's own look and show at once; the app's next props take over when they come.
   const [isRead, setRead] = useControllable(read);
   const [open, setOpen] = useControllable(revealed);
-  const [decision, setDecision] = useControllable(approval);
+  // Approve and Decline report the request and spin until the app passes the answer as `approval` (or the promise settles): the row never
+  // says approved before the server does.
+  const decision = approval;
+  const { pending, run } = usePending([approval]);
+  const [asked, setAsked] = useState<"approve" | "decline">("approve");
+  const waiting = decision === "approving" || pending;
   const face = leading === "avatar";
   const outcome = decision === "approved" || decision === "declined" || decision === "expired" ? decision : null;
   const where = decidedOn ? str("on", { device: decidedOn }) : "";
@@ -224,26 +231,28 @@ export function NotificationItem({
             variant="ink"
             size="sm"
             iconLeading="check"
-            loading={decision === "approving"}
+            loading={decision === "approving" || (pending && asked === "approve")}
+            disabled={pending && asked === "decline"}
             onPress={() => {
-              setDecision("approved");
-              onApprove?.();
+              setAsked("approve");
+              run(onApprove);
             }}
           />
           <Button
             label={str("decline")}
             variant="secondary"
             size="sm"
-            disabled={decision === "approving"}
+            loading={pending && asked === "decline"}
+            disabled={waiting && !(pending && asked === "decline")}
             onPress={() => {
-              setDecision("declined");
-              onDecline?.();
+              setAsked("decline");
+              run(onDecline);
             }}
           />
         </View>
       ) : null}
       {approval !== "" && outcome ? (
-        <Enter motion="fade" testID={partId(testID, "notification-item", "decided")} role="status" style={[s.decided, r.decided.view]}>
+        <Enter motion="fade" testID={partId(testID, "notification-item", "decided")} style={[s.decided, r.decided.view]}>
           <Icon
             testID={partId(testID, "notification-item", "decidedIcon")}
             name={outcome === "approved" ? "circle-check" : outcome === "declined" ? "circle-x" : "clock"}

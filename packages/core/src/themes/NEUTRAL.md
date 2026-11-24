@@ -74,10 +74,11 @@ The worst passing pairs are `border.default` on `surface.recessed` (3.07 against
 Neutral was a look only: every size was the kit's. Two size rules from the audit are now neutral's, so a product that passes no theme gets them; `antfabric` keeps 1.0's sizes.
 
 - **One height per size name** (X-04): `sm` is `control.hSm`, `md` `control.hMd`, `lg` `control.hInput`, across Button, Select, TextField and SearchField. The overrides are Button's `sm` and `lg` heights and the Select trigger's and SearchField's base height (both were `control.hLg`). The phone's `control.hLg` is 48 (was 40, under its `hMd` 44), so the phone's scale climbs.
-- **24px desktop targets** (X-05, WCAG 2.2 2.5.8): the desktop profile's `control.hIconSm` and `control.hXxs` are 24 (were 20 and 22), as the web's already are.
-- **24px targets in the components** (X-05, S1-04, S1-05, S3-13, S3-19): on the web and the desktop a label-less checkbox (`checkbox.root`
-  min 24 × 24), a radio row (`radio-group.option`), a chip's ✕ (`chip.remove`, `control.hXxs`), ConnectionBanner's retry and a notification
-  row's actions take `control.hit`; the macOS menu bar's rows and titles (`osMenu.macItemH`, `macTitleH`) are 24. The phone reaches 44pt by
+- **24px desktop targets** (X-05, WCAG 2.2 2.5.8): the desktop profile's `control.hXxs` is 24 (was 22), as the web's already is.
+  (`control.hIconSm` is 24 on the desktop in the schema itself since B10, so both themes have it.)
+- **24px targets in the components** (X-05, S1-04, S1-05, S3-13, S3-19): on the web and the desktop a radio row (`radio-group.option`) and
+  ConnectionBanner's retry take `control.hit`; the macOS menu bar's rows and titles (`osMenu.macItemH`, `macTitleH`) are 24. A label-less
+  checkbox, a chip's ✕ and a notification row's actions moved into the schema in B10, so `antfabric` has them too. The phone reaches 44pt by
   `hitSlop` in both themes, which draws nothing.
 - **The segmented strip** (S1-18): `segmentedControl.h` is 26 on the web, 24 on the desktop and 34 on the phone, so the strip (tab, track
   padding and edge) is as tall as `control.hMd` beside the other medium controls.

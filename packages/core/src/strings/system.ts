@@ -21,7 +21,7 @@ export const system = {
     tryingLabel: "Reconnecting",
     /** The strip's button that reconnects at once (web and desktop). */
     tryNow: "Try now",
-    /** The same button's accessible name. */
+    /** The same button's description and tooltip (its name is its words, `tryNow`). */
     tryNowLabel: "Try reconnecting now",
     /** The strip while offline on the web: the page keeps what was already loaded. */
     offlineWeb: "You’re offline. Showing what was already loaded. It will reconnect on its own.",
@@ -149,11 +149,11 @@ export const system = {
     downloadingUnknown: "Downloading…",
     /** The card's detail otherwise: the version waiting. */
     versionTag: "v{version}",
-    /** The card's accessible name while a release waits. */
+    /** The card's description and tooltip while a release waits (its name is its title and detail). */
     installLabel: "Install the update, version {version}",
-    /** The card's accessible name once it needs a restart. */
+    /** The card's description and tooltip once it needs a restart. */
     restartLabel: "Restart to update to version {version}",
-    /** The card's accessible name after a failure. */
+    /** The card's description and tooltip after a failure. */
     retryLabel: "Try the update again",
     /** The sentence shown when the updater gives none. */
     errorDefault: "The update could not be installed.",

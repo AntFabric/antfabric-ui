@@ -1,9 +1,12 @@
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { recipes, useControllable, useDirection, useStrings, type ActionItem, type KitStrings } from "@antfabric/ui-core";
 import { useAutoFocus } from "../../platform";
 import { t } from "../../tokens";
+import { focusNear } from "../../lib/focus";
+import { useAnnounce } from "../../lib/announce";
 import { Icon, type IconName } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
+import { isComposing } from "../../lib/keys";
 import { useRecipe, type PartStyles } from "../../lib/recipe";
 import { rootProps, type RootProps } from "../../lib/root-props";
 import { box, css, enter, input, neg, pressable, row, rtl, text, truncate } from "../../lib/style";
@@ -115,7 +118,26 @@ export function InAppBanner({
   const [gone, setGone] = useControllable(dismissed);
   const [open, setOpen] = useControllable(replying);
   const [draft, setDraft] = useControllable(replyText);
+  // Dismissing puts this notification away, not the banner: a new one (another title, context, body or time) shows again, back at
+  // `dismissed`. Body is part of it because two messages from one sender in one minute share a title and a time. The reply and its draft
+  // are the notification's too: the next one starts at `replying` and `replyText`, not with the last one's box open.
+  const notification = [title, context, body, time].join("\n");
+  const [shown, setShown] = useState(notification);
+  if (shown !== notification) {
+    setShown(notification);
+    setGone(dismissed);
+    setOpen(replying);
+    setDraft(replyText);
+  }
+  // The hit area's name says everything the card shows: the title and conversation, the time, the lead and body, the queue, then "Open".
+  const heading = context ? s("titleIn", { title, context }) : title;
+  const timed = time ? s("withDetail", { label: heading, detail: time }) : heading;
+  const told = body ? s("withBody", { label: timed, body: lead ? s("leadBody", { lead, body }) : body }) : timed;
+  const named = s("toOpen", { label: queued > 0 ? s("withDetail", { label: told, detail: s("more", { count: queued }) }) : told });
+  // The card goes with its × (and with Escape, and an action that dismisses): focus moves to the nearest control that stays.
+  const cardRef = useRef<HTMLDivElement | null>(null);
   const dismiss = (reason: InAppBannerDismissReason) => {
+    focusNear(cardRef.current);
     setGone(true);
     onDismiss?.(reason);
   };
@@ -139,13 +161,20 @@ export function InAppBanner({
     if (open) fieldRef.current?.focus({ preventScroll: true });
     else if (document.activeElement === document.body || !document.activeElement) actionsRef.current?.querySelector<HTMLElement>("button")?.focus({ preventScroll: true });
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A banner is said when it arrives, politely, as the sender and the preview (a region mounted holding its text is not read); a reply
+  // that fails is said at once.
+  useAnnounce(!gone && [title, context, body].filter(Boolean).join(". "), "polite", { initial: true });
+  useAnnounce(open && error, "assertive", { initial: true });
   return (
-    <div role="status" aria-live="polite" aria-label={s("newNotification")} data-af-part="root" {...rootProps(rest)} style={css(box, r.root, style)}>
+    <div role="group" aria-label={s("newNotification")} data-af-part="root" {...rootProps(rest)} style={css(box, r.root, style)}>
       {!gone && (
         <div
+          ref={cardRef}
           onKeyDown={(e) => {
             // Escape in the reply field closes the reply and keeps the draft; anywhere else in the card it puts the banner away.
-            if (e.key === "Escape" && !(e.target instanceof HTMLInputElement)) dismiss("close");
+            if (e.key !== "Escape" || e.target instanceof HTMLInputElement || e.defaultPrevented || isComposing(e)) return;
+            e.preventDefault();
+            dismiss("close");
           }}
           data-af-part="card"
           style={css(card, enter(dir === "rtl" ? "slide-right" : "slide-left"), r.card)}
@@ -154,7 +183,7 @@ export function InAppBanner({
             type="button"
             data-af-part="hit"
             data-af-press
-            aria-label={context ? s("openIn", { title, context, body }) : s("open", { title, body })}
+            aria-label={named}
             onClick={() => onOpen?.()}
             {...ui.handlers}
             style={css(rtl(hit, dir), r.hit)}
@@ -221,9 +250,12 @@ export function InAppBanner({
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => {
+                  // An IME's Enter commits its candidate and its Escape cancels it: neither sends nor closes the reply.
+                  if (isComposing(e)) return;
                   if (e.key === "Enter") send();
                   else if (e.key === "Escape") {
                     // The reply is closed and the draft kept; the banner stays.
+                    e.preventDefault();
                     e.stopPropagation();
                     setOpen(false);
                   }
@@ -236,7 +268,7 @@ export function InAppBanner({
             </div>
           )}
           {open && error ? (
-            <span role="alert" data-af-part="error" style={css(text, rtl({ paddingLeft: indent }, dir), r.error)}>
+            <span data-af-part="error" style={css(text, rtl({ paddingLeft: indent }, dir), r.error)}>
               {error}
             </span>
           ) : null}

@@ -93,6 +93,8 @@ export const overlays = {
     /** The word drawn on the grey block that stands in for the on-screen keyboard. */
     keyboard: "Keyboard",
   },
+  // The phone's backdrop (`close`) is `common`'s word.
+  popover: {},
   // The ✕ (`close`) is `common`'s word.
   sheet: {
     /** The sheet's accessible name when the caller gives neither `title` nor `label`. */

@@ -146,6 +146,11 @@ export function tokenValues(platform: keyof typeof tokens.profiles, scheme: Sche
  * Focus is drawn by each component as a box-shadow ring, which Windows High Contrast (forced colours) removes; there the
  * `forced-colors` block draws a system-coloured outline on whatever has keyboard focus, and a thin Highlight outline on the current,
  * selected, checked or pressed item, whose fill the mode also removes (WCAG 2.4.7, 1.4.11).
+ *
+ * A field's browser outline is taken off here (`[data-af-input]:focus`), never inline: an inline `outline: none` beats every rule in a sheet,
+ * so in forced colours a focused field showed only its caret. The forced-colours rule is the more specific (`[data-af-platform]` in front),
+ * so it wins there and the field gets its CanvasText outline; outside forced colours the kit's own ring is the focus. A scroll region a keyboard
+ * reaches (Table's) is the same: `[data-af-scroll]:focus`, never inline, so forced colours outline it.
  */
 export const kitCss = `
 @keyframes af-spin{to{transform:rotate(360deg)}}
@@ -171,6 +176,7 @@ export const kitCss = `
 [data-af-press]{-webkit-tap-highlight-color:transparent}
 [data-af-press]:focus{outline:none}
 [data-af-scroll]{scrollbar-width:thin}
+[data-af-scroll]:focus{outline:none}
 [data-af-plot] .recharts-wrapper:focus,[data-af-plot] .recharts-surface:focus{outline:none}
 @media (forced-colors:active){[data-af-platform] :focus-visible,[data-af-platform] [data-af-input]:focus{outline:2px solid CanvasText;outline-offset:2px}[data-af-platform] [aria-current]:not([aria-current="false"]),[data-af-platform] [aria-selected="true"],[data-af-platform] [aria-checked="true"],[data-af-platform] [aria-pressed="true"]{outline:1px solid Highlight;outline-offset:-1px}}
 @media (prefers-reduced-motion:reduce){[data-af-platform] *{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}[data-af-platform] [data-af-spinner]{animation-duration:2.4s!important;animation-iteration-count:infinite!important}}

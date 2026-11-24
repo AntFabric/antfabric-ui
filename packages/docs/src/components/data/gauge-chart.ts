@@ -38,7 +38,12 @@ const docs: ComponentDocs = {
       type: "object",
       description: "The shares of `max` where the fill turns to the caution colour and then the loss colour: { warning: 0.5, danger: 0.4 }. Default Meter's for the kind: usage 0.75 and 0.9, a score 0.6 and 0.4.",
     },
-    format: { ...format, default: "percent", description: "A format name, its options or a function: what core's `fmt` takes. The value, the target, the two ends, the summary and \"View as table\" all print through it, so they agree." },
+    format: { ...format, default: "percent", description: "A format name, its options or a function: what core's `fmt` takes. The value, the target, the two ends, the summary and \"View as table\" all print through it, so they agree. A percent format prints each as its share of `max`, as Meter does: 58 of 100 is 58%." },
+    showState: {
+      type: "boolean",
+      default: true,
+      description: "An icon beside the value in the caution (triangle) and critical (circle) states, so the state is not the ring's colour alone (WCAG 1.4.1), as Meter's `showState`. On by default; `false` leaves the colour and the summary to say it (\"84%, caution\"), for a product that prints the state beside the gauge itself.",
+    },
     size: { type: "number", description: "The half ring's width, in px (points on the phone); its height is half. Default 280 on the web and desktop, 220 on the phone: `chart.gaugeW`." },
     empty: { ...empty, default: "No value yet", description: "The title of the empty state when the value is not a number." },
     emptyLine: { ...emptyLine, default: "It shows once there is a number to measure.", description: "One sentence under it: what to do about it." },
@@ -79,6 +84,7 @@ const docs: ComponentDocs = {
     label: "The summary: \"Resolved by Fabric: 58.3% of resolved tickets, target 60%.\"",
     notes: [
       "The figure (the ring on the phone) is named by the sentence core's `summarizeGauge` writes: the value in the chart's format, what it is of, and the target. It is heard, not printed: the value and the target are already in the hole and under the ring.",
+      "In the caution and critical states the summary says so after the value (\"Seats in use: 42 seats, caution …\", Meter's words), and `showState` draws Meter's icon beside the number in the hole.",
       "The colour is never the only signal: the number is in the hole, the target is a tick and a caption (\"Target 60%\"), and a value past `max` says so in the summary (\"over the 100% it is measured against\").",
       "\"View as table\" is the other way in: the measure, its value and its target, with real headers.",
       "The numbers in the hole and under the ring are for the eye: the summary says them once for a screen reader.",

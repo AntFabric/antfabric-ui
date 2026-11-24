@@ -64,7 +64,7 @@ export function Avatar({ name, src = "", size = "md", shape = "circle", identity
       testID={partId(testID, "avatar", "root")}
       accessible={!decorative}
       accessibilityRole={decorative ? undefined : "image"}
-      accessibilityLabel={decorative ? undefined : presence === "none" ? name : str("labelWithPresence", { name, presence: said })}
+      accessibilityLabel={decorative ? undefined : agent ? str("labelAgent", { name }) : presence === "none" ? name : str("labelWithPresence", { name, presence: said })}
       importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
       accessibilityElementsHidden={decorative || undefined}
       {...rootProps(rest)}

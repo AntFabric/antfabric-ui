@@ -70,7 +70,9 @@ function Row({ ws, on, onPress, styles, strings, testID }: Shared & { testID?: s
   const r = useRecipe(recipes["workspace-switcher"], { state: { focus: press.focused }, styles });
   const live = !!ws.signedIn;
   const mentions = live && (ws.mentions ?? 0) > 0 ? ws.mentions! : 0;
-  const said = [on ? str("currentWorkspace") : "", mentions ? str("mentions", { count: mentions }) : "", live ? "" : str("signedOut")]
+  // The activity dot is said too, as on the desktop tile: it is not only a dot.
+  const activity = live && !!ws.activity && !mentions && !on;
+  const said = [on ? str("currentWorkspace") : "", mentions ? str("mentions", { count: mentions }) : "", activity ? str("newMessages") : "", live ? "" : str("signedOut")]
     .filter(Boolean)
     .reduce((label, detail) => str("withDetail", { label, detail }), ws.name);
   const row = partStyle(r, "row", { view: press.pressed ? { opacity: 0.6 } : undefined });
@@ -94,7 +96,7 @@ function Row({ ws, on, onPress, styles, strings, testID }: Shared & { testID?: s
         </Text>
       </View>
       {mentions && !on ? <Badge count={mentions} label={str("mentionsBadge")} style={{ alignSelf: "center" }} /> : null}
-      {live && ws.activity && !mentions && !on ? <Badge dot tone="neutral" style={{ alignSelf: "center" }} /> : null}
+      {activity ? <Badge dot tone="neutral" style={{ alignSelf: "center" }} /> : null}
       {on ? (
         <Enter motion="pop">
           <Icon testID={partId(testID, "workspace-switcher", "check")} name="check" {...glyphOf(r.check)} />
@@ -129,12 +131,12 @@ function AddRow({ label, onPress, styles, testID }: Shared & { testID?: string; 
 }
 
 /** The sheet the header photo opens on a long-press: every workspace, the current one ticked. */
-export function WorkspaceSwitcher({ workspaces = [], current = "", addLabel = "", onCurrentChange, onAdd, styles, strings, style, testID, ...rest }: WorkspaceSwitcherProps) {
+export function WorkspaceSwitcher({ workspaces = [], current, addLabel = "", onCurrentChange, onAdd, styles, strings, style, testID, ...rest }: WorkspaceSwitcherProps) {
   const s = useStyles();
   const str = useStrings("workspace-switcher", strings);
   const r = useRecipe(recipes["workspace-switcher"], { styles });
   // Controlled when the app passes both: it confirms the switch first, then moves `current` itself.
-  const [active, setCurrent] = useControllable(current, onCurrentChange);
+  const [active = "", setCurrent] = useControllable(current, onCurrentChange);
   const pick = (ws: WorkspaceSwitcherWorkspace) => {
     // A signed-out workspace starts sign-in instead: the app hears of it, and nothing changes here.
     if (ws.signedIn) setCurrent(ws.key);

@@ -163,7 +163,7 @@ export function MetricTabs({ data, x, metrics, title, subtitle = "", format = "i
       subtitle={subtitle}
       table={!loading && !nothing ? { data, x, y: tabs.map((m) => m.field), format, xFormat, formats: Object.fromEntries(tabs.map((m) => [m.field, m.format])), labels: Object.fromEntries(tabs.map((m) => [m.field, m.label])) } : null}
       style={style}
-      {...({ testID, ...rootProps(rest) } as object)}
+      testID={testID} root={rootProps(rest)}
     >
       {loading ? (
         <LoadingLines lines={lines} label={str("loadingMetrics")} />

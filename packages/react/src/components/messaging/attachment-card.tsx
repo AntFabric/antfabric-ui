@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { recipes, useControllable, useDirection, useStrings, type Attachment, type KitStrings } from "@antfabric/ui-core";
+import { recipes, useControllable, useDirection, usePending, useStrings, type Attachment, type KitStrings } from "@antfabric/ui-core";
 import { t } from "../../tokens";
 import { Icon } from "../../lib/icon";
 import { useInteraction } from "../../lib/interaction";
@@ -47,6 +47,7 @@ export interface AttachmentCardProps extends RootProps<HTMLDivElement> {
   waveform?: number[];
   /** How many waveform bars have played; those are coral. */
   played?: number;
+  /** The voice note is playing. Play and Pause report it through `onPlayingChange`; the app starts and stops the audio. */
   playing?: boolean;
   /** The staged chip in the composer tray. */
   compact?: boolean;
@@ -55,10 +56,12 @@ export interface AttachmentCardProps extends RootProps<HTMLDivElement> {
   /** Opens the preview (lightbox or file viewer). */
   onOpen?: () => void;
   onDownload?: () => void;
-  /** Called with `status` as Retry leaves it (uploading). */
+  /** Reports the request Retry makes (uploading). The card waits for the app to pass the new `status`; it never moves it. */
   onStatusChange?: (status: AttachmentCardStatus) => void;
-  /** Retry was pressed on a failed upload: the app starts it again. */
-  onRetry?: () => void;
+  /** Retry was pressed on a failed upload: the app starts it again. Retry spins until the app answers with `status`, `error` or `progress`, or the promise settles. */
+  onRetry?: () => void | Promise<unknown>;
+  /** Called with `playing` as Play or Pause leaves it: the app starts or stops the voice note. */
+  onPlayingChange?: (playing: boolean) => void;
   /** Cancels an upload in progress, removes a staged file, or removes a link's preview. */
   onCancel?: () => void;
   /** This card's built-in text (its accessible names, "Uploading…", "Paused", the error) over the tree's and the English defaults. */
@@ -131,11 +134,13 @@ function Track({ name, progress, status, height, part, decorative = false, strin
   );
 }
 
-type Card = Required<Omit<AttachmentCardProps, "id" | "ref" | "className" | "style" | "strings" | "styles" | "onOpen" | "onDownload" | "onRetry" | "onStatusChange" | "onCancel" | "playing">> &
+type Card = Required<Omit<AttachmentCardProps, "id" | "ref" | "className" | "style" | "strings" | "styles" | "onOpen" | "onDownload" | "onRetry" | "onStatusChange" | "onCancel" | "playing" | "onPlayingChange">> &
   Shared & {
     open: () => void;
     download: () => void;
     retry: () => void;
+    /** Retry was pressed and the app has not answered yet. */
+    retrying: boolean;
     cancel: () => void;
   };
 
@@ -196,7 +201,7 @@ function FileCard(p: Card) {
       </button>
       {p.status === "ready" && <IconButton icon="download" label={s("download", { name: p.name })} size="sm" shape="square" onPress={p.download} style={{ flexShrink: 0 }} />}
       {(p.status === "uploading" || p.status === "paused") && <IconButton icon="x" label={s("cancelUpload", { name: p.name })} size="sm" onPress={p.cancel} style={{ flexShrink: 0 }} />}
-      {p.status === "failed" && <Button label={s("retry")} variant="secondary" size="sm" iconLeading="rotate-ccw" onPress={p.retry} style={{ flexShrink: 0 }} />}
+      {p.status === "failed" && <Button label={s("retry")} variant="secondary" size="sm" iconLeading="rotate-ccw" loading={p.retrying} onPress={p.retry} style={{ flexShrink: 0 }} />}
     </div>
   );
 }
@@ -235,7 +240,7 @@ function ImageCard(p: Card & { onBroken: () => void }) {
           <span data-af-part="failedTitle" style={css(text, truncate(2), r.failedTitle)}>
             {s.parts("failedUpload", { name: p.name })}
           </span>
-          <Button label={s("retry")} variant="secondary" size="sm" iconLeading="rotate-ccw" onPress={p.retry} />
+          <Button label={s("retry")} variant="secondary" size="sm" iconLeading="rotate-ccw" loading={p.retrying} onPress={p.retry} />
         </div>
       )}
     </div>
@@ -278,6 +283,8 @@ function LinkCard(p: Card) {
         data-af-part="linkOpen"
         data-af-press
         aria-label={s("link", { title: p.title, domain: p.domain })}
+        // The browser follows the link; the app hears it was opened (to count it, or to open it in its own viewer instead).
+        onClick={() => p.open()}
         {...ui.handlers}
         style={css(pressable, { flexDirection: "row", alignItems: "flex-start", flex: 1 }, r.linkOpen)}
       >
@@ -347,16 +354,14 @@ function VoiceCard(p: Card & { playing: boolean; onPlaying: (on: boolean) => voi
 function Chip(p: Card) {
   const { strings } = p;
   const s = useStrings("attachment-card", strings);
-  const r = useRecipe(recipes["attachment-card"], { styles: p.styles });
+  const ui = useInteraction();
+  const r = useRecipe(recipes["attachment-card"], { state: { focus: ui.focused }, styles: p.styles });
   const shared = { strings: p.strings, styles: p.styles };
   const pct = Math.round(p.progress);
   const moving = p.status === "uploading" || p.status === "paused";
   const dir = useDirection();
-  return (
-    <div
-      data-af-part="chip"
-      style={css(row, rtl({ width: 260, maxWidth: "100%", paddingTop: t.space.xs, paddingRight: t.space["2xs"], paddingBottom: t.space.xs, paddingLeft: t.space.xs, borderRadius: 10 }, dir), r.chip)}
-    >
+  const body = (
+    <>
       {p.kind === "image" && p.src && (
         <img
           src={p.src}
@@ -396,7 +401,30 @@ function Chip(p: Card) {
           </span>
         )}
       </span>
-      {p.status === "failed" && <IconButton icon="rotate-ccw" label={s("retryName", { name: p.name })} size="sm" onPress={p.retry} style={{ flexShrink: 0 }} />}
+    </>
+  );
+  return (
+    <div
+      data-af-part="chip"
+      style={css(row, rtl({ width: 260, maxWidth: "100%", paddingTop: t.space.xs, paddingRight: t.space["2xs"], paddingBottom: t.space.xs, paddingLeft: t.space.xs, borderRadius: 10 }, dir), r.chip)}
+    >
+      {p.status === "ready" ? (
+        // A staged file that has arrived opens its preview, as it will once sent.
+        <button
+          type="button"
+          data-af-part="chipOpen"
+          data-af-press
+          aria-label={s("preview", { name: p.name })}
+          onClick={p.open}
+          {...ui.handlers}
+          style={css(pressable, { flexDirection: "row", alignItems: "center", flex: 1, minWidth: 0 }, r.chipOpen)}
+        >
+          {body}
+        </button>
+      ) : (
+        body
+      )}
+      {p.status === "failed" && <IconButton icon="rotate-ccw" label={s("retryName", { name: p.name })} size="sm" disabled={p.retrying} aria-busy={p.retrying || undefined} onPress={p.retry} style={{ flexShrink: 0 }} />}
       <IconButton icon="x" label={moving ? s("cancelUpload", { name: p.name }) : s("remove", { name: p.name })} size="sm" onPress={p.cancel} style={{ flexShrink: 0 }} />
     </div>
   );
@@ -409,7 +437,7 @@ export function AttachmentCard({
   badge = "",
   typeLabel = "",
   size = "",
-  status = "ready",
+  status: state = "ready",
   progress = 0,
   error = "",
   src = "",
@@ -420,13 +448,14 @@ export function AttachmentCard({
   duration = "",
   waveform = [],
   played = 0,
-  playing = false,
+  playing,
   compact = false,
   removable = false,
   onOpen,
   onDownload,
   onStatusChange,
   onRetry,
+  onPlayingChange,
   onCancel,
   strings,
   styles,
@@ -436,8 +465,10 @@ export function AttachmentCard({
   const s = useStrings("attachment-card", strings);
   const r = useRecipe(recipes["attachment-card"], { styles });
   const extension = (n: string) => (/\.([a-z0-9]{1,5})$/i.exec(n)?.[1] ?? s("imageBadge")).toUpperCase();
-  const [state, setState] = useControllable(status, onStatusChange);
-  const [on, setOn] = useControllable(playing);
+  // Retry reports the request and spins until the app answers: the upload's status is the app's, never moved here.
+  const { pending: retrying, run } = usePending([state, error, progress]);
+  // Playing is the card's own toggle, reported so the app can start or stop the audio.
+  const [on = false, setOn] = useControllable(playing, onPlayingChange);
   // A thumbnail that will not load falls back to the file card with the image badge, so the file can still be downloaded.
   const [broken, setBroken] = useState<string | null>(null);
   const asFile = kind === "image" && !compact && src !== "" && broken === src;
@@ -471,10 +502,16 @@ export function AttachmentCard({
     removable,
     open: () => onOpen?.(),
     download: () => onDownload?.(),
-    retry: () => {
-      setState("uploading");
-      onRetry?.();
-    },
+    retry: () =>
+      run(
+        onStatusChange || onRetry
+          ? () => {
+              onStatusChange?.("uploading");
+              return onRetry?.();
+            }
+          : undefined,
+      ),
+    retrying,
     cancel: () => onCancel?.(),
     strings,
     styles,

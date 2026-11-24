@@ -101,7 +101,7 @@ const docs: ComponentDocs = {
       type: "boolean",
       default: false,
       platforms: ["web", "desktop"],
-      description: "The row's ⋮ (Move to…, Mute, Leave), always shown when set. With `onMenu` alone it is there but transparent until the pointer is over the row or keyboard focus is in it; the room for it is reserved, so showing it never reflows the row.",
+      description: "The row's ⋮ (Move to…, Mute, Leave), always shown when set. With `onMenu` alone it is there but transparent until the pointer is over the row or keyboard focus is in it, and takes no press while transparent (a tap on a touch screen lands on the row); the room for it is reserved, so showing it never reflows the row.",
     },
     onPress: {
       type: "event",
@@ -141,14 +141,14 @@ const docs: ComponentDocs = {
     },
     desktop: {
       status: "ready",
-      base: "The same @antfabric/ui-react component as the web: a <button> row (6/10 padding, radius.row) + Avatar, Badge and the ⋮ IconButton as a sibling; inline styles over t, states from useInteraction. active is kept by the row (useControllable) and toggled by a press; a surrounding section decides through selectedName",
+      base: "The same @antfabric/ui-react component as the web: a <button> row (6/10 padding, radius.row) + Avatar, Badge and the ⋮ IconButton as a sibling; inline styles over t, states from useInteraction. active is the app's (a press reports onPress and never makes the row current itself); a surrounding section decides through selectedName",
       import: "import { SidebarItem } from \"@antfabric/ui-react/shell\"",
       notes: [
         "Unread is asked first: a channel you have open can still gather unread (window in the background) and then it is bold AND selected.",
         "The ⋮ is a sibling button laid over the row's right end, never a button inside a button; the row reserves its room only while it is shown, so it never covers the count. The catalogue draws it with actionsVisible.",
         "Muted and typing are new in this spec — today's sidebar has neither. Draft (pencil, fg.faint at 5.33:1, never an opacity) and the # / lock / face rules are today's.",
         "The external-organisation glyph is new; it stays on even when the row is muted, because who can read the channel is not a notification preference.",
-        "Pressing the row makes it `active` (the grey selected fill fades in) and leaves it active if pressed again: the current page is not a toggle. Inside a sidebar-section the section's `selected` decides instead, through `selectedName`, so only one row is ever open.",
+        "Pressing the row reports onPress; the app navigates and passes `active` (the grey selected fill fades in), so a row never claims to be current before the page is. Inside a sidebar-section the section's `selected` decides instead, through `selectedName`, so only one row is ever open.",
       ],
       keyboard: [
         {
@@ -200,6 +200,7 @@ const docs: ComponentDocs = {
     notes: [
       "A button on every platform (there is no href prop): the row reports `onPress` and the app navigates. Middle-click and open-in-new-tab are the app's to add.",
       "The whole row is one accessible name: '#design-crit, 3 mentions, muted, draft'. The glyph and the badge's own number are hidden so nothing is read twice.",
+      "A row with `avatar` says its face in words, after the name: 'Fabric, AI agent' for the sparkle, 'Lena Fischer, away' for the presence dot. Neither is colour or shape alone.",
       "The open conversation has aria-current=\"page\" (selected on the phone); selection is never carried by colour alone. Pressing the open row leaves it open.",
       "Web and desktop: with `onMenu` the row's ⋮ appears while the row has pointer hover or keyboard focus and stays in the tab order; the context menu and Shift+F10 or the Menu key on the row also call `onMenu`.",
       "Phone: `onLongPress` is also an accessibility action, 'Options for #design-crit', so a screen reader, Voice Control or Switch Control user can run it.",
@@ -527,7 +528,7 @@ const docs: ComponentDocs = {
     {
       title: "Hover-only ⋮ on touch",
       platforms: ["web", "desktop", "mobile"],
-      handling: "On a phone the ⋮ does not exist: long-press opens the action sheet and swipe reveals Mark as read and Mute. On a touch laptop (pointer: coarse) the ⋮ is always visible on the open row and the row grows to 40px.",
+      handling: "On a phone the ⋮ does not exist: long-press opens the action sheet and swipe reveals Mark as read and Mute. On a touch screen with the web or desktop kit, a hidden ⋮ takes no press (pointer-events: none until it shows), so a tap at the row's end opens the row rather than an invisible menu; pass `actionsVisible` to keep the ⋮ there for touch. On a touch laptop (pointer: coarse) the ⋮ is always visible on the open row and the row grows to 40px.",
       example: {
         name: "Phone, long-press target",
         props: {
