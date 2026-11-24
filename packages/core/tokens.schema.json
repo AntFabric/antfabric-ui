@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://antfabric.dev/tokens.schema.json",
+  "title": "AntFabric UI token extension",
+  "description": "What each token in tokens.json carries under $extensions[\"com.antfabric\"], beside the W3C Design Tokens Format Module's own $type, $value, $description and $deprecated. `pnpm check names` holds tokens.json to this file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tier"
+  ],
+  "properties": {
+    "tier": {
+      "enum": [
+        "semantic",
+        "component"
+      ],
+      "description": "semantic: a role any component reads. component: owned by the components in `component`."
+    },
+    "component": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The docs ids of the components a component token belongs to."
+    },
+    "visibility": {
+      "enum": [
+        "internal"
+      ],
+      "description": "Present when the token is left out of the documented set. It still resolves and can be themed."
+    },
+    "modes": {
+      "type": "object",
+      "description": "The token's value in each mode, when they differ: { light, dark } for colours and shadows, { web, desktop, mobile } for sizes and type, with an OS key (android) where that OS changes its profile's value.",
+      "propertyNames": {
+        "enum": [
+          "light",
+          "dark",
+          "web",
+          "desktop",
+          "mobile",
+          "android"
+        ]
+      },
+      "additionalProperties": {
+        "description": "A value in the W3C Design Tokens format for the token's $type, or a reference in braces."
+      }
+    },
+    "onlyIn": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "web",
+          "desktop",
+          "mobile"
+        ]
+      },
+      "description": "The profiles that have the token, when not all three do."
+    },
+    "sameInDark": {
+      "const": true,
+      "description": "The same in light and dark on purpose."
+    },
+    "source": {
+      "type": "string",
+      "pattern": "^(--[a-z0-9-]+|mobile:[A-Za-z0-9_.-]+|proposal|unmapped)$",
+      "description": "Where the value was copied from: a product token, a path in the phone app's theme, a proposal awaiting a decision, or unmapped (this library's own)."
+    },
+    "mobileSource": {
+      "type": "string",
+      "description": "The phone app's name for it, where it has one."
+    },
+    "sourceNote": {
+      "type": "string",
+      "description": "Why the source is what it is."
+    },
+    "notes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mobile": {
+          "type": "string"
+        },
+        "web": {
+          "type": "string"
+        }
+      },
+      "description": "Where a profile's value or use differs from desktop's."
+    },
+    "css": {
+      "description": "The string the kits use, where $value cannot say it exactly (a percentage, em, a gradient's angle)."
+    },
+    "cssModes": {
+      "type": "object",
+      "description": "The same, per mode."
+    },
+    "renamedTo": {
+      "type": "string",
+      "description": "On a deprecated token: the path it was renamed to."
+    },
+    "since": {
+      "type": "string",
+      "description": "On a deprecated token: the version that renamed it."
+    },
+    "cssVar": {
+      "type": "string",
+      "description": "On a primitive: the product's CSS variable."
+    }
+  }
+}

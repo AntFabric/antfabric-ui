@@ -16,7 +16,7 @@ export { primitives, primitiveMeta, primitivesFrom, type Primitives } from "./pr
 export { isReference, isTokenReference, ref, referencePath, tokenReferencePath, primitiveAt, primitiveValue, primitiveVar, resolveAliases, resolveValue, resolveTree, spell, type Reference, type Resolved, type TokenReference } from "./refs";
 export { resolveTokens, tokenVars, type Native, type NativeTokens, type TokenVars, type Vars } from "./native";
 export { descriptions, type TokenNote, type TokenPath } from "./descriptions";
-export { naming, namingJson, tokenNameProblems } from "./naming";
+export { glossaryMd, naming, namingJson, tokenNameProblems } from "./naming";
 export { tokenMeta, tokenRegistry, type DtcgType, type TokenGroup, type TokenMeta, type TokenSection, type TokenTier, type TokenVisibility } from "./token-registry";
 export * from "./art";
 export { menuItemKey, type ActionItem, type AppMark, type IconActionItem, type IconComponent, type IconName, type MenuItem, type NavItem } from "./items";

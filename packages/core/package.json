@@ -33,7 +33,8 @@
     "./fonts.css": "./fonts/fonts.css",
     "./fonts/*": "./fonts/*",
     "./renames.json": "./renames.json",
-    "./naming.json": "./naming.json"
+    "./naming.json": "./naming.json",
+    "./tokens.schema.json": "./tokens.schema.json"
   },
   "bin": {
     "af-tokens-codemod": "./codemod/rename-tokens.mjs"
@@ -49,7 +50,8 @@
     "LICENSE",
     "codemod",
     "renames.json",
-    "naming.json"
+    "naming.json",
+    "tokens.schema.json"
   ],
   "publishConfig": {
     "access": "public",
@@ -80,7 +82,8 @@
       "./fonts.css": "./fonts/fonts.css",
       "./fonts/*": "./fonts/*",
       "./renames.json": "./renames.json",
-      "./naming.json": "./naming.json"
+      "./naming.json": "./naming.json",
+      "./tokens.schema.json": "./tokens.schema.json"
     }
   },
   "peerDependencies": {

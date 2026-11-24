@@ -501,6 +501,27 @@ function checkNames() {
   const file = "reports/names.allow.json";
   const allowed = JSON.parse(readFileSync(join(repoRoot(), file), "utf8")) as Record<string, string[]>;
   if (readFileSync(join(repoRoot(), "packages/core/naming.json"), "utf8") !== Core.namingJson()) err("packages/core/naming.json", "is stale: run `pnpm tokens:build`");
+  if (readFileSync(join(repoRoot(), "GLOSSARY.md"), "utf8") !== Core.glossaryMd()) err("GLOSSARY.md", "is stale: run `pnpm tokens:build`");
+  // tokens.json against tokens.schema.json: every token's extension holds only what the schema declares, of the kind it declares.
+  const schema = JSON.parse(readFileSync(join(repoRoot(), "packages/core/tokens.schema.json"), "utf8")) as { required: string[]; properties: Record<string, { enum?: unknown[]; const?: unknown; type?: string; pattern?: string }> };
+  const visit = (node: Record<string, unknown>, path: string) => {
+    for (const [k, v] of Object.entries(node)) {
+      if (k.startsWith("$") || !v || typeof v !== "object") continue;
+      const p = path ? `${path}.${k}` : k;
+      if (!("$value" in v)) { visit(v as Record<string, unknown>, p); continue; }
+      const ext = ((v as { $extensions?: Record<string, Record<string, unknown>> }).$extensions ?? {})[EXTENSION] ?? {};
+      if (!p.startsWith("primitives.")) for (const r of schema.required) if (!(r in ext)) err("packages/core/tokens.schema.json", `${p} has no "${r}"`);
+      for (const [key, value] of Object.entries(ext)) {
+        const rule = schema.properties[key];
+        if (!rule) err("packages/core/tokens.schema.json", `${p} carries "${key}", which the schema does not declare`);
+        else if (rule.enum && !rule.enum.includes(value)) err("packages/core/tokens.schema.json", `${p}: ${key} is ${JSON.stringify(value)}, not one of ${rule.enum.join(", ")}`);
+        else if (rule.const !== undefined && value !== rule.const) err("packages/core/tokens.schema.json", `${p}: ${key} is ${JSON.stringify(value)}, not ${String(rule.const)}`);
+        else if (rule.type === "array" && !Array.isArray(value)) err("packages/core/tokens.schema.json", `${p}: ${key} is not a list`);
+        else if (rule.type === "string" && (typeof value !== "string" || (rule.pattern !== undefined && !new RegExp(rule.pattern).test(value)))) err("packages/core/tokens.schema.json", `${p}: ${key} is ${JSON.stringify(value)}, which the schema does not allow`);
+      }
+    }
+  };
+  visit(JSON.parse(readFileSync(join(repoRoot(), "packages/core/tokens.json"), "utf8")) as Record<string, unknown>, "");
   const found: Record<string, string[]> = {};
   for (const path of tokenPaths()) {
     const problems = Core.tokenNameProblems(path);

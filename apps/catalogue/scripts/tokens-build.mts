@@ -11,7 +11,7 @@
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { tokensJson } from "@antfabric/ui-core/dtcg";
-import { namingJson } from "@antfabric/ui-core";
+import { glossaryMd, namingJson } from "@antfabric/ui-core";
 import { componentsJson, llmsTxt } from "./agent-surface";
 import { DEPRECATED_GEN, deprecatedGen } from "./deprecated-gen";
 
@@ -22,6 +22,7 @@ for (const [path, text] of [
   [DEPRECATED_GEN, deprecatedGen()],
   ["packages/core/tokens.json", tokensJson()],
   ["packages/core/naming.json", namingJson()],
+  ["GLOSSARY.md", glossaryMd()],
   ["packages/docs/components.json", componentsJson()],
   ["llms.txt", llmsTxt()],
 ] as const) {

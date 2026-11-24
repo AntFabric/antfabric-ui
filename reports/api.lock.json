@@ -1224,6 +1224,7 @@
       "formatParts",
       "formatShortcut",
       "formatString",
+      "glossaryMd",
       "hasGlass",
       "initials",
       "isDeprecatedPath",
