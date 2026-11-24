@@ -11,7 +11,7 @@ export const mobileHeader = defineRecipe({
   parts: ["root", "statusBar", "island", "punchHole", "clock", "sysIcon", "header", "titleCentre", "largeTitle", "me", "title", "titleGlyph", "subtitle", "connection", "connectionIcon", "connectionText"],
   styles: {
     root: { base: { bg: "$color.background.app" } },
-    statusBar: { base: { height: "$size.layout.statusBar" }, platforms: { android: { base: { height: "$size.layout.statusBarAndroid" } } } },
+    statusBar: { base: { height: "$size.layout.statusBar" } },
     island: { base: { top: "$osHeader.islandTop", width: "$osHeader.islandW", height: "$osHeader.islandH", radius: "$radius.pill", bg: "$os.island" } },
     punchHole: { base: { top: "$osHeader.punchTop", square: "$osHeader.punchSize", radius: "$radius.circle", bg: "$os.island" } },
     clock: { base: { fg: "$os.statusFg" } },

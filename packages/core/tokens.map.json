@@ -2122,11 +2122,7 @@
   },
   "size.layout.statusBar": {
     "source": "unmapped",
-    "note": "iOS status bar height (47pt); a platform constant, zero elsewhere"
-  },
-  "size.layout.statusBarAndroid": {
-    "source": "unmapped",
-    "note": "ours: height of Android's status bar; the iOS bar is statusbar.h. Only the phone reads it"
+    "note": "the status bar's height, a platform constant: 47pt on iOS, 32 on Android (the OS set), zero elsewhere"
   },
   "color.text.success": {
     "source": "--success",

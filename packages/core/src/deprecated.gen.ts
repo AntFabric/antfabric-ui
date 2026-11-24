@@ -398,7 +398,7 @@ export const renames = {
   "rail.wSidebar": "size.layout.sidebar",
   "tabbar.h": "size.layout.tabBar",
   "statusbar.h": "size.layout.statusBar",
-  "statusbar.hAndroid": "size.layout.statusBarAndroid",
+  "statusbar.hAndroid": "size.layout.statusBar",
   "homeIndicator.h": "size.layout.homeIndicator",
   "avatar.xs": "size.avatar.xs",
   "avatar.sm": "size.avatar.sm",
@@ -433,6 +433,7 @@ export const renames = {
   "button.iconSm": "button.iconSizeSm",
   "button.iconMd": "button.iconSizeMd",
   "button.iconLg": "button.iconSizeLg",
+  "size.layout.statusBarAndroid": "size.layout.statusBar",
 } as const;
 
 type At<T, P extends string> = P extends `${infer Head}.${infer Rest}` ? (Head extends keyof T ? At<T[Head], Rest> : never) : P extends keyof T ? T[P] : never;
@@ -1372,8 +1373,8 @@ export interface DeprecatedTokens<T> {
   statusbar: {
     /** @deprecated since 1.2.0: renamed to `size.layout.statusBar`. */
     h: At<T, "size.layout.statusBar">;
-    /** @deprecated since 1.2.0: renamed to `size.layout.statusBarAndroid`. */
-    hAndroid: At<T, "size.layout.statusBarAndroid">;
+    /** @deprecated since 1.2.0: renamed to `size.layout.statusBar`. */
+    hAndroid: At<T, "size.layout.statusBar">;
   };
   homeIndicator: {
     /** @deprecated since 1.2.0: renamed to `size.layout.homeIndicator`. */
@@ -1452,5 +1453,11 @@ export interface DeprecatedTokens<T> {
     iconMd: At<T, "button.iconSizeMd">;
     /** @deprecated since 1.2.0: renamed to `button.iconSizeLg`. */
     iconLg: At<T, "button.iconSizeLg">;
+  };
+  size: {
+    layout: {
+      /** @deprecated since 1.2.0: renamed to `size.layout.statusBar`. */
+      statusBarAndroid: At<T, "size.layout.statusBar">;
+    };
   };
 }

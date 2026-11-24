@@ -352,8 +352,8 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
     web: "260, over desktop's 248.",
   },
   "size.layout.statusBar": {
-    text: "Height of the iOS status bar that the mobile header sits below. Zero where there is none.",
-    mobile: "47pt; desktop and web are 0.",
+    text: "Height of the phone's status bar, which the mobile header sits below. Zero where there is none.",
+    mobile: "47pt on iOS and 32 on Android, the OS's own; desktop and web are 0.",
   },
   "size.layout.tabBar": {
     text: "Height of the bottom tab bar. Zero on desktop and web, which use the rail and top bar.",
@@ -655,7 +655,6 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "workspaceSwitcher.menuWidth": "Width of the workspace menu on web and desktop; the phone's fills the screen.",
   "workspaceSwitcher.menuRowHeight": "Minimum height of a workspace row in the menu: 64pt on the phone, 44 on web and desktop. The kits differ.",
   "workspaceSwitcher.tileRingWidth": "Width of the ring around the current workspace's tile on the phone.",
-  "size.layout.statusBarAndroid": "Height of Android's status bar; the iOS bar is size.layout.statusBar. Only the phone reads it.",
   "osHeader.islandTop": "How far the iPhone's Dynamic Island sits below the top edge.",
   "osHeader.islandW": "Width of the iPhone's Dynamic Island.",
   "osHeader.islandH": "Height of the iPhone's Dynamic Island.",

@@ -18644,10 +18644,7 @@
         ],
         "styles": {
           "root": { "base": { "bg": "$color.background.app" } },
-          "statusBar": {
-            "base": { "height": "$size.layout.statusBar" },
-            "platforms": { "android": { "base": { "height": "$size.layout.statusBarAndroid" } } }
-          },
+          "statusBar": { "base": { "height": "$size.layout.statusBar" } },
           "island": {
             "base": {
               "top": "$osHeader.islandTop",
@@ -18744,7 +18741,6 @@
           "size.icon.md",
           "size.icon.sm",
           "size.layout.statusBar",
-          "size.layout.statusBarAndroid",
           "space.gutter.pane"
         ]
       },

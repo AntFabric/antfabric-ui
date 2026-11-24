@@ -261,6 +261,8 @@
     "web-top-bar": "B12: compact removes Recent history (M32); the search field is named by its placeholder, and a new example (L54)",
     "workspace-switcher": "B12: the web add row is the tab stop of an empty menu, and a new example (L43); the phone row says its activity dot (L44)",
     "workspace-switcher/desktop": "B10: fg.onBrand turns to ink on the coral fill (owner decision 1)",
-    "workspace-switcher/mobile": "B10: fg.onBrand turns to ink on the coral fill (owner decision 1)"
+    "workspace-switcher/mobile": "B10: fg.onBrand turns to ink on the coral fill (owner decision 1)",
+    "token:statusbar.h": "24 November 2026, owner: Android's status bar height (32) is this token's Android value, so the token gains an android mode; iOS, web and desktop keep theirs.",
+    "token:statusbar.hAndroid": "24 November 2026, owner: folded into statusbar.h (size.layout.statusBar) as its Android value, so a name no longer carries a platform; the old path is a deprecated alias that is 32 on Android and the iOS 47 elsewhere."
   }
 }

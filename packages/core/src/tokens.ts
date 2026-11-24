@@ -1007,7 +1007,6 @@ export const tokenSource = {
           sidebar: 260,
           tabBar: 0,
           statusBar: 0,
-          statusBarAndroid: 0,
           homeIndicator: 0,
         },
         avatar: {
@@ -1182,7 +1181,6 @@ export const tokenSource = {
           sidebar: 248,
           tabBar: 0,
           statusBar: 0,
-          statusBarAndroid: 0,
           homeIndicator: 0,
         },
         avatar: {
@@ -1357,7 +1355,6 @@ export const tokenSource = {
           sidebar: 0,
           tabBar: "{primitives.raw.56}",
           statusBar: 47,
-          statusBarAndroid: "{primitives.raw.32}",
           homeIndicator: "{primitives.raw.34}",
         },
         avatar: {
@@ -1529,7 +1526,7 @@ export const tokenSource = {
   },
   os: {
     android: {
-      $description: "Material 3 on the phone: what changes from the mobile profile, which is iOS's. The switch is a thin track under a bigger thumb.",
+      $description: "Material 3 on the phone: what changes from the mobile profile, which is iOS's. The switch is a thin track under a bigger thumb, and the status bar is 32 tall.",
       switch: {
         trackWidth: 36,
         trackHeight: "{primitives.raw.14}",
@@ -1537,6 +1534,12 @@ export const tokenSource = {
         thumbSize: "{primitives.raw.20}",
         thumbTravel: "{primitives.raw.16}",
         thumbShadow: "0 1px 3px rgba(0,0,0,.3)",
+      },
+      // Android's status bar is shorter than the iPhone's (47): one token, with the OS's value, never a platform in a name.
+      size: {
+        layout: {
+          statusBar: "{primitives.raw.32}",
+        },
       },
     },
   },

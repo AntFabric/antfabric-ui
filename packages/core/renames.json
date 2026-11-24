@@ -393,7 +393,7 @@
   "rail.wSidebar": "size.layout.sidebar",
   "tabbar.h": "size.layout.tabBar",
   "statusbar.h": "size.layout.statusBar",
-  "statusbar.hAndroid": "size.layout.statusBarAndroid",
+  "statusbar.hAndroid": "size.layout.statusBar",
   "homeIndicator.h": "size.layout.homeIndicator",
   "avatar.xs": "size.avatar.xs",
   "avatar.sm": "size.avatar.sm",
@@ -427,5 +427,6 @@
   "button.labelLg": "button.labelFontSizeLg",
   "button.iconSm": "button.iconSizeSm",
   "button.iconMd": "button.iconSizeMd",
-  "button.iconLg": "button.iconSizeLg"
+  "button.iconLg": "button.iconSizeLg",
+  "size.layout.statusBarAndroid": "size.layout.statusBar"
 }
