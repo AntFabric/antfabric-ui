@@ -43,7 +43,7 @@
  * `--af-fg-on-brand` as a variable (see `vars.ts`).
  */
 
-import { resolveTree } from "./refs";
+import { resolveAliases, resolveTree, type Resolved } from "./refs";
 import { PLATFORM_OS, type OS, type Platform } from "./types";
 
 export const tokenSource = {
@@ -1534,10 +1534,16 @@ export const tokenSource = {
 export type TokenSource = typeof tokenSource;
 
 /**
- * The same tree with every `"{primitives.…}"` replaced by the primitive's value, so a literal is what a reader finds:
+ * The same tree with every `"{primitives.…}"` replaced by the primitive's value and every alias of another token by that token's, so a literal is what a reader finds:
  * `tokens.themes.light.fg.body` is `"#1a1b1e"`. What the kits, the catalogue and the scripts read.
  */
-export const tokens = resolveTree(tokenSource);
+export const tokens = aliasesResolved(resolveTree(tokenSource));
+
+/** Each set with its aliases (`"{border.subtle}"`) replaced by the value of the token they name in that set, so no reader of `tokens` meets one. */
+function aliasesResolved(tree: Resolved<typeof tokenSource>): Resolved<typeof tokenSource> {
+  const each = <T extends object>(sets: T, name: string): T => Object.fromEntries(Object.entries(sets).map(([k, set]) => [k, resolveAliases(set as never, `${name}.${k}`)])) as T;
+  return { shared: resolveAliases(tree.shared as never, "shared"), themes: each(tree.themes, "themes"), profiles: each(tree.profiles, "profiles"), os: each(tree.os, "os") } as Resolved<typeof tokenSource>;
+}
 
 /** `tokenSource` with each reference resolved, at the type level too: a reference is the literal type of its primitive. */
 export type Tokens = typeof tokens;

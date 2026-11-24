@@ -12,7 +12,7 @@ export { tokensCss, tokenValues, flatTokens, referencedPrimitives, kitCss } from
 export { defineTheme, themeCss, type Theme, type ThemeFonts, type ThemeInput, type ThemeRecipes, type ThemeTokens, type TokenOverrides, type TokenSet } from "./theme";
 export { antfabric, neutral, themes } from "./themes";
 export { primitives, primitiveMeta, primitivesFrom, type Primitives } from "./primitives";
-export { isReference, referencePath, primitiveAt, primitiveValue, primitiveVar, resolveValue, resolveTree, spell, type Reference, type Resolved } from "./refs";
+export { isReference, isTokenReference, ref, referencePath, tokenReferencePath, primitiveAt, primitiveValue, primitiveVar, resolveAliases, resolveValue, resolveTree, spell, type Reference, type Resolved, type TokenReference } from "./refs";
 export { resolveTokens, tokenVars, type Native, type NativeTokens, type TokenVars, type Vars } from "./native";
 export { descriptions, type TokenNote, type TokenPath } from "./descriptions";
 export { tokenMeta, tokenRegistry, type DtcgType, type TokenGroup, type TokenMeta, type TokenSection, type TokenTier, type TokenVisibility } from "./token-registry";

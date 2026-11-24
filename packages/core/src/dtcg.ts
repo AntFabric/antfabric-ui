@@ -29,8 +29,8 @@
 
 import { referencedPrimitives } from "./css";
 import { primitiveMeta, primitivesFrom } from "./primitives";
-import { isReference, primitiveValue, resolveValue } from "./refs";
-import { platformOf, tokenSource as tokens } from "./tokens";
+import { isReference, isTokenReference, primitiveValue } from "./refs";
+import { platformOf, tokenSource, tokens as resolvedTokens } from "./tokens";
 import { descriptions, type TokenNote, type TokenPath } from "./descriptions";
 import { tokenMeta, type DtcgType } from "./token-registry";
 import tokenMap from "../tokens.map.json";
@@ -196,15 +196,20 @@ const CONVERT: Record<DtcgType, (raw: Raw, path: string) => Converted> = {
 /** What a token is, from the group it lives in (`token-registry.ts`). A token of a group nobody declared fails the build instead of being guessed. */
 export const typeOf = (path: string): DtcgType => tokenMeta(path).type;
 
-/** A value in DTCG: itself converted, or a reference as it is (its target is converted where it is declared, and here only to prove it can be). */
-function convert(type: DtcgType, raw: Raw, path: string): Converted & { resolved: unknown } {
-  const resolved = CONVERT[type](resolveValue(raw), path);
-  return { value: isReference(raw) ? raw : resolved.value, resolved: resolved.value, ...(resolved.lossy ? { lossy: true as const } : {}) };
+/**
+ * A value in DTCG: itself converted, or a reference as it is (a primitive's, or an alias of another token: its target is converted where it is
+ * declared, and here only to prove it can be). `resolved` is what the value is once every reference is followed.
+ */
+function convert(type: DtcgType, raw: Raw, resolved: Raw, path: string): Converted & { resolved: unknown } {
+  const to = CONVERT[type](resolved, path);
+  return { value: isReference(raw) || isTokenReference(raw) ? raw : to.value, resolved: to.value, ...(to.lossy ? { lossy: true as const } : {}) };
 }
 
 /* ---------- leaves ---------- */
 
-type Leaf = { path: string; type: DtcgType; kind: "shared" | "theme" | "profile"; modes: Partial<Record<Mode, Raw>> };
+/** `modes` is each mode's value as `tokens.ts` writes it (a reference stays one); `resolved` is the same with every reference followed. */
+type Leaf = { path: string; type: DtcgType; kind: "shared" | "theme" | "profile"; modes: Partial<Record<Mode, Raw>>; resolved: Partial<Record<Mode, Raw>> };
+type Document = typeof tokenSource;
 
 function leavesOf(tree: Tree, prefix = "", out = new Map<string, Raw>()) {
   for (const [key, value] of Object.entries(tree)) {
@@ -217,8 +222,14 @@ function leavesOf(tree: Tree, prefix = "", out = new Map<string, Raw>()) {
   return out;
 }
 
-/** Every leaf once, in the order `tokens.ts` declares it, with its value in each mode it has. */
+/** Every leaf once, in the order `tokens.ts` declares it, with its value in each mode it has, as written and as resolved. */
 function leaves(): Leaf[] {
+  const written = leavesIn(tokenSource);
+  const values = new Map(leavesIn(resolvedTokens as unknown as Document).map((l) => [l.path, l.modes]));
+  return written.map((l) => ({ ...l, resolved: values.get(l.path)! }));
+}
+
+function leavesIn(tokens: Document): Omit<Leaf, "resolved">[] {
   const shared = leavesOf(tokens.shared);
   const theme = { light: leavesOf(tokens.themes.light), dark: leavesOf(tokens.themes.dark) };
   const profile = { web: leavesOf(tokens.profiles.web), desktop: leavesOf(tokens.profiles.desktop), mobile: leavesOf(tokens.profiles.mobile) };
@@ -229,7 +240,7 @@ function leaves(): Leaf[] {
   // A profile leaf that shared also defines (`radius.card`) is still a profile leaf: shared is its default.
   for (const p of [...profile.desktop.keys(), ...profile.web.keys(), ...profile.mobile.keys()]) order.set(p, "profile");
 
-  const out: Leaf[] = [];
+  const out: Omit<Leaf, "resolved">[] = [];
   for (const [path, kind] of order) {
     const modes: Leaf["modes"] = {};
     if (kind === "theme") {
@@ -271,10 +282,11 @@ function tokenOf(leaf: Leaf): Node {
   if (!text) throw new Error(`tokens.json: ${path} has no description`);
 
   const entries = Object.entries(leaf.modes) as [Mode, Raw][];
-  const main = leaf.kind === "theme" ? leaf.modes.light! : (leaf.modes.desktop ?? leaf.modes.web ?? leaf.modes.mobile)!;
-  const converted = new Map(entries.map(([m, raw]) => [m, convert(type, raw, path)] as const));
+  const mainMode: Mode = leaf.kind === "theme" ? "light" : leaf.modes.desktop !== undefined ? "desktop" : leaf.modes.web !== undefined ? "web" : "mobile";
+  const main = leaf.modes[mainMode]!;
+  const converted = new Map(entries.map(([m, raw]) => [m, convert(type, raw, leaf.resolved[m]!, path)] as const));
   const varies = new Set([...converted.values()].map((c) => JSON.stringify(c.resolved))).size > 1;
-  const value = convert(type, main, path);
+  const value = convert(type, main, leaf.resolved[mainMode]!, path);
 
   // What the token is, first: its tier, the components a component token belongs to, and `internal` where it is left out of the documented set.
   const meta = tokenMeta(path);
@@ -297,8 +309,8 @@ function tokenOf(leaf: Leaf): Node {
   }
   if (typeof note === "object" && (note.mobile || note.web)) ext.notes = { ...(note.mobile ? { mobile: note.mobile } : {}), ...(note.web ? { web: note.web } : {}) };
   if (value.lossy || [...converted.values()].some((c) => c.lossy)) {
-    ext.css = resolveValue(main);
-    if (varies) ext.cssModes = Object.fromEntries(entries.map(([m, raw]) => [m, resolveValue(raw)]));
+    ext.css = leaf.resolved[mainMode]!;
+    if (varies) ext.cssModes = Object.fromEntries(entries.map(([m]) => [m, leaf.resolved[m]!]));
   }
 
   return { $type: type, $value: value.value, $description: text, $extensions: { [EXTENSION]: ext } };
@@ -340,7 +352,9 @@ const DESCRIPTION =
   "Dimensions are px; the phone reads px as pt. Where the format cannot say a value exactly (a percentage, em, a gradient angle, no shadow), $value is the closest it can say and " +
   "$extensions[\"com.antfabric\"].css keeps the string the kits use. " +
   "A $value in braces, \"{primitives.color.neutral.900}\", points at a primitive of the product's Tier 1 in the `primitives` group at the end of this file, " +
-  "which holds the primitives some token points at (the whole mirror is packages/core/src/primitives.ts); a token that has drifted from the product, has no product token or has no primitive of its own holds its value.";
+  "which holds the primitives some token points at (the whole mirror is packages/core/src/primitives.ts); a token that has drifted from the product, has no product token or has no primitive of its own holds its value. " +
+  "A $value that names another token, \"{border.subtle}\", is an alias: the token is that one, in every mode, and follows it when a theme changes it. " +
+  "Each token's $extensions[\"com.antfabric\"] says its tier (semantic: a role any component reads; component: owned by the components listed in `component`) and `visibility: internal` where it is left out of the documented set.";
 
 /** The primitives some token points at, nested the way the mirror nests them: a token each, typed and described. */
 function primitivesGroup(): Node {
@@ -379,8 +393,8 @@ export function tokensDtcg(): object {
     if (last in at) throw new Error(`tokens.json: ${leaf.path} is defined twice`);
     at[last] = tokenOf(leaf);
   }
-  const profiles = Object.fromEntries(Object.entries(tokens.profiles).map(([name, p]) => [name, (p as { $description: string }).$description]));
-  const os = Object.fromEntries(Object.entries(tokens.os).map(([name, set]) => [name, { extends: platformOf(name as never), $description: (set as { $description: string }).$description }]));
+  const profiles = Object.fromEntries(Object.entries(tokenSource.profiles).map(([name, p]) => [name, (p as { $description: string }).$description]));
+  const os = Object.fromEntries(Object.entries(tokenSource.os).map(([name, set]) => [name, { extends: platformOf(name as never), $description: (set as { $description: string }).$description }]));
   return {
     $description: DESCRIPTION,
     $extensions: {

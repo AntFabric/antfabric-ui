@@ -5,6 +5,7 @@
 ### Added
 
 - **Token tiers.** `tokenRegistry` and `tokenMeta(path)` (with the types `TokenGroup`, `TokenMeta`, `TokenTier`, `TokenSection`, `TokenVisibility`, `DtcgType`) say what each token group is: `semantic` (a role any component reads) or `component` (owned by the components it names), the type of its values and whether it is `internal` (resolves and can be themed, and is left out of the documented set: the pictures of OS chrome). `tokens.json` carries the same under `$extensions["com.antfabric"]` as `tier`, `component` and `visibility`. No token's name or value changes.
+- **A token can be an alias of another token.** In `tokens.ts` a value may be `ref.text("border.subtle")` or `ref.number("control.hMd")`, written `"{border.subtle}"` in `tokens.json` (the W3C format's alias). The alias is its target in every mode: `tokens` holds the target's value, the stylesheet writes `--af-chart-grid:var(--af-border-subtle)`, and under a theme that sets the target and not the alias, `tokenValues` and `resolveTokens` follow it as the sheet does. New exports: `ref`, `isTokenReference`, `tokenReferencePath`, `resolveAliases`, `TokenReference`. A theme's own `tokens` still take values and primitive references only.
 
 ## 1.1.0
 

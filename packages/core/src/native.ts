@@ -5,6 +5,7 @@
  * component reads `t.control.hMd` and `t.brand.default` exactly as the React kit does.
  */
 
+import { followAliases } from "./alias";
 import type { Theme } from "./theme";
 import { assertBuilt } from "./theme-built";
 import { platformOf, tokens, type Tokens } from "./tokens";
@@ -128,6 +129,15 @@ export function resolveTokens(profile: keyof Tokens["profiles"], scheme: keyof T
   for (const [base, over] of layers) {
     if (base) merge(merged, base);
     for (const [path, v] of Object.entries(over ?? {})) putLeaf(merged, path, v, theme!, profile === "mobile");
+  }
+  // An alias the theme left alone follows its target, as it does in the web's sheet: a theme that sets `border.subtle` moves `chart.grid` too.
+  if (sets) {
+    const node = (path: string): [Record<string, unknown> | undefined, string] => {
+      const keys = path.split(".");
+      const last = keys.pop()!;
+      return [keys.reduce<unknown>((at, k) => (typeof at === "object" && at !== null ? (at as Record<string, unknown>)[k] : undefined), merged) as Record<string, unknown> | undefined, last];
+    };
+    followAliases({ platform: profile, scheme, os }, sets, (path) => { const [at, k] = node(path); return at?.[k] as string | number | undefined; }, (path, v) => { const [at, k] = node(path); if (at) at[k] = v; });
   }
   const out = walk(merged, !!opts.web);
   if (resolved.size >= RESOLVED_MAX) resolved.delete(resolved.keys().next().value!);

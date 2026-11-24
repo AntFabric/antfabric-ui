@@ -7,8 +7,9 @@
  *   [data-af-os="android"]               what that OS changes inside its platform's profile (after the profiles, so it wins)
  *   [data-af-theme="dark"]               that theme's colours and shadows
  *
- * A token that is a reference is `--af-fg-body:var(--af-p-color-neutral-900)`; one that is not is its value. Components read
- * `var(--af-fg-body)` either way, so a reference changes nothing they draw.
+ * A token that is a reference is `--af-fg-body:var(--af-p-color-neutral-900)`, one that is an alias of another token is that token's
+ * variable (`--af-chart-grid:var(--af-border-subtle)`), and one that is neither is its value. Components read `var(--af-fg-body)`
+ * either way, so a reference changes nothing they draw.
  *
  * Put both attributes on <html> (or any container) and every React component under it draws at that
  * density and theme. A switch is an attribute change; nothing re-renders. A theme other than AntFabric adds its own sheet,
@@ -16,7 +17,8 @@
  */
 
 import { primitiveMeta } from "./primitives";
-import { isReference, primitiveValue, primitiveVar, referencePath } from "./refs";
+import { followAliases } from "./alias";
+import { isReference, isTokenReference, primitiveValue, primitiveVar, referencePath, tokenReferencePath } from "./refs";
 import type { Theme } from "./theme";
 import { assertBuilt } from "./theme-built";
 import { tokens, tokenSource } from "./tokens";
@@ -50,6 +52,11 @@ export function flatten(tree: Tree, prefix: string, out: [string, string][], ref
         primitiveValue(path); // throws on a reference that names nothing
         refs.add(path);
         out.push([`--af-${css}`, `var(${primitiveVar(path)})`]);
+        continue;
+      }
+      // An alias of another token is that token's variable, so whatever sets the target (a theme, a brand) reaches the alias too.
+      if (refs && isTokenReference(v)) {
+        out.push([`--af-${css}`, `var(${cssVarName(tokenReferencePath(v))})`]);
         continue;
       }
       out.push([`--af-${css}`, cssValue(css, v)]);
@@ -136,6 +143,8 @@ export function tokenValues(platform: keyof typeof tokens.profiles, scheme: Sche
       out[name] = cssValue(name.slice(5), v);
     }
   }
+  // An alias the theme left alone follows its target, as `var(--af-target)` does in the sheet: a theme that sets the target moves both.
+  followAliases({ platform, scheme, os }, sets, (path) => out[cssVarName(path)], (path, v) => void (out[cssVarName(path)] = v as string));
   return out;
 }
 

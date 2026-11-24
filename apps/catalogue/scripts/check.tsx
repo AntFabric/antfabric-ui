@@ -138,7 +138,7 @@ import { renderToString } from "react-dom/server";
 import { dirname, join } from "node:path";
 import { parseHTML } from "linkedom";
 import { icons as lucide } from "lucide";
-import { BRAND_FONT_PATHS, BRAND_PATHS, OS_VERSIONS, defaultStrings, formatParts, formatString, mergeStrings, stringsFor, stringsKey, PLATFORM_OS, PLATFORMS, STYLE_KEYS, antfabric, themes, brandValues, cssVarName, defineTheme, resolveTokens, tokens, tokensCss, themeCss, pascal, isReference, primitiveAt, primitiveMeta, primitiveValue, primitiveVar, primitives, primitivesFrom, platformOf, recipeEntries, recipeFor, recipeLayers, mergeLayers, recipes, referencedPrimitives, referencePath, tokenMeta, tokenOf, tokenRegistry, tokenSource, tokenValues, type InteractionState, type OS, type Platform, type Recipe, type RecipeContext, type Scheme, type StateKey, type StyleKey, type StyleValue, type Theme, type ThemeInput } from "@antfabric/ui-core";
+import { BRAND_FONT_PATHS, BRAND_PATHS, OS_VERSIONS, defaultStrings, formatParts, formatString, mergeStrings, stringsFor, stringsKey, PLATFORM_OS, PLATFORMS, STYLE_KEYS, antfabric, themes, brandValues, cssVarName, defineTheme, resolveTokens, tokens, tokensCss, themeCss, pascal, isReference, isTokenReference, tokenReferencePath, resolveAliases, primitiveAt, primitiveMeta, primitiveValue, primitiveVar, primitives, primitivesFrom, platformOf, recipeEntries, recipeFor, recipeLayers, mergeLayers, recipes, referencedPrimitives, referencePath, tokenMeta, tokenOf, tokenRegistry, tokenSource, tokenValues, type InteractionState, type OS, type Platform, type Recipe, type RecipeContext, type Scheme, type StateKey, type StyleKey, type StyleValue, type Theme, type ThemeInput } from "@antfabric/ui-core";
 import * as Core from "@antfabric/ui-core";
 import * as ReactKit from "@antfabric/ui-react";
 import * as NativeKit from "@antfabric/ui-react-native";
@@ -168,6 +168,8 @@ import { PART_MARKS, canonical, normalise, unknownVars, type DrawnIn } from "./s
 import { citedPaths, componentsJson, llmsTxt } from "./agent-surface";
 import { tokensJson, EXTENSION, REFERENCE } from "@antfabric/ui-core/dtcg";
 import { tokenLeaves, tokenPaths } from "./token-leaves";
+import { aliasTable, followAliases } from "../../../packages/core/src/alias";
+import { flatten as flattenCss } from "../../../packages/core/src/css";
 import { API_LOCK, apiDiff, apiSurface, breaking, major, readLock, type ApiSurface } from "./api-surface";
 import { barLayout, barScale, bySign, chartTable, clampScore, easeFn, cellText as coreCellText, fitLabel, fmt as coreFmt, gaugeState, labelWidth, lineScale, goalsOf, lttb, meterReading as coreMeterReading, meterShown, meterTone, moved as coreMoved, nearestAxis, niceScale, onHalfRing, pickState, prepare as corePrepare, rowIds, segmentAt, segmentsOf, shareOf, sortRows, sparseLabels, summarize as coreSummarize, summarizeCompare as coreSummarizeCompare, summarizeGauge as coreSummarizeGauge, summarizeGoals as coreSummarizeGoals, summarizeSegments as coreSummarizeSegments, tipRows as coreTipRows, toggleRow, totalOf, valueDomain, valueParts as coreValueParts, whenOf, withAlpha, withoutSign, type CompareWords, type FormatSpec, type FormatWords, type GaugeWords, type GoalWords, type SegmentWords, type SummaryWords } from "@antfabric/ui-core/chart";
 import { exceptZero, radarPoint, seriesMark, shortNumber, texturePath } from "@antfabric/ui-core/chart";
@@ -302,6 +304,90 @@ function checkApi() {
   else if (since.added.length) err("api", `${since.added.length} public name(s) were added since ${tag} was released (${list(since.added)}): the next push would publish them as a patch. Raise the version to ${x}.${Number(y) + 1}.0 in packages/*/package.json`);
 }
 
+/**
+ * Aliases: a token whose value is another token (`"{border.subtle}"`). `tokens.ts` already refused, when it loaded, an alias whose target its
+ * set does not have and one that comes back to itself. Here:
+ *   - the two are one type (a colour is not a size);
+ *   - the alias points down the tiers or along its own: at a semantic token, or at a token of its own component group. Never from a
+ *     role at a component's token, never from one component's group at another's;
+ *   - where a set laid over the alias's (a profile over shared, an OS over its profile) gives the target a value of its own, it declares
+ *     the alias too. Otherwise the sheet's `var(--af-target)` follows the target there and `tokens` would not, and the readers disagree.
+ * Then the engine itself, on a document of its own, so it is proven before `tokens.ts` holds an alias and after.
+ */
+function checkAliases() {
+  const at = "packages/core/src/tokens.ts";
+  const leaves = (tree: object, prefix = "", out = new Map<string, string | number>()) => {
+    for (const [k, v] of Object.entries(tree)) {
+      if (k.startsWith("$")) continue;
+      if (typeof v === "object" && v) leaves(v, `${prefix}${k}.`, out);
+      else out.set(`${prefix}${k}`, v as string | number);
+    }
+    return out;
+  };
+  const src = tokenSource as { shared: object; themes: Record<string, object>; profiles: Record<string, object>; os: Record<string, object> };
+  const profiles = Object.entries(src.profiles).map(([name, set]) => ({ name: `profiles.${name}`, platform: name, set: leaves(set) }));
+  const oses = Object.entries(src.os).map(([name, set]) => ({ name: `os.${name}`, platform: platformOf(name as OS) as string, set: leaves(set) }));
+  // Each set with the sets laid over it.
+  const sets: { name: string; set: Map<string, string | number>; over: { name: string; set: Map<string, string | number> }[] }[] = [
+    { name: "shared", set: leaves(src.shared), over: [...profiles, ...oses] },
+    ...Object.entries(src.themes).map(([name, set]) => ({ name: `themes.${name}`, set: leaves(set), over: [] })),
+    ...profiles.map((p) => ({ name: p.name, set: p.set, over: oses.filter((o) => o.platform === p.platform) })),
+    ...oses.map((o) => ({ name: o.name, set: o.set, over: [] })),
+  ];
+  let count = 0;
+  for (const { name, set, over } of sets)
+    for (const [path, v] of set) {
+      if (!isTokenReference(v)) continue;
+      count++;
+      const to = tokenReferencePath(v);
+      if (!set.has(to)) continue; // tokens.ts threw on this already
+      const [a, b] = [tokenMeta(path), tokenMeta(to)];
+      if (a.type !== b.type) err(at, `${name}.${path} is ${v}: a ${a.type} cannot be an alias of a ${b.type}`);
+      if (!(b.tier === "semantic" || (a.tier === "component" && a.group === b.group)))
+        err(at, `${name}.${path} is ${v}: an alias points at a semantic token or at one of its own group, never ${a.tier === "semantic" ? "from a role at a component's token" : "at another component's"}`);
+      for (const o of over) if (o.set.has(to) && !o.set.has(path)) err(at, `${name}.${path} is ${v}, and ${o.name} gives ${to} a value of its own without declaring ${path}: add ${path} to ${o.name}, as the same alias or a value`);
+    }
+
+  // The engine, on its own document.
+  const eng = "alias engine";
+  const expect = (what: string, got: unknown, want: unknown) => {
+    if (JSON.stringify(got) !== JSON.stringify(want)) err(eng, `${what}: ${JSON.stringify(got)}, not ${JSON.stringify(want)}`);
+  };
+  const throws = (what: string, run: () => unknown, message: RegExp) => {
+    try {
+      run();
+      err(eng, `${what} did not throw`);
+    } catch (e) {
+      if (!message.test(e instanceof Error ? e.message : String(e))) err(eng, `${what} threw "${e instanceof Error ? e.message : e}"`);
+    }
+  };
+  expect("a chain resolves to its end", resolveAliases({ grid: { line: "{edge.soft}" }, edge: { soft: "{edge.base}", base: 5 } }, "t"), { grid: { line: 5 }, edge: { soft: 5, base: 5 } });
+  throws("a cycle", () => resolveAliases({ a: { x: "{a.y}", y: "{a.x}" } }, "t"), /comes back to itself/);
+  throws("a target the set does not have", () => resolveAliases({ a: { x: "{b.y}" } }, "t"), /has no token b\.y/);
+  expect("the sheet writes an alias as its target's variable", flattenCss({ grid: { lineW: "{edge.softW}" }, edge: { softW: 1 } }, "", [], new Set()), [["--af-grid-line-w", "var(--af-edge-soft-w)"], ["--af-edge-soft-w", "1px"]]);
+  const doc = {
+    shared: { grid: { line: "{edge.soft}", rule: "{grid.line}" }, edge: { soft: 1 } },
+    themes: { light: { ink: { chart: "{ink.body}", body: "#111" } }, dark: { ink: { chart: "{ink.body}", body: "#eee" } } },
+    profiles: { web: {}, desktop: {}, mobile: { grid: { line: 9 } } },
+    os: { android: {} },
+  };
+  const table = aliasTable(doc);
+  const under = (c: { platform: Platform; scheme: Scheme; os?: OS }, theme: Parameters<typeof followAliases>[1], base: Record<string, string | number>) => {
+    const out: Record<string, string | number> = { ...base };
+    for (const layer of [theme.shared, theme.schemes[c.scheme], theme.profiles[c.platform], c.os ? theme.os[c.os] : undefined]) Object.assign(out, layer ?? {});
+    followAliases(c, theme, (p) => out[p], (p, v) => void (out[p] = v), table);
+    return out;
+  };
+  const desktop = { "grid.line": 1, "grid.rule": 1, "edge.soft": 1, "ink.chart": "#111", "ink.body": "#111" };
+  const phone = { ...desktop, "grid.line": 9, "grid.rule": 9 };
+  const none = { schemes: {}, profiles: {}, os: {} };
+  expect("a theme that sets a target moves its alias, and the alias of that alias", under({ platform: "desktop", scheme: "light" }, { ...none, shared: { "edge.soft": 3 } }, desktop), { ...desktop, "edge.soft": 3, "grid.line": 3, "grid.rule": 3 });
+  expect("a theme that sets the alias itself has said what it is", under({ platform: "desktop", scheme: "light" }, { ...none, shared: { "edge.soft": 3, "grid.line": 7 } }, desktop), { ...desktop, "edge.soft": 3, "grid.line": 7, "grid.rule": 7 });
+  expect("a later base layer's own value beats the alias under it", under({ platform: "mobile", scheme: "light" }, { ...none, shared: { "edge.soft": 3 } }, phone), { ...phone, "edge.soft": 3 });
+  expect("a scheme's alias follows that scheme's target", under({ platform: "desktop", scheme: "dark" }, { ...none, schemes: { dark: { "ink.body": "#fff" } } }, { ...desktop, "ink.chart": "#eee", "ink.body": "#eee" }), { ...desktop, "ink.chart": "#fff", "ink.body": "#fff" });
+  if (!quiet) console.log(`  aliases: ${count} in tokens.ts`);
+}
+
 function checkPrimitives() {
   const at = "primitives.ts";
   const flat = new Map<string, string | number>();
@@ -342,7 +428,8 @@ function checkPrimitives() {
       if (k.startsWith("$")) continue;
       if (typeof v === "object" && v) refs(v, `${where}.${k}`);
       else if (typeof v === "string" && v.startsWith("{")) {
-        if (!isReference(v)) err(at, `${where}.${k} is "${v}": a reference is {primitives.<path>}`);
+        if (isTokenReference(v)) continue; // an alias of another token: checkAliases holds those
+        if (!isReference(v)) err(at, `${where}.${k} is "${v}": a reference is {primitives.<path>}, or an alias {group.key}`);
         else if (primitiveAt(referencePath(v)) === undefined) err(at, `${where}.${k} points at ${v}, which primitives.ts does not have`);
       }
     }
@@ -350,6 +437,7 @@ function checkPrimitives() {
   refs(tokenSource.shared, "shared");
   for (const [m, t] of Object.entries(tokenSource.themes)) refs(t, `themes.${m}`);
   for (const [m, t] of Object.entries(tokenSource.profiles)) refs(t, `profiles.${m}`);
+  for (const [m, t] of Object.entries(tokenSource.os)) refs(t, `os.${m}`);
 
   // Primitives are the product's layer under the roles; a component that read one would hold a literal the roles cannot move.
   const NAMES = ["primitives", "primitiveMeta", "primitivesFrom", "primitiveAt", "primitiveValue", "primitiveVar", "referencedPrimitives"];
@@ -3066,7 +3154,9 @@ function checkThemes() {
       }
     }
     const out: Record<string, string> = {};
-    for (const [name, { value }] of won) if (!name.startsWith("--af-p-")) out[name] = value.replace(/var\((--af-p-[\w-]+)\)/g, (_, p: string) => won.get(p)?.value ?? `var(${p})`);
+    // A reference is its primitive's variable and an alias its target's, both declared on the same element: followed to a value, as the browser does.
+    const followed = (value: string, depth = 0): string => value.replace(/var\((--af-[\w-]+)\)/g, (all, p: string) => (won.has(p) && depth < 8 ? followed(won.get(p)!.value, depth + 1) : all));
+    for (const [name, { value }] of won) if (!name.startsWith("--af-p-")) out[name] = followed(value);
     return out;
   };
   const attrsOf = (c: { platform: Platform; scheme?: Scheme; os?: OS }, id?: string): Record<string, string> => ({
@@ -3457,6 +3547,7 @@ function checkThemes() {
 if (!only.length || only.includes("tokens")) checkTokenMap();
 if (!only.length || only.includes("tokens")) checkRegistry();
 if (!only.length || only.includes("tokens") || only.includes("primitives")) checkPrimitives();
+if (!only.length || only.includes("tokens")) checkAliases();
 if (!only.length || only.includes("tokens")) checkTokensJson();
 if (!only.length || only.includes("tokens") || only.includes("palette")) checkPalette();
 if (!only.length || only.includes("tokens")) checkContrast();
