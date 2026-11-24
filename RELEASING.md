@@ -8,7 +8,8 @@ three share one version. Nobody publishes from a laptop (except 1.0.0, once; see
 ## How a change ships
 
 1. **Open a pull request.** `ci.yml` runs `pnpm build` (which runs `pnpm check`), `pnpm verify:packages`
-   and `pnpm release:dry`, an `npm publish --dry-run` of the three packed packages.
+   and `pnpm release:dry`, an `npm publish --dry-run` of the three packed packages at the version the
+   merge would publish (`release-version.mjs` writes it first, as `release.yml` does).
 2. **Merge it.** `release.yml` runs on the push to `main`: `pnpm check`, then picks the version
    (`scripts/release-version.mjs`), `pnpm build:packages`, `pnpm verify:packages`, publishes the three
    packages (`scripts/publish-packages.mjs`), tags the commit `v<version>` and makes a GitHub release with notes generated
@@ -65,7 +66,8 @@ the repository is public (it refuses provenance for a private one).
 ## Locally
 
 - `pnpm release:dry`: builds the packages, packs them with pnpm and runs `npm publish --dry-run` on
-  each tarball, listing what it would hold. Nothing is sent.
+  each tarball, listing what it would hold. Nothing is sent. A version npm already has is skipped
+  (npm's dry run refuses it), so after a release it checks nothing until the version moves.
 - `pnpm verify:packages`: packs the three packages, installs them in a scratch project, renders and
   type-checks them (under `moduleResolution` bundler and nodenext), and checks the `"use client"`
   directives, the source maps and which of core's entries load under the `react-server` condition.

@@ -3,7 +3,8 @@
 // pnpm packs each package, because only pnpm applies publishConfig (the dist exports) and turns
 // workspace:^ into a version range; npm publishes the tarball, because npm's trusted publishing
 // (OIDC from GitHub Actions, no token) needs the npm CLI 11.5.1 or later. Run `pnpm build:packages` first.
-// A version npm already has is skipped, so a failed release can be re-run.
+// A version npm already has is skipped, so a failed release can be re-run (the dry run skips it too:
+// npm's own dry run refuses a version it has).
 //
 // In GitHub Actions every package still to publish is checked first, with the same OIDC token exchange
 // npm does, and nothing is published unless npmjs.com trusts this workflow for all of them. Without
@@ -61,7 +62,7 @@ const todo = [];
 for (const name of PACKAGES) {
   const dir = join(ROOT, "packages", name);
   const { name: pkg, version } = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
-  if (!dry && onNpm(pkg, version)) console.log(`${pkg}@${version} is already on npm, skipped`);
+  if (onNpm(pkg, version)) console.log(`${pkg}@${version} is already on npm, skipped`);
   else todo.push({ dir, pkg, version });
 }
 

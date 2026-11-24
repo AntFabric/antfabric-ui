@@ -35,8 +35,10 @@ jobs:
       - name: Verify the packed packages
         run: pnpm verify:packages
 
+      # The version merging this would publish, as release.yml picks it (written here, never committed),
+      # so the dry run checks that version and not the one in package.json, which npm may already have.
       - name: Publish dry run
-        run: pnpm release:dry
+        run: node scripts/release-version.mjs && pnpm release:dry
 
       - uses: actions/upload-artifact@v4
         with:
