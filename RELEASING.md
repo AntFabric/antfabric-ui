@@ -37,6 +37,10 @@ A failed run is safe to re-run (Actions → Release → Re-run):
   the rest and tags it. A version is never left with core but no kits.
 - **Already shipped** (the commit carries a `v<version>` tag, as 1.0.0 does after the one-time setup):
   the re-run publishes nothing, so it never puts out a second version with the same contents.
+- **Not trusted** (the Publish step says npm does not trust this workflow for a package):
+  `publish-packages.mjs` first tries npm's OIDC token exchange for every package it is about to
+  publish, so nothing went out. Add the trusted publisher to the packages it names (One-time setup,
+  step 2) and re-run.
 
 ## One-time setup
 

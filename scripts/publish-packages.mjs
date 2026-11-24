@@ -5,6 +5,11 @@
 // (OIDC from GitHub Actions, no token) needs the npm CLI 11.5.1 or later. Run `pnpm build:packages` first.
 // A version npm already has is skipped, so a failed release can be re-run.
 //
+// In GitHub Actions every package still to publish is checked first, with the same OIDC token exchange
+// npm does, and nothing is published unless npmjs.com trusts this workflow for all of them. Without
+// it, npm falls back to no token for an untrusted package and stops there with ENEEDAUTH, after the
+// packages before it went out (1.1.0's core without its kits).
+//
 //   node scripts/publish-packages.mjs             publish
 //   node scripts/publish-packages.mjs --dry-run   pack and run npm publish --dry-run (sends nothing)
 import { execFileSync } from "node:child_process";
@@ -33,14 +38,46 @@ function onNpm(name, version) {
   }
 }
 
-const out = mkdtempSync(join(tmpdir(), "antfabric-ui-publish-"));
+/** The packages npmjs.com does not trust this workflow to publish, each with npm's answer. */
+async function untrusted(names) {
+  if (!process.env.GITHUB_ACTIONS) return []; // a hand publish signs in with npm login
+  const { ACTIONS_ID_TOKEN_REQUEST_URL: url, ACTIONS_ID_TOKEN_REQUEST_TOKEN: bearer } = process.env;
+  if (!url || !bearer) throw new Error("the job has no OIDC token: give it permissions: id-token: write");
+  const request = new URL(url);
+  request.searchParams.set("audience", "npm:registry.npmjs.org");
+  const id = await fetch(request, { headers: { Accept: "application/json", Authorization: `Bearer ${bearer}` } });
+  if (!id.ok) throw new Error(`GitHub refused the OIDC token: ${id.status} ${await id.text()}`);
+  const { value } = await id.json();
+  const failed = [];
+  for (const name of names) {
+    const exchange = `https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/${name.replace("/", "%2f")}`;
+    const res = await fetch(exchange, { method: "POST", headers: { Authorization: `Bearer ${value}` } });
+    if (!res.ok) failed.push(`${name}: ${res.status} ${(await res.text()).slice(0, 300)}`);
+  }
+  return failed;
+}
+
+const todo = [];
 for (const name of PACKAGES) {
   const dir = join(ROOT, "packages", name);
   const { name: pkg, version } = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
-  if (!dry && onNpm(pkg, version)) {
-    console.log(`${pkg}@${version} is already on npm, skipped`);
-    continue;
-  }
+  if (!dry && onNpm(pkg, version)) console.log(`${pkg}@${version} is already on npm, skipped`);
+  else todo.push({ dir, pkg, version });
+}
+
+const refused = dry ? [] : await untrusted(todo.map((p) => p.pkg));
+if (refused.length) {
+  const repo = process.env.GITHUB_REPOSITORY ?? "AntFabric/antfabric-ui";
+  throw new Error(
+    `npm does not trust this workflow for ${refused.length} package(s), so nothing was published:\n` +
+      refused.map((line) => `  ${line}`).join("\n") +
+      `\nOn npmjs.com, each package, Settings, Trusted Publisher, GitHub Actions: ${repo.split("/")[0]} / ` +
+      `${repo.split("/")[1]}, workflow release.yml, no environment (RELEASING.md). Then re-run this job.`,
+  );
+}
+
+const out = mkdtempSync(join(tmpdir(), "antfabric-ui-publish-"));
+for (const { dir, pkg, version } of todo) {
   const before = new Set(readdirSync(out));
   const shell = pnpm.endsWith(".js") || pnpm.endsWith(".cjs") || pnpm.endsWith(".mjs");
   run(shell ? process.execPath : pnpm, [...(shell ? [pnpm] : []), "pack", "--pack-destination", out], { cwd: dir });
