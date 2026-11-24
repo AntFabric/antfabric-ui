@@ -77,6 +77,34 @@ else {
   next = `${major}.${minor}.${patch + 1}`;
 }
 
+// The public surface (reports/api.lock.json: every token and exported name) against the lock the newest release carried. A push that
+// publishes a patch may neither drop a name (that needs a major) nor add one (a minor); a chosen version may drop one only as a major.
+// `pnpm check api` says the same before the merge; this is the last gate, on the version actually being published.
+function surface(text) {
+  const lock = JSON.parse(text);
+  const out = new Map();
+  for (const [path, what] of Object.entries(lock.tokens)) out.set(`token ${path}`, what.replace(/ internal$/, ""));
+  for (const [entry, names] of Object.entries(lock.exports)) for (const name of names) out.set(`export ${entry} ${name}`, "");
+  return out;
+}
+function guard() {
+  if (!newest || !tagged(newest)) return;
+  let before;
+  try {
+    before = surface(git("show", `v${newest}:reports/api.lock.json`));
+  } catch {
+    return; // the newest release predates the lock
+  }
+  const after = surface(readFileSync(join(ROOT, "reports/api.lock.json"), "utf8"));
+  const gone = [...before].filter(([k, v]) => !after.has(k) || after.get(k) !== v).map(([k]) => k);
+  const added = [...after.keys()].filter((k) => !before.has(k));
+  const [a, b] = [parse(newest), parse(next)];
+  const show = (list) => `${list.slice(0, 8).join(", ")}${list.length > 8 ? `, and ${list.length - 8} more` : ""}`;
+  if (gone.length && b[0] <= a[0]) throw new Error(`${next} would remove or change ${gone.length} public name(s) that ${newest} has (${show(gone)}): that is a major. Raise the version to ${a[0] + 1}.0.0 in packages/*/package.json.`);
+  if (added.length && b[0] === a[0] && b[1] === a[1]) throw new Error(`${next} would add ${added.length} public name(s) to ${newest} as a patch (${show(added)}): that is a minor. Raise the version to ${a[0]}.${a[1] + 1}.0 in packages/*/package.json.`);
+}
+guard();
+
 if (!process.argv.includes("--dry")) {
   for (const name of PACKAGES) {
     const json = read(name);

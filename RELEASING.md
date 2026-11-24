@@ -84,3 +84,11 @@ the repository is public (it refuses provenance for a private one).
   chosen.
 - **Apps on the old internal registry** used the `@antfabric-ui/*` names. They move to
   `@antfabric/ui-*` (rename the imports) and drop their `@antfabric-ui:registry=` line from `.npmrc`.
+
+## What a version may change
+
+`reports/api.lock.json` is the public surface: every token and every name the packages export. `pnpm api:lock` rewrites it and `pnpm check api` fails while it is stale, so each change to it is in a commit.
+
+- A **patch** (what a push publishes when the version in the three `package.json` files is already on npm) adds and removes nothing. `scripts/release-version.mjs` stops the release if the lock gained or lost a name since the newest release's tag.
+- A **minor** may add names. Raise the version to `x.(y+1).0` in the three files in the pull request that adds them.
+- A **major** may remove them. `pnpm api:lock` refuses a removal until the major version is raised. Before that, a renamed token or export keeps its old name as a deprecated alias.

@@ -168,6 +168,7 @@ import { PART_MARKS, canonical, normalise, unknownVars, type DrawnIn } from "./s
 import { citedPaths, componentsJson, llmsTxt } from "./agent-surface";
 import { tokensJson, EXTENSION, REFERENCE } from "@antfabric/ui-core/dtcg";
 import { tokenLeaves, tokenPaths } from "./token-leaves";
+import { API_LOCK, apiDiff, apiSurface, breaking, major, readLock, type ApiSurface } from "./api-surface";
 import { barLayout, barScale, bySign, chartTable, clampScore, easeFn, cellText as coreCellText, fitLabel, fmt as coreFmt, gaugeState, labelWidth, lineScale, goalsOf, lttb, meterReading as coreMeterReading, meterShown, meterTone, moved as coreMoved, nearestAxis, niceScale, onHalfRing, pickState, prepare as corePrepare, rowIds, segmentAt, segmentsOf, shareOf, sortRows, sparseLabels, summarize as coreSummarize, summarizeCompare as coreSummarizeCompare, summarizeGauge as coreSummarizeGauge, summarizeGoals as coreSummarizeGoals, summarizeSegments as coreSummarizeSegments, tipRows as coreTipRows, toggleRow, totalOf, valueDomain, valueParts as coreValueParts, whenOf, withAlpha, withoutSign, type CompareWords, type FormatSpec, type FormatWords, type GaugeWords, type GoalWords, type SegmentWords, type SummaryWords } from "@antfabric/ui-core/chart";
 import { exceptZero, radarPoint, seriesMark, shortNumber, texturePath } from "@antfabric/ui-core/chart";
 import { contrast, lightnessChroma, separation } from "../src/lib/palette";
@@ -271,6 +272,34 @@ function checkRegistry() {
       if (entry?.tier === "component" && !entry.owners?.includes(id)) err(at, `recipe ${id} reads the component group "${g}" and is not one of its owners (${entry.owners?.join(", ")})`);
     }
   }
+}
+
+/**
+ * The public surface against `reports/api.lock.json` (`scripts/api-surface.ts`): every token and every exported name is in the lock and
+ * the lock holds nothing else, so the lock's diff is exactly what a change does to the people who installed the last version. `pnpm api:lock`
+ * writes it, and refuses a removal without a major version. And against the lock the last release carried, when this version is already
+ * tagged: a push after a release publishes the next patch, so nothing may have left (a major) or arrived (a minor) since that tag.
+ */
+function checkApi() {
+  const lock = readLock();
+  if (!lock) return err(API_LOCK, "is missing or not JSON: run `pnpm api:lock`");
+  const now = apiSurface();
+  const list = (lines: string[]) => `${lines.slice(0, 6).join("; ")}${lines.length > 6 ? `; and ${lines.length - 6} more` : ""}`;
+  const diff = apiDiff(lock, now);
+  if (lock.version !== now.version) err(API_LOCK, `was written at ${lock.version} and the packages are at ${now.version}: run \`pnpm api:lock\``);
+  if (diff.added.length) err(API_LOCK, `${diff.added.length} public name(s) are not in the lock (${list(diff.added)}): run \`pnpm api:lock\` and commit it`);
+  if (diff.removed.length) err(API_LOCK, `${diff.removed.length} name(s) in the lock are gone (${list(diff.removed)}): a removal breaks whoever installed ${lock.version}; keep a deprecated alias, or raise the major version and run \`pnpm api:lock\``);
+  if (diff.changed.length) err(API_LOCK, `${diff.changed.length} token(s) are not what the lock says (${list(diff.changed)}): run \`pnpm api:lock\``);
+
+  const tag = `v${now.version}`;
+  if (git("rev-parse", "-q", "--verify", `refs/tags/${tag}`).status !== 0) return;
+  const then = git("show", `${tag}:${API_LOCK}`);
+  if (then.status !== 0) return;
+  const since = apiDiff(JSON.parse(then.stdout) as ApiSurface, now);
+  const broke = breaking(since);
+  const [x, y] = now.version.split(".");
+  if (broke.length) err("api", `${broke.length} breaking change(s) since ${tag} was released (${list(broke)}): the next push would publish them as a patch. Raise the version to ${major(now.version) + 1}.0.0 in packages/*/package.json`);
+  else if (since.added.length) err("api", `${since.added.length} public name(s) were added since ${tag} was released (${list(since.added)}): the next push would publish them as a patch. Raise the version to ${x}.${Number(y) + 1}.0 in packages/*/package.json`);
 }
 
 function checkPrimitives() {
@@ -3443,6 +3472,7 @@ if (!only.length || only.includes("tokens")) {
   }
 }
 if (!only.length || only.includes("agent")) checkAgent();
+if (!only.length || only.includes("api")) checkApi();
 if (!only.length || only.includes("architecture")) checkArchitecture();
 if (!only.length || only.includes("literals")) checkLiterals();
 if (!only.length || only.includes("helpers")) checkHelpers();

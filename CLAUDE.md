@@ -25,6 +25,8 @@ pnpm frames <id> [platform] [os]  # where each flow frame's `press` lands
 pnpm rerender [id…]               # only the re-render pass of `check`
 pnpm report [--json]              # token reads, literals and branches per component (design-system baseline)
 pnpm tokens:build                 # rewrite packages/core/tokens.json (W3C Design Tokens file); `check` fails when it is stale
+pnpm api:lock                     # rewrite reports/api.lock.json (every token and exported name); refuses a removal without a major version
+pnpm check api                    # the public surface against that lock, and against the last release's when this version is already tagged
 pnpm build                        # check, then static build to apps/catalogue/dist
 pnpm build:packages [core|react|react-native]  # the three publishable packages to packages/*/dist (esbuild + tsc)
 pnpm verify:packages              # build, pnpm pack, install the tarballs in a scratch project, render and type-check
@@ -112,5 +114,6 @@ The tokens move from a flat file to tiers, component tokens and per-part recipes
 
 - **CI (`.github/workflows/ci.yml`):** on every pull request (and by hand): `pnpm install --frozen-lockfile`, `pnpm build` (which runs `pnpm check` first, then builds the catalogue), `pnpm verify:packages`, then `pnpm release:dry` (packs the three packages with pnpm and runs `npm publish --dry-run` on each). The catalogue's `dist` is uploaded as an artifact.
 - **Release (`.github/workflows/release.yml`):** on every push to `main`. It runs `pnpm check`, picks the version (`scripts/release-version.mjs`: the `package.json` version when npm does not have it and it is newer, otherwise the next patch after npm's newest), `pnpm build:packages` and `pnpm verify:packages`, publishes `@antfabric/ui-core`, `ui-react` and `ui-react-native` to npm (`scripts/publish-packages.mjs`: pnpm packs, npm publishes through trusted publishing, so there is no token; provenance once the repository is public), tags the commit `v<version>` and makes a GitHub release. `RELEASING.md` is the whole procedure.
+- **The public surface is locked.** `reports/api.lock.json` lists every token (type, tier, visibility) and every name each entry exports, types included (`apps/catalogue/scripts/api-surface.ts`). `pnpm check api` fails when it differs from the source, so an addition is committed with its lock diff. `pnpm api:lock` refuses to drop an entry or change what a token is unless the major version rose: keep the old name as a deprecated alias instead. Once a version is tagged, `check api` and `scripts/release-version.mjs` compare with the lock that tag carried: a patch may neither drop a name (a major) nor add one (a minor).
 - **Never publish by hand** and never push a release tag yourself; merging to `main` publishes. To start a minor or major, raise the version in the three `package.json` files; note consumer-visible changes in each `CHANGELOG.md`.
 - **Catalogue hosting** is not set up yet; `pnpm build` writes it to `apps/catalogue/dist`.
