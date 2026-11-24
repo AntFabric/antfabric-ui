@@ -32,13 +32,14 @@ import { primitiveMeta, primitivesFrom } from "./primitives";
 import { isReference, primitiveValue, resolveValue } from "./refs";
 import { platformOf, tokenSource as tokens } from "./tokens";
 import { descriptions, type TokenNote, type TokenPath } from "./descriptions";
+import { tokenMeta, type DtcgType } from "./token-registry";
 import tokenMap from "../tokens.map.json";
 
 type Raw = string | number;
 type Tree = { readonly [k: string]: Raw | Tree };
 type Mode = "light" | "dark" | "web" | "desktop" | "mobile" | "android";
 
-export type DtcgType = "color" | "dimension" | "duration" | "cubicBezier" | "fontFamily" | "fontWeight" | "number" | "shadow" | "gradient";
+export type { DtcgType } from "./token-registry";
 
 /** The key under `$extensions` that holds everything that is ours. */
 export const EXTENSION = "com.antfabric";
@@ -192,50 +193,8 @@ const CONVERT: Record<DtcgType, (raw: Raw, path: string) => Converted> = {
   gradient,
 };
 
-const COLOUR_GROUPS = new Set([
-  "surface", "fg", "border", "brand", "focus", "hover", "link", "success", "warning", "danger", "info", "identity", "scrim",
-  "skeleton", "tag", "banner", "tabs", "accent", "presence", "os", "data",
-]);
-const DIMENSION_GROUPS = new Set(["radius", "space", "text", "control", "avatar", "row", "rail", "gutter", "breadcrumb", "topbar", "tabbar", "statusbar", "homeIndicator", "button", "dot", "sheet", "fab", "iconButton", "segmentedControl", "choice", "radioGroup", "checkbox", "chip", "select", "textField", "icon", "inAppBanner", "notificationItem", "notificationSchedule", "osBadge", "osNotification", "osTray", "permissionPrompt", "breadcrumbs", "mobileHeader", "navRail", "osHeader", "osMenu", "osWindow", "sidebar", "tabBar", "tab", "workspace", "connectionBanner", "contextMenu", "dialog", "emoji", "hoverCard", "menu", "palette", "phone", "sessionState", "tooltip", "updateBanner", "questionPanel", "thinking", "agentSteps", "kpi"]);
-
-/** What a token is, from where it lives. A token this does not know fails the build instead of being guessed. */
-export function typeOf(path: string): DtcgType {
-  const [group, ...rest] = path.split(".");
-  switch (group) {
-    case "tracking":
-    case "z":
-    case "opacity":
-      return "number";
-    case "icon":
-      return rest[0]?.startsWith("stroke") ? "number" : "dimension";
-    case "font":
-      // A font file is a family name: the phone loads one file per weight.
-      return rest[0]?.startsWith("weight") ? "fontWeight" : "fontFamily";
-    case "duration":
-      return "duration";
-    case "ease":
-      return "cubicBezier";
-    case "glass":
-      return rest[0] === "blur" ? "dimension" : rest[0] === "saturate" ? "number" : "color";
-    case "border":
-      // `border.wHairline` is a width; every other `border.*` is a colour.
-      return /^w[A-Z]/.test(rest[0] ?? "") ? "dimension" : "color";
-    case "switch":
-      return rest[0] === "thumbShadow" ? "shadow" : rest[0] === "trackOff" || rest[0] === "thumb" ? "color" : "dimension";
-    case "shadow":
-      return "shadow";
-    case "chart":
-      // Text and its phone files are families; a colour has one of these names; everything else is a size (a dash is a length).
-      return /^(font|file)/.test(rest[0] ?? "") ? "fontFamily" : /^(series\d|previous|other|grid|axis|label|crosshair|reference|tooltip|tooltipText|tooltipMuted|tooltipRule|track)$/.test(rest[0] ?? "") ? "color" : "dimension";
-    case "table":
-      return /^(header|rowHover|rowSelected|divider)$/.test(rest[0] ?? "") ? "color" : "dimension";
-    default:
-      if (path === "os.wallpaper") return "gradient";
-      if (DIMENSION_GROUPS.has(group!)) return "dimension";
-      if (COLOUR_GROUPS.has(group!)) return "color";
-      throw new Error(`tokens.json: no DTCG type for "${path}"`);
-  }
-}
+/** What a token is, from the group it lives in (`token-registry.ts`). A token of a group nobody declared fails the build instead of being guessed. */
+export const typeOf = (path: string): DtcgType => tokenMeta(path).type;
 
 /** A value in DTCG: itself converted, or a reference as it is (its target is converted where it is declared, and here only to prove it can be). */
 function convert(type: DtcgType, raw: Raw, path: string): Converted & { resolved: unknown } {
@@ -317,7 +276,11 @@ function tokenOf(leaf: Leaf): Node {
   const varies = new Set([...converted.values()].map((c) => JSON.stringify(c.resolved))).size > 1;
   const value = convert(type, main, path);
 
-  const ext: Node = {};
+  // What the token is, first: its tier, the components a component token belongs to, and `internal` where it is left out of the documented set.
+  const meta = tokenMeta(path);
+  const ext: Node = { tier: meta.tier };
+  if (meta.owners.length) ext.component = [...meta.owners];
+  if (meta.visibility !== "public") ext.visibility = meta.visibility;
   if (varies) ext.modes = Object.fromEntries(entries.map(([m]) => [m, converted.get(m)!.value]));
   const profiles = entries.map(([m]) => m).filter((m) => m === "web" || m === "desktop" || m === "mobile");
   if (kind === "profile" && profiles.length < 3) ext.onlyIn = profiles;
@@ -338,7 +301,7 @@ function tokenOf(leaf: Leaf): Node {
     if (varies) ext.cssModes = Object.fromEntries(entries.map(([m, raw]) => [m, resolveValue(raw)]));
   }
 
-  return { $type: type, $value: value.value, $description: text, ...(Object.keys(ext).length ? { $extensions: { [EXTENSION]: ext } } : {}) };
+  return { $type: type, $value: value.value, $description: text, $extensions: { [EXTENSION]: ext } };
 }
 
 const isToken = (n: unknown): n is Node => typeof n === "object" && n !== null && "$value" in n;

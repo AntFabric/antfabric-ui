@@ -1,5 +1,11 @@
 # @antfabric/ui-core
 
+## Unreleased
+
+### Added
+
+- **Token tiers.** `tokenRegistry` and `tokenMeta(path)` (with the types `TokenGroup`, `TokenMeta`, `TokenTier`, `TokenSection`, `TokenVisibility`, `DtcgType`) say what each token group is: `semantic` (a role any component reads) or `component` (owned by the components it names), the type of its values and whether it is `internal` (resolves and can be themed, and is left out of the documented set: the pictures of OS chrome). `tokens.json` carries the same under `$extensions["com.antfabric"]` as `tier`, `component` and `visibility`. No token's name or value changes.
+
 ## 1.1.0
 
 1.1.0 fixes the 1.0 component review (`reports/audit/2026-11-23-component-review.md`). It removes nothing, but several components change behaviour (see "Changed" below, and MIGRATION.md, "1.0 → 1.1").

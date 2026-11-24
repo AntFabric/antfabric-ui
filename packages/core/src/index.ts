@@ -15,6 +15,7 @@ export { primitives, primitiveMeta, primitivesFrom, type Primitives } from "./pr
 export { isReference, referencePath, primitiveAt, primitiveValue, primitiveVar, resolveValue, resolveTree, spell, type Reference, type Resolved } from "./refs";
 export { resolveTokens, tokenVars, type Native, type NativeTokens, type TokenVars, type Vars } from "./native";
 export { descriptions, type TokenNote, type TokenPath } from "./descriptions";
+export { tokenMeta, tokenRegistry, type DtcgType, type TokenGroup, type TokenMeta, type TokenSection, type TokenTier, type TokenVisibility } from "./token-registry";
 export * from "./art";
 export { menuItemKey, type ActionItem, type AppMark, type IconActionItem, type IconComponent, type IconName, type MenuItem, type NavItem } from "./items";
 export type { AgentStep, Approval, Attachment, AvatarIdentity, AvatarPresence, Person, QuestionOption, Reaction, ToolArg } from "./chat-items";

@@ -138,7 +138,7 @@ import { renderToString } from "react-dom/server";
 import { dirname, join } from "node:path";
 import { parseHTML } from "linkedom";
 import { icons as lucide } from "lucide";
-import { BRAND_FONT_PATHS, BRAND_PATHS, OS_VERSIONS, defaultStrings, formatParts, formatString, mergeStrings, stringsFor, stringsKey, PLATFORM_OS, PLATFORMS, STYLE_KEYS, antfabric, themes, brandValues, cssVarName, defineTheme, resolveTokens, tokens, tokensCss, themeCss, pascal, isReference, primitiveAt, primitiveMeta, primitiveValue, primitiveVar, primitives, primitivesFrom, platformOf, recipeEntries, recipeFor, recipeLayers, mergeLayers, recipes, referencedPrimitives, referencePath, tokenOf, tokenSource, tokenValues, type InteractionState, type OS, type Platform, type Recipe, type RecipeContext, type Scheme, type StateKey, type StyleKey, type StyleValue, type Theme, type ThemeInput } from "@antfabric/ui-core";
+import { BRAND_FONT_PATHS, BRAND_PATHS, OS_VERSIONS, defaultStrings, formatParts, formatString, mergeStrings, stringsFor, stringsKey, PLATFORM_OS, PLATFORMS, STYLE_KEYS, antfabric, themes, brandValues, cssVarName, defineTheme, resolveTokens, tokens, tokensCss, themeCss, pascal, isReference, primitiveAt, primitiveMeta, primitiveValue, primitiveVar, primitives, primitivesFrom, platformOf, recipeEntries, recipeFor, recipeLayers, mergeLayers, recipes, referencedPrimitives, referencePath, tokenMeta, tokenOf, tokenRegistry, tokenSource, tokenValues, type InteractionState, type OS, type Platform, type Recipe, type RecipeContext, type Scheme, type StateKey, type StyleKey, type StyleValue, type Theme, type ThemeInput } from "@antfabric/ui-core";
 import * as Core from "@antfabric/ui-core";
 import * as ReactKit from "@antfabric/ui-react";
 import * as NativeKit from "@antfabric/ui-react-native";
@@ -245,6 +245,34 @@ function checkTokenMap() {
   }
 }
 // A primitives.ts that was hand-edited or half generated (a path with no variable, a value that is an object, two paths that become one `--af-p-…`) breaks every reference to it without the product being involved.
+/**
+ * `packages/core/src/token-registry.ts` against the tokens and the docs: every top-level group of `tokens.ts` is declared and every declared
+ * group has a token; a component group names its owners, each a component the docs have, and a semantic group names none; and every
+ * component that reads a component group in its recipe is one of that group's owners, so the list says who a change reaches.
+ */
+function checkRegistry() {
+  const at = "packages/core/src/token-registry.ts";
+  const groups = new Set(tokenPaths().map((p) => p.split(".")[0]!));
+  for (const g of groups) if (!(g in tokenRegistry)) err(at, `the token group "${g}" is not declared`);
+  const ids = new Set(components.map((c) => c.id));
+  for (const [name, g] of Object.entries(tokenRegistry)) {
+    if (!groups.has(name)) err(at, `"${name}" is declared and tokens.ts has no such group`);
+    if (g.tier === "component" && !g.owners?.length) err(at, `"${name}" is a component group with no owners`);
+    if (g.tier === "semantic" && g.owners?.length) err(at, `"${name}" is semantic and names owners: a role belongs to no component`);
+    for (const o of g.owners ?? []) if (!ids.has(o)) err(at, `"${name}" is owned by "${o}", which is not a component id`);
+    if (g.owners && [...g.owners].sort().join() !== g.owners.join()) err(at, `"${name}": owners are not in alphabetical order`);
+  }
+  for (const p of tokenPaths()) if (p.split(".")[0]! in tokenRegistry) tokenMeta(p);
+  for (const [id, recipe] of Object.entries(recipes)) {
+    const read = new Set<string>();
+    JSON.stringify(recipe, (_, v) => (typeof v === "string" && v.startsWith("$") ? (read.add(v.slice(1).split(".")[0]!), v) : v));
+    for (const g of read) {
+      const entry = tokenRegistry[g];
+      if (entry?.tier === "component" && !entry.owners?.includes(id)) err(at, `recipe ${id} reads the component group "${g}" and is not one of its owners (${entry.owners?.join(", ")})`);
+    }
+  }
+}
+
 function checkPrimitives() {
   const at = "primitives.ts";
   const flat = new Map<string, string | number>();
@@ -2294,7 +2322,7 @@ function checkBare(doc: ComponentDocs, platform: Platform) {
 /* ---------- recipes ---------- */
 
 /** What a kit file may read with no recipe entry: the gaps that lay parts out (`space`) and how things move (`duration`, `ease`). Written here, not per recipe, so it stays small. */
-const STRUCTURAL = /^(space|duration|ease)\./;
+const STRUCTURAL = new RegExp(`^(${Object.entries(tokenRegistry).filter(([, g]) => g.structural).map(([name]) => name).join("|")})\\.`);
 const KIT_KEYS: Record<"react" | "react-native", Set<string>> = {
   react: new Set(["web", "desktop", "browser", "mac", "windows", "linux"]),
   "react-native": new Set(["mobile", "ios", "android"]),
@@ -3398,6 +3426,7 @@ function checkThemes() {
 /* ---------- run ---------- */
 
 if (!only.length || only.includes("tokens")) checkTokenMap();
+if (!only.length || only.includes("tokens")) checkRegistry();
 if (!only.length || only.includes("tokens") || only.includes("primitives")) checkPrimitives();
 if (!only.length || only.includes("tokens")) checkTokensJson();
 if (!only.length || only.includes("tokens") || only.includes("palette")) checkPalette();

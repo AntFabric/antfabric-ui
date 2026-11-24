@@ -6,7 +6,7 @@
  * grouping into sections, and `rowCount()` fails the build if a token lands in none of them.
  */
 
-import { cssVarName, descriptions, tokenValues, type TokenNote, type TokenPath } from "@antfabric/ui-core";
+import { cssVarName, descriptions, tokenRegistry, tokenValues, type TokenNote, type TokenPath, type TokenSection } from "@antfabric/ui-core";
 import { tokenLeaves, type Context, type Leaf } from "../../scripts/token-leaves";
 
 export type Platform = "web" | "desktop" | "mobile";
@@ -117,30 +117,35 @@ export interface Group {
 
 // The data components' groups (`chart`, `data`, `table`) each mix colours, shared values and per-platform sizes, which have different columns, so each
 // kind is its own table: `chart-theme`, `chart-profile`… The phone's files (`font.file*`, `chart.file*`) have one cell, not three, so they get their own too.
-const DATA_GROUPS = ["chart", "data", "table"];
+/** The groups `token-registry.ts` puts in a section, in the order it declares them. */
+const groupsIn = (section: TokenSection): string[] => Object.entries(tokenRegistry).filter(([, g]) => g.section === section).map(([name]) => name);
+
+const DATA_GROUPS = groupsIn("data");
 const groupName = (r: Row) => {
   const g = r.path.split(".")[0]!;
   if (DATA_GROUPS.includes(g)) return r.path.startsWith("chart.file") ? "chart-files" : `${g}-${r.kind}`;
   return r.path.startsWith("font.file") ? "fontFiles" : g;
 };
 
-// The groups that are not colours, in the order each section shows them. Everything else with a theme value is a colour.
+// The groups that are not colours, in the order each section shows them: which section a group is in, and in what order, is the registry's
+// (`packages/core/src/token-registry.ts`). Everything else with a theme value is a colour.
 const SECTIONS = {
-  type: ["text", "font", "fontFiles", "tracking"],
-  space: ["space", "gutter"],
-  radius: ["radius"],
-  size: ["control", "row", "breadcrumb", "topbar", "rail", "tabbar", "statusbar", "homeIndicator", "avatar", "icon", "border"],
+  // The phone's font files have one cell, not three, so they are a table of their own, after the families and weights.
+  type: groupsIn("type").flatMap((g) => (g === "font" ? ["font", "fontFiles"] : [g])),
+  space: groupsIn("space"),
+  radius: groupsIn("radius"),
+  size: groupsIn("size"),
   // A component's own decisions: every group not named in another section (`switch`, `button`, `chip`, `osNotification`…), so a
   // new component token always has a home. The colours of `switch` (and `danger.fg`) are in Colour with the rest of the theme.
-  components: [],
-  elevation: ["shadow"],
-  motion: ["duration", "ease"],
-  layers: ["z", "opacity"],
+  components: [] as string[],
+  elevation: groupsIn("elevation"),
+  motion: groupsIn("motion"),
+  layers: groupsIn("layers"),
   // `glass.blur` and `glass.saturate` are shared; the other `glass.*` are colours and sit in Colour.
-  materials: ["glass"],
+  materials: groupsIn("materials"),
   // The data components' own: the chart palette and the data status colours (themes), then the plot's geometry, dashes and text, then the table.
   data: ["chart-theme", "data-theme", "chart-profile", "chart-shared", "chart-files", "table-theme", "table-profile", "table-shared"],
-} as const;
+};
 export type Section = keyof SECTIONS_T | "colour";
 type SECTIONS_T = typeof SECTIONS;
 
