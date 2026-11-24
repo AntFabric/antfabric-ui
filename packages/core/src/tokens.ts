@@ -38,9 +38,9 @@
  * its own so no chart or KPI reads the brand or a status colour; `chart.*` and `table.*` point at the neutrals they share (`color.border.subtle` is
  * `chart.gridColor` in each theme) and hold the plot's geometry per platform.
  *
- * Paths are the product's Tier 2 names nested the way its generated object nests them (G2): the first
- * word is the group, the rest one camelCase key, so the product's `--fg-on-brand` is `color.text.onBrand` here and
- * `--af-color-text-on-brand` as a variable (see `vars.ts`).
+ * Paths follow one grammar (`naming.ts`): a semantic token is `category.property.role` (`color.text.onBrand`, `size.control.md`),
+ * a component token is `componentId.key` (`chip.removeSize`). The product's own name for each (`--fg-on-brand`) is in `tokens.map.json`,
+ * and a variable is `--af-` plus the kebab-cased path (see `vars.ts`).
  */
 
 import { ref, resolveAliases, resolveTree, type Resolved } from "./refs";

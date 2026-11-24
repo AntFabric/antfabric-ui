@@ -14,6 +14,7 @@
 - **`npx af-tokens-codemod <dir>`** (a bin of this package) rewrites `t.fg.muted`, `"$fg.muted"` and `--af-fg-muted` in your source; `--dry` lists what it would change. A theme's nested `tokens` object is moved by hand: `fg: { muted }` becomes `color: { text: { muted } }`.
 - **A theme's id does not move.** It is still hashed over the names the tokens had when ids were first made, so a stored theme and its scoped sheet keep their `data-af-theme-id`.
 - `tokenRegistry` is keyed by the new groups (`color`, `font`, `size`, `space`, `motion`, …).
+- **The naming rules are data.** `naming` (and `@antfabric/ui-core/naming.json`, served at `/naming.json`) holds the grammar, each category's properties, the words a component token's key ends in and a glossary; `tokenNameProblems(path)` says what is wrong with a name. `pnpm check names` holds every token to it.
 
 ### Changed (behaviour)
 

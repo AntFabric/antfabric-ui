@@ -490,6 +490,27 @@ function checkDeprecated() {
       }
 }
 
+/**
+ * Every token's name against the grammar (`packages/core/src/naming.ts`): a semantic token is `category.property.role` with a property
+ * its category has and no platform in it; a component token is `componentId.key` with a key in whole words that says what the value is.
+ * What breaks a rule today is in `reports/names.allow.json` with the rule it breaks: a name not listed fails, and a listed one that now
+ * passes must come off, so the list only shrinks. `naming.json` is what `namingJson()` writes.
+ */
+function checkNames() {
+  const at = "names";
+  const file = "reports/names.allow.json";
+  const allowed = JSON.parse(readFileSync(join(repoRoot(), file), "utf8")) as Record<string, string[]>;
+  if (readFileSync(join(repoRoot(), "packages/core/naming.json"), "utf8") !== Core.namingJson()) err("packages/core/naming.json", "is stale: run `pnpm tokens:build`");
+  const found: Record<string, string[]> = {};
+  for (const path of tokenPaths()) {
+    const problems = Core.tokenNameProblems(path);
+    if (problems.length) found[path] = problems;
+  }
+  if (process.env.AF_TODO_WRITE === "1") return void writeFileSync(join(repoRoot(), file), `${JSON.stringify(found, null, 2)}\n`);
+  for (const [path, problems] of Object.entries(found)) if (!(path in allowed)) err(at, `${path}: ${problems.join("; ")}. Rename it (with its old name in packages/core/renames.json), or it is the owner's call`);
+  for (const path of Object.keys(allowed)) if (!(path in found)) err(file, `${path} is listed and its name now passes: take it off`);
+}
+
 function checkPrimitives() {
   const at = "primitives.ts";
   const flat = new Map<string, string | number>();
@@ -3820,6 +3841,7 @@ if (!only.length || only.includes("tokens")) {
 }
 if (!only.length || only.includes("agent")) checkAgent();
 if (!only.length || only.includes("api")) checkApi();
+if (!only.length || only.includes("tokens") || only.includes("names")) checkNames();
 if (!only.length || only.includes("tokens") || only.includes("deprecated")) checkDeprecated();
 if (!only.length || only.includes("architecture")) checkArchitecture();
 if (!only.length || only.includes("literals")) checkLiterals();

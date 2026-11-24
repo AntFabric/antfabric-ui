@@ -199,6 +199,26 @@ export const switchRecipe = defineRecipe({
   rest render with the kit's defaults only (a `required` prop takes its `sample`), the English strings and the `neutral` theme, which
   is what a product gets before it passes anything. A kit default that changes, or a built-in string that is reworded, moves it.
 
+## Tokens: which one, and what to call a new one
+
+A size or a colour in a component reads a token. Go down this list and stop at the first that fits.
+
+1. **A semantic token whose role fits.** Read it: `$color.text.muted`, `$space.md`, `$size.control.md`, `$radius.card`. Most styles end here.
+2. **The same role, but a theme should be able to retarget it for this component alone.** Add a component token that is an alias of the semantic one: `gridColor: ref.text("color.border.subtle")` under `chart` in `tokens.ts`. It follows the role until a theme sets it.
+3. **A value of this component's own that a theme may reasonably change** (a part's height, padding, radius). Add a component token: `<componentId>.<part><Property><Variant>`, one camelCase key in whole words that ends in what the value is: `chip.removeSize`, `select.panelMaxHeight`, `dialog.widthForm`.
+4. **Private geometry** (a nudge, an overhang, a loading placeholder's width, a picture of OS chrome). Still a token, so the literal ratchet holds, in a group marked `visibility: "internal"` in `packages/core/src/token-registry.ts`.
+
+Naming rules, held by `pnpm check names` (`packages/core/src/naming.ts`, served at `/naming.json`):
+
+- A semantic token is `category.property.role`. The categories and their properties are fixed: `color.text | background | border`, `font.family | size | lineHeight | weight | letterSpacing | file`, `size.control | icon | stroke | dot | row | avatar | target | layout`, `motion.duration | easing`, `elevation.shadow`, `border.width`, and `space`, `radius`, `zIndex`, `opacity` with no property level. A new category or property is the owner's decision: open an issue.
+- A component token's group is the camelCase of the component's docs id, or a family several components share and the registry declares (`chart`, `kpi`, `choice`, `sheet`). Its owners are listed in the registry, and a recipe that reads a component group it does not own fails `pnpm check tokens`.
+- Whole words: `Height`, `Width`, `PaddingX`, never `H`, `W`, `Pad`.
+- Never a mode in a name. Light and dark, and web, desktop, mobile and Android, are values of one token.
+- An alias points down the tiers: a component token at a semantic one, or at one of its own group; a semantic one at another semantic one.
+- A description says what the token is for. If it would say "the same value as X", make it an alias of X instead.
+
+To rename a token, add the old and new path to `packages/core/renames.json` and follow "Renaming a token" in `CLAUDE.md`: the old name keeps working until the next major version.
+
 ## Both kits
 
 - **Styles** come from the recipe, never from the kit file: the recipe says which token each part reads.
