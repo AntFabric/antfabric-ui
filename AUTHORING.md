@@ -77,9 +77,9 @@ export const switchRecipe = defineRecipe({
   parts: ["root", "track", "thumb"],                 // each is drawn with data-af-part / testID
   styles: {
     track: {
-      base: { width: "$switch.trackW", radius: "$radius.pill", bg: "$switch.trackOff" },
-      variants: { size: { sm: { height: "$control.hSm" } } },     // prop → value → style (the docs' options)
-      states: { on: { bg: "$brand.default" }, "hover+on": { bg: "$brand.hover" } },
+      base: { width: "$switch.trackWidth", radius: "$radius.pill", bg: "$switch.trackOffColor" },
+      variants: { size: { sm: { height: "$size.control.sm" } } },     // prop → value → style (the docs' options)
+      states: { on: { bg: "$color.background.brand.default" }, "hover+on": { bg: "$color.background.brand.hover" } },
       platforms: { mobile: { base: { padding: "$space.sm" } } },  // where the phone differs
     },
   },
@@ -356,7 +356,7 @@ The same file serves the browser and the desktop app. What differs comes from `u
 - **Press** comes from `usePress({ disabled })`: `pressed`, `focused`, `disabled`, and `handlers` for
   the `Pressable`. There is no hover on a phone.
 - **Accessibility:** `accessibilityRole`, `accessibilityLabel`, `accessibilityState`. A control drawn under 44pt gets
-  `hitSlop={hitSlopTo(t.control.hit, height, width)}` (`lib/a11y.ts`); an overlay closes on Android's back (`useBackHandler`).
+  `hitSlop={hitSlopTo(t.size.target.min, height, width)}` (`lib/a11y.ts`); an overlay closes on Android's back (`useBackHandler`).
 - **Dynamic Type:** each `Text` takes `maxFontSizeMultiplier={fontScale.content | control | chrome}` (`lib/type.ts`), and a control that
   holds a label has a `minHeight`, not a fixed `height`, so the grown label fits.
 - **Reduce Motion** is `useReducedMotion()` (state that follows Settings) or `reducedMotion()` outside render, from `lib/motion.tsx`:

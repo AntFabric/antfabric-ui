@@ -54,10 +54,10 @@ const docs: ComponentDocs = {
       import: "import { GoalRings } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath: recharts is reached only from there. The rings are handed an explicit size, never a responsive container.",
-        "Each band is `chart.ringW` thick with `chart.ringGap` between it and the next ring in; the outermost is the first goal. A ring is its value Pie over a whole track Pie, so the round end of a value sits on the track.",
+        "Each band is `chart.ringWidth` thick with `chart.ringGap` between it and the next ring in; the outermost is the first goal. A ring is its value Pie over a whole track Pie, so the round end of a value sits on the track.",
         "The overall share is the mean of the rings' fill: a goal that is passed counts as whole and cannot make up for one that is not. Pointing at a ring or at its goal (or tabbing to it) lights it: the other rings and goals fade to 38% over 150ms on the kit's ease-out, and the middle's number eases to that goal's own share (MetricValue) under \"This goal\", past 100% when it is passed (a full ring, 116%).",
         "The rings draw in once over 600ms on the kit's ease-out. Reduced motion turns it off.",
-        "The list sits beside the rings and drops under them when the card is narrower than the rings, the gap and `chart.listMinW`.",
+        "The list sits beside the rings and drops under them when the card is narrower than the rings, the gap and `chart.listMinWidth`.",
       ],
       keyboard: [
         { keys: "Tab", action: "Moves through the goals in the list, then to \"View as table\". A goal that has focus is lit, and so is its ring" },
@@ -79,7 +79,7 @@ const docs: ComponentDocs = {
       base: "The kit's Card (pad none) around a View: the same header and Button, a ChartFrame holding one react-native-gifted-charts PieChart `donut` per ring, stacked in views as wide as each ring's outer edge (each starts at 12 o'clock), MetricValue in the middle, and the goals below as Pressable rows",
       import: "import { GoalRings } from \"@antfabric/ui-react-native/data\"",
       notes: [
-        "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there. The rings are a little larger than the web's (`chart.ringSize` is 200pt, `chart.ringW` 15pt).",
+        "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there. The rings are a little larger than the web's (`chart.ringSize` is 200pt, `chart.ringWidth` 15pt).",
         "gifted-charts' slices have square ends, so the rings have none of the web's round ones. The list is below the rings, full width, each goal at least 44pt tall.",
         "A phone has no hover, so a tap on a ring or on a goal picks it (the others step back to 38% and the middle shows its share, and `onSelectedChange` is called) and a tap on it again puts it back. gifted-charts' own press reads page coordinates on the web, which are wrong wherever the chart is not at the page's corner, so the kit finds the ring from where the touch landed in the square (`ringAt`).",
         "The rings pop in over 220ms unless the person reduces motion: gifted-charts' pie draws no sweep of its own.",

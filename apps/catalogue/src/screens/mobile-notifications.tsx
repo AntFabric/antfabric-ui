@@ -7,7 +7,7 @@ import { swipeRowActions } from "@antfabric/ui-docs/samples";
 export default function MobileNotifications() {
   const { t } = useTheme();
   return (
-    <View style={{ flex: 1, position: "relative", backgroundColor: t.surface.app }}>
+    <View style={{ flex: 1, position: "relative", backgroundColor: t.color.background.app }}>
       <MobileHeader variant="pushed" title="Notifications" statusBar={false} actions={[{ key: "mark-read", icon: "check-check", label: "Mark all as read" }]} />
 
       <View style={{ paddingHorizontal: t.space.lg, paddingVertical: t.space.sm }}>
@@ -80,7 +80,7 @@ export default function MobileNotifications() {
         />
       </ScrollView>
 
-      <View style={{ position: "absolute", top: t.space.xs, left: t.space.sm, right: t.space.sm, zIndex: t.z.toast }}>
+      <View style={{ position: "absolute", top: t.space.xs, left: t.space.sm, right: t.space.sm, zIndex: t.zIndex.toast }}>
         <InAppBanner
           lead="Mentioned you"
           title="Mei Tanaka"

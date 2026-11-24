@@ -17,7 +17,7 @@
  *   tokens.json  packages/core/tokens.json (the W3C Design Tokens file, `pnpm tokens:build`) equals what `tokensJson()` writes now,
  *            every token has a `$type` (its own or its group's), a `$value` of the shape that type needs and a description, no key is
  *            neither a `$` key nor a group, and its tokens are exactly the leaves of tokens.map.json
- *   palette  the chart palette (part of `tokens`; `pnpm check tokens` runs it): for each theme the eight series against `surface.card` hold OKLCH
+ *   palette  the chart palette (part of `tokens`; `pnpm check tokens` runs it): for each theme the eight series against `color.background.card` hold OKLCH
  *            lightness in a band (light 0.43–0.77, dark 0.48–0.67), chroma of at least 0.10, neighbours at least 8 apart under protan and
  *            deutan vision (OKLab ΔE × 100, Machado–Oliveira–Fernandes 2009 at severity 1) and at least 15 apart in normal vision. A series
  *            under 3:1 on the card, and the last colour beside the first (where a ninth series wraps), are notes: the relief is the tooltip and
@@ -233,7 +233,7 @@ function checkTokenMap() {
   const map = JSON.parse(readFileSync(file, "utf8")) as Record<string, { source?: string; mobile?: string; note?: string }>;
   const at = "tokens.map.json";
   for (const path of TOKENS) if (!map[path]) err(at, `token "${path}" has no entry`);
-  // Two paths that kebab-case to one `--af-…` name (`control.hMd` and `control.h-md`) would silently share a value in the stylesheet.
+  // Two paths that kebab-case to one `--af-…` name (`size.control.md` and `control.h-md`) would silently share a value in the stylesheet.
   const named = new Map<string, string>();
   for (const path of TOKENS) {
     const v = cssVarName(path);
@@ -369,8 +369,22 @@ function checkAliases() {
   expect("the sheet writes an alias as its target's variable", flattenCss({ grid: { lineW: "{edge.softW}" }, edge: { softW: 1 } }, "", [], new Set()), [["--af-grid-line-w", "var(--af-edge-soft-w)"], ["--af-edge-soft-w", "1px"]]);
   const doc = {
     shared: { grid: { line: "{edge.soft}", rule: "{grid.line}" }, edge: { soft: 1 } },
-    themes: { light: { ink: { chart: "{ink.body}", body: "#111" } }, dark: { ink: { chart: "{ink.body}", body: "#eee" } } },
-    profiles: { web: {}, desktop: {}, mobile: { grid: { line: 9 } } },
+    themes: { light: {
+      ink: {
+        chart: "{ink.body}",
+        body: "#111",
+      },
+    }, dark: {
+      ink: {
+        chart: "{ink.body}",
+        body: "#eee",
+      },
+    } },
+    profiles: { web: {}, desktop: {}, mobile: {
+      grid: {
+        line: 9,
+      },
+    } },
     os: { android: {} },
   };
   const table = aliasTable(doc);
@@ -390,13 +404,28 @@ function checkAliases() {
 
   // And through the real readers: a theme that sets a target and not its alias moves both, on the web and on the phone, in that scheme only.
   if (count) {
-    const moved = defineTheme({ name: "alias follows", extends: null, tokens: { schemes: { light: { border: { subtle: "#123456" } } } } });
-    expect("tokenValues follows a theme's target", tokenValues("web", "light", undefined, moved)[cssVarName("chart.grid")], "#123456");
+    const moved = defineTheme({ name: "alias follows", extends: null, tokens: { schemes: { light: {
+      color: {
+        border: {
+          subtle: "#123456",
+        },
+      },
+    } } } });
+    expect("tokenValues follows a theme's target", tokenValues("web", "light", undefined, moved)[cssVarName("chart.gridColor")], "#123456");
     expect("resolveTokens follows a theme's target", resolveTokens("mobile", "light", { theme: moved }).chart.grid, "#123456");
-    expect("the other scheme is left alone", tokenValues("web", "dark", undefined, moved)[cssVarName("chart.grid")], tokenValues("web", "dark")[cssVarName("border.subtle")]);
-    const held = defineTheme({ name: "alias held", extends: null, tokens: { schemes: { light: { border: { subtle: "#123456" }, chart: { grid: "#654321" } } } } });
-    expect("a theme that sets the alias too keeps it", [tokenValues("web", "light", undefined, held)[cssVarName("chart.grid")], resolveTokens("mobile", "light", { theme: held }).chart.grid], ["#654321", "#654321"]);
-    if (!themeCss(moved).includes("--af-border-subtle:#123456") || themeCss(moved).includes("--af-chart-grid")) err(eng, `themeCss sets the target and leaves the alias to follow: ${themeCss(moved)}`);
+    expect("the other scheme is left alone", tokenValues("web", "dark", undefined, moved)[cssVarName("chart.gridColor")], tokenValues("web", "dark")[cssVarName("color.border.subtle")]);
+    const held = defineTheme({ name: "alias held", extends: null, tokens: { schemes: { light: {
+      color: {
+        border: {
+          subtle: "#123456",
+        },
+      },
+      chart: {
+        gridColor: "#654321",
+      },
+    } } } });
+    expect("a theme that sets the alias too keeps it", [tokenValues("web", "light", undefined, held)[cssVarName("chart.gridColor")], resolveTokens("mobile", "light", { theme: held }).chart.grid], ["#654321", "#654321"]);
+    if (!themeCss(moved).includes("--af-color-border-subtle:#123456") || themeCss(moved).includes("--af-chart-grid-color")) err(eng, `themeCss sets the target and leaves the alias to follow: ${themeCss(moved)}`);
   }
   if (!quiet) console.log(`  aliases: ${count} in tokens.ts`);
 }
@@ -424,16 +453,21 @@ function checkDeprecated() {
     if (now in map) err(at, `${old} is renamed to ${now}, which is itself renamed: name the last one`);
     if (liveGroups.has(old)) err(at, `the old name ${old} is a group of current tokens, so t.${old} cannot be a value`);
     if (oldGroups.has(now)) err(at, `${now} is a group of old names, so t.${now} cannot be a value while they are kept`);
+    // A rename that only moved a dot keeps its variable (`font.weightBold` and `font.weight.bold` are both `--af-font-weight-bold`): that is one name, not two.
     const name = cssVarName(old);
-    if (vars.has(name)) err(at, `${old} and ${vars.get(name)} are both ${name}`);
+    if (vars.has(name) && vars.get(name) !== now) err(at, `${old} and ${vars.get(name)} are both ${name}`);
     vars.set(name, old);
   }
   const n = Object.keys(map).length;
   if (n) {
     const [old, now] = Object.entries(map)[0]!;
     const sheet = tokensCss();
-    if (!sheet.includes(`${cssVarName(old)}:var(${cssVarName(now)})`)) err(at, `tokensCss() does not declare ${cssVarName(old)} as ${cssVarName(now)}`);
-    if (tokensCss({ deprecated: false }).includes(`${cssVarName(old)}:`)) err(at, "tokensCss({ deprecated: false }) still declares an old variable");
+    const bare = tokensCss({ deprecated: false });
+    for (const [o, w] of Object.entries(map)) {
+      if (cssVarName(o) === cssVarName(w)) continue;
+      if (!sheet.includes(`${cssVarName(o)}:var(${cssVarName(w)})`)) err(at, `tokensCss() does not declare ${cssVarName(o)} as ${cssVarName(w)}`);
+      if (bare.includes(`${cssVarName(o)}:`)) err(at, `tokensCss({ deprecated: false }) still declares ${cssVarName(o)}`);
+    }
     const read = (tree: unknown, path: string) => path.split(".").reduce<unknown>((x, k) => (x as Record<string, unknown> | undefined)?.[k], tree);
     for (const [o, w] of Object.entries(map)) {
       if (read(ReactKit.t, w) !== undefined && read(ReactKit.t, o) !== read(ReactKit.t, w)) err(at, `t.${o} is not t.${w} in the React kit`);
@@ -441,14 +475,18 @@ function checkDeprecated() {
       if (read(phone, w) !== undefined && read(phone, o) !== read(phone, w)) err(at, `t.${o} is not t.${w} on the phone`);
     }
   }
+  // The codemod leaves every current name alone, however it is written, so running it twice is running it once.
+  const current = [...live].map((p) => `t.${p} tokens.themes.light.${p} "$${p}" ${cssVarName(p)} "${p}"`).join("\n");
+  if (rewriteRenames(current, { strings: true }).text !== current) err(at, "the codemod rewrites a current token name: a new path reads as an old one somewhere");
   // Nothing here reads an old name. The files that are about the old names are left out.
-  const SKIP = /(^|\/)(node_modules|dist|\.astro)\/|deprecated(\.gen)?\.ts$|renames\.json$|CHANGELOG\.md$|MIGRATION\.md$|codemod\/|\.snapshot\.json$|components\.json$|tokens\.json$|tokens\.map\.json$/;
+  const SKIP = /(^|\/)(node_modules|dist|\.astro)\/|deprecated(\.gen)?\.ts$|primitives\.ts$|renames\.json$|CHANGELOG\.md$|MIGRATION\.md$|codemod\/|\.snapshot\.json$|components\.json$|tokens\.json$|tokens\.map\.json$/;
   const walk = (dir: string): string[] => readdirSync(dir).flatMap((f) => { const p = `${dir}/${f}`; return SKIP.test(p) ? [] : statSync(p).isDirectory() ? walk(p) : /\.(tsx?|mts|mjs|astro|css|md)$/.test(f) ? [p] : []; });
   if (n)
     for (const dir of ["packages/core/src", "packages/react/src", "packages/react-native/src", "packages/docs/src", "apps/catalogue/src"])
       for (const file of walk(join(repoRoot(), dir))) {
-        const { count } = rewriteRenames(readFileSync(file, "utf8"));
-        if (count) err(file.slice(repoRoot().length + 1), `reads ${count} renamed token name(s): run \`node packages/core/codemod/rename-tokens.mjs ${dir}\``);
+        const before = readFileSync(file, "utf8");
+        const { count, text } = rewriteRenames(before);
+        if (count && text !== before) err(file.slice(repoRoot().length + 1), `reads ${count} renamed token name(s): run \`node packages/core/codemod/rename-tokens.mjs ${dir}\``);
       }
 }
 
@@ -561,6 +599,7 @@ function checkTokensJson() {
   const valid = (type: string, v: unknown) => (typeof v === "string" && REFERENCE.test(v)) || SHAPES[type]![1](v);
 
   const found = new Set<string>();
+  const renamed = new Set<string>();
   const pointedAt = new Set<string>();
   const walk = (node: Record<string, unknown>, path: string, inherited: string | undefined) => {
     const type = typeof node.$type === "string" ? node.$type : inherited;
@@ -577,7 +616,9 @@ function checkTokensJson() {
         for (const [m, v] of Object.entries(modes)) if (!valid(type, v)) err(at, `${where}: mode ${m} is not ${SHAPES[type]![0]}`);
       }
       for (const v of [node.$value, ...(isObj(modes) ? Object.values(modes) : [])]) if (typeof v === "string" && REFERENCE.test(v)) pointedAt.add(v.slice(1, -1));
-      for (const k of Object.keys(node)) if (!["$type", "$value", "$description", "$extensions"].includes(k)) err(at, `${where} has "${k}", which a token does not`);
+      // A renamed token's old path stays as a deprecated alias (the format's `$deprecated`); it has no map entry of its own.
+      if ("$deprecated" in node) renamed.add(where);
+      for (const k of Object.keys(node)) if (!["$type", "$value", "$description", "$extensions", "$deprecated"].includes(k)) err(at, `${where} has "${k}", which a token does not`);
       return;
     }
     for (const [k, child] of Object.entries(node)) {
@@ -587,10 +628,11 @@ function checkTokensJson() {
     }
   };
   walk(doc, "", undefined);
+  for (const [old, now] of Object.entries(readRenames())) if (!renamed.has(old)) err(at, `${old} was renamed to ${now} and tokens.json does not keep it as a deprecated alias`);
 
   // The `primitives` group is the product's, not a leaf of tokens.ts, so it has no map entry; what points into it must exist.
   const mapped = new Set(Object.keys(JSON.parse(readFileSync(fileURLToPath(new URL("../../../packages/core/tokens.map.json", import.meta.url)), "utf8"))).filter((k) => !k.startsWith("$")));
-  const ours = new Set([...found].filter((p) => !p.startsWith("primitives.")));
+  const ours = new Set([...found].filter((p) => !p.startsWith("primitives.") && !renamed.has(p)));
   for (const p of mapped) if (!ours.has(p)) err(at, `tokens.map.json has "${p}" but tokens.json has no such token`);
   for (const p of ours) if (!mapped.has(p)) err(at, `"${p}" is in tokens.json but not in tokens.map.json`);
   for (const p of pointedAt) if (!found.has(p)) err(at, `a token points at {${p}}, which tokens.json does not declare`);
@@ -732,12 +774,12 @@ function checkContrast() {
     const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p) as [number, number];
     return (x + 0.05) / (y + 0.05);
   };
-  const SURFACES = ["surface.page", "surface.card", "surface.raised", "surface.sidebar"];
-  const MARKS = [...Array.from({ length: 8 }, (_, i) => `chart.series${i + 1}`), "chart.previous", "chart.other", "data.accent", "data.positive", "data.negative", "data.warning", "focus.ring"];
+  const SURFACES = ["color.background.page", "color.background.card", "color.background.raised", "color.background.sidebar"];
+  const MARKS = [...Array.from({ length: 8 }, (_, i) => `chart.series${i + 1}Color`), "chart.previousColor", "chart.otherColor", "color.background.data.accent", "color.background.data.positive", "color.background.data.negative", "color.background.data.warning", "color.border.focus"];
   const pairs: [fg: string, bg: string, min: number][] = [
-    ...["brand.default", "brand.hover", "brand.active"].map((bg) => ["fg.onBrand", bg, 4.5] as [string, string, number]),
-    ...["fg.body", "fg.muted"].flatMap((fg) => SURFACES.map((bg) => [fg, bg, 4.5] as [string, string, number])),
-    ...MARKS.map((fg) => [fg, "surface.card", 3] as [string, string, number]),
+    ...["color.background.brand.default", "color.background.brand.hover", "color.background.brand.pressed"].map((bg) => ["color.text.onBrand", bg, 4.5] as [string, string, number]),
+    ...["color.text.body", "color.text.muted"].flatMap((fg) => SURFACES.map((bg) => [fg, bg, 4.5] as [string, string, number])),
+    ...MARKS.map((fg) => [fg, "color.background.card", 3] as [string, string, number]),
   ];
   const probes: [string, Theme][] = [
     ["antfabric", antfabric],
@@ -752,9 +794,9 @@ function checkContrast() {
       // The web's values (not `resolveTokens`, whose memo is bounded and would push out what `checkBrand` holds it to).
       const values = tokenValues("web", scheme, undefined, theme);
       const get = (path: string) => parse(values[cssVarName(path)]!);
-      const page = over(get("surface.page"), scheme === "light" ? [255, 255, 255, 1] : [0, 0, 0, 1]);
+      const page = over(get("color.background.page"), scheme === "light" ? [255, 255, 255, 1] : [0, 0, 0, 1]);
       for (const [fg, bg, min] of pairs) {
-        const ground = bg === "surface.page" ? page : over(get(bg), page);
+        const ground = bg === "color.background.page" ? page : over(get(bg), page);
         const r = ratio(over(get(fg), ground), ground);
         const key = `${name}/${scheme}: ${fg} on ${bg}`;
         seen.add(key);
@@ -783,7 +825,7 @@ function checkPalette() {
   const EPS = 0.0005; // lightness is held to three places
   for (const theme of ["light", "dark"] as const) {
     const t = tokens.themes[theme];
-    const series = Object.keys(t.chart).filter((k) => /^series\d+$/.test(k)).sort() as (keyof typeof t.chart)[];
+    const series = Object.keys(t.chart).filter((k) => /^series\d+Color$/.test(k)).sort() as (keyof typeof t.chart)[];
     if (series.length !== 8) err(at, `${theme}: ${series.length} series colours, expected 8`);
     const colours = series.map((k) => t.chart[k]) as string[];
     const [lo, hi] = BAND[theme];
@@ -801,7 +843,7 @@ function checkPalette() {
       if (s.colourBlind < MIN_BLIND) err(at, `${theme} series ${i + 1} and ${i + 2}: ${s.colourBlind.toFixed(1)} apart under protan or deutan vision, need ${MIN_BLIND}`);
       if (s.normal < MIN_NORMAL) err(at, `${theme} series ${i + 1} and ${i + 2}: ${s.normal.toFixed(1)} apart, need ${MIN_NORMAL}`);
     }
-    const card = t.surface.card;
+    const card = t.color.background.card;
     const low = colours.flatMap((c, i) => (contrast(c, card) < 3 ? [i + 1] : []));
     const wrap = separation(colours[colours.length - 1]!, colours[0]!);
     if (!quiet) {
@@ -2601,7 +2643,7 @@ function checkRecipeOverrides() {
       button: {
         root: {
           base: { radius: "$radius.card", font: "none" }, // one cell replaced, one removed
-          variants: { variant: { primary: { bg: "$brand.hover", states: { hover: { bg: "$brand.active" } } } } }, // a variant's cell and a state inside it
+          variants: { variant: { primary: { bg: "$color.background.brand.hover", states: { hover: { bg: "$color.background.brand.pressed" } } } } }, // a variant's cell and a state inside it
           platforms: { mobile: { base: { gap: "$space.sm" } } }, // a platform entry the recipe does not have
         },
       },
@@ -2617,7 +2659,7 @@ function checkRecipeOverrides() {
     const out: Partial<Record<StyleKey, StyleValue>> = { radius: "$radius.card", font: "none" };
     if (ctx.variants?.variant === "primary") {
       const hover = ctx.state?.hover && ctx.platform !== "mobile";
-      out.bg = ctx.state?.pressed ? "$brand.active" : hover ? "$brand.active" : "$brand.hover"; // the recipe's own pressed comes after hover
+      out.bg = ctx.state?.pressed ? "$color.background.brand.pressed" : hover ? "$color.background.brand.pressed" : "$color.background.brand.hover"; // the recipe's own pressed comes after hover
     }
     if (ctx.platform === "mobile") out.gap = "$space.sm";
     return out;
@@ -2647,7 +2689,7 @@ function checkRecipeOverrides() {
   if (contexts < 1000) err(at, `only ${contexts} contexts were compared`);
 
   // The recipe is untouched, parts the override does not name are the recipe's own objects, and `"none"` stays a cell for the readers to drop.
-  if (button.styles.root.base.radius !== "$radius.pill" || button.styles.root.base.font !== "$font.sans") err(at, "recipeFor changed recipes.button itself");
+  if (button.styles.root.base.radius !== "$radius.pill" || button.styles.root.base.font !== "$font.family.sans") err(at, "recipeFor changed recipes.button itself");
   if (merged.styles.icon !== button.styles.icon || merged.styles.shortcut !== button.styles.shortcut) err(at, "a part the override does not name is not the recipe's own object");
   if (merged.parts !== button.parts) err(at, "the merged recipe's parts are not the recipe's");
 
@@ -2662,17 +2704,17 @@ function checkRecipeOverrides() {
   if (recipeFor(fixture, merged) !== merged) err(at, "recipeFor on a merged recipe merged it again");
 
   // A child's cell replaces its parent's; the parent's other cells stay; recipes are part of the id.
-  const child = defineTheme({ name: "Recipe child", extends: fixture, recipes: { button: { root: { base: { radius: "$radius.control" } }, icon: { base: { fg: "$fg.muted" } } } } });
+  const child = defineTheme({ name: "Recipe child", extends: fixture, recipes: { button: { root: { base: { radius: "$radius.control" } }, icon: { base: { fg: "$color.text.muted" } } } } });
   const kid = recipeFor(child, button);
   const kidRoot = kid.styles.root as { base?: Record<string, string>; variants?: Record<string, Record<string, Record<string, unknown>>> };
   if (kidRoot.base?.radius !== "$radius.control") err(at, `a child's radius is ${kidRoot.base?.radius}, not its own $radius.control`);
-  if (kidRoot.base?.font !== "none" || kidRoot.variants?.variant?.primary?.bg !== "$brand.hover") err(at, "a child theme dropped its parent's recipe cells");
-  if ((kid.styles.icon as { base?: Record<string, string> }).base?.fg !== "$fg.muted") err(at, "a child's own part override is missing");
+  if (kidRoot.base?.font !== "none" || kidRoot.variants?.variant?.primary?.bg !== "$color.background.brand.hover") err(at, "a child theme dropped its parent's recipe cells");
+  if ((kid.styles.icon as { base?: Record<string, string> }).base?.fg !== "$color.text.muted") err(at, "a child's own part override is missing");
   if (child.id === fixture.id) err(at, "a child with its own recipe cells has its parent's id");
 
   // Written in another order: the same id and the same merged order (a state the recipe lacks is added in STATE_KEYS order).
-  const a = defineTheme({ name: "Order", extends: null, recipes: { button: { icon: { states: { pressed: { fg: "$fg.strong" }, hover: { fg: "$fg.body" } } } } } });
-  const b = defineTheme({ name: "Order", extends: null, recipes: { button: { icon: { states: { hover: { fg: "$fg.body" }, pressed: { fg: "$fg.strong" } } } } } });
+  const a = defineTheme({ name: "Order", extends: null, recipes: { button: { icon: { states: { pressed: { fg: "$color.text.strong" }, hover: { fg: "$color.text.body" } } } } } });
+  const b = defineTheme({ name: "Order", extends: null, recipes: { button: { icon: { states: { hover: { fg: "$color.text.body" }, pressed: { fg: "$color.text.strong" } } } } } });
   if (a.id !== b.id) err(at, "the same overrides written in another order have another id");
   const order = (t: Theme) => Object.keys((recipeFor(t, button).styles.icon as { states?: object }).states ?? {}).join(",");
   if (order(a) !== "hover,pressed" || order(b) !== "hover,pressed") err(at, `added states merge in the order written (${order(a)} / ${order(b)}), not hover,pressed`);
@@ -2691,17 +2733,17 @@ function checkRecipeOverrides() {
   };
   throws("recipes that are not an object", ["button"], ["recipes"]);
   throws("an unknown recipe id", { buton: { root: {} } }, ["buton"]);
-  throws("an unknown part", { button: { label: { base: { fg: "$fg.body" } } } }, ["button.label"]);
+  throws("an unknown part", { button: { label: { base: { fg: "$color.text.body" } } } }, ["button.label"]);
   throws("an unknown layer", { button: { root: { on: ["web"] } } }, ["button.root.on"]);
   throws("a platforms entry inside a platform", { button: { root: { platforms: { mobile: { platforms: {} } } } } }, ["button.root.platforms.mobile.platforms"]);
-  throws("an unknown variant prop", { button: { root: { variants: { tone: { brand: { bg: "$brand.default" } } } } } }, ["button.root.variants.tone"]);
-  throws("an unknown variant value", { button: { root: { variants: { variant: { brand: { bg: "$brand.default" } } } } } }, ["button.root.variants.variant.brand"]);
+  throws("an unknown variant prop", { button: { root: { variants: { tone: { brand: { bg: "$color.background.brand.default" } } } } } }, ["button.root.variants.tone"]);
+  throws("an unknown variant value", { button: { root: { variants: { variant: { brand: { bg: "$color.background.brand.default" } } } } } }, ["button.root.variants.variant.brand"]);
   throws("a variant prop on a recipe with none", { "tab-bar": { bar: { variants: { size: { sm: {} } } } } }, ["tab-bar.bar.variants.size"]);
-  throws("an unknown state", { button: { root: { states: { hovered: { bg: "$brand.hover" } } } } }, ["button.root.states.hovered"]);
-  throws("three states joined", { button: { root: { states: { "hover+pressed+focus": { bg: "$brand.hover" } } } } }, ["button.root.states.hover+pressed+focus"]);
-  throws("an unknown state inside a variant", { button: { root: { variants: { variant: { primary: { states: { active: { bg: "$brand.hover" } } } } } } } }, ["button.root.variants.variant.primary.states.active"]);
+  throws("an unknown state", { button: { root: { states: { hovered: { bg: "$color.background.brand.hover" } } } } }, ["button.root.states.hovered"]);
+  throws("three states joined", { button: { root: { states: { "hover+pressed+focus": { bg: "$color.background.brand.hover" } } } } }, ["button.root.states.hover+pressed+focus"]);
+  throws("an unknown state inside a variant", { button: { root: { variants: { variant: { primary: { states: { active: { bg: "$color.background.brand.hover" } } } } } } } }, ["button.root.variants.variant.primary.states.active"]);
   throws("an unknown platform key", { button: { root: { platforms: { tablet: { base: { gap: "$space.sm" } } } } } }, ["button.root.platforms.tablet"]);
-  throws("an unknown style key", { button: { root: { base: { colour: "$fg.body" } } } }, ["button.root.base.colour"]);
+  throws("an unknown style key", { button: { root: { base: { colour: "$color.text.body" } } } }, ["button.root.base.colour"]);
   throws("a literal value", { button: { root: { base: { bg: "#ffffff" } } } }, ["button.root.base.bg", "#ffffff"]);
   throws("a token the tokens do not have", { button: { root: { base: { radius: "$radius.nope" } } } }, ["button.root.base.radius", "$radius.nope"]);
   throws("a number", { button: { root: { platforms: { android: { base: { radius: 4 } } } } } }, ["button.root.platforms.android.base.radius"]);
@@ -3046,8 +3088,9 @@ function checkNesting() {
 // A tenant's colours over the defaults: only the brand family moves, nothing moves without a brand, and both kits draw it.
 function checkBrand() {
   const at = "themes";
+  // Current names only: a renamed token's old key is still on `t`, holding the same value, and is held by `pnpm check deprecated`.
   const flat = (v: unknown, path = ""): Record<string, unknown> =>
-    typeof v === "object" && v !== null ? Object.assign({}, ...Object.entries(v).map(([k, x]) => flat(x, path ? `${path}.${k}` : k))) : { [path]: v };
+    typeof v === "object" && v !== null ? Object.assign({}, ...Object.entries(v).map(([k, x]) => flat(x, path ? `${path}.${k}` : k))) : Core.isDeprecatedPath(path) ? {} : { [path]: v };
   const moved = (a: object, b: object) => {
     const fa = flat(a);
     const fb = flat(b);
@@ -3082,17 +3125,17 @@ function checkBrand() {
     // With one, only the family moves: all of it for a primary and an accent, the accent's pair for an accent alone, the rest for a primary alone.
     const branded = through(brand);
     same(moved(plain, branded), family, `${where} primary and accent`);
-    same(moved(plain, through({ accent: brand.accent })), ["accent.default", "accent.soft"], `${where} accent alone`);
-    same(moved(plain, through({ primary: brand.primary })), family.filter((p) => !p.startsWith("accent.")), `${where} primary alone`);
+    same(moved(plain, through({ accent: brand.accent })), ["color.background.accent.default", "color.background.accent.soft"], `${where} accent alone`);
+    same(moved(plain, through({ primary: brand.primary })), family.filter((p) => !p.startsWith("color.background.accent.")), `${where} primary alone`);
     // Text on the brand fill: white while white reads (a dark tenant), ink on a light one.
-    const onBrand = (primary: string) => (flat(through({ primary })) as Record<string, string>)["fg.onBrand"];
+    const onBrand = (primary: string) => (flat(through({ primary })) as Record<string, string>)["color.text.onBrand"];
     if (onBrand(brand.primary!) !== "#ffffff") err(at, `${where}: fg.onBrand on ${brand.primary} is ${onBrand(brand.primary!)}, not white`);
     if (onBrand("#f2c94c") !== "#0e1828") err(at, `${where}: fg.onBrand on a light yellow brand is ${onBrand("#f2c94c")}, not ink`);
-    same(moved(plain, through({ primary: "#f2c94c" })), family.filter((p) => !p.startsWith("accent.") && p !== "fg.onBrand"), `${where} light primary`);
+    same(moved(plain, through({ primary: "#f2c94c" })), family.filter((p) => !p.startsWith("color.background.accent.") && p !== "color.text.onBrand"), `${where} light primary`);
     // A hand-picked tint wins over the derived one.
     const pick = { light: "#e6f4f1", dark: "#12302c" };
     const picked = flat(through({ primary: brand.primary, soft: pick })) as Record<string, string>;
-    if (picked["brand.soft"] !== pick[theme] || picked["brand.tint"] !== pick[theme]) err(at, `${where}: a hand-picked soft tint did not replace the derived one`);
+    if (picked["color.background.brand.soft"] !== pick[theme] || picked["color.background.brand.tint"] !== pick[theme]) err(at, `${where}: a hand-picked soft tint did not replace the derived one`);
     // Memoised: the same inputs are the same object, whatever order the brand's keys are written in; a different input is a different one.
     if (resolveTokens(profile, theme, { os }) !== plain) err(at, `${where}: resolveTokens returned a new object for the same inputs`);
     if (through({ accent: brand.accent, primary: brand.primary }) !== branded) err(at, `${where}: a brand with its keys in another order is not the same object`);
@@ -3103,12 +3146,12 @@ function checkBrand() {
     const fontPaths = BRAND_FONT_PATHS.filter((p) => profile === "mobile" || !p.startsWith("font.file")).sort();
     same(moved(plain, fonts({ sans: "Inter", display: "Inter" })), [...fontPaths], `${where} fonts`);
     const faces = flat(fonts({ sans: "Inter", display: { family: "Fraunces", files: { semibold: "Fraunces-Medium" } } })) as Record<string, string>;
-    if (faces["font.sans"] !== "Inter") err(at, `${where}: a branded font.sans is ${faces["font.sans"]}, not the family alone`);
-    if (profile === "mobile" && (faces["font.fileSansSemibold"] !== "Inter-SemiBold" || faces["font.fileDisplaySemibold"] !== "Fraunces-Medium" || faces["font.fileDisplayBold"] !== "Fraunces-Bold"))
-      err(at, `${where}: the phone's files are ${faces["font.fileSansSemibold"]}, ${faces["font.fileDisplaySemibold"]}, ${faces["font.fileDisplayBold"]}; expected <family>-<Weight> unless a file is named`);
+    if (faces["font.family.sans"] !== "Inter") err(at, `${where}: a branded font.sans is ${faces["font.family.sans"]}, not the family alone`);
+    if (profile === "mobile" && (faces["font.file.sans.semibold"] !== "Inter-SemiBold" || faces["font.file.display.semibold"] !== "Fraunces-Medium" || faces["font.file.display.bold"] !== "Fraunces-Bold"))
+      err(at, `${where}: the phone's files are ${faces["font.file.sans.semibold"]}, ${faces["font.file.display.semibold"]}, ${faces["font.file.display.bold"]}; expected <family>-<Weight> unless a file is named`);
   }
-  const stack = (flat(resolveTokens("mobile", "light", { os: "ios", web: true, theme: withBrand({ fonts: { sans: "Inter" } }) })) as Record<string, string>)["font.sans"];
-  if (stack !== `"Inter", ${tokens.shared.font.sans}`) err(at, `React Native Web's branded font.sans is ${stack}; expected "Inter" in front of the kit's stack`);
+  const stack = (flat(resolveTokens("mobile", "light", { os: "ios", web: true, theme: withBrand({ fonts: { sans: "Inter" } }) })) as Record<string, string>)["font.family.sans"];
+  if (stack !== `"Inter", ${tokens.shared.font.family.sans}`) err(at, `React Native Web's branded font.sans is ${stack}; expected "Inter" in front of the kit's stack`);
   if (resolveTokens("mobile", "light", { os: "ios" }) === resolveTokens("mobile", "light", { os: "android" })) err(at, "iOS and Android share one object");
   if (resolveTokens("mobile", "light", { os: "ios", web: true }) === resolveTokens("mobile", "light", { os: "ios" })) err(at, "web and native font stacks share one object");
 
@@ -3143,11 +3186,11 @@ function checkBrand() {
       if (vars[name] !== v) err(at, `the web's ${name} under a brand theme (${scheme}) is ${vars[name]}, brandValues has ${v}`);
     }
   }
-  if (brandValues(brand, "light")["brand.soft"] === brandValues(brand, "dark")["brand.soft"]) err(at, "the dark soft tint is the light one");
+  if (brandValues(brand, "light")["color.background.brand.soft"] === brandValues(brand, "dark")["color.background.brand.soft"]) err(at, "the dark soft tint is the light one");
   if (themeCss(withBrand({})) !== "") err(at, "an empty brand has a sheet");
   const fontTheme = withBrand({ fonts: { sans: "Inter", display: "Inter" } });
   const fontVars = tokenValues("web", "light", undefined, fontTheme);
-  same(Object.keys(fontVars).filter((n) => fontVars[n] !== tokenValues("web", "light")[n]).sort(), ["--af-font-display", "--af-font-sans"], "the web's variables under a fonts-only brand theme");
+  same(Object.keys(fontVars).filter((n) => fontVars[n] !== tokenValues("web", "light")[n]).sort(), ["--af-font-family-display", "--af-font-family-sans"], "the web's variables under a fonts-only brand theme");
 
   // Both kits draw the sample tenant's theme (`extends: antfabric`: the brand over AntFabric's own look) on every OS, in both schemes; the web root
   // carries `data-af-theme-id` and the theme's sheet holds the brand.
@@ -3163,7 +3206,7 @@ function checkBrand() {
         if (html === null) continue;
         if (waitingFor(html)) continue;
         if (platform === "web" && !html.includes(`data-af-theme-id="${tenantTheme.id}"`)) err(at, `web/${scheme}: the root does not carry data-af-theme-id="${tenantTheme.id}"`);
-        if (platform === "web" && !html.includes(`--af-brand-default:${brand.primary}`)) err(at, `web/${scheme}: the drawn markup does not carry the theme's sheet with --af-brand-default`);
+        if (platform === "web" && !html.includes(`--af-color-background-brand-default:${brand.primary}`)) err(at, `web/${scheme}: the drawn markup does not carry the theme's sheet with --af-color-background-brand-default`);
         // React Native Web writes a hex colour into a class as `rgba(15,118,110,1.00)`: `canonical` reads it back.
         const rgb = [1, 3, 5].map((i) => parseInt(brand.primary!.slice(i, i + 2), 16)).join(",");
         if (platform === "mobile" && !canonical(html).includes(`rgba(${rgb},`)) err(at, `mobile/${scheme}: nothing drawn uses the brand colour ${brand.primary}`);
@@ -3176,8 +3219,9 @@ function checkBrand() {
 // through all three readers (the web's values, the web's sheet as a browser cascades it, the phone's resolved tokens).
 function checkThemes() {
   const at = "themes";
+  // Current names only: a renamed token's old key is still on `t`, holding the same value, and is held by `pnpm check deprecated`.
   const flat = (v: unknown, path = ""): Record<string, unknown> =>
-    typeof v === "object" && v !== null ? Object.assign({}, ...Object.entries(v).map(([k, x]) => flat(x, path ? `${path}.${k}` : k))) : { [path]: v };
+    typeof v === "object" && v !== null ? Object.assign({}, ...Object.entries(v).map(([k, x]) => flat(x, path ? `${path}.${k}` : k))) : Core.isDeprecatedPath(path) ? {} : { [path]: v };
   const schemes: Scheme[] = ["light", "dark"];
   const contexts = PLATFORMS.flatMap((platform) => schemes.flatMap((scheme) => [undefined, ...PLATFORM_OS[platform]].map((os) => ({ platform, scheme, os }))));
   const where = (c: { platform: Platform; scheme: Scheme; os?: OS }) => `${c.platform}/${c.scheme}/${c.os ?? "-"}`;
@@ -3199,6 +3243,8 @@ function checkThemes() {
 
   // The browser's answer for one element: every rule of the sheet whose selector matches its attributes, the most specific and
   // then the last winning each variable, `var(--af-p-…)` replaced by the primitive's value on the same element.
+  // The renamed tokens' old variables are in the sheet too (each the new one's); `tokenValues` names current tokens, so they are left out here.
+  const OLD_VARS = new Set(Object.entries(Core.renames as Record<string, string>).filter(([o, n]) => cssVarName(o) !== cssVarName(n)).map(([o]) => cssVarName(o)));
   const cascade = (css: string, attrs: Record<string, string>) => {
     const won = new Map<string, { spec: number; value: string }>();
     for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
@@ -3220,7 +3266,7 @@ function checkThemes() {
     const out: Record<string, string> = {};
     // A reference is its primitive's variable and an alias its target's, both declared on the same element: followed to a value, as the browser does.
     const followed = (value: string, depth = 0): string => value.replace(/var\((--af-[\w-]+)\)/g, (all, p: string) => (won.has(p) && depth < 8 ? followed(won.get(p)!.value, depth + 1) : all));
-    for (const [name, { value }] of won) if (!name.startsWith("--af-p-")) out[name] = followed(value);
+    for (const [name, { value }] of won) if (!name.startsWith("--af-p-") && !OLD_VARS.has(name)) out[name] = followed(value);
     return out;
   };
   const attrsOf = (c: { platform: Platform; scheme?: Scheme; os?: OS }, id?: string): Record<string, string> => ({
@@ -3298,25 +3344,50 @@ function checkThemes() {
     fonts: { sans: "Inter", mono: "JetBrains Mono" },
     tokens: {
       shared: { radius: { card: 4, ...(spare ? { control: `{primitives.${spare}}` } : {}) } },
-      schemes: { light: { surface: { page: "#fafafa" } }, dark: { fg: { body: "#f4f4f5" } } },
-      profiles: { mobile: { control: { hMd: 48 }, switch: { trackW: 40 } } },
-      os: { android: { switch: { thumbSize: 22 } } },
+      schemes: { light: {
+        color: {
+          background: {
+            page: "#fafafa",
+          },
+        },
+      }, dark: {
+        color: {
+          text: {
+            body: "#f4f4f5",
+          },
+        },
+      } },
+      profiles: { mobile: {
+        size: {
+          control: {
+            md: 48,
+          },
+        },
+        switch: {
+          trackWidth: 40,
+        },
+      } },
+      os: { android: {
+        switch: {
+          thumbSize: 22,
+        },
+      } },
     },
     recipes: { button: { root: { base: { radius: "$radius.pill" } } } },
   };
   const fixture = defineTheme(fixtureInput);
   const brand = fixtureInput.brand!;
   const files: Record<string, string> = {
-    "font.fileSansRegular": "Inter-Regular",
-    "font.fileSansMedium": "Inter-Medium",
-    "font.fileSansSemibold": "Inter-SemiBold",
-    "font.fileSansBold": "Inter-Bold",
-    "font.fileSansExtrabold": "Inter-ExtraBold",
-    "font.fileDisplayRegular": "Fraunces-Regular",
-    "font.fileDisplayMedium": "Fraunces-Medium",
-    "font.fileDisplaySemibold": "Fraunces-Medium",
-    "font.fileDisplayBold": "",
-    "font.fileDisplayExtrabold": "Fraunces-ExtraBold",
+    "font.file.sans.regular": "Inter-Regular",
+    "font.file.sans.medium": "Inter-Medium",
+    "font.file.sans.semibold": "Inter-SemiBold",
+    "font.file.sans.bold": "Inter-Bold",
+    "font.file.sans.extrabold": "Inter-ExtraBold",
+    "font.file.display.regular": "Fraunces-Regular",
+    "font.file.display.medium": "Fraunces-Medium",
+    "font.file.display.semibold": "Fraunces-Medium",
+    "font.file.display.bold": "",
+    "font.file.display.extrabold": "Fraunces-ExtraBold",
   };
   /** What the fixture moves on one element, by dotted path, as a pixel count (`px`) or text. */
   const moves = (c: { platform: Platform; scheme: Scheme; os?: OS }, stack: boolean): Record<string, string | { px: number }> => {
@@ -3324,14 +3395,14 @@ function checkThemes() {
     for (const [path, v] of Object.entries(brandValues(brand, c.scheme))) if (!path.startsWith("font.")) out[path] = v!;
     if (c.platform !== "mobile") out["radius.card"] = { px: 4 }; // the phone's profile has its own radius.card, which beats a shared leaf
     if (spare) out["radius.control"] = { px: parseFloat(String(primitiveValue(spare))) };
-    out[c.scheme === "light" ? "surface.page" : "fg.body"] = c.scheme === "light" ? "#fafafa" : "#f4f4f5";
-    out["font.sans"] = stack ? `"Inter", ${tokens.shared.font.sans}` : "Inter";
-    out["font.display"] = stack ? `"Fraunces", ${tokens.shared.font.display}` : "Fraunces";
-    out["font.mono"] = stack ? `"JetBrains Mono", ${tokens.shared.font.mono}` : "JetBrains Mono";
+    out[c.scheme === "light" ? "color.background.page" : "color.text.body"] = c.scheme === "light" ? "#fafafa" : "#f4f4f5";
+    out["font.family.sans"] = stack ? `"Inter", ${tokens.shared.font.family.sans}` : "Inter";
+    out["font.family.display"] = stack ? `"Fraunces", ${tokens.shared.font.family.display}` : "Fraunces";
+    out["font.family.mono"] = stack ? `"JetBrains Mono", ${tokens.shared.font.family.mono}` : "JetBrains Mono";
     if (c.platform === "mobile") {
       Object.assign(out, files);
-      out["control.hMd"] = { px: 48 };
-      if (c.os !== "android") out["switch.trackW"] = { px: 40 }; // Android's own switch beats the theme's mobile leaf
+      out["size.control.md"] = { px: 48 };
+      if (c.os !== "android") out["switch.trackWidth"] = { px: 40 }; // Android's own switch beats the theme's mobile leaf
       if (c.os === "android") out["switch.thumbSize"] = { px: 22 };
     }
     return out;
@@ -3366,7 +3437,7 @@ function checkThemes() {
   const scope = `[data-af-theme-id="${fixture.id}"]`;
   for (const [, selectors] of sheet.matchAll(/([^{}]+)\{/g))
     for (const sel of selectors!.split(",")) if (!sel.trim().endsWith(scope) || sel.includes(":root")) err(at, `themeCss(fixture) has a selector not scoped by ${scope}: ${sel.trim()}`);
-  for (const decl of ["--af-radius-card:4px", "--af-control-h-md:48px", "--af-switch-thumb-size:22px", `--af-brand-default:${brand.primary}`, "--af-font-file-display-bold:;", "--af-switch-track-w:36px"])
+  for (const decl of ["--af-radius-card:4px", "--af-size-control-md:48px", "--af-switch-thumb-size:22px", `--af-color-background-brand-default:${brand.primary}`, "--af-font-file-display-bold:;", "--af-switch-track-width:36px"])
     if (!sheet.includes(decl)) err(at, `themeCss(fixture) does not hold ${decl}`);
   if (spare && !sheet.includes(`${primitiveVar(spare)}:${String(primitiveValue(spare))}`)) err(at, `themeCss(fixture) does not declare ${primitiveVar(spare)}, which its radius.control reads and the base sheet does not declare`);
   if (themeCss(defineTheme({ name: "Recipes only", extends: null, recipes: fixtureInput.recipes })) !== "") err(at, "a theme with recipes and no tokens has a sheet");
@@ -3374,7 +3445,11 @@ function checkThemes() {
   // The web root: a theme writes `data-af-theme-id` on the root and its sheet next to the kit's, the empty one neither, and
   // a provider with no theme of its own inside a themed root draws in the root's.
   {
-    const root = defineTheme({ name: "fixture-root", extends: null, tokens: { shared: { radius: { control: 6 } } } });
+    const root = defineTheme({ name: "fixture-root", extends: null, tokens: { shared: {
+      radius: {
+        control: 6,
+      },
+    } } });
     // React hoists same-precedence styles into one `<style data-href="antfabric-ui <id>">`, their texts one after the other (the kit's first).
     const styles = (html: string) => [...html.matchAll(/<style\b([^>]*)>([\s\S]*?)<\/style>/g)].map((m) => ({ attrs: m[1]!, text: m[2]! }));
     const seen: string[] = [];
@@ -3449,21 +3524,49 @@ function checkThemes() {
     v && typeof v === "object" && !Array.isArray(v) && Object.getPrototypeOf(v) === Object.prototype ? Object.fromEntries(Object.entries(v).reverse().map(([k, x]) => [k, reorder(x)])) : v;
   if (!/^check-fixture-[0-9a-f]{8}$/.test(fixture.id)) err(at, `the fixture's id is "${fixture.id}", not check-fixture-<8 hex digits>`);
   if (defineTheme(reorder(fixtureInput) as ThemeInput).id !== fixture.id) err(at, "the fixture written in another key order has another id");
-  if (defineTheme({ ...fixtureInput, tokens: { ...fixtureInput.tokens, shared: { radius: { card: 5 } } } }).id === fixture.id) err(at, "a changed value kept the fixture's id");
+  if (defineTheme({ ...fixtureInput, tokens: { ...fixtureInput.tokens, shared: {
+    radius: {
+      card: 5,
+    },
+  } } }).id === fixture.id) err(at, "a changed value kept the fixture's id");
   if (defineTheme({ ...fixtureInput, recipes: { button: { root: { base: { radius: "$radius.card" } } } } }).id === fixture.id) err(at, "a changed recipe kept the fixture's id");
   // Pinned, so a change to the hash or the canonical form shows: an id must not move between runs, machines or releases.
-  const pinned = defineTheme({ name: "Pinned", extends: null, tokens: { shared: { radius: { card: 4 } }, schemes: { dark: { surface: { page: "#101010" } } } } }).id;
+  const pinned = defineTheme({ name: "Pinned", extends: null, tokens: { shared: {
+    radius: {
+      card: 4,
+    },
+  }, schemes: { dark: {
+    color: {
+      background: {
+        page: "#101010",
+      },
+    },
+  } } } }).id;
   if (pinned !== "pinned-036d6c24") err(at, `the pinned theme's id is ${pinned}, not pinned-036d6c24: the id of every theme a product has shipped would move`);
-  const child = defineTheme({ name: "Child", extends: fixture, brand: { primary: "#f2c94c" }, tokens: { profiles: { mobile: { control: { hMd: 50 } } } } });
+  const child = defineTheme({ name: "Child", extends: fixture, brand: { primary: "#f2c94c" }, tokens: { profiles: { mobile: {
+    size: {
+      control: {
+        md: 50,
+      },
+    },
+  } } } });
   const grandchild = defineTheme({ name: "Grandchild", extends: child, brand: { primary: "#0f766e" } });
   const kid = flat(resolveTokens("mobile", "light", { os: "ios", theme: child })) as Record<string, unknown>;
-  if (kid["control.hMd"] !== 50 || kid["radius.control"] !== flat(resolveTokens("mobile", "light", { os: "ios", theme: fixture }))["radius.control"] || kid["font.sans"] !== "Inter")
-    err(at, `a child theme did not keep its parent's leaves under its own: control.hMd ${String(kid["control.hMd"])}, font.sans ${String(kid["font.sans"])}`);
-  if (kid["fg.onBrand"] !== "#0e1828") err(at, `a light brand primary in a child theme gives fg.onBrand ${String(kid["fg.onBrand"])}, not ink`);
-  if ((flat(resolveTokens("mobile", "light", { os: "ios", theme: grandchild })) as Record<string, unknown>)["fg.onBrand"] !== "#ffffff") err(at, "a dark brand primary over a parent's light one kept the parent's ink fg.onBrand");
+  if (kid["size.control.md"] !== 50 || kid["radius.control"] !== flat(resolveTokens("mobile", "light", { os: "ios", theme: fixture }))["radius.control"] || kid["font.family.sans"] !== "Inter")
+    err(at, `a child theme did not keep its parent's leaves under its own: control.hMd ${String(kid["size.control.md"])}, font.sans ${String(kid["font.family.sans"])}`);
+  if (kid["color.text.onBrand"] !== "#0e1828") err(at, `a light brand primary in a child theme gives fg.onBrand ${String(kid["color.text.onBrand"])}, not ink`);
+  if ((flat(resolveTokens("mobile", "light", { os: "ios", theme: grandchild })) as Record<string, unknown>)["color.text.onBrand"] !== "#ffffff") err(at, "a dark brand primary over a parent's light one kept the parent's ink fg.onBrand");
   // A brand.default the theme writes as hsl() is read too, and one nothing can read takes white, never the schema's ink.
   for (const [fill, want] of [["hsl(243 47% 20%)", "#ffffff"], ["hsl(50 95% 60%)", "#0e1828"], ["hsl(0.5turn 80% 25%)", "#ffffff"], ["oklch(0.3 0.1 260)", "#ffffff"]] as const) {
-    const got = defineTheme({ name: "Fill", extends: null, tokens: { schemes: { light: { brand: { default: fill } } } } }).sets.schemes.light?.["fg.onBrand"];
+    const got = defineTheme({ name: "Fill", extends: null, tokens: { schemes: { light: {
+      color: {
+        background: {
+          brand: {
+            default: fill,
+          },
+        },
+      },
+    } } } }).sets.schemes.light?.["color.text.onBrand"];
     if (got !== want) err(at, `brand.default ${fill} gives fg.onBrand ${String(got)}, not ${want}`);
   }
   if ((child.recipes as Record<string, unknown>).button === undefined) err(at, "a child theme dropped its parent's recipes");
@@ -3474,13 +3577,41 @@ function checkThemes() {
   if (Object.isFrozen(fixtureInput.recipes) || Object.isFrozen(fixtureInput.tokens)) err(at, "defineTheme froze its input");
 
   // A path the schema does not have throws, naming the theme, the layer and the path.
-  throws("a misspelt shared path", () => defineTheme({ name: "Typo", extends: null, tokens: { shared: { radius: { crad: 4 } } as never } }), ["Typo", "tokens.shared", "radius.crad"]);
-  throws("a shared path in an OS set", () => defineTheme({ name: "Typo", extends: null, tokens: { os: { android: { font: { sans: "Inter" } } } as never } }), ["Typo", "tokens.os.android", "font.sans"]);
-  throws("a group given a value", () => defineTheme({ name: "Typo", extends: null, tokens: { shared: { radius: 4 } as never } }), ["Typo", "tokens.shared", "radius"]);
-  throws("a web path on the phone's font files", () => defineTheme({ name: "Typo", extends: null, tokens: { profiles: { web: { font: { fileSansRegular: "Inter" } } } as never } }), ["Typo", "tokens.profiles.web", "font.fileSansRegular"]);
-  throws("a reference to no primitive", () => defineTheme({ name: "Typo", extends: null, tokens: { shared: { radius: { card: "{primitives.raw.nope}" } } } }), ["Typo", "tokens.shared", "radius.card"]);
+  throws("a misspelt shared path", () => defineTheme({ name: "Typo", extends: null, tokens: { shared: {
+    radius: {
+      crad: 4,
+    },
+  } as never } }), ["Typo", "tokens.shared", "radius.crad"]);
+  throws("a shared path in an OS set", () => defineTheme({ name: "Typo", extends: null, tokens: { os: { android: {
+    font: {
+      family: {
+        sans: "Inter",
+      },
+    },
+  } } as never } }), ["Typo", "tokens.os.android", "font.family.sans"]);
+  throws("a group given a value", () => defineTheme({ name: "Typo", extends: null, tokens: { shared: {
+    radius: 4,
+  } as never } }), ["Typo", "tokens.shared", "radius"]);
+  throws("a web path on the phone's font files", () => defineTheme({ name: "Typo", extends: null, tokens: { profiles: { web: {
+    font: {
+      file: {
+        sans: {
+          regular: "Inter",
+        },
+      },
+    },
+  } } as never } }), ["Typo", "tokens.profiles.web", "font.file.sans.regular"]);
+  throws("a reference to no primitive", () => defineTheme({ name: "Typo", extends: null, tokens: { shared: {
+    radius: {
+      card: "{primitives.raw.nope}",
+    },
+  } } }), ["Typo", "tokens.shared", "radius.card"]);
   throws("a scheme that does not exist", () => defineTheme({ name: "Typo", extends: null, tokens: { schemes: { dim: {} } as never } }), ["Typo", "dim"]);
-  throws("a value that breaks out of its declaration", () => defineTheme({ name: "Typo", extends: null, tokens: { shared: { radius: { card: "4px;}body{display:none" } } } }), ["Typo", "radius.card"]);
+  throws("a value that breaks out of its declaration", () => defineTheme({ name: "Typo", extends: null, tokens: { shared: {
+    radius: {
+      card: "4px;}body{display:none",
+    },
+  } } }), ["Typo", "radius.card"]);
   throws("a bad brand colour", () => defineTheme({ name: "Typo", extends: null, brand: { primary: "teal" } }), ["Typo", "brand"]);
   throws("a bad mono family", () => defineTheme({ name: "Typo", extends: null, fonts: { mono: "Mono; color: red" } }), ["Typo", "fonts"]);
   // A hand-picked brand colour is a colour: hex, rgb() or hsl(), never a url or a word, naming the theme and the field.
@@ -3497,11 +3628,23 @@ function checkThemes() {
     ["a percentage", "10%"],
     ["a calc", "calc(4px + 2px)"],
   ] as const) {
-    const remTheme = defineTheme({ name: "Rem", extends: null, tokens: { shared: { radius: { card: value } }, profiles: { mobile: { radius: { card: value } } } } });
+    const remTheme = defineTheme({ name: "Rem", extends: null, tokens: { shared: {
+      radius: {
+        card: value,
+      },
+    }, profiles: { mobile: {
+      radius: {
+        card: value,
+      },
+    } } } });
     throws(`${what} on the phone`, () => resolveTokens("mobile", "light", { os: "ios", theme: remTheme }), ["Rem", "radius.card", value]);
     resolveTokens("web", "light", { theme: remTheme });
   }
-  if ((flat(resolveTokens("mobile", "light", { os: "ios", theme: defineTheme({ name: "Round", extends: null, tokens: { profiles: { mobile: { radius: { card: "50%" } } } } }) })) as Record<string, unknown>)["radius.card"] !== 9999)
+  if ((flat(resolveTokens("mobile", "light", { os: "ios", theme: defineTheme({ name: "Round", extends: null, tokens: { profiles: { mobile: {
+    radius: {
+      card: "50%",
+    },
+  } } } }) })) as Record<string, unknown>)["radius.card"] !== 9999)
     err(at, "a theme's 50% radius on the phone is not the circle radius 9999");
   // A value that a stylesheet reads past its declaration: an escaped brace swallows every later block, a comment or an unclosed quote,
   // parenthesis or bracket does the same. Each throws naming the theme, the layer, the path and the character.
@@ -3529,17 +3672,35 @@ function checkThemes() {
     ["an at-sign", "@import", "@"],
     ["an important", "red !important", "!"],
   ] as const) {
-    throws(`a value with ${what}`, () => defineTheme({ name: "Typo", extends: null, tokens: { schemes: { light: { fg: { body: value } } } } }), ["Typo", "tokens.schemes.light", "fg.body", ch]);
+    throws(`a value with ${what}`, () => defineTheme({ name: "Typo", extends: null, tokens: { schemes: { light: {
+      color: {
+        text: {
+          body: value,
+        },
+      },
+    } } } }), ["Typo", "tokens.schemes.light", "color.text.body", ch]);
     throws(`a sans family with ${what}`, () => defineTheme({ name: "Typo", extends: null, fonts: { sans: `Foo${value}` } }), ["Typo", "fonts", "Foo"]);
     throws(`a mono family with ${what}`, () => defineTheme({ name: "Typo", extends: null, fonts: { mono: `Foo${value}` } }), ["Typo", "fonts", "mono"]);
     throws(`a brand family with ${what}`, () => defineTheme({ name: "Typo", extends: null, brand: { fonts: { display: `Foo${value}` } } }), ["Typo", "brand"]);
   }
   // Values the kit's own tokens hold (a font stack with quotes, a function with a slash, a shadow with commas) still pass.
   for (const ok of ['"Inter", ui-sans-serif', "rgb(0 0 0 / 0.1)", "0 1px 2px rgb(0 0 0 / 0.1), 0 0 0 1px #fff", "calc(1px + (2px * 3))"])
-    defineTheme({ name: "Fine", extends: null, tokens: { schemes: { light: { fg: { body: ok } } } } });
+    defineTheme({ name: "Fine", extends: null, tokens: { schemes: { light: {
+      color: {
+        text: {
+          body: ok,
+        },
+      },
+    } } } });
   // Only a theme `defineTheme` built reaches a sheet, a value map or the phone's tokens: a theme parsed from JSON or built by hand
   // (here, one whose value would close its block and open another) is refused with a message that sends it back through defineTheme.
-  const forged = JSON.parse(JSON.stringify({ ...fixture, id: "evil-1", sets: { shared: {}, schemes: { light: { "fg.body": "red}body{display:none" } }, profiles: {}, os: {} } })) as Theme;
+  const forged = JSON.parse(JSON.stringify({ ...fixture, id: "evil-1", sets: { shared: {}, schemes: { light: {
+    color: {
+      text: {
+        body: "red}body{display:none",
+      },
+    },
+  } }, profiles: {}, os: {} } })) as Theme;
   for (const [what, call] of [
     ["themeCss", () => themeCss(forged)],
     ["tokenValues", () => tokenValues("web", "light", undefined, forged)],
@@ -3560,9 +3721,15 @@ function checkThemes() {
     renderToString(nested ? createElement(NativeKit.ThemeProvider, { os: "ios", theme, children: inner }) : inner);
     return seen!;
   };
-  const phoneFixture = defineTheme({ name: "fixture-phone", extends: null, tokens: { profiles: { mobile: { control: { hMd: 48 } } } } });
+  const phoneFixture = defineTheme({ name: "fixture-phone", extends: null, tokens: { profiles: { mobile: {
+    size: {
+      control: {
+        md: 48,
+      },
+    },
+  } } } });
   const themed = probe(phoneFixture);
-  if (themed.t.control.hMd !== 48) err(at, `ThemeProvider with a theme: t.control.hMd is ${themed.t.control.hMd}, not 48`);
+  if (themed.t.size.control.md !== 48) err(at, `ThemeProvider with a theme: t.size.control.md is ${themed.t.size.control.md}, not 48`);
   if (themed.theme.id !== phoneFixture.id) err(at, `ThemeProvider with a theme: useTheme().theme.id is "${themed.theme.id}", not "${phoneFixture.id}"`);
   if (probe(phoneFixture, true).theme.id !== phoneFixture.id) err(at, "a nested ThemeProvider with no theme did not take its parent's");
   const plain = probe(undefined);
@@ -3575,13 +3742,38 @@ function checkThemes() {
   renderToString(createElement(() => ((bare = NativeKit.useTheme()), null)));
   // (By value: the memo holds 64 objects and has long dropped the one the context default was built from.)
   if (bare?.theme.id !== themes.neutral.id || diff(flat(bare.t), flat(resolveTokens("mobile", "light", { os: bare.os, web, theme: themes.neutral }))).length) err(at, "useTheme() with no provider at all is not neutral's");
-  if (probe(defineTheme({ name: "fixture-phone", extends: null, tokens: { profiles: { mobile: { control: { hMd: 48 } } } } })).t !== themed.t) err(at, "a theme built twice gave the provider two different t");
+  if (probe(defineTheme({ name: "fixture-phone", extends: null, tokens: { profiles: { mobile: {
+    size: {
+      control: {
+        md: 48,
+      },
+    },
+  } } } })).t !== themed.t) err(at, "a theme built twice gave the provider two different t");
 
   // `font()` reads its file names from the `t` it is given: `""` is the system font, so no family and the weight by number.
   const system = defineTheme({
     name: "fixture-system-font",
     extends: null,
-    tokens: { profiles: { mobile: { font: { fileSansRegular: "", fileSansMedium: "", fileSansSemibold: "", fileSansBold: "", fileSansExtrabold: "", fileDisplayRegular: "", fileDisplayMedium: "", fileDisplaySemibold: "", fileDisplayBold: "", fileDisplayExtrabold: "" } } } },
+    tokens: { profiles: { mobile: {
+      font: {
+        file: {
+          sans: {
+            regular: "",
+            medium: "",
+            semibold: "",
+            bold: "",
+            extrabold: "",
+          },
+          display: {
+            regular: "",
+            medium: "",
+            semibold: "",
+            bold: "",
+            extrabold: "",
+          },
+        },
+      },
+    } } },
   });
   const systemT = probe(system).t;
   const asIos = (fn: () => void) => {

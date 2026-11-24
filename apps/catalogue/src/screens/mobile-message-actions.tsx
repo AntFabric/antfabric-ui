@@ -8,7 +8,7 @@ import { CONTEXT_MENU_SAMPLE, messageBar } from "@antfabric/ui-docs/samples";
 export default function MobileMessageActions() {
   const { t } = useTheme();
   return (
-    <View style={{ flex: 1, backgroundColor: t.surface.app }}>
+    <View style={{ flex: 1, backgroundColor: t.color.background.app }}>
       <MobileHeader variant="pushed" title="platform-eng" titleGlyph="hash" subtitle="24 members" statusBar={false} actions={[{ key: "details", icon: "info", label: "Channel details" }]} />
 
       <View style={{ flex: 1, minHeight: 0, overflow: "hidden", justifyContent: "flex-end", paddingVertical: t.space.sm }}>
@@ -26,7 +26,7 @@ export default function MobileMessageActions() {
       </View>
 
       {/* The sheet draws its own scrim on the phone, so it fills the screen rather than sitting on a second one. */}
-      <View style={[StyleSheet.absoluteFill, { zIndex: t.z.modal }]}>
+      <View style={[StyleSheet.absoluteFill, { zIndex: t.zIndex.modal }]}>
         <ContextMenu
           {...CONTEXT_MENU_SAMPLE}
           author="Marcus Chen"

@@ -44,7 +44,7 @@ const root: CSSProperties = {
   paddingBottom: 3 /* structural: optical nudge */,
   paddingRight: t.space.sm,
   paddingLeft: t.space.xs,
-  transition: `background ${t.duration.fast}, border-color ${t.duration.fast}`,
+  transition: `background ${t.motion.duration.fast}, border-color ${t.motion.duration.fast}`,
 };
 
 const nowrap: CSSProperties = { ...text, whiteSpace: "nowrap", flexShrink: 0 };

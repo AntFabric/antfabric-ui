@@ -56,7 +56,7 @@ const linkLook: CSSProperties = {
   alignItems: "center",
   paddingBlock: 3, /* structural: 3px optical padding of a crumb */
   marginInline: neg(t.space.xs),
-  transition: `background ${t.duration.fast}, color ${t.duration.fast}`,
+  transition: `background ${t.motion.duration.fast}, color ${t.motion.duration.fast}`,
 };
 
 const sep: CSSProperties = { ...text, flexShrink: 0, lineHeight: 1 };
@@ -188,7 +188,7 @@ export function Breadcrumbs({ items, expanded, lights = false, status = "", stat
                       revealed.current = true;
                       setExpanded(true);
                     }} style={{ flexShrink: 0, justifyContent: "center" }}>
-                    <span style={{ lineHeight: t.text.bodySmLine, letterSpacing: "0.05em" }}>…</span>
+                    <span style={{ lineHeight: t.font.lineHeight.bodySm, letterSpacing: "0.05em" }}>…</span>
                   </Crumb>
                   <span aria-hidden data-af-part="separator" style={css(sep, r.separator)}>
                     \

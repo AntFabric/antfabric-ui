@@ -11,14 +11,14 @@ import { defineRecipe, type PartRecipe } from "../../recipe";
 const caption = (closeHover: boolean): PartRecipe => ({
   platforms: {
     windows: {
-      base: { width: "$osWindow.winCaptionW", fg: "$fg.body" },
+      base: { width: "$osWindow.winCaptionW", fg: "$color.text.body" },
       states: closeHover
-        ? { hover: { bg: "$os.winClose", fg: "$os.onFill" }, pressed: { bg: "$os.winClosePressed", fg: "$os.onFill" }, focus: { shadow: "$shadow.focus" } }
-        : { hover: { bg: "$hover.surface" }, pressed: { bg: "$surface.selected" }, focus: { shadow: "$shadow.focus" } },
+        ? { hover: { bg: "$os.winClose", fg: "$os.onFill" }, pressed: { bg: "$os.winClosePressed", fg: "$os.onFill" }, focus: { shadow: "$elevation.shadow.focus" } }
+        : { hover: { bg: "$color.background.hover" }, pressed: { bg: "$color.background.selected" }, focus: { shadow: "$elevation.shadow.focus" } },
     },
     linux: {
-      base: { square: "$osWindow.linuxCaption", radius: "$radius.circle", bg: "$surface.muted", fg: "$fg.strong" },
-      states: { hover: { bg: "$border.muted" }, pressed: { bg: "$border.default" }, focus: { shadow: "$shadow.focus" } },
+      base: { square: "$osWindow.linuxCaption", radius: "$radius.circle", bg: "$color.background.muted", fg: "$color.text.strong" },
+      states: { hover: { bg: "$color.border.muted" }, pressed: { bg: "$color.border.default" }, focus: { shadow: "$elevation.shadow.focus" } },
     },
   },
 });
@@ -26,38 +26,38 @@ const caption = (closeHover: boolean): PartRecipe => ({
 const light = (color: "$os.macClose" | "$os.macMin" | "$os.macMax"): PartRecipe => ({
   base: { square: "$osWindow.macLight", radius: "$radius.circle", bg: color },
   // macOS greys the lights while another app's window is in front.
-  variants: { focused: { false: { bg: "$border.muted" } } },
+  variants: { focused: { false: { bg: "$color.border.muted" } } },
 });
 
 export const titleBar = defineRecipe({
   parts: ["root", "searchSlot", "lights", "lightClose", "lightMin", "lightMax", "search", "searchIcon", "trailing", "captions", "caption", "captionClose", "captionIcon"],
   styles: {
-    root: { base: { height: "$topbar.h", bg: "$surface.chrome", borderBottomWidth: "$border.wHairline", borderBottomColor: "$border.subtle", font: "$font.sans", fg: "$fg.body" } },
-    searchSlot: { on: ["desktop"], base: { minWidth: "$topbar.searchMinW" } },
+    root: { base: { height: "$size.layout.topBar", bg: "$color.background.chrome", borderBottomWidth: "$border.width.hairline", borderBottomColor: "$color.border.subtle", font: "$font.family.sans", fg: "$color.text.body" } },
+    searchSlot: { on: ["desktop"], base: { minWidth: "$size.layout.topBarSearchMin" } },
     lights: { on: ["desktop"], base: { width: "$osWindow.macLightsW" } },
     lightClose: { on: ["desktop"], ...light("$os.macClose") },
     lightMin: { on: ["desktop"], ...light("$os.macMin") },
     lightMax: { on: ["desktop"], ...light("$os.macMax") },
     search: {
       base: {
-        height: "$control.hXs",
-        maxWidth: "$topbar.searchMaxW",
+        height: "$size.control.xs",
+        maxWidth: "$size.layout.topBarSearchMax",
         radius: "$radius.control",
-        bg: "$surface.card",
-        borderWidth: "$border.wHairline",
-        borderColor: "$border.subtle",
-        shadow: "$shadow.hairline",
-        fg: "$fg.faint",
-        size: "$text.bodySm",
+        bg: "$color.background.card",
+        borderWidth: "$border.width.hairline",
+        borderColor: "$color.border.subtle",
+        shadow: "$elevation.shadow.hairline",
+        fg: "$color.text.faint",
+        size: "$font.size.bodySm",
       },
-      states: { hover: { borderColor: "$border.muted", bg: "$surface.recessed" }, focus: { shadow: "$shadow.focus" } },
+      states: { hover: { borderColor: "$color.border.muted", bg: "$color.background.recessed" }, focus: { shadow: "$elevation.shadow.focus" } },
     },
-    searchIcon: { base: { square: "$icon.sizeMd", fg: "$fg.subtle" } },
-    trailing: { base: { size: "$text.caption" } },
+    searchIcon: { base: { square: "$size.icon.md", fg: "$color.text.subtle" } },
+    trailing: { base: { size: "$font.size.caption" } },
     captions: { variants: { focused: { false: { opacity: "$opacity.disabled" } } } },
     caption: { on: ["desktop"], ...caption(false) },
     captionClose: { on: ["desktop"], ...caption(true) },
-    captionIcon: { platforms: { windows: { base: { square: "$icon.sizeMd" } }, linux: { base: { square: "$icon.sizeSm" } } } },
+    captionIcon: { platforms: { windows: { base: { square: "$size.icon.md" } }, linux: { base: { square: "$size.icon.sm" } } } },
   },
-  reads: ["$radius.pill", "$icon.strokeThin", "$icon.strokeBold", "$os.macLightEdge"],
+  reads: ["$radius.pill", "$size.stroke.thin", "$size.stroke.bold", "$os.macLightEdge"],
 });

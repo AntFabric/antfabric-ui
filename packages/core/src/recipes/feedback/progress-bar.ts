@@ -7,18 +7,18 @@ import { defineRecipe } from "../../recipe";
 export const progressBar = defineRecipe({
   parts: ["root", "header", "title", "detail", "track", "fill"],
   styles: {
-    root: { base: { gap: "$space.xs", font: "$font.sans" } },
-    header: { base: { gap: "$space.sm", minHeight: "$control.hIconSm" } },
-    title: { base: { size: "$text.bodySm", weight: "$font.weightMedium", fg: "$fg.strong" } },
+    root: { base: { gap: "$space.xs", font: "$font.family.sans" } },
+    header: { base: { gap: "$space.sm", minHeight: "$size.control.iconSm" } },
+    title: { base: { size: "$font.size.bodySm", weight: "$font.weight.medium", fg: "$color.text.strong" } },
     detail: {
-      base: { size: "$text.caption", fg: "$fg.faint" },
-      variants: { tone: { danger: { fg: "$danger.default", weight: "$font.weightMedium" } } },
-      platforms: { mobile: { base: { weight: "$font.weightNormal" }, variants: { tone: { danger: { weight: "$font.weightMedium" } } } } },
+      base: { size: "$font.size.caption", fg: "$color.text.faint" },
+      variants: { tone: { danger: { fg: "$color.text.danger", weight: "$font.weight.medium" } } },
+      platforms: { mobile: { base: { weight: "$font.weight.normal" }, variants: { tone: { danger: { weight: "$font.weight.medium" } } } } },
     },
-    track: { base: { radius: "$radius.pill", bg: "$surface.muted" } },
+    track: { base: { radius: "$radius.pill", bg: "$color.background.muted" } },
     fill: {
       base: { radius: "$radius.pill" },
-      variants: { tone: { brand: { bg: "$brand.default" }, neutral: { bg: "$fg.faint" }, success: { bg: "$success.default" }, danger: { bg: "$danger.default" } } },
+      variants: { tone: { brand: { bg: "$color.background.brand.default" }, neutral: { bg: "$color.text.faint" }, success: { bg: "$color.text.success" }, danger: { bg: "$color.text.danger" } } },
     },
   },
 });

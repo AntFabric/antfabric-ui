@@ -108,8 +108,8 @@ function RailWindow({ platform, rail }: { platform: Platform; rail: Record<strin
         maxWidth: "100%",
         overflow: "hidden",
         borderRadius: R.t.radius.card,
-        border: `1px solid ${R.t.border.subtle}`,
-        background: R.t.surface.page,
+        border: `1px solid ${R.t.color.border.subtle}`,
+        background: R.t.color.background.page,
       }}
     >
       {platform === "web" ? <RS.WebTopBar compact {...WEB_TOP_BAR_SAMPLE} {...bar} /> : <RS.TitleBar {...TITLE_BAR_SAMPLE} {...bar} />}
@@ -279,7 +279,7 @@ function DomScene({ scene: s, platform }: { scene: Scene; platform: Platform }):
   }
 }
 
-/** A token path (`brand.default`) looked up in the resolved tokens. */
+/** A token path (`color.background.brand.default`) looked up in the resolved tokens. */
 function lookup(t: NativeTokens, path: string): string | number | undefined {
   let at: unknown = t;
   for (const k of path.split(".")) at = (at as Record<string, unknown> | undefined)?.[k];
@@ -406,7 +406,7 @@ function NativeScene({ scene: s }: { scene: Scene }): ReactNode {
       );
     case "text":
       return (
-        <Text numberOfLines={s.style?.truncate ? Number(s.style.truncate) : undefined} style={[{ color: t.fg.body, fontSize: t.text.body }, N.font("regular"), style]}>
+        <Text numberOfLines={s.style?.truncate ? Number(s.style.truncate) : undefined} style={[{ color: t.color.text.body, fontSize: t.font.size.body }, N.font("regular"), style]}>
           {s.text}
         </Text>
       );
@@ -414,7 +414,7 @@ function NativeScene({ scene: s }: { scene: Scene }): ReactNode {
       return <N.Icon name={s.icon ?? ""} color={typeof style.color === "string" ? style.color : undefined} />;
     case "input":
     case "textarea":
-      return <TextInput placeholder={String(s.attrs?.placeholder ?? "")} placeholderTextColor={t.fg.placeholder} multiline={s.el === "textarea"} style={[{ color: t.fg.body, fontSize: t.text.body }, style]} />;
+      return <TextInput placeholder={String(s.attrs?.placeholder ?? "")} placeholderTextColor={t.color.text.placeholder} multiline={s.el === "textarea"} style={[{ color: t.color.text.body, fontSize: t.font.size.body }, style]} />;
     default:
       return wrap(
         <View accessibilityLabel={s.attrs?.label ? String(s.attrs.label) : undefined} style={style}>

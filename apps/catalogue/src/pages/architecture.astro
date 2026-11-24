@@ -325,7 +325,7 @@ const confirmed = counted.filter((f) => countNow(f) === f.count!.claimed).length
 
     <div class="grid c2" style="margin-top:14px">
       <div class="card">
-        <b style="color:var(--af-fg-strong)">The React kit</b>
+        <b style="color:var(--af-color-text-strong)">The React kit</b>
         <ul class="notes" style="margin-top:10px">
           <li>Every value is read as <code class="mono">t.…</code>, which is a CSS variable, so density and theme come from the attributes above the component.</li>
           <li>Styles are inline objects, so hover, press and focus are state from <code class="mono">useInteraction()</code>, never CSS <code class="mono">:hover</code>.</li>
@@ -333,7 +333,7 @@ const confirmed = counted.filter((f) => countNow(f) === f.count!.claimed).length
         </ul>
       </div>
       <div class="card">
-        <b style="color:var(--af-fg-strong)">The React Native kit</b>
+        <b style="color:var(--af-color-text-strong)">The React Native kit</b>
         <ul class="notes" style="margin-top:10px">
           <li>Every value is read from <code class="mono">t</code> as a number or colour, once per scheme, through <code class="mono">createStyles()</code>.</li>
           <li>There is no hover, so state is pressed and focused from <code class="mono">usePress()</code>.</li>
@@ -371,7 +371,7 @@ const confirmed = counted.filter((f) => countNow(f) === f.count!.claimed).length
             matrix.rows.map((r) => (
               <tr class={r.react.present !== r.native.present ? "one-kit" : undefined}>
                 <td>
-                  <a href={`/components/${r.id}`} style="color:var(--af-fg-strong);font-weight:600;text-decoration:none">{r.name}</a>
+                  <a href={`/components/${r.id}`} style="color:var(--af-color-text-strong);font-weight:600;text-decoration:none">{r.name}</a>
                   <div class="faint" style="font-size:11.5px">{r.category}</div>
                 </td>
                 {[r.react, r.native].map((c) => (
@@ -479,7 +479,7 @@ const confirmed = counted.filter((f) => countNow(f) === f.count!.claimed).length
           {
             differences.map((d) => (
               <tr>
-                <td><b style="color:var(--af-fg-strong)">{d.what}</b></td>
+                <td><b style="color:var(--af-color-text-strong)">{d.what}</b></td>
                 <td>{d.react.says}<div class="ref">{d.react.ref}</div></td>
                 <td>{d.native.says}<div class="ref">{d.native.ref}</div></td>
               </tr>

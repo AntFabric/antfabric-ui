@@ -3,10 +3,10 @@ import type { ComponentDocs, Scene } from "../../types";
 /** A small picture of a page layout, for a card's `preview`: a ground with a bar on the side named and the page beside it. */
 const layout = (side: "left" | "top" | "none"): Scene => ({
   el: "view",
-  style: { height: 64, bg: "$surface.recessed", padding: 8, gap: 6, direction: side === "top" ? "column" : "row" },
+  style: { height: 64, bg: "$color.background.recessed", padding: 8, gap: 6, direction: side === "top" ? "column" : "row" },
   children: [
-    ...(side === "none" ? [] : [{ el: "view" as const, style: side === "top" ? { height: 10, bg: "$border.default", radius: 3 } : { width: 18, bg: "$border.default", radius: 3 } }]),
-    { el: "view", style: { grow: 1, bg: "$surface.card", radius: 3 } },
+    ...(side === "none" ? [] : [{ el: "view" as const, style: side === "top" ? { height: 10, bg: "$color.border.default", radius: 3 } : { width: 18, bg: "$color.border.default", radius: 3 } }]),
+    { el: "view", style: { grow: 1, bg: "$color.background.card", radius: 3 } },
   ],
 });
 
@@ -65,7 +65,7 @@ const docs: ComponentDocs = {
       type: "enum",
       options: ["list", "pills", "cards"],
       default: "list",
-      description: "list is a ring and a label per row. pills is the desktop's ChoicePills — a wrapping row of short answers (Yes · No · Maybe); the phone draws them as the list. cards is a card per option, for a choice that needs a picture or a few more words (a layout, a plan): its `preview` on top, its label with its `tags`, its description. The chosen card takes a 2px edge in the strong ink, not the brand, and draws no ring. Web and desktop lay the cards out in as many columns of at least `radioGroup.cardMinW` (220) as fit; the phone stacks them one per row.",
+      description: "list is a ring and a label per row. pills is the desktop's ChoicePills — a wrapping row of short answers (Yes · No · Maybe); the phone draws them as the list. cards is a card per option, for a choice that needs a picture or a few more words (a layout, a plan): its `preview` on top, its label with its `tags`, its description. The chosen card takes a 2px edge in the strong ink, not the brand, and draws no ring. Web and desktop lay the cards out in as many columns of at least `radioGroup.cardMinWidth` (220) as fit; the phone stacks them one per row.",
     },
     disabled: {
       type: "boolean",
@@ -85,7 +85,7 @@ const docs: ComponentDocs = {
       import: "import { RadioGroup } from \"@antfabric/ui-react\"",
       notes: [
         "Pressing an option sets `value` (an `on.press` action, so the catalogue preview is interactive): the new dot grows from the ring's centre as the old one shrinks away, and a pill's ink fill cross-fades. Disabled options set nothing.",
-        "appearance=\"cards\": each card is the <button role=\"radio\">, in a CSS grid of as many columns of at least `radioGroup.cardMinW` as fit. Hover takes the edge to border.default; the chosen card's edge is the strong ink at 2px (a hairline plus an inset ring, so nothing moves), never the brand. The preview is aria-hidden; the card is named by its label and its tags (aria-labelledby), and its description is its aria-describedby.",
+        "appearance=\"cards\": each card is the <button role=\"radio\">, in a CSS grid of as many columns of at least `radioGroup.cardMinWidth` as fit. Hover takes the edge to border.default; the chosen card's edge is the strong ink at 2px (a hairline plus an inset ring, so nothing moves), never the brand. The preview is aria-hidden; the card is named by its label and its tags (aria-labelledby), and its description is its aria-describedby.",
       ],
       keyboard: [
         {
@@ -414,7 +414,7 @@ const docs: ComponentDocs = {
     {
       title: "Cards in a narrow column",
       platforms: ["web", "desktop", "mobile"],
-      handling: "Cards take as many columns of at least `radioGroup.cardMinW` (220) as fit and wrap; narrower than one, a card is the column's full width. A long label wraps and its tags move under it whole. The phone always stacks the cards one per row.",
+      handling: "Cards take as many columns of at least `radioGroup.cardMinWidth` (220) as fit and wrap; narrower than one, a card is the column's full width. A long label wraps and its tags move under it whole. The phone always stacks the cards one per row.",
       example: {
         name: "Narrow cards",
         props: {

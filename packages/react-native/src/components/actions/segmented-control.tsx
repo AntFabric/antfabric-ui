@@ -76,7 +76,7 @@ function Segment({ item, chosen, full, pick, place, styles, strings, testID, gro
       accessibilityLabel={n > 0 ? str("labelWithCount", { label: item.label, count: n }) : item.label}
       accessibilityState={{ selected: chosen }}
       accessibilityHint={group || undefined}
-      hitSlop={typeof tab.view.height === "number" ? hitSlopTo(t.control.hit, tab.view.height) : undefined}
+      hitSlop={typeof tab.view.height === "number" ? hitSlopTo(t.size.target.min, tab.view.height) : undefined}
       onPress={pick}
       onLayout={(e) => {
         const { x, y, width, height } = e.nativeEvent.layout;
@@ -106,7 +106,7 @@ export function SegmentedControl({ items, value, full = false, scrollable = fals
   const at = items.findIndex((i) => i.key === current);
   // Each tab's slop reaches 44pt, but iOS tests a touch against the parents first and drops one outside their bounds: the track and the
   // root, as tall as the tabs, take the same slop so it is reached. A scrolling strip's ScrollView still clips it.
-  const slop = typeof r.tab.view.height === "number" ? hitSlopTo(t.control.hit, r.tab.view.height) : undefined;
+  const slop = typeof r.tab.view.height === "number" ? hitSlopTo(t.size.target.min, r.tab.view.height) : undefined;
   // iOS and Android never read a container's name, so each tab says the strip's after its own; the web reads the tablist's.
   const group = Platform.OS === "web" ? "" : (rest.accessibilityLabel as string | undefined) || label;
 

@@ -55,7 +55,7 @@ const docs: ComponentDocs = {
       sample: columns,
       required: true,
       description:
-        "One per column: { key, label, cell, align, format, priority, sortable, rank, tones, inverse, kind, width, maxWidth, wrap, emphasis }. `width` and `maxWidth` (px) and `wrap` are for web and desktop: a cell wider than `maxWidth` is cut with an ellipsis and its full text is the cell's title, or wraps with `wrap`. `emphasis` (web and desktop) draws the column that names the row stronger: `fg.strong` at medium weight, the `emphasis` part; on the phone the row's name is its card's title. `key` is the field of each row the column reads and `cell` is what it draws: text, number, currency, percent, date, delta, badge, tag, avatar, sparkline or progress. A column is plain data, so it can be written down and sent as JSON.",
+        "One per column: { key, label, cell, align, format, priority, sortable, rank, tones, inverse, kind, width, maxWidth, wrap, emphasis }. `width` and `maxWidth` (px) and `wrap` are for web and desktop: a cell wider than `maxWidth` is cut with an ellipsis and its full text is the cell's title, or wraps with `wrap`. `emphasis` (web and desktop) draws the column that names the row stronger: `color.text.strong` at medium weight, the `emphasis` part; on the phone the row's name is its card's title. `key` is the field of each row the column reads and `cell` is what it draws: text, number, currency, percent, date, delta, badge, tag, avatar, sparkline or progress. A column is plain data, so it can be written down and sent as JSON.",
     },
     rows: {
       type: "array",
@@ -181,7 +181,7 @@ const docs: ComponentDocs = {
       default: "scroll",
       platforms: ["web", "desktop"],
       description:
-        "What the table does when its own box is narrower than `table.cardsBelow` (600px), measured with a ResizeObserver on the table, not the window: `scroll` keeps the grid and scrolls it sideways; `cards` draws the phone's card per row (the `priority` columns: the title, a badge beside it and the row's actions, then a label and value line for every other column) with a sort bar above and the pager under them. Ticking, sorting, paging, `onRowPress`, `renderCell`, `renderActions`, loading and the empty state all work in both. Before it has measured (on the server) a `cards` table draws cards.",
+        "What the table does when its own box is narrower than `table.cardsBreakpoint` (600px), measured with a ResizeObserver on the table, not the window: `scroll` keeps the grid and scrolls it sideways; `cards` draws the phone's card per row (the `priority` columns: the title, a badge beside it and the row's actions, then a label and value line for every other column) with a sort bar above and the pager under them. Ticking, sorting, paging, `onRowPress`, `renderCell`, `renderActions`, loading and the empty state all work in both. Before it has measured (on the server) a `cards` table draws cards.",
     },
     label: {
       type: "string",
@@ -199,7 +199,7 @@ const docs: ComponentDocs = {
         "Shipped from the data subpath. Core's `@antfabric/ui-core/chart` holds what both kits agree on: how a column is read, how rows are ordered and paged, what the phone's card keeps.",
         "The header sticks to the top of the scroll region. A table that is as tall as its rows never scrolls the region, so it has nothing to stick to: pass `maxHeight` (or give the table a parent with a height) and the rows scroll under the header.",
         "A column is as wide as its widest cell. Wider than the region, the table scrolls sideways; the region is a keyboard stop, so the arrow keys scroll it.",
-        "`narrow=\"cards\"`: below `table.cardsBelow` (600px) of its own width the table draws the phone's card per row instead of the grid, a description list of label and value lines per card, under a sort bar (the kit's Select and an IconButton). It measures its box before paint, so a page drawn in the browser never shows the other layout first; drawn on the server it starts as cards and turns into the grid once it measures a wide box. The web's card shows every column (the card's own lines, then the rest): it has no details button.",
+        "`narrow=\"cards\"`: below `table.cardsBreakpoint` (600px) of its own width the table draws the phone's card per row instead of the grid, a description list of label and value lines per card, under a sort bar (the kit's Select and an IconButton). It measures its box before paint, so a page drawn in the browser never shows the other layout first; drawn on the server it starts as cards and turns into the grid once it measures a wide box. The web's card shows every column (the card's own lines, then the rest): it has no details button.",
       ],
       keyboard: [
         { keys: "Tab", action: "Moves to the scroll region, then through the sort buttons and the boxes" },
@@ -225,7 +225,7 @@ const docs: ComponentDocs = {
       notes: [
         "One card per row. The column with the lowest `priority` is the card's title, a `badge` column among the next three sits beside it, and the rest are label and value lines. A column with no priority is left off the card; when none has one, the columns' order is the priority.",
         "Sorting is the sort bar above the cards: the Select picks a column (the same first direction as the header's first press) and the arrow button beside it reverses the direction. \"As listed\" clears the sort. With no sortable column the bar has no Select, and with neither a sort nor `selectable` there is no bar.",
-        "A card's height is its content, and `table.rowH` (52pt) is the least a one-line card is.",
+        "A card's height is its content, and `table.rowHeight` (52pt) is the least a one-line card is.",
         "`dense` and `maxHeight` have no meaning here and are not props on the phone.",
         "The card shows the title and three more columns, lowest `priority` first; the other columns are not dropped: the card's details button opens them in place as more label and value lines (`expanded`).",
       ],
@@ -277,7 +277,7 @@ const docs: ComponentDocs = {
     },
     {
       name: "Cards when narrow",
-      description: "`narrow=\"cards\"` in a box narrower than `table.cardsBelow`: a card per row, the account its title and health its badge, then a line per other column, under the sort bar. Two accounts are ticked.",
+      description: "`narrow=\"cards\"` in a box narrower than `table.cardsBreakpoint`: a card per row, the account its title and health its badge, then a line per other column, under the sort bar. Two accounts are ticked.",
       props: { columns: lean, rows: accounts, label: "Accounts", narrow: "cards", selectable: true, selected: ["acc-3", "acc-9"], sort: { column: "arr", direction: "desc" }, pageSize: 3 },
       width: 360,
       platforms: ["web", "desktop"],

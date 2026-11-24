@@ -93,9 +93,9 @@ export function ProgressBar({
               r,
               "fill",
               unknown
-                ? { width: "32%", animation: `af-indeterminate 1.4s ${t.ease.standard} infinite` }
+                ? { width: "32%", animation: `af-indeterminate 1.4s ${t.motion.easing.standard} infinite` }
                 : // A transform, not a width: the fill slides out from under the track's clip, so no layout runs while it moves and the rounded end keeps its shape.
-                  { width: "100%", transform: `translateX(${dir === "rtl" ? "" : "-"}${100 - pct}%)`, transition: `transform ${t.duration.slow} ease` },
+                  { width: "100%", transform: `translateX(${dir === "rtl" ? "" : "-"}${100 - pct}%)`, transition: `transform ${t.motion.duration.slow} ease` },
             ),
           )}
         />

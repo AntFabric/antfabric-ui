@@ -32,7 +32,7 @@ const root: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   flexShrink: 0,
-  transition: `background ${t.duration.fast}, color ${t.duration.fast}, transform ${t.duration.fast} ${t.ease.out}`,
+  transition: `background ${t.motion.duration.fast}, color ${t.motion.duration.fast}, transform ${t.motion.duration.fast} ${t.motion.easing.out}`,
 };
 
 export function MenuButton({ icon, label, open, controls, shape = "circle", size = "md", onPress, ref, style }: MenuButtonProps) {

@@ -20,7 +20,7 @@ export interface SelectItem {
   /** A second line under the label in the sheet. */
   supportingText?: string;
   icon?: IconName;
-  /** The icon's tint, as a token: `$info.default`. */
+  /** The icon's tint, as a token: `$color.text.info`. */
   color?: string;
   /** A photo URL; "" draws initials. Leave it out for no avatar. */
   avatar?: string;
@@ -63,13 +63,13 @@ export interface SelectProps extends RootProps {
   style?: ViewStyle;
 }
 
-/** `$info.default` → the resolved colour; a literal passes through. */
+/** `$color.text.info` → the resolved colour; a literal passes through. */
 function tint(t: NativeTokens, color?: string): string {
-  if (!color) return t.fg.subtle;
+  if (!color) return t.color.text.subtle;
   if (!color.startsWith("$")) return color;
   let at: unknown = t;
   for (const k of color.slice(1).split(".")) at = (at as Record<string, unknown> | undefined)?.[k];
-  return typeof at === "string" ? at : t.fg.subtle;
+  return typeof at === "string" ? at : t.color.text.subtle;
 }
 
 /** Layout no token decides; the sizes, fills, edges, spacing and type are the recipe's. */

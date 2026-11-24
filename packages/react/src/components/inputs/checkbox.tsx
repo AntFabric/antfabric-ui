@@ -34,7 +34,7 @@ const square: CSSProperties = {
   flexShrink: 0,
   alignItems: "center",
   justifyContent: "center",
-  transition: `background ${t.duration.base}, border-color ${t.duration.base}, transform ${t.duration.fast} ${t.ease.out}`,
+  transition: `background ${t.motion.duration.base}, border-color ${t.motion.duration.base}, transform ${t.motion.duration.fast} ${t.motion.easing.out}`,
 };
 
 export function Checkbox({ label: name, description: detail = "", checked, indeterminate = false, hideLabel = false, disabled = false, onCheckedChange, styles, style, ...rest }: CheckboxProps) {
@@ -71,7 +71,7 @@ export function Checkbox({ label: name, description: detail = "", checked, indet
       style={css(root, partStyle(r, "root", hideLabel && { justifyContent: "center" }, ui.disabled && { cursor: "not-allowed" }), style)}
     >
       <span aria-hidden data-af-part="box" style={css(square, partStyle(r, "box", { marginTop: hideLabel ? 0 : 0.5 }))}>
-        {filled && <Icon part="tick" key={mixed ? "minus" : "check"} name={mixed ? "minus" : "check"} style={partStyle(r, "tick", { strokeWidth: t.icon.strokeTick, ...enter("pop") })} />}
+        {filled && <Icon part="tick" key={mixed ? "minus" : "check"} name={mixed ? "minus" : "check"} style={partStyle(r, "tick", { strokeWidth: t.size.stroke.tick, ...enter("pop") })} />}
       </span>
       {!hideLabel && (
         <span style={css(box, { gap: t.space["3xs"], flexShrink: 1 })}>

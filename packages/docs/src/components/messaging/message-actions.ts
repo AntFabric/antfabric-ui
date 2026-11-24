@@ -601,8 +601,8 @@ const docs: ComponentDocs = {
                 style: {
                   width: 340,
                   justify: "space-between",
-                  borderLeft: "1px solid $border.subtle",
-                  bg: "$surface.card",
+                  borderLeft: "1px solid $color.border.subtle",
+                  bg: "$color.background.card",
                 },
                 children: [
                   {
@@ -616,24 +616,24 @@ const docs: ComponentDocs = {
                           gap: "$space.xs",
                           paddingY: "$space.sm",
                           paddingX: 18,
-                          borderBottom: "1px solid $border.subtle",
+                          borderBottom: "1px solid $color.border.subtle",
                         },
                         children: [
                           {
                             el: "text",
                             text: "Thread",
                             style: {
-                              fontSize: "$text.body",
-                              fontWeight: "$font.weightBold",
-                              color: "$fg.strong",
+                              fontSize: "$font.size.body",
+                              fontWeight: "$font.weight.bold",
+                              color: "$color.text.strong",
                             },
                           },
                           {
                             el: "text",
                             text: "#platform-eng",
                             style: {
-                              fontSize: "$text.caption",
-                              color: "$fg.faint",
+                              fontSize: "$font.size.caption",
+                              color: "$color.text.faint",
                             },
                           },
                         ],

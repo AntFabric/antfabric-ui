@@ -78,13 +78,13 @@ const useStyles = createStyles((t) => ({
   bare: { borderWidth: 0 },
   tab: { flexShrink: 1, flexBasis: 0, alignItems: "center", justifyContent: "center", gap: t.space["3xs"] },
   capsule: { ...StyleSheet.absoluteFillObject },
-  badge: { position: "absolute", top: -t.space.xs, left: t.tabBar.badgeX, borderWidth: t.border.wThick, borderColor: t.surface.card },
+  badge: { position: "absolute", top: -t.space.xs, left: t.tabBar.badgeOffsetX, borderWidth: t.border.width.thick, borderColor: t.color.background.card },
   pressed: { transform: [{ scale: 0.94 }] },
   squeezedSurface: { flex: 1, padding: t.space["2xs"] },
   disc: { flex: 1, alignItems: "center", justifyContent: "center" },
   grow: { flex: 1 },
   action: { alignItems: "center", justifyContent: "center" },
-  actionBadge: { position: "absolute", top: -t.space["2xs"], right: -t.space["2xs"], borderWidth: t.border.wThick, borderColor: t.surface.card },
+  actionBadge: { position: "absolute", top: -t.space["2xs"], right: -t.space["2xs"], borderWidth: t.border.width.thick, borderColor: t.color.background.card },
   lens: { position: "absolute", left: 0, top: 0, borderRadius: t.radius.pill, pointerEvents: "none" },
   lensGlass: { ...StyleSheet.absoluteFillObject, borderRadius: t.radius.pill },
   safeArea: { alignItems: "center", justifyContent: "flex-end", paddingBottom: t.space.sm },
@@ -122,7 +122,7 @@ function Tab({ tab, on, under, labelled, testID, onPress, onPressIn, onPressOut,
       sel.setValue(on ? 1 : 0);
       return;
     }
-    const run = Animated.timing(sel, { toValue: on ? 1 : 0, duration: t.duration.slow, easing: bezier(t.ease.out), useNativeDriver: false });
+    const run = Animated.timing(sel, { toValue: on ? 1 : 0, duration: t.motion.duration.slow, easing: bezier(t.motion.easing.out), useNativeDriver: false });
     run.start();
     return () => run.stop();
   }, [on, sel, t.duration, t.ease, reduceMotion]);
@@ -184,7 +184,7 @@ function Squeezed({ tab, testID, onPress, styles, strings }: { tab?: NavItem; te
       accessibilityRole="button"
       accessibilityLabel={tab ? str("showTabs", { label: tab.label }) : str("show")}
       // The disc is drawn under the 44pt touch size: its touch area grows to it.
-      hitSlop={hitSlopTo(t.control.hit, t.tabBar.itemSqueezed, t.tabBar.itemSqueezed)}
+      hitSlop={hitSlopTo(t.size.target.min, t.tabBar.itemSizeSqueezed, t.tabBar.itemSizeSqueezed)}
       onPress={() => onPress()}
       {...press.handlers}
       style={squeezed.view}

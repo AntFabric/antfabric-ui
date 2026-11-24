@@ -14,11 +14,11 @@ function SectionLabel({ children }: { children: string }) {
           marginTop: t.space.lg,
           marginBottom: t.space["3xs"],
           paddingHorizontal: t.space["2xs"],
-          fontSize: t.text.caption,
-          lineHeight: t.text.captionLine,
-          letterSpacing: t.text.caption * 0.08 /* tracking.caps, 0.08em, in points */,
+          fontSize: t.font.size.caption,
+          lineHeight: t.font.lineHeight.caption,
+          letterSpacing: t.font.size.caption * 0.08 /* tracking.caps, 0.08em, in points */,
           textTransform: "uppercase",
-          color: t.fg.faint,
+          color: t.color.text.faint,
         },
       ]}
     >
@@ -30,7 +30,7 @@ function SectionLabel({ children }: { children: string }) {
 function Group({ children }: { children: ReactNode }) {
   const { t } = useTheme();
   return (
-    <View style={{ gap: t.space["2xs"], paddingHorizontal: t.space.md, paddingVertical: t.space["2xs"], borderRadius: t.radius.card, backgroundColor: t.surface.card }}>
+    <View style={{ gap: t.space["2xs"], paddingHorizontal: t.space.md, paddingVertical: t.space["2xs"], borderRadius: t.radius.card, backgroundColor: t.color.background.card }}>
       {children}
     </View>
   );
@@ -40,7 +40,7 @@ function Group({ children }: { children: ReactNode }) {
 export default function MobileNotificationSettings() {
   const { t } = useTheme();
   return (
-    <View style={{ flex: 1, backgroundColor: t.surface.recessed }}>
+    <View style={{ flex: 1, backgroundColor: t.color.background.recessed }}>
       <MobileHeader variant="pushed" title="Notifications" statusBar={false} actions={[]} />
 
       <ScrollView style={{ flex: 1, minHeight: 0 }} contentContainerStyle={{ gap: t.space.xs, paddingHorizontal: t.space.lg, paddingBottom: t.space.xl }} showsVerticalScrollIndicator={false}>

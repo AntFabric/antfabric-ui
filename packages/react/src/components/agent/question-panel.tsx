@@ -73,7 +73,7 @@ const fieldLook: CSSProperties = { ...input, width: "100%", borderStyle: "solid"
 /** A scroll area a keyboard can reach: a tab stop with a name and a ring, since a clipped list cannot be scrolled otherwise (Safari does not focus scrollers). */
 function useScrollRegion() {
   const ui = useInteraction();
-  return { tabIndex: 0, ...ui.handlers, ring: ui.focused ? ({ boxShadow: `inset 0 0 0 2px ${t.focus.ring}` } as CSSProperties) : undefined };
+  return { tabIndex: 0, ...ui.handlers, ring: ui.focused ? ({ boxShadow: `inset 0 0 0 2px ${t.color.border.focus}` } as CSSProperties) : undefined };
 }
 
 interface RowProps {
@@ -117,7 +117,7 @@ function Row({ option, index, id, chosen, tabbable, disabled, onChoose, onMove, 
       onClick={() => onChoose(index, false)}
       onKeyDown={keys}
       {...ui.handlers}
-      style={css(pressable, row, rtl({ width: "100%", textAlign: "left" }, dir), partStyle(r, "row", { cursor: disabled ? "not-allowed" : "pointer", transition: `background ${t.duration.fast}, border-color ${t.duration.fast}` }))}
+      style={css(pressable, row, rtl({ width: "100%", textAlign: "left" }, dir), partStyle(r, "row", { cursor: disabled ? "not-allowed" : "pointer", transition: `background ${t.motion.duration.fast}, border-color ${t.motion.duration.fast}` }))}
     >
       <span style={css(box, { flex: 1, gap: t.space["3xs"] })}>
         <span data-af-part="rowLabel" style={css(text, r.rowLabel)}>

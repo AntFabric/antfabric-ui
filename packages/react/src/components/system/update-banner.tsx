@@ -97,9 +97,9 @@ function Art({ styles }: { styles?: PartStyles<"update-banner"> }) {
 const card: CSSProperties = {
   ...row,
   width: "100%",
-  paddingInline: t.updateBanner.cardPadX,
+  paddingInline: t.updateBanner.cardPaddingX,
   textAlign: "left",
-  transition: `background ${t.duration.base}`,
+  transition: `background ${t.motion.duration.base}`,
 };
 
 function Card({
@@ -204,7 +204,7 @@ function RailIcon({ stage, pending, styles, strings, onPress }: { stage: UpdateB
           aria-hidden
           data-af-part="railDot"
           style={css(
-            { position: "absolute", boxShadow: `0 0 0 2px ${t.surface.chrome}` },
+            { position: "absolute", boxShadow: `0 0 0 2px ${t.color.background.chrome}` },
             partStyle(r, "railDot", enter("pop")),
           )}
         />

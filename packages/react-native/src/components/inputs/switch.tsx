@@ -47,7 +47,7 @@ export function Switch({ checked, label, description = "", icon = "", hideLabel 
   // The thumb slides by transform, as the native switches animate it.
   const x = useRef(new Animated.Value(on ? 1 : 0)).current;
   useEffect(() => {
-    const run = Animated.timing(x, { toValue: on ? 1 : 0, duration: t.duration.quick, easing: bezier(t.ease.out), useNativeDriver: Platform.OS !== "web" });
+    const run = Animated.timing(x, { toValue: on ? 1 : 0, duration: t.motion.duration.quick, easing: bezier(t.motion.easing.out), useNativeDriver: Platform.OS !== "web" });
     run.start();
     return () => run.stop();
   }, [on, x, t.duration, t.ease]);

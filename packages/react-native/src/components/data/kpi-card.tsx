@@ -59,7 +59,7 @@ function Trend({ rows, y, label, styles, id }: { rows: Row[]; y: string; label: 
   const r = useRecipe(recipes["kpi-card"], { styles });
   return (
     <View testID={id("trend")} onLayout={onLayout} style={[{ alignSelf: "stretch" }, r.trend.view]}>
-      <Sparkline data={rows} y={y} width={width} height={t.kpi.cardTrendH} area flush animate label={label} />
+      <Sparkline data={rows} y={y} width={width} height={t.kpi.cardTrendHeight} area flush animate label={label} />
     </View>
   );
 }
@@ -73,7 +73,7 @@ export function KpiCard({ label, value, format = { type: "currency" }, delta, de
   const id = (part: string) => partId(testID, "kpi-card", part);
   const formatWords: FormatWords = { unavailable: str("unavailable"), points: ({ value }) => str("formatPoints", { value }), duration: ({ minutes, seconds }) => str("formatDuration", { minutes, seconds }) };
   if (loading) {
-    const lines = [{ width: `${t.kpi.loadM}px`, height: `${t.kpi.loadLineH}px` }, { width: `${t.kpi.loadL}px`, height: `${t.kpi.loadValueH}px` }, { width: `${t.kpi.loadXl}px`, height: `${t.kpi.loadLineH}px` }];
+    const lines = [{ width: `${t.kpi.loadWidthMd}px`, height: `${t.kpi.loadLineHeight}px` }, { width: `${t.kpi.loadWidthLg}px`, height: `${t.kpi.loadValueHeight}px` }, { width: `${t.kpi.loadWidthXl}px`, height: `${t.kpi.loadLineHeight}px` }];
     return <Card pad="none" elevate="card" style={StyleSheet.flatten([s.card, style])} children={<View testID={id("root")} accessible accessibilityLabel={str("loading", { label })} accessibilityState={{ busy: true }} {...rootProps(rest)} style={r.root.view}><LoadingLines lines={lines} label={str("loadingLines", { label })} /></View>} />;
   }
   // The sentence about the change: core says which way it went and by how much, the words are the card's.
@@ -103,7 +103,7 @@ export function KpiCard({ label, value, format = { type: "currency" }, delta, de
                 {change ? (
                   <View testID={id("moved")} style={[s.moved, r.moved.view]}>
                     <Text style={r.moved.text}>{change.text}</Text>
-                    <Icon name={TRENDING[change.direction]} size={t.icon.sizeMd} color={r.moved.text.color} />
+                    <Icon name={TRENDING[change.direction]} size={t.size.icon.md} color={r.moved.text.color} />
                   </View>
                 ) : null}
                 {note ? <Text testID={id("note")} style={[r.note.view, r.note.text]}>{note}</Text> : null}

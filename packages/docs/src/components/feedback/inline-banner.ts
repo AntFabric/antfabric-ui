@@ -358,9 +358,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "What the assistant remembers",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -405,9 +405,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "What the assistant remembers",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -451,9 +451,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "What the assistant remembers",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -485,9 +485,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "What the assistant remembers",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -518,9 +518,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "What the assistant remembers",
                 style: {
-                  fontSize: "$text.body",
-                  fontWeight: "$font.weightSemibold",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.body",
+                  fontWeight: "$font.weight.semibold",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -692,17 +692,17 @@ const docs: ComponentDocs = {
                       el: "text",
                       text: "Hey Companion, this is Priya.",
                       style: {
-                        fontSize: "$text.lead",
-                        fontWeight: "$font.weightSemibold",
-                        color: "$fg.strong",
+                        fontSize: "$font.size.lead",
+                        fontWeight: "$font.weight.semibold",
+                        color: "$color.text.strong",
                       },
                     },
                     {
                       el: "text",
                       text: "Find a quiet spot and speak clearly at arm’s length.",
                       style: {
-                        fontSize: "$text.bodySm",
-                        color: "$fg.faint",
+                        fontSize: "$font.size.bodySm",
+                        color: "$color.text.faint",
                       },
                     },
                   ],

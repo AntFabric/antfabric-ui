@@ -9,22 +9,22 @@ import { defineRecipe } from "../../recipe";
 export const switchRecipe = defineRecipe({
   parts: ["root", "icon", "label", "description", "track", "thumb"],
   styles: {
-    root: { base: { gap: "$choice.gap", minHeight: "$control.hit", font: "$font.sans" }, states: { disabled: { opacity: "$opacity.disabled" } } },
-    icon: { base: { square: "$icon.sizeMd", fg: "$fg.muted" }, platforms: { mobile: { base: { square: "$icon.size" } } } }, // idiom: one step larger
+    root: { base: { gap: "$choice.gap", minHeight: "$size.target.min", font: "$font.family.sans" }, states: { disabled: { opacity: "$opacity.disabled" } } },
+    icon: { base: { square: "$size.icon.md", fg: "$color.text.muted" }, platforms: { mobile: { base: { square: "$size.icon.default" } } } }, // idiom: one step larger
     label: {
-      base: { size: "$text.caption", line: "$text.captionLine", weight: "$font.weightSemibold", fg: "$fg.body" },
-      platforms: { mobile: { base: { size: "$text.body", line: "$text.bodyLine" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.semibold", fg: "$color.text.body" },
+      platforms: { mobile: { base: { size: "$font.size.body", line: "$font.lineHeight.body" } } }, // idiom: one step larger
     },
     description: {
-      base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal" } } }, // idiom: one step larger
     },
     track: {
-      base: { width: "$switch.trackW", height: "$switch.trackH", padding: "$switch.trackPad", radius: "$radius.pill", bg: "$switch.trackOff" },
+      base: { width: "$switch.trackWidth", height: "$switch.trackHeight", padding: "$switch.trackPadding", radius: "$radius.pill", bg: "$switch.trackOffColor" },
       // Hover greys the off track to the muted edge and deepens the coral of the on one; the phone has no hover.
-      states: { on: { bg: "$brand.default" }, hover: { bg: "$border.muted" }, "hover+on": { bg: "$brand.hover" }, focus: { shadow: "$shadow.focus" } },
+      states: { on: { bg: "$color.background.brand.default" }, hover: { bg: "$color.border.muted" }, "hover+on": { bg: "$color.background.brand.hover" }, focus: { shadow: "$elevation.shadow.focus" } },
     },
-    thumb: { base: { square: "$switch.thumbSize", radius: "$radius.circle", bg: "$switch.thumb", shadow: "$switch.thumbShadow" } },
+    thumb: { base: { square: "$switch.thumbSize", radius: "$radius.circle", bg: "$switch.thumbColor", shadow: "$switch.thumbShadow" } },
   },
   reads: ["$switch.thumbTravel"],
 });

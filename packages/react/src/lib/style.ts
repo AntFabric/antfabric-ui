@@ -75,12 +75,12 @@ export function truncate(lines = 1): CSSProperties {
  * specular edge. `clear` is the lighter material over media.
  */
 export function glass(kind: "glass" | "glass-clear" = "glass"): CSSProperties {
-  const filter = `blur(${t.glass.blur}) saturate(${t.glass.saturate})`;
+  const filter = `blur(${t.effect.glass.blur}) saturate(${t.effect.glass.saturate})`;
   return {
-    background: kind === "glass-clear" ? t.glass.clear : t.glass.bg,
+    background: kind === "glass-clear" ? t.color.background.glass.clear : t.color.background.glass.default,
     backdropFilter: filter,
     WebkitBackdropFilter: filter,
-    boxShadow: t.shadow.glass,
+    boxShadow: t.elevation.shadow.glass,
     borderColor: "transparent",
   };
 }

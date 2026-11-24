@@ -13,8 +13,8 @@
  *   tokens    leaves by set: `shared`, `schemes`, `profiles`, `os`
  *   recipes   per-component recipe overrides by recipe id (`ThemeRecipes`), a child's cell over its parent's; `recipeFor` lays them over a recipe
  *
- * `fg.onBrand` follows the fill: in each scheme where this theme's `brand` or `tokens` set `brand.default`, it is white or ink by contrast
- * (`onBrandFor`, WCAG 4.5:1), unless the theme's own `tokens` set `fg.onBrand` for that scheme too. A theme that leaves `brand.default`
+ * `color.text.onBrand` follows the fill: in each scheme where this theme's `brand` or `tokens` set `color.background.brand.default`, it is white or ink by contrast
+ * (`onBrandFor`, WCAG 4.5:1), unless the theme's own `tokens` set `color.text.onBrand` for that scheme too. A theme that leaves `color.background.brand.default`
  * alone keeps its parent's (the schema's is what `onBrandFor` gives AntFabric's coral: ink).
  *
  * Every path is checked against `tokenSource` for its set (an OS set against its platform's profile), so a typo throws here,
@@ -46,7 +46,7 @@ import { platformOf, tokens, tokenSource, type TokenSource } from "./tokens";
 import { neutralInput } from "./themes/neutral";
 import { PLATFORM_OS, PLATFORMS, type OS, type Platform, type Scheme } from "./types";
 import { cssVarName } from "./vars";
-import { canonicalPath, warnDeprecated } from "./deprecated";
+import { canonicalPath, legacyNames, warnDeprecated } from "./deprecated";
 
 /** Any leaf of a token subtree may be given, as a literal (`"#18181b"`, `6`, `"6px"`) or a primitive reference (`"{primitives.color.neutral.900}"`). */
 export type TokenOverrides<T> = { [K in keyof T]?: T[K] extends string | number ? string | number : TokenOverrides<T[K]> };
@@ -256,7 +256,7 @@ export function defineTheme(input: ThemeInput): Theme {
     throw new Error(`defineTheme("${name}"), ${layer}: ${message}`);
   };
   const sets = new Map<SetName, Record<string, Value>>();
-  /** The layer that last wrote each `<set>|<path>`, so `fg.onBrand` can follow a `brand.default` this theme set. */
+  /** The layer that last wrote each `<set>|<path>`, so `color.text.onBrand` can follow a `color.background.brand.default` this theme set. */
   const by = new Map<string, string>();
   const put = (layer: string, set: SetName, given: string, v: unknown) => {
     // A renamed token's old path sets the new one (`deprecated.ts`).
@@ -325,7 +325,7 @@ export function defineTheme(input: ThemeInput): Theme {
     if (mono !== undefined) {
       const family = typeof mono === "string" ? mono.trim() : "";
       if (!family || /["'()[\]]/.test(family) || flaw(family)) fail("fonts", `mono must be a font family name (no quotes, brackets, backslashes or comment markers), got "${String(mono)}"`);
-      put("fonts", "shared", "font.mono", `"${family}", ${tokens.shared.font.mono}`);
+      put("fonts", "shared", "font.family.mono", `"${family}", ${tokens.shared.font.family.mono}`);
     }
   }
 
@@ -348,14 +348,14 @@ export function defineTheme(input: ThemeInput): Theme {
     named("os", t.os, OSES, (k) => `os.${k}`);
   }
 
-  // fg.onBrand: by contrast on a `brand.default` this theme set (its brand or its tokens), unless its own tokens set `fg.onBrand` for the scheme.
+  // color.text.onBrand: by contrast on a `color.background.brand.default` this theme set (its brand or its tokens), unless its own tokens set `color.text.onBrand` for the scheme.
   for (const scheme of SCHEMES) {
     const set: SetName = `schemes.${scheme}`;
-    const fill = by.get(`${set}|brand.default`);
-    if (!fill || fill.startsWith("extends") || by.get(`${set}|fg.onBrand`)?.startsWith("tokens")) continue;
-    const rgb = rgbOf(String(resolveValue(sets.get(set)!["brand.default"]!)));
+    const fill = by.get(`${set}|color.background.brand.default`);
+    if (!fill || fill.startsWith("extends") || by.get(`${set}|color.text.onBrand`)?.startsWith("tokens")) continue;
+    const rgb = rgbOf(String(resolveValue(sets.get(set)!["color.background.brand.default"]!)));
     // A fill this cannot read (oklch(), a keyword) takes white, as every brand did before 1.1, not the schema's ink (AntFabric's coral's).
-    put(fill, set, "fg.onBrand", rgb ? onBrandFor(rgb) : "#ffffff");
+    put(fill, set, "color.text.onBrand", rgb ? onBrandFor(rgb) : "#ffffff");
   }
 
   // Resolved, in the shape `Theme.sets` has: only the sets that hold something.
@@ -374,7 +374,7 @@ export function defineTheme(input: ThemeInput): Theme {
   checkOverrides(input.recipes, badRecipe("recipes"));
   const recipes = mergeOverrides(parent?.recipes, input.recipes);
   const kept = prune(recipes);
-  const id = !sets.size && kept === undefined ? "" : `${slug(name)}-${fnv1a(canonical({ sets: shape, recipes: kept ?? {} }))}`;
+  const id = !sets.size && kept === undefined ? "" : `${slug(name)}-${fnv1a(canonical(legacyNames({ sets: shape, recipes: kept ?? {} })))}`;
 
   // Marked before it is frozen: the mark is a property, and a frozen object takes none.
   const theme = deepFreeze(markBuilt({ id, name, sets: shape, recipes: recipes as ThemeRecipes })) as Theme;
@@ -406,7 +406,7 @@ function setsOf(theme: Theme): Map<SetName, Readonly<Record<string, Value>>> {
 
 /** One variable in one layer: its value as the browser resolves it, and as the sheet writes it (a reference is its primitive's variable). */
 /**
- * `alias` marks a base token that is another token (`var(--af-border-subtle)`): under a theme it is whatever the target is there, so
+ * `alias` marks a base token that is another token (`var(--af-color-border-subtle)`): under a theme it is whatever the target is there, so
  * its `value` (the base's) says nothing about what the browser gives, and it is the same as another declaration only when both write the same thing.
  */
 type Decl = { value: string; css: string; primitive?: string; alias?: true };

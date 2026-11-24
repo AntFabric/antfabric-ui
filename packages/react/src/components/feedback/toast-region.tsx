@@ -74,7 +74,7 @@ export function ToastRegion({ side = "bottom", align = "center", max = 3, childr
     <>
       <span ref={marker} hidden />
       {floating && layer.host ? (
-        <OverlayLayer host={layer.host} zIndex={t.z.toast} modal={false} near={marker}>
+        <OverlayLayer host={layer.host} zIndex={t.zIndex.toast} modal={false} near={marker}>
           {drawn}
         </OverlayLayer>
       ) : (

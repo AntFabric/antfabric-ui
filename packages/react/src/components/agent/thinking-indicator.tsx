@@ -123,7 +123,7 @@ export function ThinkingIndicator({ steps = [], agentName = "", words = [], sinc
             <span
               key={i}
               data-af-part="cell"
-              style={partStyle(r, "cell", still ? { opacity: 0.6 } : { opacity: 0.15, animation: `af-lattice ${CYCLE_MS}ms ${t.ease.standard} ${ring * RING_MS}ms infinite` })}
+              style={partStyle(r, "cell", still ? { opacity: 0.6 } : { opacity: 0.15, animation: `af-lattice ${CYCLE_MS}ms ${t.motion.easing.standard} ${ring * RING_MS}ms infinite` })}
             />
           ))}
         </span>
@@ -140,7 +140,7 @@ export function ThinkingIndicator({ steps = [], agentName = "", words = [], sinc
           name="chevron-down"
           size={r.chevron.width}
           color={r.chevron.color}
-          style={partStyle(r, "chevron", { transform: unfolded ? "rotate(180deg)" : "none", transition: `transform ${t.duration.base} ${t.ease.out}` })}
+          style={partStyle(r, "chevron", { transform: unfolded ? "rotate(180deg)" : "none", transition: `transform ${t.motion.duration.base} ${t.motion.easing.out}` })}
         />
       )}
     </>
@@ -169,7 +169,7 @@ export function ThinkingIndicator({ steps = [], agentName = "", words = [], sinc
         </div>
       )}
       {hasTrace && (
-        <div aria-hidden={!unfolded} style={{ display: "grid", gridTemplateRows: unfolded ? "1fr" : "0fr", transition: `grid-template-rows 350ms ${t.ease.out}`, alignSelf: "stretch" }}>
+        <div aria-hidden={!unfolded} style={{ display: "grid", gridTemplateRows: unfolded ? "1fr" : "0fr", transition: `grid-template-rows 350ms ${t.motion.easing.out}`, alignSelf: "stretch" }}>
           <div style={{ overflow: "hidden", minHeight: 0 }}>
             <div data-af-part="trace" style={css(box, rtl({ paddingLeft: `calc(${r.mark.width} + ${t.space.sm})` }, dir), { paddingBottom: t.space["3xs"] }, r.trace)}>
               <AgentSteps steps={steps} />

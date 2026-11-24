@@ -44,7 +44,7 @@ const docs: ComponentDocs = {
       default: true,
       description: "An icon beside the value in the caution (triangle) and critical (circle) states, so the state is not the ring's colour alone (WCAG 1.4.1), as Meter's `showState`. On by default; `false` leaves the colour and the summary to say it (\"84%, caution\"), for a product that prints the state beside the gauge itself.",
     },
-    size: { type: "number", description: "The half ring's width, in px (points on the phone); its height is half. Default 280 on the web and desktop, 220 on the phone: `chart.gaugeW`." },
+    size: { type: "number", description: "The half ring's width, in px (points on the phone); its height is half. Default 280 on the web and desktop, 220 on the phone: `chart.gaugeWidth`." },
     empty: { ...empty, default: "No value yet", description: "The title of the empty state when the value is not a number." },
     emptyLine: { ...emptyLine, default: "It shows once there is a number to measure.", description: "One sentence under it: what to do about it." },
     loading,
@@ -56,9 +56,9 @@ const docs: ComponentDocs = {
       import: "import { GaugeChart } from \"@antfabric/ui-react/data\"",
       notes: [
         "Shipped from the data subpath: recharts is reached only from there. The ring is handed an explicit width and height, never a responsive container.",
-        "The fill is `tokens.data.warning` or `data.negative` once the share crosses a threshold, and a series colour otherwise, so a gauge reads the same as the Meter that shows the same number; no colour of the brand is read.",
+        "The fill is `tokens.color.background.data.warning` or `color.background.data.negative` once the share crosses a threshold, and a series colour otherwise, so a gauge reads the same as the Meter that shows the same number; no colour of the brand is read.",
         "The fill draws in from the left over 600ms on the kit's ease-out and tweens to a new value; the number in the hole eases with it (MetricValue). Reduced motion turns both off.",
-        "The tick is drawn across the band and a little past it on both sides (`chart.tickOver`), so it reads as a mark on the ring and not a gap in it.",
+        "The tick is drawn across the band and a little past it on both sides (`chart.tickOverhang`), so it reads as a mark on the ring and not a gap in it.",
       ],
     },
     desktop: {
@@ -72,7 +72,7 @@ const docs: ComponentDocs = {
       import: "import { GaugeChart } from \"@antfabric/ui-react-native/data\"",
       notes: [
         "Shipped from the data subpath: gifted-charts and react-native-svg are reached only from there.",
-        "gifted-charts draws a half ring as a whole pie, in a view half as tall that crops it; the kit lays that view `chart.tickOver` down in a taller one so the tick has room above the ring.",
+        "gifted-charts draws a half ring as a whole pie, in a view half as tall that crops it; the kit lays that view `chart.tickOverhang` down in a taller one so the tick has room above the ring.",
         "gifted-charts' slices have square ends, so the fill and the track meet in a straight cut, not the web's round ends. That is the one difference in the drawing.",
         "The ring pops in over 220ms unless the person reduces motion.",
         "In the catalogue, where the phone kit is drawn through react-native-web, a half ring would be shrunk into its half-height view instead of cropped by it. The catalogue's react-native-svg stand-in sets `flex-shrink: 0` on every svg it draws, so the svg keeps its size and the view crops it, as it does on a device; nothing is done to the kit's own code.",

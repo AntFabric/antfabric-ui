@@ -26,7 +26,7 @@ export function easeFn(easing: string): (x: number) => number {
 export interface TweenOptions {
   /** How long the change takes, ms (default 300). */
   ms?: number;
-  /** The curve, as the kit's `ease.out` resolves (`cubic-bezier(.16,1,.3,1)`). */
+  /** The curve, as the kit's `motion.easing.out` resolves (`cubic-bezier(.16,1,.3,1)`). */
   easing?: string;
   /** No movement: the value is returned as it is. Reduced motion, or a caller that never animates. */
   off?: boolean;

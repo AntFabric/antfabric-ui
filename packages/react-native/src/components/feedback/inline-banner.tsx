@@ -86,10 +86,10 @@ export function InlineBanner({
     if (!gone) announce([title, message].filter(Boolean).join(". "));
   }, [tone, title, message]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
-    const run = Animated.timing(fade, { toValue: gone ? 0 : 1, duration: t.duration.base, useNativeDriver: Platform.OS !== "web" });
+    const run = Animated.timing(fade, { toValue: gone ? 0 : 1, duration: t.motion.duration.base, useNativeDriver: Platform.OS !== "web" });
     run.start();
     return () => run.stop();
-  }, [gone, fade, t.duration.base]);
+  }, [gone, fade, t.motion.duration.base]);
   return (
     <Enter motion="fade" style={{ alignSelf: "stretch" }}>
       <Animated.View

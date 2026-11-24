@@ -69,7 +69,7 @@ const docs: ComponentDocs = {
         "Shipped from the data subpath: recharts is reached only from there. The ring is handed an explicit size, never a responsive container.",
         "Pointing at a segment, tabbing to a row or pointing at one lights that segment: the others fade to 38% over 150ms on the kit's ease-out, and the hole's number eases to the segment's value (MetricValue). The states come from the kit's interaction hook and recharts' own mouse events, never `:hover`.",
         "The ring draws in once over 600ms on the kit's ease-out and tweens when a segment is turned off or the rows change. Reduced motion turns both off.",
-        "The legend sits under the ring in as many columns as fit, each at least `chart.partMinW` wide, so a narrow card has fewer columns, not a squeezed ring.",
+        "The legend sits under the ring in as many columns as fit, each at least `chart.partMinWidth` wide, so a narrow card has fewer columns, not a squeezed ring.",
         "Segments are not keyboard stops: the list is the way in for a keyboard (each row is a button that picks its segment, a swatch toggle beside it turns the segment off, and focusing either lights its segment), and \"View as table\" has every number.",
       ],
       keyboard: [
@@ -149,7 +149,7 @@ const docs: ComponentDocs = {
     {
       title: "More than eight segments",
       platforms: ["web", "desktop", "mobile"],
-      handling: "The palette has eight colours, and a ninth would wrap onto the first, so the first eight keep their own and every row after them is summed into one more, labelled \"Other\", in a neutral grey (`chart.other`) that is no colour of the palette. Pass the rows largest first so what is folded is what is smallest. It is one row in the list and turns off as one, and the summary says how many it holds (\"Other, 3 more, 47 (6.1%)\"). \"View as table\" shows every row.",
+      handling: "The palette has eight colours, and a ninth would wrap onto the first, so the first eight keep their own and every row after them is summed into one more, labelled \"Other\", in a neutral grey (`chart.otherColor`) that is no colour of the palette. Pass the rows largest first so what is folded is what is smallest. It is one row in the list and turns off as one, and the summary says how many it holds (\"Other, 3 more, 47 (6.1%)\"). \"View as table\" shows every row.",
       example: { name: "Eleven channels", props: { ...tickets, data: CHANNELS_MANY, subtitle: "Eleven channels, October 2026" }, width: 520 },
     },
     {

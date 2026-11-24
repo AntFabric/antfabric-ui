@@ -61,7 +61,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 /** Layout no token decides; what the tokens decide (size, colours, radius) is the recipe's. */
 const useStyles = createStyles((t) => ({
   root: { alignItems: "center", justifyContent: "center" },
-  badge: { position: "absolute", top: t.iconButton.badgeTop, right: t.iconButton.badgeRight },
+  badge: { position: "absolute", top: t.iconButton.badgeOffsetY, right: t.iconButton.badgeOffsetX },
   // The avatar part fills the button; the face inside fills the part.
   avatar: { width: "100%", height: "100%", overflow: "hidden" },
   face: { width: "100%", height: "100%" },
@@ -105,8 +105,8 @@ export function IconButton({
   useEffect(() => {
     const run = Animated.timing(scale, {
       toValue: press.pressed ? 0.92 : 1,
-      duration: t.duration.fast,
-      easing: bezier(t.ease.out),
+      duration: t.motion.duration.fast,
+      easing: bezier(t.motion.easing.out),
       useNativeDriver: Platform.OS !== "web",
     });
     run.start();
@@ -122,7 +122,7 @@ export function IconButton({
       accessibilityState={{ disabled: press.disabled, selected: toggle || on ? on : undefined }}
       disabled={press.disabled}
       // The visible box is 40pt (32 for sm); the target reaches 44.
-      hitSlop={hitSlopTo(t.control.hit, side, side)}
+      hitSlop={hitSlopTo(t.size.target.min, side, side)}
       onPress={() => {
         if (toggle) setOn(!on);
         onPress?.();

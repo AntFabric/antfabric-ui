@@ -114,7 +114,7 @@ function Item({ label, value, share, color, on, active, picked, onPick, onToggle
           ui.handlers.onBlur();
           onHot(false);
         }}
-        style={css(pressable, partStyle(r, "item", { display: "grid", gridTemplateColumns: `${t.space.smMd} 1fr`, alignItems: "center", alignSelf: "stretch", textAlign: "left", fontFamily: t.chart.font, columnGap: t.space.sm }))}
+        style={css(pressable, partStyle(r, "item", { display: "grid", gridTemplateColumns: `${t.space.smMd} 1fr`, alignItems: "center", alignSelf: "stretch", textAlign: "left", fontFamily: t.chart.fontFamily, columnGap: t.space.sm }))}
       >
         <span aria-hidden data-af-part="swatch" style={partStyle(r, "swatch", { background: color, opacity: on ? 1 : t.opacity.muted })} />
         <span data-af-part="label" style={css(text, partStyle(r, "label", { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textDecoration: on ? "none" : "line-through" }))}>{label}</span>
@@ -123,7 +123,7 @@ function Item({ label, value, share, color, on, active, picked, onPick, onToggle
           <span data-af-part="share" style={css(text, { fontVariantNumeric: "tabular-nums" }, r.share)}>{share}</span>
         </span>
       </button>
-      {/* The swatch's own control: a transparent button beside the row's (not inside it), centred on the swatch and `control.hit` square, WCAG 2.2's
+      {/* The swatch's own control: a transparent button beside the row's (not inside it), centred on the swatch and `size.target.min` square, WCAG 2.2's
           24px target, so the swatch is drawn once and the button reaches past it. */}
       <button
         type="button"
@@ -135,13 +135,13 @@ function Item({ label, value, share, color, on, active, picked, onPick, onToggle
         {...swatchUi.handlers}
         style={css(pressable, {
           position: "absolute",
-          top: `calc(${r.item.paddingTop ?? t.space.xs} + (${t.text.captionLine} - ${t.control.hit}) / 2)`,
-          left: `calc(${r.item.paddingLeft ?? t.space.sm} + (${t.space.smMd} - ${t.control.hit}) / 2)`,
-          width: t.control.hit,
-          height: t.control.hit,
+          top: `calc(${r.item.paddingTop ?? t.space.xs} + (${t.font.lineHeight.caption} - ${t.size.target.min}) / 2)`,
+          left: `calc(${r.item.paddingLeft ?? t.space.sm} + (${t.space.smMd} - ${t.size.target.min}) / 2)`,
+          width: t.size.target.min,
+          height: t.size.target.min,
           borderRadius: t.radius.circle,
           background: "transparent",
-          boxShadow: swatchUi.focused ? t.shadow.focus : "none",
+          boxShadow: swatchUi.focused ? t.elevation.shadow.focus : "none",
         })}
       />
     </li>
@@ -224,7 +224,7 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
                           key={x.key}
                           fill={s.colorOf(x.key)}
                           fillOpacity={focus === null || focus.key === x.key ? 1 : DIMMED}
-                          style={{ cursor: "pointer", outline: "none", transition: `fill-opacity ${t.duration.base} ${t.ease.out}` }}
+                          style={{ cursor: "pointer", outline: "none", transition: `fill-opacity ${t.motion.duration.base} ${t.motion.easing.out}` }}
                         />
                       ))}
                     </Pie>
@@ -236,13 +236,13 @@ export function DonutChart({ data, name, value, title, subtitle = "", headline, 
                   )}
                 </PieChart>
                 <div aria-hidden data-af-part="center" style={css(box, { position: "absolute", inset: 0, alignItems: "center", justifyContent: "center", pointerEvents: "none", textAlign: "center" }, r.center)}>
-                  <span data-af-part="centerLabel" style={css(text, { maxWidth: LABEL_SHARE, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: t.chart.font }, r.centerLabel)}>
+                  <span data-af-part="centerLabel" style={css(text, { maxWidth: LABEL_SHARE, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: t.chart.fontFamily }, r.centerLabel)}>
                     {focus ? focus.label : (centerLabel ?? str("centerLabel"))}
                   </span>
                   <MetricValue value={focus ? focus.value : total} format={format} size="md" />
                 </div>
               </div>
-              <ul data-af-part="list" aria-label={str("segments")} style={css({ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${t.chart.partMinW}, 1fr))`, columnGap: t.space.lg, listStyle: "none", margin: 0, padding: 0 }, r.list)}>
+              <ul data-af-part="list" aria-label={str("segments")} style={css({ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${t.chart.partMinWidth}, 1fr))`, columnGap: t.space.lg, listStyle: "none", margin: 0, padding: 0 }, r.list)}>
                 {all.map((x) => {
                   const on = s.visible.includes(x.key);
                   return (

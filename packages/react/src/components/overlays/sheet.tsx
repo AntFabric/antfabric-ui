@@ -18,7 +18,7 @@ export interface SheetProps extends RootProps<HTMLDivElement> {
   onOpenChange?: (open: boolean) => void;
   /** Which edge of the window it slides in from: end (the right in a left-to-right page) for details, start for a navigation drawer. */
   side?: SheetSide;
-  /** The panel's width in pixels; 0 is the `sheet.w` token. A window narrower than that draws it full width. */
+  /** The panel's width in pixels; 0 is the `sheet.width` token. A window narrower than that draws it full width. */
   width?: number;
   /** The header's title. Empty draws no title (a drawer names itself with `label`). */
   title?: string;
@@ -96,7 +96,7 @@ export function Sheet({
     <>
       <span ref={marker} hidden />
       {floating && layer.host ? (
-        <OverlayLayer host={layer.host} zIndex={t.z.modal} modal near={marker}>
+        <OverlayLayer host={layer.host} zIndex={t.zIndex.modal} modal near={marker}>
           {drawn}
         </OverlayLayer>
       ) : (

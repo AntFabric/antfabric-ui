@@ -170,9 +170,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "Projects",
                 style: {
-                  fontSize: "$text.bodySm",
-                  fontWeight: "$font.weightMedium",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.bodySm",
+                  fontWeight: "$font.weight.medium",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -203,9 +203,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "Projects",
                 style: {
-                  fontSize: "$text.bodySm",
-                  fontWeight: "$font.weightMedium",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.bodySm",
+                  fontWeight: "$font.weight.medium",
+                  color: "$color.text.strong",
                 },
               },
               {
@@ -235,9 +235,9 @@ const docs: ComponentDocs = {
                 el: "text",
                 text: "Projects",
                 style: {
-                  fontSize: "$text.bodySm",
-                  fontWeight: "$font.weightMedium",
-                  color: "$fg.strong",
+                  fontSize: "$font.size.bodySm",
+                  fontWeight: "$font.weight.medium",
+                  color: "$color.text.strong",
                 },
               },
               {

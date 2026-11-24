@@ -53,7 +53,7 @@ export function Checkbox({ label, description = "", checked, indeterminate = fal
       accessibilityRole="checkbox"
       accessibilityLabel={label}
       accessibilityHint={[description, form?.hint].filter(Boolean).join(". ") || undefined}
-      hitSlop={hitSlopTo(t.control.hit, t.checkbox.size + 2 * t.choice.padY, hideLabel ? t.checkbox.size : t.control.hit)}
+      hitSlop={hitSlopTo(t.size.target.min, t.checkbox.size + 2 * t.choice.paddingY, hideLabel ? t.checkbox.size : t.size.target.min)}
       accessibilityState={{ checked: mixed ? "mixed" : isChecked, disabled: press.disabled }}
       disabled={press.disabled}
       onPress={() => {
@@ -67,7 +67,7 @@ export function Checkbox({ label, description = "", checked, indeterminate = fal
       <View testID={partId(testID, "checkbox", "box")} style={[s.box, partStyle(r, "box", { view: [{ marginTop: hideLabel ? 0 : 1 }, press.pressed && { transform: [{ scale: 0.92 }] }] }).view]}>
         {filled ? (
           <Enter key={mixed ? "minus" : "check"} motion="pop">
-            <Icon testID={partId(testID, "checkbox", "tick")} name={mixed ? "minus" : "check"} size={tickSize as number} strokeWidth={t.icon.strokeTick} color={r.tick.text.color ?? r.box.text.color} style={Object.keys(tickRest).length ? tickRest : undefined} />
+            <Icon testID={partId(testID, "checkbox", "tick")} name={mixed ? "minus" : "check"} size={tickSize as number} strokeWidth={t.size.stroke.tick} color={r.tick.text.color ?? r.box.text.color} style={Object.keys(tickRest).length ? tickRest : undefined} />
           </Enter>
         ) : null}
       </View>

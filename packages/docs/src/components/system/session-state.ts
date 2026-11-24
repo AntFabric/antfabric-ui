@@ -347,7 +347,7 @@ const docs: ComponentDocs = {
               minHeight: 420,
               justify: "center",
               align: "center",
-              bg: "$surface.card",
+              bg: "$color.background.card",
             },
             children: [
               {
@@ -374,7 +374,7 @@ const docs: ComponentDocs = {
               minHeight: 420,
               justify: "center",
               align: "center",
-              bg: "$surface.card",
+              bg: "$color.background.card",
             },
             children: [
               {
@@ -399,7 +399,7 @@ const docs: ComponentDocs = {
               minHeight: 420,
               justify: "center",
               align: "center",
-              bg: "$surface.card",
+              bg: "$color.background.card",
             },
             children: [
               {
@@ -423,7 +423,7 @@ const docs: ComponentDocs = {
               minHeight: 420,
               justify: "center",
               align: "center",
-              bg: "$surface.card",
+              bg: "$color.background.card",
             },
             children: [
               {
@@ -447,7 +447,7 @@ const docs: ComponentDocs = {
               minHeight: 420,
               justify: "center",
               align: "center",
-              bg: "$surface.card",
+              bg: "$color.background.card",
             },
             children: [
               {
@@ -474,7 +474,7 @@ const docs: ComponentDocs = {
               minHeight: 520,
               justify: "center",
               align: "center",
-              bg: "$surface.card",
+              bg: "$color.background.card",
             },
             children: [
               {
@@ -501,7 +501,7 @@ const docs: ComponentDocs = {
               minHeight: 520,
               justify: "center",
               align: "center",
-              bg: "$surface.card",
+              bg: "$color.background.card",
             },
             children: [
               {
@@ -526,7 +526,7 @@ const docs: ComponentDocs = {
               minHeight: 520,
               justify: "center",
               align: "center",
-              bg: "$surface.card",
+              bg: "$color.background.card",
             },
             children: [
               {
@@ -550,7 +550,7 @@ const docs: ComponentDocs = {
               minHeight: 520,
               justify: "center",
               align: "center",
-              bg: "$surface.card",
+              bg: "$color.background.card",
             },
             children: [
               {
@@ -574,7 +574,7 @@ const docs: ComponentDocs = {
               minHeight: 520,
               justify: "center",
               align: "center",
-              bg: "$surface.card",
+              bg: "$color.background.card",
             },
             children: [
               {

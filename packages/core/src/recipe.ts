@@ -10,7 +10,7 @@
  *   export const switchRecipe = defineRecipe({
  *     parts: ["root", "track", "thumb"],
  *     styles: {
- *       track: { base: { bg: "$switch.trackOff", radius: "$radius.pill" }, states: { on: { bg: "$brand.default" } } },
+ *       track: { base: { bg: "$switch.trackOffColor", radius: "$radius.pill" }, states: { on: { bg: "$color.background.brand.default" } } },
  *     },
  *   });
  *
@@ -34,7 +34,7 @@ import type { TokenPath } from "./descriptions";
 import type { DeprecatedTokenPath } from "./deprecated";
 import type { OS, Platform } from "./types";
 
-/** `"$fg.body"`: a token by its path, as `descriptions.ts` and the Foundations page name it. */
+/** `"$color.text.body"`: a token by its path, as `descriptions.ts` and the Foundations page name it. */
 /** A renamed token's old path is still a reference until the next major version (`deprecated.ts`). */
 export type TokenRef = `$${TokenPath | DeprecatedTokenPath}`;
 export type StyleValue = TokenRef | "transparent" | "none";
@@ -63,18 +63,18 @@ export type StyleValue = TokenRef | "transparent" | "none";
  *   marginTop, marginRight, marginBottom, marginLeft    one edge's margin (a pull or a push)   the same longhands, both kits
  *   top, right, bottom, left    an offset from the positioned parent's edge    the same, both kits (the kit says `position`)
  *   inset        the same offset on all four edges `inset`                     `top` + `right` + `bottom` + `left`
- *   zIndex       the stacking order (`$z.menu`)    `zIndex`                    `zIndex`
+ *   zIndex       the stacking order (`$zIndex.menu`)    `zIndex`                    `zIndex`
  *   gap          space between children            `gap`                       `gap`
  *   radius       corner radius                     `borderRadius`              `borderRadius`
  *   radiusTop, radiusBottom      the two top, or the two bottom, corners       `border<Top|Bottom><Left|Right>Radius`, both kits
  *   radiusTopLeft, radiusTopRight, radiusBottomRight, radiusBottomLeft    one corner     `border<Corner>Radius`, both kits
- *   font         the family (`$font.sans`)         `fontFamily`                `font(…, face)`: the family's file
- *   weight       the weight (`$font.weightSemibold`) `fontWeight`              `font(weight)`: the weight's file; `none` leaves it unset
+ *   font         the family (`$font.family.sans`)         `fontFamily`                `font(…, face)`: the family's file
+ *   weight       the weight (`$font.weight.semibold`) `fontWeight`              `font(weight)`: the weight's file; `none` leaves it unset
  *   size         the font size                     `fontSize`                  `fontSize`
  *   line         the line height                   `lineHeight`                `lineHeight`
- *   tracking     letter spacing (`$tracking.caps`) `letterSpacing`             `letterSpacing`, in points (`em` × font size)
+ *   tracking     letter spacing (`$font.letterSpacing.caps`) `letterSpacing`             `letterSpacing`, in points (`em` × font size)
  *   shadow       a shadow token                    `boxShadow`                 `boxShadow`
- *   ring         an inset 1px ring in a colour     an inset `0 0 0 <border.wHairline> colour` in `boxShadow`, the same on the phone.
+ *   ring         an inset 1px ring in a colour     an inset `0 0 0 <border.width.hairline> colour` in `boxShadow`, the same on the phone.
  *                Over a 1px border it makes the 2px focus edge without moving the text.
  *   halo         a second shadow token             a shadow in `boxShadow`, the same on the phone.
  *                Shadows stack with one rule, top first: `halo`, then `ring`, then `shadow`, joined in one `boxShadow`
@@ -299,22 +299,22 @@ export function mergeLayers(layers: readonly TokenStyle[]): TokenStyle {
   return out as TokenStyle;
 }
 
-/** `"$fg.body"` → `"fg.body"`; anything else (`transparent`, `none`) → `null`. */
+/** `"$color.text.body"` → `"color.text.body"`; anything else (`transparent`, `none`) → `null`. */
 export const tokenOf = (value: StyleValue): string | null => (value.startsWith("$") ? value.slice(1) : null);
 
 /**
- * The font token's words for the phone, which picks a font by file: `$font.weightSemibold` is `semibold`,
- * `$font.weightNormal` is `regular` (the product's own `weightRegular` is the 450, `book`).
+ * The font token's words for the phone, which picks a font by file: `$font.weight.semibold` is `semibold`,
+ * `$font.weight.normal` is `regular` (the product's own `weightRegular` is the 450, `book`).
  */
 export const WEIGHT_NAMES: Record<string, "regular" | "book" | "medium" | "semibold" | "bold" | "black"> = {
-  "font.weightNormal": "regular",
-  "font.weightRegular": "book",
-  "font.weightMedium": "medium",
-  "font.weightSemibold": "semibold",
-  "font.weightBold": "bold",
-  "font.weightBlack": "black",
+  "font.weight.normal": "regular",
+  "font.weight.regular": "book",
+  "font.weight.medium": "medium",
+  "font.weight.semibold": "semibold",
+  "font.weight.bold": "bold",
+  "font.weight.black": "black",
 };
-export const FACE_NAMES: Record<string, "sans" | "display" | "mono"> = { "font.sans": "sans", "font.display": "display", "font.mono": "mono" };
+export const FACE_NAMES: Record<string, "sans" | "display" | "mono"> = { "font.family.sans": "sans", "font.family.display": "display", "font.family.mono": "mono" };
 
 /** One cell of the recipe, flattened: where it sits and the value it holds. `pnpm check recipes` and the catalogue's anatomy table both read this. */
 export interface RecipeEntry {

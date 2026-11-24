@@ -47,7 +47,7 @@ const root: CSSProperties = {
   ...row,
   width: "100%",
   cursor: "text",
-  transition: `border-color ${t.duration.base}, background ${t.duration.base}`,
+  transition: `border-color ${t.motion.duration.base}, background ${t.motion.duration.base}`,
 };
 
 // The focused edge is the border plus an outline drawn inside it (a -2 offset, which no token names).
@@ -141,7 +141,7 @@ export function SearchField({
       )}
       {!launcher && query && <IconButton part="clear" icon="x" label={s("clearSearch")} size="sm" disabled={ui.disabled} onPress={() => clear()} style={partStyle(r, "clear", { flexShrink: 0 })} />}
       {/* The hint holds its box at rest, so the placeholder never stretches into its space. */}
-      {shortcut && !query && <Kbd keys={shortcut} style={{ flexShrink: 0, opacity: isFocused || ui.hovered ? 1 : 0, transition: `opacity ${t.duration.fast}` }} />}
+      {shortcut && !query && <Kbd keys={shortcut} style={{ flexShrink: 0, opacity: isFocused || ui.hovered ? 1 : 0, transition: `opacity ${t.motion.duration.fast}` }} />}
       {launcher && (
         <button
           type="button"

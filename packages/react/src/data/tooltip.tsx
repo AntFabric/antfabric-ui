@@ -18,36 +18,36 @@ const card: CSSProperties = {
   gap: t.space["3xs"],
   padding: `${t.space.sm} ${t.space.smMd}`,
   borderRadius: t.radius.control,
-  background: t.chart.tooltip,
-  borderWidth: t.border.wHairline,
+  background: t.chart.tooltipColor,
+  borderWidth: t.border.width.hairline,
   borderStyle: "solid",
-  borderColor: t.chart.tooltipRule,
-  boxShadow: t.shadow.menu,
-  fontFamily: t.chart.font,
-  fontSize: t.text.caption,
+  borderColor: t.chart.tooltipRuleColor,
+  boxShadow: t.elevation.shadow.menu,
+  fontFamily: t.chart.fontFamily,
+  fontSize: t.font.size.caption,
   pointerEvents: "none",
 };
 
 const line: CSSProperties = { ...row, gap: t.space.xs };
 const swatch = (color?: string): CSSProperties => ({ width: t.space.smMd, height: t.space.smMd, borderRadius: t.radius.tag, flexShrink: 0, background: color });
-const number: CSSProperties = { fontVariantNumeric: "tabular-nums", fontWeight: t.font.weightSemibold, color: t.chart.tooltipText };
+const number: CSSProperties = { fontVariantNumeric: "tabular-nums", fontWeight: t.font.weight.semibold, color: t.chart.tooltipTextColor };
 
 /** The tooltip every chart shows on hover: one card, fed by core's `tipRows`. The phone kit draws the same card in `View`s and `Text`. */
 export function ChartTooltip({ tip, totalLabel, style }: ChartTooltipProps) {
   return (
     <div role="tooltip" style={css(card, style)}>
-      <span style={css(text, { fontWeight: t.font.weightSemibold, color: t.chart.tooltipText, marginBottom: t.space["3xs"] })}>{tip.title}</span>
+      <span style={css(text, { fontWeight: t.font.weight.semibold, color: t.chart.tooltipTextColor, marginBottom: t.space["3xs"] })}>{tip.title}</span>
       {tip.rows.map((r) => (
         <div key={r.key} style={line}>
           <span aria-hidden style={swatch(r.color)} />
-          <span style={css(text, { flex: 1, color: t.chart.tooltipMuted })}>{r.label}</span>
+          <span style={css(text, { flex: 1, color: t.chart.tooltipMutedColor })}>{r.label}</span>
           <span style={number}>{r.value}</span>
         </div>
       ))}
       {tip.total != null ? (
-        <div style={css(line, { borderTopWidth: t.border.wHairline, borderTopStyle: "solid", borderTopColor: t.chart.tooltipRule, marginTop: t.space["3xs"], paddingTop: t.space["3xs"] })}>
+        <div style={css(line, { borderTopWidth: t.border.width.hairline, borderTopStyle: "solid", borderTopColor: t.chart.tooltipRuleColor, marginTop: t.space["3xs"], paddingTop: t.space["3xs"] })}>
           <span aria-hidden style={swatch()} />
-          <span style={css(text, { flex: 1, color: t.chart.tooltipMuted })}>{totalLabel}</span>
+          <span style={css(text, { flex: 1, color: t.chart.tooltipMutedColor })}>{totalLabel}</span>
           <span style={number}>{tip.total}</span>
         </div>
       ) : null}

@@ -63,7 +63,7 @@ const hit: CSSProperties = {
   padding: `14px ${t.space.lg}`,
   textAlign: "left",
   width: "100%",
-  transition: `background ${t.duration.fast}`,
+  transition: `background ${t.motion.duration.fast}`,
 };
 
 const kindBadge: CSSProperties = { ...box, position: "absolute", right: neg(t.space["2xs"]), bottom: neg(t.space["2xs"]), alignItems: "center", justifyContent: "center" };
@@ -71,7 +71,7 @@ const kindBadge: CSSProperties = { ...box, position: "absolute", right: neg(t.sp
 const tile: CSSProperties = { ...box, flexShrink: 0, alignSelf: "flex-start", marginTop: t.space["3xs"], alignItems: "center", justifyContent: "center" };
 
 // Under the text column: past the padding, the face and the gap.
-const indent: CSSProperties = { paddingLeft: `calc(${t.space.lg} + ${t.avatar.md} + ${t.space.md})`, paddingRight: t.space.lg, paddingBottom: t.space.mdLg };
+const indent: CSSProperties = { paddingLeft: `calc(${t.space.lg} + ${t.size.avatar.md} + ${t.space.md})`, paddingRight: t.space.lg, paddingBottom: t.space.mdLg };
 
 const DECIDED: Record<"approved" | "declined" | "expired", string> = { approved: "circle-check", declined: "circle-x", expired: "clock" };
 
@@ -167,14 +167,14 @@ export function NotificationItem({
           onOpen?.();
         }}
         {...ui.handlers}
-        style={css(rtl(hit, dir), partStyle(r, "hit", ui.focused && { boxShadow: `inset 0 0 0 2px ${t.focus.ring}` }))}
+        style={css(rtl(hit, dir), partStyle(r, "hit", ui.focused && { boxShadow: `inset 0 0 0 2px ${t.color.border.focus}` }))}
       >
         {face ? (
           <div style={css(box, { flexShrink: 0, alignSelf: "flex-start", marginTop: t.space["3xs"] })}>
             <Avatar name={sender} src={avatarSrc} size="md" identity={agent ? "agent" : identity} agent={agent} />
             {!agent && icon && (
               <div aria-hidden data-af-part="kindBadge" style={css(rtl(kindBadge, dir), r.kindBadge)}>
-                <Icon name={icon} size={10} style={{ strokeWidth: t.icon.strokeBold }} />
+                <Icon name={icon} size={10} style={{ strokeWidth: t.size.stroke.bold }} />
               </div>
             )}
           </div>

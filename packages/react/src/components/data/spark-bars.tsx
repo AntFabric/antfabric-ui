@@ -47,7 +47,7 @@ export function SparkBars({ data, y, width = 96, height = 36, animate = false, t
   const values = data.map((row) => row[y]).filter((v): v is number => typeof v === "number" && Number.isFinite(v));
   const frame = css(partStyle(r, "root", { display: "inline-block", width, height, flexShrink: 0 }), style);
   if (!values.length) return <span data-af-part="root" {...rootProps(rest)} aria-hidden style={frame} />;
-  const color = tone === "positive" ? t.data.positive : tone === "negative" ? t.data.negative : t.chart.series1;
+  const color = tone === "positive" ? t.color.background.data.positive : tone === "negative" ? t.color.background.data.negative : t.chart.series1Color;
   const rows = values.map((v, i) => ({ i, v }));
   const [lo, hi] = valueDomain(rows, ["v"]);
   const last = rows.length - 1;
@@ -57,7 +57,7 @@ export function SparkBars({ data, y, width = 96, height = 36, animate = false, t
     <span data-af-part="root" role="img" aria-label={said} {...rootProps(rest)} style={frame}>
       <BarChart accessibilityLayer={false} width={width} height={height} data={rows} margin={{ top: 0, right: 0, bottom: 0, left: 0 }} barCategoryGap={gap / 2} style={{ display: "block" }}>
         <YAxis hide domain={[lo, hi === lo ? lo + 1 : hi]} />
-        <Bar dataKey="v" maxBarSize={t.kpi.sparkBarMaxW} radius={[t.kpi.sparkBarRadius, t.kpi.sparkBarRadius, 0, 0]} tooltipType="none" {...rechartsMotion(animate, reduced)}>
+        <Bar dataKey="v" maxBarSize={t.kpi.sparkBarMaxWidth} radius={[t.kpi.sparkBarRadius, t.kpi.sparkBarRadius, 0, 0]} tooltipType="none" {...rechartsMotion(animate, reduced)}>
           {rows.map((row) => (
             <Cell key={row.i} fill={color} fillOpacity={row.i === last ? 1 : EARLIER_BARS} />
           ))}

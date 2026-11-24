@@ -44,7 +44,7 @@ const root: CSSProperties = {
   ...enter("pop"),
 };
 
-const dotted: CSSProperties = { minWidth: t.dot.size, paddingInline: 0 };
+const dotted: CSSProperties = { minWidth: t.size.dot.default, paddingInline: 0 };
 
 export function Badge({ count = 0, max = 99, dot = false, tone = "brand", label, unread = false, live = false, styles, strings, style, ...rest }: BadgeProps) {
   const s = useStrings("badge", strings);

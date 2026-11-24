@@ -9,30 +9,30 @@ export const checkbox = defineRecipe({
   parts: ["root", "box", "tick", "label", "description"],
   styles: {
     root: {
-      base: { gap: "$choice.gap", paddingY: "$choice.padY", font: "$font.sans" },
+      base: { gap: "$choice.gap", paddingY: "$choice.paddingY", font: "$font.family.sans" },
       states: { disabled: { opacity: "$opacity.disabled" } },
       // A box drawn without its label is still a 24px target on the web and the desktop (WCAG 2.2 2.5.8); the phone reaches 44pt by hitSlop.
-      platforms: { web: { base: { minHeight: "$control.hit", minWidth: "$control.hit" } }, desktop: { base: { minHeight: "$control.hit", minWidth: "$control.hit" } } },
+      platforms: { web: { base: { minHeight: "$size.target.min", minWidth: "$size.target.min" } }, desktop: { base: { minHeight: "$size.target.min", minWidth: "$size.target.min" } } },
     },
     box: {
-      base: { square: "$checkbox.size", radius: "$checkbox.radius", borderWidth: "$border.wThick", borderColor: "$border.default", bg: "transparent", fg: "$fg.onBrand" },
+      base: { square: "$checkbox.size", radius: "$checkbox.radius", borderWidth: "$border.width.thick", borderColor: "$color.border.default", bg: "transparent", fg: "$color.text.onBrand" },
       // Hover darkens the edge of an empty box and deepens the coral of a ticked one; the phone has no hover.
       states: {
-        on: { bg: "$brand.default", borderColor: "$brand.default" },
-        hover: { borderColor: "$fg.faint" },
-        "hover+on": { bg: "$brand.hover", borderColor: "$brand.hover" },
-        focus: { shadow: "$shadow.focus" },
+        on: { bg: "$color.background.brand.default", borderColor: "$color.background.brand.default" },
+        hover: { borderColor: "$color.text.faint" },
+        "hover+on": { bg: "$color.background.brand.hover", borderColor: "$color.background.brand.hover" },
+        focus: { shadow: "$elevation.shadow.focus" },
       },
     },
     tick: { base: { square: "$checkbox.tickSize" } },
     label: {
-      base: { size: "$text.caption", line: "$text.captionLine", weight: "$font.weightSemibold", fg: "$fg.body" },
-      platforms: { mobile: { base: { size: "$text.body", line: "$text.bodyLine" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.semibold", fg: "$color.text.body" },
+      platforms: { mobile: { base: { size: "$font.size.body", line: "$font.lineHeight.body" } } }, // idiom: one step larger
     },
     description: {
-      base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal" } } }, // idiom: one step larger
     },
   },
-  reads: ["$icon.strokeTick", "$control.hit"],
+  reads: ["$size.stroke.tick", "$size.target.min"],
 });

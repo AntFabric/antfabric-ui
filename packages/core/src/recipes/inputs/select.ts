@@ -1,7 +1,7 @@
 import { defineRecipe, type PartLayers } from "../../recipe";
 
 /** The wash under the cursor or the finger: the active row, and a pressed one on the phone. */
-const wash: PartLayers = { states: { on: { bg: "$hover.surface" } } };
+const wash: PartLayers = { states: { on: { bg: "$color.background.hover" } } };
 
 /**
  * Select. Written from the React kit's table. `on` is "under the cursor" for an option (the active row, which pointer hover also moves). The web draws a
@@ -13,122 +13,122 @@ const wash: PartLayers = { states: { on: { bg: "$hover.surface" } } };
  * The phone's larger label, value, row text and icons, and its more generous gaps, are a deliberate platform idiom (owner decision, 2026-11-03), kept in `platforms.mobile`.
  * The trigger's hairline shadow and value weight, the label's weight and ink, the option's label weight, the supporting text's weight and ink and the
  * empty message's ink are the web's on the phone (item 43). Kept, borderline (listed for the owner): the trigger is the web's md field on the phone with the lg field's
- * height floor and radius (web md `control.hLg` and `radius.control`, phone minimum `control.hInput` and `radius.input`) and its right padding (web `space.smMd`, phone
- * `space.md`); the option's box (web a 9px-padded `radius.row` row, phone a `row.h` row with the pane gutter) and the dot's right margin (web `select.dotGap`, phone none,
+ * height floor and radius (web md `size.control.lg` and `radius.control`, phone minimum `size.control.input` and `radius.input`) and its right padding (web `space.smMd`, phone
+ * `space.md`); the option's box (web a 9px-padded `radius.row` row, phone a `size.row.default` row with the pane gutter) and the dot's right margin (web `select.dotGap`, phone none,
  * the row's gap does it). The phone has its own pressed fill on the trigger; the web has hover.
- * Vocabulary gap: the icon's default tint (`fg.subtle`, when the item names no colour) is read by the kits.
+ * Vocabulary gap: the icon's default tint (`color.text.subtle`, when the item names no colour) is read by the kits.
  */
 export const select = defineRecipe({
   parts: ["root", "label", "trigger", "icon", "placeholder", "supporting", "caret", "panel", "sheet", "grabber", "title", "search", "empty", "option", "optionIcon", "optionLabel", "dot"],
   styles: {
-    root: { base: { gap: "$space.xs", font: "$font.sans" }, platforms: { mobile: { base: { gap: "$space.sm" } } } },
+    root: { base: { gap: "$space.xs", font: "$font.family.sans" }, platforms: { mobile: { base: { gap: "$space.sm" } } } },
     label: {
-      base: { size: "$text.caption", line: "$text.captionLine", weight: "$font.weightSemibold", fg: "$fg.body" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.semibold", fg: "$color.text.body" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm" } } }, // idiom: one step larger
     },
     trigger: {
       base: {
         gap: "$space.sm",
-        height: "$control.hLg",
+        height: "$size.control.lg",
         paddingLeft: "$space.md",
         paddingRight: "$space.smMd",
         radius: "$radius.control",
-        bg: "$surface.card",
-        borderWidth: "$border.wHairline",
-        borderColor: "$border.subtle",
-        shadow: "$shadow.hairline",
-        font: "$font.sans",
-        size: "$text.bodySm",
-        weight: "$font.weightSemibold",
-        fg: "$fg.body",
+        bg: "$color.background.card",
+        borderWidth: "$border.width.hairline",
+        borderColor: "$color.border.subtle",
+        shadow: "$elevation.shadow.hairline",
+        font: "$font.family.sans",
+        size: "$font.size.bodySm",
+        weight: "$font.weight.semibold",
+        fg: "$color.text.body",
       },
       variants: {
         size: {
-          sm: { height: "$control.hSm", paddingLeft: "$select.padLeftSm", paddingRight: "$space.sm", size: "$text.caption" },
+          sm: { height: "$size.control.sm", paddingLeft: "$select.paddingLeftSm", paddingRight: "$space.sm", size: "$font.size.caption" },
           md: {},
-          lg: { height: "$control.hInput", paddingLeft: "$space.mdLg", paddingRight: "$space.md", radius: "$radius.input", size: "$text.body" },
+          lg: { height: "$size.control.input", paddingLeft: "$space.mdLg", paddingRight: "$space.md", radius: "$radius.input", size: "$font.size.body" },
         },
         variant: {
           field: {
             // A 2px edge: the border and an inner ring, over the hairline shadow the field keeps. Invalid takes the ring too.
             states: {
-              focus: { borderColor: "$border.active", halo: "$shadow.hairline", ring: "$border.active", shadow: "none" },
-              "invalid+focus": { ring: "$danger.default" },
+              focus: { borderColor: "$color.border.selected", halo: "$elevation.shadow.hairline", ring: "$color.border.selected", shadow: "none" },
+              "invalid+focus": { ring: "$color.text.danger" },
             },
           },
           chip: {
-            height: "$select.chipH",
+            height: "$select.chipHeight",
             gap: "$select.triggerGap",
-            paddingLeft: "$select.chipPadLeft",
+            paddingLeft: "$select.chipPaddingLeft",
             paddingRight: "$space.xs",
             radius: "$radius.control",
-            bg: "$surface.recessed",
+            bg: "$color.background.recessed",
             shadow: "none",
-            size: "$text.caption",
-            states: { focus: { borderColor: "$border.active", shadow: "none" } },
+            size: "$font.size.caption",
+            states: { focus: { borderColor: "$color.border.selected", shadow: "none" } },
           },
           link: {
-            height: "$select.linkH",
+            height: "$select.linkHeight",
             gap: "$select.triggerGap",
-            paddingLeft: "$select.linkPadX",
-            paddingRight: "$select.linkPadX",
+            paddingLeft: "$select.linkPaddingX",
+            paddingRight: "$select.linkPaddingX",
             radius: "$radius.control",
             bg: "transparent",
-            borderWidth: "$border.wThick",
+            borderWidth: "$border.width.thick",
             borderColor: "transparent",
             shadow: "none",
-            size: "$text.bodySm",
-            states: { focus: { borderColor: "$border.active", shadow: "none" } },
+            size: "$font.size.bodySm",
+            states: { focus: { borderColor: "$color.border.selected", shadow: "none" } },
           },
         },
       },
       // Invalid beats focus: its edge stays danger. The kit passes `hover` only while the panel is closed.
-      states: { invalid: { borderColor: "$danger.default" }, hover: { bg: "$hover.surface", fg: "$fg.strong" }, pressed: { bg: "$hover.surface" }, disabled: { bg: "$surface.muted", fg: "$fg.faint" } },
+      states: { invalid: { borderColor: "$color.text.danger" }, hover: { bg: "$color.background.hover", fg: "$color.text.strong" }, pressed: { bg: "$color.background.hover" }, disabled: { bg: "$color.background.muted", fg: "$color.text.faint" } },
       platforms: {
         mobile: {
-          base: { gap: "$space.md", height: "none", minHeight: "$control.hInput", paddingLeft: "$space.md", paddingRight: "$space.md", radius: "$radius.input", size: "$text.body" },
-          states: { focus: { borderColor: "$border.active" }, "invalid+focus": { borderColor: "$danger.default" } },
+          base: { gap: "$space.md", height: "none", minHeight: "$size.control.input", paddingLeft: "$space.md", paddingRight: "$space.md", radius: "$radius.input", size: "$font.size.body" },
+          states: { focus: { borderColor: "$color.border.selected" }, "invalid+focus": { borderColor: "$color.text.danger" } },
         },
       },
     },
-    icon: { base: { square: "$icon.sizeMd" }, platforms: { mobile: { base: { square: "$icon.size" } } } },
-    placeholder: { base: { fg: "$fg.faint", weight: "$font.weightMedium" } },
+    icon: { base: { square: "$size.icon.md" }, platforms: { mobile: { base: { square: "$size.icon.default" } } } },
+    placeholder: { base: { fg: "$color.text.faint", weight: "$font.weight.medium" } },
     supporting: {
-      base: { marginLeft: "$space.xs", fg: "$fg.faint", weight: "$font.weightMedium" },
+      base: { marginLeft: "$space.xs", fg: "$color.text.faint", weight: "$font.weight.medium" },
       // The phone draws it on a line of its own under the label, so it has no margin.
-      platforms: { mobile: { base: { marginLeft: "none", size: "$text.bodySm", line: "$text.bodySmLine" } } },
+      platforms: { mobile: { base: { marginLeft: "none", size: "$font.size.bodySm", line: "$font.lineHeight.bodySm" } } },
     },
     caret: {
-      base: { square: "$icon.size", fg: "$fg.faint" },
-      variants: { size: { sm: { square: "$icon.sizeMd" } }, variant: { chip: { square: "$icon.sizeMd" }, link: { square: "$icon.sizeMd" } } },
+      base: { square: "$size.icon.default", fg: "$color.text.faint" },
+      variants: { size: { sm: { square: "$size.icon.md" } }, variant: { chip: { square: "$size.icon.md" }, link: { square: "$size.icon.md" } } },
     },
     panel: {
       on: ["web", "desktop"],
-      base: { padding: "$select.panelPad", radius: "$radius.card", borderWidth: "$border.wHairline", borderColor: "$border.subtle", bg: "$surface.raised", shadow: "$shadow.menu", maxHeight: "$select.panelMaxH" },
-      variants: { variant: { link: { minWidth: "$select.panelMinW" } } },
+      base: { padding: "$select.panelPadding", radius: "$radius.card", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle", bg: "$color.background.raised", shadow: "$elevation.shadow.menu", maxHeight: "$select.panelMaxHeight" },
+      variants: { variant: { link: { minWidth: "$select.panelMinWidth" } } },
     },
-    sheet: { on: ["mobile"], base: { paddingBottom: "$homeIndicator.h", radiusTop: "$radius.sheet", bg: "$surface.raised", shadow: "$shadow.modal" } },
-    grabber: { on: ["mobile"], base: { width: "$sheet.grabberW", height: "$sheet.grabberH", marginTop: "$space.xs", radius: "$radius.pill", bg: "$border.muted" } },
-    title: { on: ["mobile"], base: { paddingX: "$gutter.pane", paddingY: "$space.md", size: "$text.title", line: "$text.titleLine", weight: "$font.weightSemibold", fg: "$fg.strong" } },
-    search: { platforms: { mobile: { base: { paddingX: "$gutter.pane", paddingBottom: "$space.sm" } } } },
+    sheet: { on: ["mobile"], base: { paddingBottom: "$size.layout.homeIndicator", radiusTop: "$radius.sheet", bg: "$color.background.raised", shadow: "$elevation.shadow.modal" } },
+    grabber: { on: ["mobile"], base: { width: "$sheet.grabberWidth", height: "$sheet.grabberHeight", marginTop: "$space.xs", radius: "$radius.pill", bg: "$color.border.muted" } },
+    title: { on: ["mobile"], base: { paddingX: "$space.gutter.pane", paddingY: "$space.md", size: "$font.size.title", line: "$font.lineHeight.title", weight: "$font.weight.semibold", fg: "$color.text.strong" } },
+    search: { platforms: { mobile: { base: { paddingX: "$space.gutter.pane", paddingBottom: "$space.sm" } } } },
     empty: {
-      base: { size: "$text.caption", fg: "$fg.faint" },
-      platforms: { mobile: { base: { paddingY: "$space.smMd", paddingX: "$gutter.pane", size: "$text.bodySm", weight: "$font.weightNormal" } } },
+      base: { size: "$font.size.caption", fg: "$color.text.faint" },
+      platforms: { mobile: { base: { paddingY: "$space.smMd", paddingX: "$space.gutter.pane", size: "$font.size.bodySm", weight: "$font.weight.normal" } } },
     },
     option: {
       states: { disabled: { opacity: "$opacity.disabled" } },
       platforms: {
         web: { base: { gap: "$choice.gap", radius: "$radius.row", bg: "transparent" }, ...wash },
         desktop: { base: { gap: "$choice.gap", radius: "$radius.row", bg: "transparent" }, ...wash },
-        mobile: { base: { gap: "$space.md", minHeight: "$row.h", paddingX: "$gutter.pane", paddingY: "$space.xs" }, states: { on: { bg: "$hover.surface" }, pressed: { bg: "$hover.surface" } } },
+        mobile: { base: { gap: "$space.md", minHeight: "$size.row.default", paddingX: "$space.gutter.pane", paddingY: "$space.xs" }, states: { on: { bg: "$color.background.hover" }, pressed: { bg: "$color.background.hover" } } },
       },
     },
-    optionIcon: { base: { square: "$icon.size" } },
+    optionIcon: { base: { square: "$size.icon.default" } },
     optionLabel: {
-      base: { size: "$text.bodySm", weight: "$font.weightSemibold", fg: "$fg.strong" },
-      platforms: { mobile: { base: { size: "$text.body", line: "$text.bodyLine" } } }, // idiom: one step larger
+      base: { size: "$font.size.bodySm", weight: "$font.weight.semibold", fg: "$color.text.strong" },
+      platforms: { mobile: { base: { size: "$font.size.body", line: "$font.lineHeight.body" } } }, // idiom: one step larger
     },
-    dot: { base: { square: "$choice.dotSize", marginRight: "$select.dotGap", radius: "$radius.circle", bg: "$brand.default" }, platforms: { mobile: { base: { marginRight: "none" } } } },
+    dot: { base: { square: "$choice.dotSize", marginRight: "$select.dotGap", radius: "$radius.circle", bg: "$color.background.brand.default" }, platforms: { mobile: { base: { marginRight: "none" } } } },
   },
-  reads: ["$fg.subtle"],
+  reads: ["$color.text.subtle"],
 });

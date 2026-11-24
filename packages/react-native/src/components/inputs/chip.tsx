@@ -85,8 +85,8 @@ export function Chip({
   // An icon's size is its width and height (`size`); what else `styles` sets on it goes on the glyph.
   const { width: iconSize, height: _ih, ...iconRest } = r.icon.view;
   const { width: removeSize, height: _rh, ...removeRest } = rx.removeIcon.view;
-  const mainSlop = drawn ? hitSlopTo(t.control.hit, drawn) : undefined;
-  const removeSlop = removable ? hitSlopTo(t.control.hit, removeSize as number, removeSize as number) : undefined;
+  const mainSlop = drawn ? hitSlopTo(t.size.target.min, drawn) : undefined;
+  const removeSlop = removable ? hitSlopTo(t.size.target.min, removeSize as number, removeSize as number) : undefined;
   // iOS drops a touch outside a parent's bounds before asking its children, so the root, as tall as the chip, takes their slop too: the
   // chip's above and below, and the ✕'s past the end edge.
   const end = removeSlop?.right ?? 0;

@@ -6,7 +6,7 @@ import { Skeleton } from "../components/feedback/skeleton";
 import { useChartTokens } from "./theme";
 
 export interface LoadingLine {
-  /** A length: a token read as `${t.kpi.loadM}`. The Skeleton sizes itself, so a percentage would resolve against nothing. */
+  /** A length: a token read as `${t.kpi.loadWidthMd}`. The Skeleton sizes itself, so a percentage would resolve against nothing. */
   width: string;
   height: string;
 }

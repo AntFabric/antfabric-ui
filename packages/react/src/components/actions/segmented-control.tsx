@@ -52,7 +52,7 @@ const tab: CSSProperties = {
   zIndex: 1,
   whiteSpace: "nowrap",
   flexShrink: 0,
-  transition: `color ${t.duration.base} ${t.ease.standard}, background ${t.duration.base} ${t.ease.standard}`,
+  transition: `color ${t.motion.duration.base} ${t.motion.easing.standard}, background ${t.motion.duration.base} ${t.motion.easing.standard}`,
 };
 
 const card: CSSProperties = { position: "absolute", boxSizing: "border-box", pointerEvents: "none" };
@@ -191,7 +191,7 @@ export function SegmentedControl({ items, value, size = "md", full = false, scro
                 width: slot.w,
                 height: slot.h,
                 transform: `translate(${slot.x}px, ${slot.y}px)`,
-                transition: `transform ${t.duration.slow} ${t.ease.out}, width ${t.duration.slow} ${t.ease.out}`,
+                transition: `transform ${t.motion.duration.slow} ${t.motion.easing.out}, width ${t.motion.duration.slow} ${t.motion.easing.out}`,
               }),
             )}
           />

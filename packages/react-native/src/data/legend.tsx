@@ -23,7 +23,7 @@ const KEY = { w: 24, h: 12, stroke: 2 } as const;
 
 const useStyles = createStyles((t) => ({
   root: { flexDirection: "row", flexWrap: "wrap", gap: t.space["3xs"] },
-  item: { flexDirection: "row", alignItems: "center", gap: t.space.xs, minHeight: t.control.hit, paddingHorizontal: t.space.sm, borderRadius: t.radius.pill },
+  item: { flexDirection: "row", alignItems: "center", gap: t.space.xs, minHeight: t.size.target.min, paddingHorizontal: t.space.sm, borderRadius: t.radius.pill },
   swatch: { width: t.space.smMd, height: t.space.smMd, borderRadius: t.radius.tag },
   clip: { overflow: "hidden" },
 }));
@@ -42,7 +42,7 @@ function Item({ label, on, color, onPress, index, texture = false }: { label: st
       accessibilityState={{ selected: on }}
       onPress={() => onPress()}
       {...press.handlers}
-      style={[s.item, { backgroundColor: press.pressed ? t.hover.surface : "transparent", boxShadow: press.focused ? t.shadow.focus : undefined }]}
+      style={[s.item, { backgroundColor: press.pressed ? t.color.background.hover : "transparent", boxShadow: press.focused ? t.elevation.shadow.focus : undefined }]}
     >
       {mark && !texture ? (
         <Svg width={t.space.smMd * 2} height={t.space.smMd} viewBox={`0 0 ${KEY.w} ${KEY.h}`} style={{ opacity: on ? 1 : t.opacity.muted }}>
@@ -51,9 +51,9 @@ function Item({ label, on, color, onPress, index, texture = false }: { label: st
         </Svg>
       ) : (
         // A bar chart's key: the swatch in the series' texture over its colour, as its bars are filled (the first series is plain).
-        <View style={[s.swatch, { backgroundColor: color, opacity: on ? 1 : t.opacity.muted }, mark && mark.texture !== "none" && s.clip]}>{mark && mark.texture !== "none" ? <Texture id={pattern} texture={mark.texture} ink={t.surface.card} /> : null}</View>
+        <View style={[s.swatch, { backgroundColor: color, opacity: on ? 1 : t.opacity.muted }, mark && mark.texture !== "none" && s.clip]}>{mark && mark.texture !== "none" ? <Texture id={pattern} texture={mark.texture} ink={t.color.background.card} /> : null}</View>
       )}
-      <Text style={[chartFont(t), { color: on ? t.fg.muted : t.fg.faint, fontSize: t.text.caption, lineHeight: t.text.captionLine, textDecorationLine: on ? "none" : "line-through" }]}>{label}</Text>
+      <Text style={[chartFont(t), { color: on ? t.color.text.muted : t.color.text.faint, fontSize: t.font.size.caption, lineHeight: t.font.lineHeight.caption, textDecorationLine: on ? "none" : "line-through" }]}>{label}</Text>
     </Pressable>
   );
 }

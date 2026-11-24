@@ -7,8 +7,8 @@
  *   [data-af-os="android"]               what that OS changes inside its platform's profile (after the profiles, so it wins)
  *   [data-af-theme="dark"]               that theme's colours and shadows
  *
- * A token that is a reference is `--af-fg-body:var(--af-p-color-neutral-900)`, one that is an alias of another token is that token's
- * variable (`--af-chart-grid:var(--af-border-subtle)`), and one that is neither is its value. Components read `var(--af-fg-body)`
+ * A token that is a reference is `--af-color-text-body:var(--af-p-color-neutral-900)`, one that is an alias of another token is that token's
+ * variable (`--af-chart-grid-color:var(--af-color-border-subtle)`), and one that is neither is its value. Components read `var(--af-color-text-body)`
  * either way, so a reference changes nothing they draw.
  *
  * Put both attributes on <html> (or any container) and every React component under it draws at that
@@ -28,8 +28,8 @@ import { cssVarName, kebab } from "./vars";
 
 export type Tree = { readonly [k: string]: string | number | Tree };
 
-// Matched on the variable's name (the path as hyphens, after kebab-casing), so `font.weightBold` is `font-weight-bold`.
-const UNITLESS_GROUPS = ["font-weight", "opacity", "z", "icon-stroke"];
+// Matched on the variable's name (the path as hyphens, after kebab-casing), so `font.weight.bold` is `font-weight-bold`.
+const UNITLESS_GROUPS = ["font-weight", "opacity", "z-index", "size-stroke"];
 
 /** A literal as the sheet writes it, by its variable's name without `--af-`: a number is pixels unless its group has no unit. */
 export function cssValue(css: string, v: string | number): string {
@@ -100,12 +100,13 @@ export function tokensCss(options: { deprecated?: boolean } = {}): string {
 }
 
 /**
- * The renamed tokens' old variables, each the new one's: `--af-fg-muted:var(--af-color-text-muted)`. On every element that carries one
+ * The renamed tokens' old variables, each the new one's: `--af-color-text-muted:var(--af-color-text-muted)`. On every element that carries one
  * of the attributes, as the primitives are, so it follows the theme and the platform there. `tokensCss()` ends with it unless told
  * `{ deprecated: false }`; `""` when nothing is renamed. It leaves in the next major version.
  */
 export function deprecatedCss(): string {
-  const vars = Object.entries(renames as Record<string, string>).map(([old, now]): [string, string] => [cssVarName(old), `var(${cssVarName(now)})`]);
+  // A rename that only moved a dot (`font.weightBold` to `font.weight.bold`) is the same variable: there is nothing to declare.
+  const vars = Object.entries(renames as Record<string, string>).flatMap(([old, now]): [string, string][] => (cssVarName(old) === cssVarName(now) ? [] : [[cssVarName(old), `var(${cssVarName(now)})`]]));
   return vars.length ? block("[data-af-platform],[data-af-theme],[data-af-os]", vars) : "";
 }
 
@@ -192,7 +193,7 @@ export const kitCss = `
 @keyframes af-in-slide-left{from{opacity:0;transform:translateX(24px)}}
 @keyframes af-in-slide-right{from{opacity:0;transform:translateX(-24px)}}
 @keyframes af-in-grow-x{from{opacity:0;transform:scaleX(.4)}}
-[data-af-input]::placeholder{color:var(--af-fg-placeholder);opacity:1}
+[data-af-input]::placeholder{color:var(--af-color-text-placeholder);opacity:1}
 [data-af-input]:focus{outline:none}
 [data-af-press]{-webkit-tap-highlight-color:transparent}
 [data-af-press]:focus{outline:none}

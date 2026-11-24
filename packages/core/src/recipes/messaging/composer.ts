@@ -5,7 +5,7 @@ import { defineRecipe } from "../../recipe";
  * `focused` prop drawing it, which editing's coral edge outranks: the kit's call). `invalid` on the counter is `tooLong`.
  * Text parts carry their own type (the web draws spans, the phone `Text`). The web has a formatting toolbar and a keyboard hint,
  * the phone a Cancel button and a one-line sheet radius; the phone's larger type is a deliberate platform idiom (item 42), kept in
- * `platforms.mobile`, as is its regular weight (its `Text` needs one to name a font file). The card's edge (`border.subtle`, the hairline shadow, the
+ * `platforms.mobile`, as is its regular weight (its `Text` needs one to name a font file). The card's edge (`color.border.subtle`, the hairline shadow, the
  * coral edge while editing) and the "Editing message" weight are the web's on the phone (item 43). Kept, borderline (listed for the owner): the card's
  * radius (`sheet`, a one-line field) and the "Also send to" gap (`space.sm`, one step larger).
  */
@@ -35,69 +35,69 @@ export const composer = defineRecipe({
     "hint",
   ],
   styles: {
-    root: { base: { gap: "$space.xs", font: "$font.sans" } },
-    editBanner: { base: { gap: "$space.xs", paddingX: "$space.2xs", fg: "$brand.default" }, platforms: { mobile: { base: { gap: "$space.sm", paddingX: "$space.sm" } } } },
-    editIcon: { base: { square: "$icon.sizeMd" } },
+    root: { base: { gap: "$space.xs", font: "$font.family.sans" } },
+    editBanner: { base: { gap: "$space.xs", paddingX: "$space.2xs", fg: "$color.background.brand.default" }, platforms: { mobile: { base: { gap: "$space.sm", paddingX: "$space.sm" } } } },
+    editIcon: { base: { square: "$size.icon.md" } },
     editLabel: {
-      base: { size: "$text.caption", line: "$text.captionLine", weight: "$font.weightSemibold", fg: "$link.default" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine" } } }, // idiom: one step larger
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.semibold", fg: "$color.text.link" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm" } } }, // idiom: one step larger
     },
-    editHint: { on: ["web", "desktop"], base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" } },
-    cancel: { on: ["mobile"], base: { minHeight: "$control.hit", paddingX: "$space.xs" } },
-    cancelText: { on: ["mobile"], base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal", fg: "$fg.muted" } },
+    editHint: { on: ["web", "desktop"], base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint" } },
+    cancel: { on: ["mobile"], base: { minHeight: "$size.target.min", paddingX: "$space.xs" } },
+    cancelText: { on: ["mobile"], base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal", fg: "$color.text.muted" } },
     offline: {
-      base: { gap: "$space.sm", padding: "$space.2xs", size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" },
+      base: { gap: "$space.sm", padding: "$space.2xs", size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint" },
       platforms: {
-        mobile: { base: { padding: "none", paddingX: "$space.md", paddingY: "$space.xs", radius: "$radius.control", bg: "$surface.muted", size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal" } },
+        mobile: { base: { padding: "none", paddingX: "$space.md", paddingY: "$space.xs", radius: "$radius.control", bg: "$color.background.muted", size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal" } },
       },
     },
-    offlineIcon: { base: { square: "$icon.sizeMd", fg: "$fg.onBrandSoft" } },
+    offlineIcon: { base: { square: "$size.icon.md", fg: "$color.text.onBrandSoft" } },
     locked: {
-      base: { gap: "$space.smMd", radius: "$radius.control", borderWidth: "$border.wHairline", borderColor: "$border.default", bg: "$surface.recessed" },
+      base: { gap: "$space.smMd", radius: "$radius.control", borderWidth: "$border.width.hairline", borderColor: "$color.border.default", bg: "$color.background.recessed" },
       platforms: { mobile: { base: { radius: "$radius.sheet" } } },
     },
-    lockedIcon: { base: { square: "$icon.size", fg: "$fg.muted" } },
+    lockedIcon: { base: { square: "$size.icon.default", fg: "$color.text.muted" } },
     lockedTitle: {
-      base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightBold", fg: "$fg.strong" },
-      platforms: { mobile: { base: { size: "$text.body", line: "$text.bodyLine" } } },
+      base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.bold", fg: "$color.text.strong" },
+      platforms: { mobile: { base: { size: "$font.size.body", line: "$font.lineHeight.body" } } },
     },
     lockedDetail: {
-      base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.muted" },
-      platforms: { mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal" } } },
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.muted" },
+      platforms: { mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal" } } },
     },
     card: {
-      base: { radius: "$radius.control", borderWidth: "$border.wHairline", borderColor: "$border.subtle", bg: "$surface.card", shadow: "$shadow.hairline" },
-      variants: { mode: { editing: { borderColor: "$border.brand" }, offline: { bg: "$surface.recessed" } } },
-      states: { focus: { borderColor: "$border.active" } },
+      base: { radius: "$radius.control", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle", bg: "$color.background.card", shadow: "$elevation.shadow.hairline" },
+      variants: { mode: { editing: { borderColor: "$color.border.brand" }, offline: { bg: "$color.background.recessed" } } },
+      states: { focus: { borderColor: "$color.border.selected" } },
       platforms: { mobile: { base: { radius: "$radius.sheet" } } },
     },
     // The web's formatting toolbar; its buttons take the tag radius from `reads` (they are IconButtons, which the kit styles by prop).
-    toolbar: { on: ["web", "desktop"], base: { fg: "$fg.muted" } },
-    toolbarRule: { on: ["web", "desktop"], base: { width: "$border.wHairline", bg: "$border.subtle" } },
+    toolbar: { on: ["web", "desktop"], base: { fg: "$color.text.muted" } },
+    toolbarRule: { on: ["web", "desktop"], base: { width: "$border.width.hairline", bg: "$color.border.subtle" } },
     input: {
-      base: { size: "$text.body", line: "$text.bodyLine", fg: "$fg.body" },
-      platforms: { mobile: { base: { line: "none", weight: "$font.weightNormal", placeholder: "$fg.placeholder" } } },
+      base: { size: "$font.size.body", line: "$font.lineHeight.body", fg: "$color.text.body" },
+      platforms: { mobile: { base: { line: "none", weight: "$font.weight.normal", placeholder: "$color.text.placeholder" } } },
     },
     counter: {
-      base: { size: "$text.micro", fg: "$fg.faint" },
-      states: { invalid: { fg: "$danger.default", weight: "$font.weightSemibold" } },
+      base: { size: "$font.size.micro", fg: "$color.text.faint" },
+      states: { invalid: { fg: "$color.text.danger", weight: "$font.weight.semibold" } },
       platforms: {
-        mobile: { base: { size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal" }, states: { invalid: { fg: "$danger.default", weight: "$font.weightSemibold" } } },
+        mobile: { base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal" }, states: { invalid: { fg: "$color.text.danger", weight: "$font.weight.semibold" } } },
       },
     },
     alsoSend: {
-      base: { gap: "$space.xs", radius: "$radius.tag", size: "$text.caption", line: "$text.captionLine", fg: "$fg.muted" },
-      states: { hover: { fg: "$fg.strong" }, focus: { shadow: "$shadow.focus" } },
-      platforms: { mobile: { base: { gap: "$space.sm", minHeight: "$control.hit", size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal" } } },
+      base: { gap: "$space.xs", radius: "$radius.tag", size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.muted" },
+      states: { hover: { fg: "$color.text.strong" }, focus: { shadow: "$elevation.shadow.focus" } },
+      platforms: { mobile: { base: { gap: "$space.sm", minHeight: "$size.target.min", size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal" } } },
     },
     alsoBox: {
-      base: { square: "$checkbox.size", radius: "$checkbox.radius", borderWidth: "$border.wHairline", borderColor: "$border.default", bg: "$surface.card", fg: "$fg.onBrand" },
-      states: { on: { borderColor: "$brand.default", bg: "$brand.default" } },
+      base: { square: "$checkbox.size", radius: "$checkbox.radius", borderWidth: "$border.width.hairline", borderColor: "$color.border.default", bg: "$color.background.card", fg: "$color.text.onBrand" },
+      states: { on: { borderColor: "$color.background.brand.default", bg: "$color.background.brand.default" } },
     },
-    alsoTick: { base: { square: "$icon.sizeSm" } },
+    alsoTick: { base: { square: "$size.icon.sm" } },
     hint: {
-      base: { size: "$text.micro", line: "$text.captionLine", fg: "$fg.faint" },
-      platforms: { mobile: { base: { size: "$text.caption", weight: "$font.weightNormal" } } },
+      base: { size: "$font.size.micro", line: "$font.lineHeight.caption", fg: "$color.text.faint" },
+      platforms: { mobile: { base: { size: "$font.size.caption", weight: "$font.weight.normal" } } },
     },
   },
   reads: ["$radius.tag"],

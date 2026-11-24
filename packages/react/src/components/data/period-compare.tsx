@@ -82,7 +82,7 @@ export function PeriodCompare({ data, x, current, previous, title, subtitle = ""
     { field: current, value: total.current, size: "md", dashed: false },
     { field: previous, value: total.previous, size: "sm", dashed: true },
   ] as const;
-  const lines = [{ width: t.kpi.loadS, height: t.kpi.loadLineH }, { width: t.kpi.loadM, height: t.kpi.loadValueH }, { width: t.kpi.loadS, height: t.kpi.loadLineH }];
+  const lines = [{ width: t.kpi.loadWidthSm, height: t.kpi.loadLineHeight }, { width: t.kpi.loadWidthMd, height: t.kpi.loadValueHeight }, { width: t.kpi.loadWidthSm, height: t.kpi.loadLineHeight }];
   return (
     <ChartCard r={r} viewAsTable={str("viewAsTable")} viewAsChart={str("viewAsChart")} title={title} subtitle={subtitle} table={!loading && data.length ? { data, x, y: [current, previous], format, xFormat, labels } : null} style={style} root={rootProps(rest)}>
       <div data-af-part="compare" style={css(row, { alignItems: "stretch", flexWrap: "wrap" }, r.compare)}>
@@ -110,7 +110,7 @@ export function PeriodCompare({ data, x, current, previous, title, subtitle = ""
             ))}
           </div>
         ) : null}
-        <ChartFrame style={{ flexGrow: 1, flexShrink: 1, flexBasis: t.chart.listMinW }} height={height} label={loading ? str("loading", { title }) : summary} loading={loading} empty={data.length === 0} emptyTitle={empty ?? str("empty")} emptyLine={emptyLine ?? str("emptyLine")} loadingLabel={str("loadingChart")}>
+        <ChartFrame style={{ flexGrow: 1, flexShrink: 1, flexBasis: t.chart.listMinWidth }} height={height} label={loading ? str("loading", { title }) : summary} loading={loading} empty={data.length === 0} emptyTitle={empty ?? str("empty")} emptyLine={emptyLine ?? str("emptyLine")} loadingLabel={str("loadingChart")}>
           {(width) => <RechartsLines tk={tk} theme={theme} ui={ui} plot={r.plot} hint={str("arrowKeys", { title })} rows={rows} s={s} labels={labels} format={format} formatWords={formatWords} scale={scale} area dashed={[previous]} width={width} height={height} />}
         </ChartFrame>
       </div>

@@ -130,16 +130,16 @@ export function GaugeChart({ value, max = 1, target, title, subtitle = "", headl
               <div aria-hidden data-af-part="center" style={css(box, { position: "absolute", left: 0, right: 0, top: 0, bottom: over, alignItems: "center", justifyContent: "flex-end", pointerEvents: "none", textAlign: "center", paddingBottom: t.space["3xs"] }, r.center)}>
                 {icon ? (
                   <span style={css(row, { gap: t.space["2xs"] })}>
-                    <Icon name={icon} size={t.icon.sizeMd} color={color} />
+                    <Icon name={icon} size={t.size.icon.md} color={color} />
                     <MetricValue value={shown(value)} format={format} size="lg" />
                   </span>
                 ) : (
                   <MetricValue value={shown(value)} format={format} size="lg" />
                 )}
-                {label ? <span data-af-part="centerLabel" style={css(text, { maxWidth: "70%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: t.chart.font }, r.centerLabel)}>{label}</span> : null}
+                {label ? <span data-af-part="centerLabel" style={css(text, { maxWidth: "70%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: t.chart.fontFamily }, r.centerLabel)}>{label}</span> : null}
               </div>
             </div>
-            <div data-af-part="foot" style={css(row, partStyle(r, "foot", { justifyContent: "space-between", width: w, marginTop: t.space.xs, fontFamily: t.chart.font, fontVariantNumeric: "tabular-nums" }))}>
+            <div data-af-part="foot" style={css(row, partStyle(r, "foot", { justifyContent: "space-between", width: w, marginTop: t.space.xs, fontFamily: t.chart.fontFamily, fontVariantNumeric: "tabular-nums" }))}>
               <span>{fmt(format, shown(0), formatWords, locale)}</span>
               {hasTarget ? <span>{str.parts("targetValue", { value: fmt(format, shown(target!), formatWords, locale) })}</span> : null}
               <span>{fmt(format, shown(max), formatWords, locale)}</span>

@@ -132,7 +132,8 @@ def component(group, key, typ):
         prop = 'fontSize'; variant = []
     if typ == 'color' and prop is None:
         prop = 'color'
-    if typ == 'shadow': prop = 'shadow'
+    if typ == 'shadow':
+        return f'{cid}.{key}', '', True
     if typ == 'fontFamily':
         prop = 'fontFamily' if not key.startswith('file') else 'fontFile'
         if key.startswith('file'): ws = []; variant = [lower(key[4:])]
@@ -161,7 +162,7 @@ hand('permissionPrompt', 'permissionPrompt', lock='lockSize', tile='tileSize')
 hand('breadcrumbs', 'breadcrumbs', recordingDot='recordingDotSize')
 hand('navRail', 'navRail', item='itemSize', logo='logoSize', logoGlyph='logoFontSize')
 hand('workspace', 'workspaceSwitcher', tileEdge='tileRingWidth')
-hand('tabBar', 'tabBar', itemSqueezed='itemSizeSqueezed')
+hand('tabBar', 'tabBar', itemSqueezed='itemSizeSqueezed', badgeX='badgeOffsetX')
 hand('palette', 'commandPalette', slot='slotSize')
 hand('contextMenu', 'contextMenu', sceneOffset='sceneOffsetX')
 hand('dialog', 'dialog', icon='iconSize')

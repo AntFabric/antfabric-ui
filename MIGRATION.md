@@ -1,5 +1,49 @@
 # Migrating to AntFabric UI
 
+## 1.1 → 1.2: token names
+
+1.2 renames 429 of the 670 design tokens to a category-first standard and breaks nothing: every old name keeps working, marked deprecated, until 2.0. Nothing a component draws changes.
+
+### What changed
+
+| Kind | Before | After |
+|---|---|---|
+| Text colour | `fg.muted` | `color.text.muted` |
+| Surface | `surface.card` | `color.background.card` |
+| Border colour, border width | `border.subtle`, `border.wHairline` | `color.border.subtle`, `border.width.hairline` |
+| Brand and status | `brand.default`, `danger.solid`, `success.default` | `color.background.brand.default`, `color.background.danger.default`, `color.text.success` |
+| Control and icon sizes | `control.hMd`, `icon.size` | `size.control.md`, `size.icon.default` |
+| Type | `text.body`, `text.bodyLine`, `font.sans`, `font.weightBold`, `tracking.caps` | `font.size.body`, `font.lineHeight.body`, `font.family.sans`, `font.weight.bold`, `font.letterSpacing.caps` |
+| Motion, elevation, layers | `duration.fast`, `ease.out`, `shadow.card`, `z.modal` | `motion.duration.fast`, `motion.easing.out`, `elevation.shadow.card`, `zIndex.modal` |
+| A component's own | `chip.h`, `select.panelMaxH`, `dialog.icon`, `palette.w` | `chip.height`, `select.panelMaxHeight`, `dialog.iconSize`, `commandPalette.width` |
+
+The CSS variable is still `--af-` plus the path in kebab case, so `--af-fg-muted` is now `--af-color-text-muted`. Unchanged: `space.*`, `radius.*`, `opacity.*`, and the tokens that picture OS chrome (`os.*`, `osBadge.*`, `osNotification.*` and the rest). The whole list is `reports/migration/tokens-2.md`, and as data `@antfabric/ui-core/renames.json`.
+
+Two role words changed with the move: `brand.active` is `color.background.brand.pressed`, and `border.active` is `color.border.selected`.
+
+### What to do
+
+1. **Install 1.2.** Everything compiles and draws as it did. Your editor strikes through each old `t.` key, and `defineTheme` logs one warning per old path outside production.
+2. **Run the codemod.**
+
+   ```bash
+   npx af-tokens-codemod src --dry
+   ```
+
+   ```bash
+   npx af-tokens-codemod src
+   ```
+
+   It rewrites `t.fg.muted` (and `theme.t.…`), `"$fg.muted"` in recipe overrides and token props, and `--af-fg-muted` in any file. Add `--strings` if you keep flat maps keyed by token path.
+3. **Move nested theme overrides by hand.** The codemod lists the files. `tokens: { schemes: { light: { fg: { muted: "#555" } } } }` becomes `tokens: { schemes: { light: { color: { text: { muted: "#555" } } } } }`. Until you do, the old shape still works.
+4. **Optional: drop the old variables from your stylesheet** once nothing of yours reads them, with `tokensCss({ deprecated: false })` where you ship the base sheet yourself.
+
+A theme's id (`data-af-theme-id`) does not change, so stored themes and cached theme sheets stay valid.
+
+### Fourteen tokens now follow the role they always equalled
+
+`chart.gridColor` is an alias of `color.border.subtle`, `color.text.placeholder` of `color.text.faint`, and twelve more (each package's changelog has the list). A theme that sets the role now moves the alias. A theme of yours that sets one of those roles and wants the chart or table to stay as it was sets the alias too. AntFabric and `neutral` draw exactly what they drew.
+
 ## 1.0 → 1.1
 
 1.1.0 fixes the 1.0 component review (`reports/audit/2026-11-23-component-review.md`). It removes no prop, so an app on 1.0 compiles on 1.1 apart from the `ref` types ("Pass-through props") and an item's `icon`, which may now be a component ("Icons"). But several components change behaviour, and a few need something from your app. The full list is under "Changed (behaviour)" in each package's `CHANGELOG.md`; this section is what to do about it.

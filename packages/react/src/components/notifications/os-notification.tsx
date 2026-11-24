@@ -216,7 +216,7 @@ function ReplyRow({ os, sender, placeholder, value, sending, strings, styles, on
           input,
           { flex: 1 },
           // Windows' underline: a 2px bottom edge, in the brand colour while focused.
-          partStyle(r, "replyField", win && { borderBottomWidth: "2px", borderBottomStyle: "solid", borderBottomColor: field.focused ? t.brand.default : t.border.default }),
+          partStyle(r, "replyField", win && { borderBottomWidth: "2px", borderBottomStyle: "solid", borderBottomColor: field.focused ? t.color.background.brand.default : t.color.border.default }),
         )}
       />
       <button
@@ -383,7 +383,7 @@ export function OsNotification({
           style={css(pressable, { flexDirection: "row", alignItems: "flex-start", width: "100%", textAlign: "left" }, HIT[os], r.hit)}
         >
           {mac && face && (
-            <span style={css(box, { flexShrink: 0, marginTop: t.border.wHairline })}>
+            <span style={css(box, { flexShrink: 0, marginTop: t.border.width.hairline })}>
               {avatar}
               {!agent && (
                 <span aria-hidden data-af-part="badge" style={css(box, center, { position: "absolute", right: neg(t.space["2xs"]), bottom: neg(t.space["2xs"]) }, partStyle(r, "badge", badgeEdge))}>
@@ -395,7 +395,7 @@ export function OsNotification({
             </span>
           )}
           {mac && !face && (
-            <span aria-hidden data-af-part="appIcon" style={css(box, center, { flexShrink: 0, marginTop: t.border.wHairline }, r.appIcon)}>
+            <span aria-hidden data-af-part="appIcon" style={css(box, center, { flexShrink: 0, marginTop: t.border.width.hairline }, r.appIcon)}>
               <span data-af-part="macMark" style={css(mark, r.macMark)}>
                 {initial(appName)}
               </span>
@@ -460,7 +460,7 @@ function Stack({ more, liquid, styles }: { more: boolean; liquid: boolean; style
     />
   );
   return (
-    <div aria-hidden style={css(box, { alignItems: "center", marginTop: neg(t.border.wHairline) })}>
+    <div aria-hidden style={css(box, { alignItems: "center", marginTop: neg(t.border.width.hairline) })}>
       {sliver("sliver", "93%", 9, 12)}
       {more && sliver("sliverFar", "86%", 7, 10, 0.8)}
     </div>

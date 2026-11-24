@@ -262,9 +262,9 @@ export function Table({ columns, rows, rowKey = "key", sort, onSortChange, selec
 
   let body: ReactNode;
   if (loading) {
-    const title = `${t.table.loadCardL}px`;
-    const lineW = `${t.table.loadCardS}px`;
-    const height = `${t.table.loadH}px`;
+    const title = `${t.table.loadCardWidthLg}px`;
+    const lineW = `${t.table.loadCardWidthSm}px`;
+    const height = `${t.table.loadHeight}px`;
     body = (
       <View testID={id("cards")} accessibilityState={{ busy: true }} style={r.cards.view}>
         {Array.from({ length: pageSize > 0 ? Math.min(pageSize, 3) : 3 }, (_, i) => (

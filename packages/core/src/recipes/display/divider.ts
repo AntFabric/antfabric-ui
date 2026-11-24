@@ -13,9 +13,9 @@ export const divider = defineRecipe({
       variants: { inset: { sm: { margin: "$space.sm" }, md: { margin: "$space.md" } } },
     },
     rule: {
-      base: { bg: "$border.subtle" },
-      variants: { orientation: { horizontal: { height: "$border.wHairline", minWidth: "$space.xl" }, vertical: { width: "$border.wHairline", minHeight: "$icon.size" } } },
+      base: { bg: "$color.border.subtle" },
+      variants: { orientation: { horizontal: { height: "$border.width.hairline", minWidth: "$space.xl" }, vertical: { width: "$border.width.hairline", minHeight: "$size.icon.default" } } },
     },
-    label: { base: { fg: "$fg.muted", font: "$font.sans", size: "$text.caption", line: "$text.captionLine", weight: "$font.weightMedium" } },
+    label: { base: { fg: "$color.text.muted", font: "$font.family.sans", size: "$font.size.caption", line: "$font.lineHeight.caption", weight: "$font.weight.medium" } },
   },
 });

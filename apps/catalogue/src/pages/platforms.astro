@@ -85,10 +85,10 @@ const shown = chrome
               {g.features.map((f) => (
                 <tr>
                   <td>
-                    <b style="color:var(--af-fg-strong)">{f.name}</b>
+                    <b style="color:var(--af-color-text-strong)">{f.name}</b>
                     {f.component && registry[f.component] && (
                       <div>
-                        <a class="mono" style="font-size:11.5px;color:var(--af-link-default)" href={`/components/${f.component}`}>
+                        <a class="mono" style="font-size:11.5px;color:var(--af-color-text-link)" href={`/components/${f.component}`}>
                           {f.component}
                         </a>
                       </div>
@@ -118,7 +118,7 @@ const shown = chrome
     <h2>Rules that follow from this</h2>
     <div class="grid c2">
       <div class="card">
-        <b style="color:var(--af-fg-strong)">Web is a guest in the browser</b>
+        <b style="color:var(--af-color-text-strong)">Web is a guest in the browser</b>
         <ul class="notes" style="margin-top:10px">
           <li>Never bind ⌘W, ⌘T, ⌘N, ⌘L, ⌘R or ⌘1–9. The web alternative goes in the shortcut's hint.</li>
           <li>Every place is a URL. Back means the browser's back, and ⌘-click opens a new tab.</li>
@@ -127,7 +127,7 @@ const shown = chrome
         </ul>
       </div>
       <div class="card">
-        <b style="color:var(--af-fg-strong)">Desktop owns its window</b>
+        <b style="color:var(--af-color-text-strong)">Desktop owns its window</b>
         <ul class="notes" style="margin-top:10px">
           <li>macOS uses the system menu bar. Windows and Linux use ☰ in our title bar, with the same items.</li>
           <li>Close hides the window, so notifications keep arriving. Quit is explicit.</li>
@@ -136,7 +136,7 @@ const shown = chrome
         </ul>
       </div>
       <div class="card">
-        <b style="color:var(--af-fg-strong)">Mobile has no hover and no pointer</b>
+        <b style="color:var(--af-color-text-strong)">Mobile has no hover and no pointer</b>
         <ul class="notes" style="margin-top:10px">
           <li>Every hover affordance on desktop has a long-press, swipe or visible-button twin.</li>
           <li>Touch targets are at least 44pt, and the React Native kit has no hover styles.</li>
@@ -145,7 +145,7 @@ const shown = chrome
         </ul>
       </div>
       <div class="card">
-        <b style="color:var(--af-fg-strong)">Same component, same props</b>
+        <b style="color:var(--af-color-text-strong)">Same component, same props</b>
         <ul class="notes" style="margin-top:10px">
           <li>A component's props API is identical on all three platforms, and <code class="mono">pnpm check</code> holds both kits to the documented <code class="mono">props</code>.</li>
           <li>A prop that only makes sense on some platforms (such as <code class="mono">shortcut</code>) says so, and the other platforms' kits ignore it.</li>

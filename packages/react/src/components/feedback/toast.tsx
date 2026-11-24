@@ -36,15 +36,15 @@ export interface ToastProps extends RootProps<HTMLDivElement> {
 }
 
 /** A chip mixed from the toast's own ink, so it survives the inverse surface turning light in dark themes. */
-const ink = (pct: number) => `color-mix(in srgb, ${t.fg.onInverse} ${pct}%, transparent)`;
-const ring = `0 0 0 2px ${t.fg.onInverse}`;
+const ink = (pct: number) => `color-mix(in srgb, ${t.color.text.onInverse} ${pct}%, transparent)`;
+const ring = `0 0 0 2px ${t.color.text.onInverse}`;
 
 /** The layout and the motion no token decides; what the tokens decide (fill, ink, type, shadow, insets) is the recipe's. */
 const pill: CSSProperties = {
   ...row,
   paddingBlock: 11,
   borderRadius: 13,
-  transition: `opacity ${t.duration.base}, transform ${t.duration.base} ${t.ease.out}`,
+  transition: `opacity ${t.motion.duration.base}, transform ${t.motion.duration.base} ${t.motion.easing.out}`,
 };
 
 /** The info mark's fill is the pill's ink, mixed: a `color-mix`, which the recipe cannot say. */

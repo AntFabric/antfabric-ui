@@ -1110,17 +1110,17 @@ const docs: ComponentDocs = {
                   paddingY: "$space.sm",
                   paddingX: "$space.md",
                   radius: 12,
-                  border: "1px solid $border.default",
-                  bg: "$surface.recessed",
+                  border: "1px solid $color.border.default",
+                  bg: "$color.background.recessed",
                 },
                 children: [
                   {
                     el: "text",
                     text: "You're offline, so this hasn't been sent. It's still here.",
                     style: {
-                      fontSize: "$text.bodySm",
-                      lineHeight: "$text.bodySmLine",
-                      color: "$danger.default",
+                      fontSize: "$font.size.bodySm",
+                      lineHeight: "$font.lineHeight.bodySm",
+                      color: "$color.text.danger",
                     },
                   },
                 ],

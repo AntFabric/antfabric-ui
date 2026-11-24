@@ -44,14 +44,14 @@ export function Meter({ value, max = 1, label, kind = "usage", format = "percent
   const tone = known ? meterTone(kind, share, thresholds) : "ok";
   const reading = meterReading(value, max, formatWords, format, locale);
   const shown = reading.kind === "unavailable" ? s("unavailable") : reading.kind === "of" ? s("valueOfMax", { value: reading.value, max: reading.max }) : reading.value;
-  const fill = tone === "warning" ? t.data.warning : tone === "danger" ? t.data.negative : null;
+  const fill = tone === "warning" ? t.color.background.data.warning : tone === "danger" ? t.color.background.data.negative : null;
   // The state is spoken as well as drawn: the fill's colour is never the only signal.
   const said = tone === "warning" ? s("stateWarning", { value: shown }) : tone === "danger" ? s("stateDanger", { value: shown }) : shown;
   const icon = meterIcon(tone);
-  const mark = showState && icon ? <Icon name={icon} size={t.icon.sizeMd} color={fill ?? undefined} style={{ marginRight: t.space["2xs"] }} /> : null;
+  const mark = showState && icon ? <Icon name={icon} size={t.size.icon.md} color={fill ?? undefined} style={{ marginRight: t.space["2xs"] }} /> : null;
   const valueText = <span data-af-part="value" style={css(text, partStyle(r, "value", { fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap", ...(mark ? { display: "inline-flex", alignItems: "center" } : {}) }))}>{mark}{shown}</span>;
   return (
-    <div data-af-part="root" {...rootProps(rest)} style={css(box, partStyle(r, "root", { alignSelf: "stretch" }, compact ? { flexDirection: "row", alignItems: "center" } : { minWidth: t.kpi.meterMinW }), style)}>
+    <div data-af-part="root" {...rootProps(rest)} style={css(box, partStyle(r, "root", { alignSelf: "stretch" }, compact ? { flexDirection: "row", alignItems: "center" } : { minWidth: t.kpi.meterMinWidth }), style)}>
       {!compact ? (
         <div data-af-part="head" style={css(row, { justifyContent: "space-between" }, r.head)}>
           <span data-af-part="label" style={css(text, r.label)}>{label}</span>
@@ -67,10 +67,10 @@ export function Meter({ value, max = 1, label, kind = "usage", format = "percent
         aria-valuenow={known ? Math.min(max, Math.max(0, value)) : undefined}
         aria-valuetext={known ? said : undefined}
         data-af-part="track"
-        style={css(box, partStyle(r, "track", { overflow: "hidden" }, compact && { width: t.kpi.meterCompactW, flexShrink: 0 }))}
+        style={css(box, partStyle(r, "track", { overflow: "hidden" }, compact && { width: t.kpi.meterCompactWidth, flexShrink: 0 }))}
       >
         {/* The fill is the track's whole width, slid left by what is unfilled: a transform moves on the compositor, where a width would lay the page out every frame. The track clips it. */}
-        <div data-af-part="fill" style={partStyle(r, "fill", { position: "absolute", top: 0, bottom: 0, left: 0, width: "100%", transform: `translateX(${-(1 - Math.min(1, Math.max(0, share))) * 100}%)`, transition: `transform ${t.duration.slow} ${t.ease.out}` }, fill !== null && { background: fill })} />
+        <div data-af-part="fill" style={partStyle(r, "fill", { position: "absolute", top: 0, bottom: 0, left: 0, width: "100%", transform: `translateX(${-(1 - Math.min(1, Math.max(0, share))) * 100}%)`, transition: `transform ${t.motion.duration.slow} ${t.motion.easing.out}` }, fill !== null && { background: fill })} />
       </div>
       {compact ? valueText : null}
     </div>

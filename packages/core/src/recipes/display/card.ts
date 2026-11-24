@@ -11,49 +11,49 @@ export const card = defineRecipe({
     root: {
       base: {
         gap: "$space.sm",
-        bg: "$surface.card",
-        fg: "$fg.body",
-        borderWidth: "$border.wHairline",
-        borderColor: "$border.subtle",
-        font: "$font.sans",
+        bg: "$color.background.card",
+        fg: "$color.text.body",
+        borderWidth: "$border.width.hairline",
+        borderColor: "$color.border.subtle",
+        font: "$font.family.sans",
       },
       variants: {
         level: { pane: { radius: "$radius.panel" }, rail: { radius: "$radius.rail" }, inner: { radius: "$radius.card" } },
         elevate: {
-          none: { shadow: "$shadow.none" },
-          hairline: { shadow: "$shadow.hairline" },
-          card: { shadow: "$shadow.card" },
-          raise: { shadow: "$shadow.raise" },
-          float: { shadow: "$shadow.float" },
+          none: { shadow: "$elevation.shadow.none" },
+          hairline: { shadow: "$elevation.shadow.hairline" },
+          card: { shadow: "$elevation.shadow.card" },
+          raise: { shadow: "$elevation.shadow.raise" },
+          float: { shadow: "$elevation.shadow.float" },
         },
         // Hover fills an interactive card; the kit turns `hover` on only for one. A brand card hovers to its own deeper tint.
         tint: {
-          default: { states: { hover: { bg: "$hover.surface" } } },
-          brand: { bg: "$brand.soft", borderColor: "$brand.softHover", fg: "$fg.onBrandSoft", states: { hover: { bg: "$brand.softHover" } } },
-          recessed: { bg: "$surface.recessed", states: { hover: { bg: "$hover.surface" } } },
+          default: { states: { hover: { bg: "$color.background.hover" } } },
+          brand: { bg: "$color.background.brand.soft", borderColor: "$color.background.brand.softHover", fg: "$color.text.onBrandSoft", states: { hover: { bg: "$color.background.brand.softHover" } } },
+          recessed: { bg: "$color.background.recessed", states: { hover: { bg: "$color.background.hover" } } },
         },
         pad: { default: { padding: "$space.lg" } },
       },
       // The focus ring replaces the elevation shadow; the border and the shadow otherwise hold still.
-      states: { focus: { shadow: "$shadow.focus" } },
+      states: { focus: { shadow: "$elevation.shadow.focus" } },
       // The phone's 12pt inset is `space.md` and stays in the kit's StyleSheet: React Native Web writes a StyleSheet's `padding` as a shorthand and an
       // inline one as four longhands, which the render snapshot does not equate. Move it here (`padding: "$space.md"`) when it does.
       // idiom (kept, listed for the owner): the phone's card is one radius, flat and inset 12pt, and the elevation and `level` props do not apply.
       platforms: { mobile: { base: { radius: "$radius.panel", shadow: "none", padding: "none" } } },
     },
     placeholder: {
-      base: { size: "$text.bodySm", line: "$text.bodySmLine" },
-      platforms: { mobile: { base: { fg: "$fg.body", weight: "$font.weightNormal" }, variants: { tint: { brand: { fg: "$fg.onBrandSoft" } } } } },
+      base: { size: "$font.size.bodySm", line: "$font.lineHeight.bodySm" },
+      platforms: { mobile: { base: { fg: "$color.text.body", weight: "$font.weight.normal" }, variants: { tint: { brand: { fg: "$color.text.onBrandSoft" } } } } },
     },
     accent: {
       on: ["mobile"],
       variants: {
         accent: {
-          brand: { bg: "$brand.default" },
-          success: { bg: "$success.default" },
-          warning: { bg: "$warning.default" },
-          danger: { bg: "$danger.default" },
-          info: { bg: "$info.default" },
+          brand: { bg: "$color.background.brand.default" },
+          success: { bg: "$color.text.success" },
+          warning: { bg: "$color.text.warning" },
+          danger: { bg: "$color.text.danger" },
+          info: { bg: "$color.text.info" },
         },
       },
     },

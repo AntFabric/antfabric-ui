@@ -49,35 +49,35 @@ export const osNotification = defineRecipe({
     root: { platforms: { mobile: { base: { width: "$osNotification.w" } } } },
     card: {
       platforms: {
-        mac: { base: { bg: "$os.notificationBg", fg: "$os.notificationFg", radius: "$osNotification.macRadius", gap: "$space.sm", shadow: "$shadow.float", borderWidth: "$border.wHairline", borderColor: "$border.subtle" } },
-        windows: { base: { bg: "$surface.raised", fg: "$fg.strong", radius: "$osNotification.winRadius", shadow: "$shadow.modal", borderWidth: "$border.wHairline", borderColor: "$border.muted" } },
-        linux: { base: { bg: "$surface.raised", fg: "$fg.strong", radius: "$osNotification.linuxRadius", padding: "$space.md", gap: "$space.sm", shadow: "$shadow.menu", borderWidth: "$border.wHairline", borderColor: "$border.subtle" } },
-        browser: { base: { bg: "$surface.raised", fg: "$fg.strong", radius: "$osNotification.browserRadius", shadow: "$shadow.modal", borderWidth: "$border.wHairline", borderColor: "$border.subtle" } },
-        ios: { base: { bg: "$os.notificationBg", radius: "$osNotification.iosRadius", paddingX: "$space.mdLg", paddingY: "$space.md", gap: "$space.smMd", shadow: "$shadow.raise" } },
+        mac: { base: { bg: "$os.notificationBg", fg: "$os.notificationFg", radius: "$osNotification.macRadius", gap: "$space.sm", shadow: "$elevation.shadow.float", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle" } },
+        windows: { base: { bg: "$color.background.raised", fg: "$color.text.strong", radius: "$osNotification.winRadius", shadow: "$elevation.shadow.modal", borderWidth: "$border.width.hairline", borderColor: "$color.border.muted" } },
+        linux: { base: { bg: "$color.background.raised", fg: "$color.text.strong", radius: "$osNotification.linuxRadius", padding: "$space.md", gap: "$space.sm", shadow: "$elevation.shadow.menu", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle" } },
+        browser: { base: { bg: "$color.background.raised", fg: "$color.text.strong", radius: "$osNotification.browserRadius", shadow: "$elevation.shadow.modal", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle" } },
+        ios: { base: { bg: "$os.notificationBg", radius: "$osNotification.iosRadius", paddingX: "$space.mdLg", paddingY: "$space.md", gap: "$space.smMd", shadow: "$elevation.shadow.raise" } },
         // The phone's padding (a `space.lg` shorthand) stays in the kit's stylesheet.
-        android: { base: { bg: "$surface.raised", radius: "$osNotification.androidRadius", gap: "$space.sm", shadow: "$shadow.float" } },
+        android: { base: { bg: "$color.background.raised", radius: "$osNotification.androidRadius", gap: "$space.sm", shadow: "$elevation.shadow.float" } },
       },
     },
     // The small app mark on Windows, Linux and the browser's header, and Android's round one.
     smallIcon: {
-      base: { square: "$osNotification.iconSize", radius: "$osNotification.controlRadius", bg: "$brand.default" },
+      base: { square: "$osNotification.iconSize", radius: "$osNotification.controlRadius", bg: "$color.background.brand.default" },
       platforms: { mobile: { base: { square: "$osNotification.androidIconSize", radius: "$radius.circle" } } },
     },
-    source: { base: { size: "$text.caption", fg: "$fg.muted" } },
+    source: { base: { size: "$font.size.caption", fg: "$color.text.muted" } },
     closeButton: {
       on: ["web", "desktop"],
-      base: { radius: "$osNotification.controlRadius", fg: "$fg.muted" },
-      states: { hover: { bg: "$hover.surface", fg: "$fg.strong" }, focus: { shadow: "$shadow.focus" } },
+      base: { radius: "$osNotification.controlRadius", fg: "$color.text.muted" },
+      states: { hover: { bg: "$color.background.hover", fg: "$color.text.strong" }, focus: { shadow: "$elevation.shadow.focus" } },
       // The Mac's floats over the banner's corner: a round, blurred, hairline-edged button that greys on hover.
       platforms: {
         mac: {
-          base: { top: "$osNotification.closeHang", left: "$osNotification.closeHang", bg: "$os.notificationBg", borderColor: "$border.muted", shadow: "$shadow.hairline" },
-          states: { hover: { bg: "$hover.surface", fg: "$fg.strong" }, focus: { shadow: "$shadow.focus" } },
+          base: { top: "$osNotification.closeHang", left: "$osNotification.closeHang", bg: "$os.notificationBg", borderColor: "$color.border.muted", shadow: "$elevation.shadow.hairline" },
+          states: { hover: { bg: "$color.background.hover", fg: "$color.text.strong" }, focus: { shadow: "$elevation.shadow.focus" } },
         },
       },
     },
     hit: {
-      states: { focus: { shadow: "$shadow.focus" } },
+      states: { focus: { shadow: "$elevation.shadow.focus" } },
       platforms: {
         mac: { base: { gap: "$space.smMd" } },
         windows: { base: { gap: "$space.md" } },
@@ -89,56 +89,56 @@ export const osNotification = defineRecipe({
     },
     badge: {
       on: ["desktop", "mobile"],
-      base: { square: "$osNotification.badgeSize", radius: "$osNotification.badgeRadius", bg: "$brand.default", borderColor: "$surface.raised" },
+      base: { square: "$osNotification.badgeSize", radius: "$osNotification.badgeRadius", bg: "$color.background.brand.default", borderColor: "$color.background.raised" },
       platforms: { mobile: { base: { borderWidth: "$osNotification.badgeEdge" } } },
     },
     appIcon: {
       on: ["desktop", "mobile"],
-      base: { radius: "$osNotification.appIconRadius", bg: "$brand.default" },
+      base: { radius: "$osNotification.appIconRadius", bg: "$color.background.brand.default" },
       platforms: { desktop: { base: { square: "$osNotification.macIconSize" } }, mobile: { base: { square: "$osNotification.iosIconSize" } } },
     },
     mark: {
-      base: { fg: "$fg.onBrand", font: "$font.display", size: "$osNotification.iconLabel" },
-      platforms: { mobile: { base: { size: "none", weight: "$font.weightBlack" } } },
+      base: { fg: "$color.text.onBrand", font: "$font.family.display", size: "$osNotification.iconLabel" },
+      platforms: { mobile: { base: { size: "none", weight: "$font.weight.black" } } },
     },
-    macMark: { on: ["desktop"], base: { fg: "$fg.onBrand", font: "$font.display", size: "$osNotification.macIconLabel" } },
+    macMark: { on: ["desktop"], base: { fg: "$color.text.onBrand", font: "$font.family.display", size: "$osNotification.macIconLabel" } },
     title: {
       platforms: {
-        mac: { base: { size: "$text.bodySm", weight: "$font.weightBold" } },
-        windows: { base: { size: "$text.body", weight: "$font.weightSemibold" } },
-        linux: { base: { size: "$text.body", weight: "$font.weightBold" } },
-        browser: { base: { size: "$text.body", weight: "$font.weightSemibold" } },
+        mac: { base: { size: "$font.size.bodySm", weight: "$font.weight.bold" } },
+        windows: { base: { size: "$font.size.body", weight: "$font.weight.semibold" } },
+        linux: { base: { size: "$font.size.body", weight: "$font.weight.bold" } },
+        browser: { base: { size: "$font.size.body", weight: "$font.weight.semibold" } },
         ios: { base: { size: "$osNotification.iosBody", line: "$osNotification.iosLine", fg: "$os.notificationFg" } },
-        android: { base: { size: "$osNotification.iosBody", line: "$osNotification.iosLine", fg: "$fg.strong" } },
+        android: { base: { size: "$osNotification.iosBody", line: "$osNotification.iosLine", fg: "$color.text.strong" } },
       },
     },
     // The Mac's, Linux's and the browser's second line, and iOS's.
     subtitle: {
       platforms: {
-        web: { base: { size: "$text.bodySm", weight: "$font.weightMedium" } },
-        desktop: { base: { size: "$text.bodySm", weight: "$font.weightMedium" } },
+        web: { base: { size: "$font.size.bodySm", weight: "$font.weight.medium" } },
+        desktop: { base: { size: "$font.size.bodySm", weight: "$font.weight.medium" } },
         mobile: { base: { size: "$osNotification.iosBody", line: "$osNotification.iosLine", fg: "$os.notificationFg" } },
       },
     },
     time: {
       on: ["desktop", "mobile"],
-      base: { size: "$text.caption", fg: "$fg.muted" },
+      base: { size: "$font.size.caption", fg: "$color.text.muted" },
       platforms: { mobile: { base: { size: "$osNotification.iosTime" } } },
     },
     body: {
       platforms: {
-        mac: { base: { size: "$text.bodySm", fg: "$os.notificationFg" } },
-        windows: { base: { size: "$text.body", fg: "$fg.muted" } },
-        linux: { base: { size: "$text.bodySm", fg: "$fg.body" } },
-        browser: { base: { size: "$text.bodySm", fg: "$fg.muted" } },
+        mac: { base: { size: "$font.size.bodySm", fg: "$os.notificationFg" } },
+        windows: { base: { size: "$font.size.body", fg: "$color.text.muted" } },
+        linux: { base: { size: "$font.size.bodySm", fg: "$color.text.body" } },
+        browser: { base: { size: "$font.size.bodySm", fg: "$color.text.muted" } },
         ios: { base: { line: "$osNotification.iosLine", fg: "$os.notificationFg" } },
-        android: { base: { line: "$osNotification.iosLine", fg: "$fg.muted" } },
+        android: { base: { line: "$osNotification.iosLine", fg: "$color.text.muted" } },
       },
     },
-    lead: { base: { fg: "$fg.muted" }, platforms: { web: { base: { weight: "$font.weightMedium" } }, desktop: { base: { weight: "$font.weightMedium" } } } },
+    lead: { base: { fg: "$color.text.muted" }, platforms: { web: { base: { weight: "$font.weight.medium" } }, desktop: { base: { weight: "$font.weight.medium" } } } },
     // "+2 more" and Windows' context line. The phone's sizes are literals in the kit.
-    small: { on: ["desktop", "mobile"], base: { size: "$text.caption", fg: "$fg.muted" }, platforms: { mobile: { base: { size: "none" } } } },
-    context: { on: ["desktop"], base: { size: "$text.caption", fg: "$fg.faint" } },
+    small: { on: ["desktop", "mobile"], base: { size: "$font.size.caption", fg: "$color.text.muted" }, platforms: { mobile: { base: { size: "none" } } } },
+    context: { on: ["desktop"], base: { size: "$font.size.caption", fg: "$color.text.faint" } },
     actions: {
       on: ["web", "desktop"],
       platforms: {
@@ -146,66 +146,66 @@ export const osNotification = defineRecipe({
         windows: { base: { gap: "$space.sm" } },
         linux: { base: { gap: "$space.xs" } },
         // The browser's buttons sit under a rule: a hairline top edge.
-        browser: { base: { borderTopWidth: "$border.wHairline", borderTopColor: "$border.subtle" } },
+        browser: { base: { borderTopWidth: "$border.width.hairline", borderTopColor: "$color.border.subtle" } },
       },
     },
     action: {
-      states: { focus: { shadow: "$shadow.focus" }, disabled: { opacity: "$opacity.disabled" } },
+      states: { focus: { shadow: "$elevation.shadow.focus" }, disabled: { opacity: "$opacity.disabled" } },
       platforms: {
-        mac: { base: { paddingX: "$space.smMd", fg: "$fg.strong", height: "$osNotification.macActionH", radius: "$osNotification.macActionRadius", bg: "$surface.overlay", size: "$text.bodySm", weight: "$font.weightMedium" }, states: { hover: { bg: "$surface.selected" } } },
+        mac: { base: { paddingX: "$space.smMd", fg: "$color.text.strong", height: "$osNotification.macActionH", radius: "$osNotification.macActionRadius", bg: "$color.background.overlay", size: "$font.size.bodySm", weight: "$font.weight.medium" }, states: { hover: { bg: "$color.background.selected" } } },
         windows: {
-          base: { paddingX: "$space.smMd", fg: "$fg.strong", height: "$control.hSm", radius: "$osNotification.controlRadius", bg: "$surface.muted", size: "$text.body", weight: "$font.weightNormal", borderWidth: "$border.wHairline", borderColor: "$border.subtle" },
-          states: { hover: { bg: "$surface.selected" } },
+          base: { paddingX: "$space.smMd", fg: "$color.text.strong", height: "$size.control.sm", radius: "$osNotification.controlRadius", bg: "$color.background.muted", size: "$font.size.body", weight: "$font.weight.normal", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle" },
+          states: { hover: { bg: "$color.background.selected" } },
         },
-        linux: { base: { paddingX: "$space.smMd", fg: "$fg.strong", height: "$osNotification.linuxActionH", radius: "$osNotification.linuxActionRadius", bg: "$surface.muted", size: "$text.bodySm", weight: "$font.weightSemibold" }, states: { hover: { bg: "$surface.selected" } } },
+        linux: { base: { paddingX: "$space.smMd", fg: "$color.text.strong", height: "$osNotification.linuxActionH", radius: "$osNotification.linuxActionRadius", bg: "$color.background.muted", size: "$font.size.bodySm", weight: "$font.weight.semibold" }, states: { hover: { bg: "$color.background.selected" } } },
         // The browser's buttons are flat text on the card, with no radius (the kit's literal 0).
-        browser: { base: { paddingX: "$space.smMd", fg: "$info.default", height: "$osNotification.browserActionH", bg: "transparent", size: "$text.bodySm", weight: "$font.weightSemibold" }, states: { hover: { bg: "$surface.selected" } } },
+        browser: { base: { paddingX: "$space.smMd", fg: "$color.text.info", height: "$osNotification.browserActionH", bg: "transparent", size: "$font.size.bodySm", weight: "$font.weight.semibold" }, states: { hover: { bg: "$color.background.selected" } } },
         mobile: { base: { height: "$osNotification.iosControlH", radius: "$osNotification.iosActionRadius", bg: "transparent" } },
       },
     },
-    actionText: { on: ["mobile"], base: { size: "$text.bodySm", fg: "$brand.active" } },
+    actionText: { on: ["mobile"], base: { size: "$font.size.bodySm", fg: "$color.background.brand.pressed" } },
     replyField: {
       on: ["desktop", "mobile"],
-      base: { height: "$osNotification.fieldH", radius: "$osNotification.macActionRadius", paddingX: "$space.smMd", bg: "$surface.card", borderWidth: "$border.wHairline", borderColor: "$border.muted", size: "$text.bodySm", fg: "$fg.strong" },
-      states: { focus: { borderColor: "$border.strong" }, disabled: { opacity: "$opacity.muted" } },
+      base: { height: "$osNotification.fieldH", radius: "$osNotification.macActionRadius", paddingX: "$space.smMd", bg: "$color.background.card", borderWidth: "$border.width.hairline", borderColor: "$color.border.muted", size: "$font.size.bodySm", fg: "$color.text.strong" },
+      states: { focus: { borderColor: "$color.border.strong" }, disabled: { opacity: "$opacity.muted" } },
       platforms: {
-        windows: { base: { height: "$control.hSm", radius: "$osNotification.controlRadius", size: "$text.body" } },
-        ios: { base: { height: "$osNotification.iosControlH", radius: "$osNotification.iosFieldRadius", paddingX: "$space.mdLg", size: "$osNotification.iosBody", placeholder: "$fg.placeholder" } },
-        android: { base: { height: "$osNotification.androidFieldH", radius: "$osNotification.androidFieldRadius", paddingX: "$space.lg", bg: "$surface.selected", size: "$text.bodySm", placeholder: "$fg.placeholder" } },
+        windows: { base: { height: "$size.control.sm", radius: "$osNotification.controlRadius", size: "$font.size.body" } },
+        ios: { base: { height: "$osNotification.iosControlH", radius: "$osNotification.iosFieldRadius", paddingX: "$space.mdLg", size: "$osNotification.iosBody", placeholder: "$color.text.placeholder" } },
+        android: { base: { height: "$osNotification.androidFieldH", radius: "$osNotification.androidFieldRadius", paddingX: "$space.lg", bg: "$color.background.selected", size: "$font.size.bodySm", placeholder: "$color.text.placeholder" } },
       },
     },
     sendButton: {
       on: ["desktop", "mobile"],
-      base: { square: "$osNotification.sendSize", bg: "$brand.default", fg: "$fg.onBrand" },
-      states: { hover: { bg: "$brand.hover" }, focus: { shadow: "$shadow.focus" }, disabled: { opacity: "$opacity.disabled" } },
+      base: { square: "$osNotification.sendSize", bg: "$color.background.brand.default", fg: "$color.text.onBrand" },
+      states: { hover: { bg: "$color.background.brand.hover" }, focus: { shadow: "$elevation.shadow.focus" }, disabled: { opacity: "$opacity.disabled" } },
       platforms: {
-        windows: { base: { square: "$osNotification.winSendSize", radius: "$osNotification.controlRadius", bg: "transparent", fg: "$brand.active" }, states: { hover: { bg: "$hover.surface" } } },
+        windows: { base: { square: "$osNotification.winSendSize", radius: "$osNotification.controlRadius", bg: "transparent", fg: "$color.background.brand.pressed" }, states: { hover: { bg: "$color.background.hover" } } },
         ios: { base: { square: "none", radius: "$radius.circle" } },
-        android: { base: { square: "none", radius: "$radius.circle", bg: "transparent", fg: "$brand.active" } },
+        android: { base: { square: "none", radius: "$radius.circle", bg: "transparent", fg: "$color.background.brand.pressed" } },
       },
     },
-    statusIcon: { on: ["desktop", "mobile"], base: { fg: "$danger.default" } },
-    statusText: { on: ["desktop", "mobile"], base: { size: "$text.caption", fg: "$fg.muted" }, states: { invalid: { fg: "$danger.default" } } },
+    statusIcon: { on: ["desktop", "mobile"], base: { fg: "$color.text.danger" } },
+    statusText: { on: ["desktop", "mobile"], base: { size: "$font.size.caption", fg: "$color.text.muted" }, states: { invalid: { fg: "$color.text.danger" } } },
     menu: { on: ["mobile"], base: { width: "$osNotification.iosMenuW" } },
-    menuSheet: { on: ["mobile"], base: { radius: "$osNotification.iosMenuRadius", bg: "$os.notificationBg", shadow: "$shadow.menu" } },
+    menuSheet: { on: ["mobile"], base: { radius: "$osNotification.iosMenuRadius", bg: "$os.notificationBg", shadow: "$elevation.shadow.menu" } },
     // The row's rule is its bottom edge only: the kit draws that side with this width and colour.
     menuRow: {
       on: ["mobile"],
-      base: { height: "$control.hit", paddingX: "$space.lg", borderBottomWidth: "$osNotification.iosHairline", borderBottomColor: "$border.muted" },
-      states: { pressed: { bg: "$surface.selected" }, focus: { shadow: "$shadow.focus" } },
+      base: { height: "$size.target.min", paddingX: "$space.lg", borderBottomWidth: "$osNotification.iosHairline", borderBottomColor: "$color.border.muted" },
+      states: { pressed: { bg: "$color.background.selected" }, focus: { shadow: "$elevation.shadow.focus" } },
     },
     menuText: { on: ["mobile"], base: { size: "$osNotification.iosHeader", fg: "$os.notificationFg" } },
     sliver: {
       on: ["desktop", "mobile"],
-      base: { bg: "$os.notificationBg", borderWidth: "$border.wHairline", borderColor: "$border.subtle", shadow: "$shadow.card" },
+      base: { bg: "$os.notificationBg", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle", shadow: "$elevation.shadow.card" },
       platforms: { mobile: { base: { height: "$osNotification.sliverH", radiusBottom: "$osNotification.sliverRadius" } } },
     },
     sliverFar: {
       on: ["desktop", "mobile"],
-      base: { bg: "$os.notificationBg", borderWidth: "$border.wHairline", borderColor: "$border.subtle", shadow: "$shadow.hairline" },
+      base: { bg: "$os.notificationBg", borderWidth: "$border.width.hairline", borderColor: "$color.border.subtle", shadow: "$elevation.shadow.hairline" },
       platforms: { mobile: { base: { height: "$osNotification.sliverFarH", radiusBottom: "$osNotification.sliverFarRadius" } } },
     },
   },
   // Left to the kit: Windows' reply underline, a bottom border written as a shorthand over the input's own reset.
-  reads: ["$border.default"],
+  reads: ["$color.border.default"],
 });

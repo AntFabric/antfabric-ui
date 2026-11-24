@@ -1,11 +1,19 @@
 # @antfabric/ui-core
 
-## Unreleased
+## 1.2.0
 
 ### Added
 
 - **Token tiers.** `tokenRegistry` and `tokenMeta(path)` (with the types `TokenGroup`, `TokenMeta`, `TokenTier`, `TokenSection`, `TokenVisibility`, `DtcgType`) say what each token group is: `semantic` (a role any component reads) or `component` (owned by the components it names), the type of its values and whether it is `internal` (resolves and can be themed, and is left out of the documented set: the pictures of OS chrome). `tokens.json` carries the same under `$extensions["com.antfabric"]` as `tier`, `component` and `visibility`. No token's name or value changes.
 - **A token can be an alias of another token.** In `tokens.ts` a value may be `ref.text("border.subtle")` or `ref.number("control.hMd")`, written `"{border.subtle}"` in `tokens.json` (the W3C format's alias). The alias is its target in every mode: `tokens` holds the target's value, the stylesheet writes `--af-chart-grid:var(--af-border-subtle)`, and under a theme that sets the target and not the alias, `tokenValues` and `resolveTokens` follow it as the sheet does. New exports: `ref`, `isTokenReference`, `tokenReferencePath`, `resolveAliases`, `TokenReference`. A theme's own `tokens` still take values and primitive references only.
+
+### Changed
+
+- **Tokens are named category first** (429 of the 670; `reports/migration/tokens-2.md` lists every one). A semantic token is `category.property.role`: `fg.muted` is `color.text.muted`, `surface.card` is `color.background.card`, `control.hMd` is `size.control.md`, `text.body` and `text.bodyLine` are `font.size.body` and `font.lineHeight.body`, `shadow.card` is `elevation.shadow.card`, `duration.fast` is `motion.duration.fast`, `z.modal` is `zIndex.modal`. A component token is its component's id and one key in full words: `chip.h` is `chip.height`, `select.panelMaxH` is `select.panelMaxHeight`, `dialog.icon` is `dialog.iconSize`, `palette.w` is `commandPalette.width`, `chart.grid` is `chart.gridColor`. The CSS variable follows (`--af-color-text-muted`). The tokens that picture OS chrome (`os`, `osBadge`, `osNotification`, `osTray`, `osMenu`, `osWindow`, `osHeader`) keep their names.
+- **Every old name still works, and is deprecated.** `packages/core/renames.json` (exported as `@antfabric/ui-core/renames.json`, and as `renames`) is the list. `tokensCss()` declares each old variable as the new one (`deprecatedCss()`; `tokensCss({ deprecated: false })` leaves them out); `t` holds the old key in both kits, marked `@deprecated`; `defineTheme` takes an old path in `tokens` and warns once outside production; a `$old.path` in a recipe override or a prop resolves; `tokens.json` keeps the old leaf as an alias with `$deprecated`. They leave in 2.0.
+- **`npx af-tokens-codemod <dir>`** (a bin of this package) rewrites `t.fg.muted`, `"$fg.muted"` and `--af-fg-muted` in your source; `--dry` lists what it would change. A theme's nested `tokens` object is moved by hand: `fg: { muted }` becomes `color: { text: { muted } }`.
+- **A theme's id does not move.** It is still hashed over the names the tokens had when ids were first made, so a stored theme and its scoped sheet keep their `data-af-theme-id`.
+- `tokenRegistry` is keyed by the new groups (`color`, `font`, `size`, `space`, `motion`, …).
 
 ### Changed (behaviour)
 

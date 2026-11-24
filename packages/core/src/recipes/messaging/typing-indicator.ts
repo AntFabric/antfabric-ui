@@ -9,9 +9,9 @@ export const typingIndicator = defineRecipe({
   parts: ["root", "dots", "dot", "who", "verb"],
   styles: {
     root: {
-      base: { gap: "$space.sm", paddingX: "$space.lgXl", font: "$font.sans", size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint" },
-      platforms: { mobile: { base: { paddingX: "$gutter.pane", size: "$text.bodySm", line: "$text.bodySmLine", weight: "$font.weightNormal" } } },
+      base: { gap: "$space.sm", paddingX: "$space.lgXl", font: "$font.family.sans", size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint" },
+      platforms: { mobile: { base: { paddingX: "$space.gutter.pane", size: "$font.size.bodySm", line: "$font.lineHeight.bodySm", weight: "$font.weight.normal" } } },
     },
-    dot: { base: { square: "$dot.sizeSm", radius: "$radius.circle", bg: "$fg.onBrandSoft" } },
+    dot: { base: { square: "$size.dot.sm", radius: "$radius.circle", bg: "$color.text.onBrandSoft" } },
   },
 });

@@ -113,7 +113,7 @@ export function BottomSheet({
           {
             paddingTop: t.space.md,
             paddingBottom: t.space.xl,
-            transition: `transform ${t.duration.slow} ${t.ease.out}`,
+            transition: `transform ${t.motion.duration.slow} ${t.motion.easing.out}`,
           },
           partStyle(
             r,
@@ -139,7 +139,7 @@ export function BottomSheet({
           onBlur={handleUi.handlers.onBlur}
           style={css({ alignSelf: "center", flexShrink: 0, padding: 0, border: 0, cursor: "pointer", marginBottom: t.space.lg, position: "relative" }, r.handle)}
         >
-          <span aria-hidden style={{ position: "absolute", insetInline: 0, height: t.control.hit, top: `calc((${handleH} - ${t.control.hit}) / 2)` }} />
+          <span aria-hidden style={{ position: "absolute", insetInline: 0, height: t.size.target.min, top: `calc((${handleH} - ${t.size.target.min}) / 2)` }} />
         </button>
         {title && (
           <div style={css(row, { justifyContent: "space-between", gap: t.space.sm, marginBottom: t.space.lg })}>

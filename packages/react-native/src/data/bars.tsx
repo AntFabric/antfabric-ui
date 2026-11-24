@@ -15,7 +15,7 @@ const LABEL_SHARE = 0.8;
 /** And it is pulled back by two fifths of the air, so it sits under its bars and not to the right of them. */
 const LABEL_SHIFT = 0.4;
 
-/** The card over a stack is laid on the plot's top edge, centred in the room the chart reserves for it (`chart.tipW`), and never takes a touch. */
+/** The card over a stack is laid on the plot's top edge, centred in the room the chart reserves for it (`chart.tipWidth`), and never takes a touch. */
 const overlay: ViewStyle = { position: "absolute", top: 0, alignItems: "center" };
 
 export interface GiftedBarsProps {

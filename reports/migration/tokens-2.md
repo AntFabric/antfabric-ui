@@ -3,7 +3,7 @@
 Every token, with the name it would take under the category-first standard. Nothing here is applied yet: this table is for review.
 Generated from `packages/core/tokens.json`; `tokens-2.json` beside it is the same data for the codemod.
 
-**430 renamed · 81 keep their name · 159 internal, left as they are · 0 collisions**
+**429 renamed · 82 keep their name · 159 internal, left as they are · 0 collisions**
 
 ## The rules
 
@@ -534,7 +534,7 @@ Generated from `packages/core/tokens.json`; `tokens-2.json` beside it is the sam
 | Old | New | CSS variable | Tier | Note |
 |---|---|---|---|---|
 | `tabBar.itemH` | `tabBar.itemHeight` | `--af-tab-bar-item-height` | component |  |
-| `tabBar.badgeX` | `tabBar.badgePaddingX` | `--af-tab-bar-badge-padding-x` | component |  |
+| `tabBar.badgeX` | `tabBar.badgeOffsetX` | `--af-tab-bar-badge-offset-x` | component | chosen by hand: the old name had no property word |
 | `tabBar.labelLine` | `tabBar.labelLineHeight` | `--af-tab-bar-label-line-height` | component |  |
 | `tabBar.labelMaxW` | `tabBar.labelMaxWidth` | `--af-tab-bar-label-max-width` | component |  |
 | `tabBar.itemSqueezed` | `tabBar.itemSizeSqueezed` | `--af-tab-bar-item-size-squeezed` | component | chosen by hand: the old name had no property word |
@@ -855,7 +855,7 @@ Generated from `packages/core/tokens.json`; `tokens-2.json` beside it is the sam
 | `switch.trackPad` | `switch.trackPadding` | `--af-switch-track-padding` | component |  |
 | `switch.thumbSize` | (same) |  | component |  |
 | `switch.thumbTravel` | (same) |  | component |  |
-| `switch.thumbShadow` | `switch.thumbShadowShadow` | `--af-switch-thumb-shadow-shadow` | component |  |
+| `switch.thumbShadow` | (same) |  | component |  |
 
 ## `os`
 

@@ -35,7 +35,7 @@ export interface RechartsBarsProps {
   totalLabel?: string;
   horizontal?: boolean;
   /**
-   * The fill is the plot's own ink (`currentColor`), which eases to a new colour over `duration.slow`. recharts gives each bar a new element as its value moves, so a
+   * The fill is the plot's own ink (`currentColor`), which eases to a new colour over `motion.duration.slow`. recharts gives each bar a new element as its value moves, so a
    * transition on the bar's own fill never runs; one on the element they inherit from does. For a chart whose one series changes colour (MetricTabs), which sets that
    * `color` and its transition on the `plot` style it passes in.
    */

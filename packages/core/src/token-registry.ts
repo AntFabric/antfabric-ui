@@ -5,8 +5,8 @@
  *
  * The tiers:
  *   primitive   raw values mirrored from the product (`primitives.ts`); no component reads one, and none is listed here
- *   semantic    a role any component may read: `fg.muted`, `space.md`, `control.hMd`
- *   component   a value that belongs to the components named in `owners`: `chip.removeSize`, `osBadge.winLabel`
+ *   semantic    a role any component may read: `color.text.muted`, `space.md`, `size.control.md`
+ *   component   a value that belongs to the components named in `owners`: `chip.removeSize`, `select.panelMaxHeight`
  *
  * A reference points down the tiers only: component to semantic to primitive.
  */
@@ -35,118 +35,85 @@ const component = (type: TokenGroup["type"], owners: readonly string[], more: Pa
 /** A picture of a surface the operating system draws: it has tokens so the literal ratchet holds, and nobody themes it. */
 const picture = (type: TokenGroup["type"], owners: readonly string[]): TokenGroup => component(type, owners, { visibility: "internal" });
 
-const CHART_COLOUR = /^(series\d|previous|other|grid|axis|label|crosshair|reference|tooltip|tooltipText|tooltipMuted|tooltipRule|track)$/;
+/** What a component token's value is, from its key: `gridColor` is a colour, `thumbShadow` a shadow, `fontFamily` and a font file a family, anything else a size. */
+const byKey = (key: string): DtcgType => (/Color(\d|[A-Z]|$)/.test(key) ? "color" : /Shadow$/.test(key) ? "shadow" : /^font(Family|File)/.test(key) ? "fontFamily" : "dimension");
 const CHARTS = ["bar-chart", "breakdown", "combo-chart", "donut-chart", "gauge-chart", "goal-rings", "line-chart", "meter", "metric-tabs", "period-compare", "progress-ring", "radar-chart", "spark-bars", "sparkline"] as const;
 
 /**
- * Every top-level group of `tokens.ts`. The order is the order the Foundations page lists a section's groups in.
+ * Every top-level group of `tokens.ts`. A semantic group is a category (`color`, `size`, `font`); a component group is the camelCase of a
+ * component's docs id, or a family several components share (`chart`, `kpi`, `choice`, `sheet`). The order is the order the Foundations
+ * page lists a section's groups in.
  */
 export const tokenRegistry: Record<string, TokenGroup> = {
-  // Type
-  text: semantic("dimension", "type"),
-  // A font file is a family name: the phone loads one file per weight.
-  font: semantic((key) => (key.startsWith("weight") ? "fontWeight" : "fontFamily"), "type"),
-  tracking: semantic("number", "type"),
+  // Colour: `color.text.*`, `color.background.*`, `color.border.*`
+  color: semantic("color", "colour"),
+
+  // Type: families, sizes, line heights, weights, letter spacing, and the files the phone loads (a file is a family name)
+  font: semantic((key) => (key === "weight" ? "fontWeight" : key === "letterSpacing" ? "number" : key === "size" || key === "lineHeight" ? "dimension" : "fontFamily"), "type"),
 
   // Space
   space: semantic("dimension", "space", { structural: true }),
-  gutter: semantic("dimension", "space"),
 
   // Radius
   radius: semantic("dimension", "radius"),
 
-  // Size: controls, rows, the profile's chrome, avatars, icons, and the widths of `border`
-  control: semantic("dimension", "size"),
-  row: semantic("dimension", "size"),
-  breadcrumb: semantic("dimension", "size"),
-  topbar: semantic("dimension", "size"),
-  rail: semantic("dimension", "size"),
-  tabbar: semantic("dimension", "size"),
-  statusbar: semantic("dimension", "size"),
-  homeIndicator: semantic("dimension", "size"),
-  avatar: semantic("dimension", "size"),
-  icon: semantic((key) => (key.startsWith("stroke") ? "number" : "dimension"), "size"),
-  // `border.wHairline` is a width; every other `border.*` is a colour.
-  border: semantic((key) => (/^w[A-Z]/.test(key) ? "dimension" : "color"), "size"),
+  // Size: controls, rows, the profile's chrome, avatars, icons (a stroke is a number), and the widths of `border`
+  size: semantic((key) => (key === "stroke" ? "number" : "dimension"), "size"),
+  border: semantic("dimension", "size"),
 
   // Elevation, motion, layers, materials
-  shadow: semantic("shadow", "elevation"),
-  duration: semantic("duration", "motion", { structural: true }),
-  ease: semantic("cubicBezier", "motion", { structural: true }),
-  z: semantic("number", "layers"),
+  elevation: semantic("shadow", "elevation"),
+  motion: semantic((key) => (key === "duration" ? "duration" : "cubicBezier"), "motion", { structural: true }),
+  zIndex: semantic("number", "layers"),
   opacity: semantic("number", "layers"),
-  glass: semantic((key) => (key === "blur" ? "dimension" : key === "saturate" ? "number" : "color"), "materials"),
+  effect: semantic((_key, path) => (path.endsWith(".blur") ? "dimension" : "number"), "materials"),
 
-  // Colour
-  surface: semantic("color", "colour"),
-  fg: semantic("color", "colour"),
-  brand: semantic("color", "colour"),
-  accent: semantic("color", "colour"),
-  focus: semantic("color", "colour"),
-  hover: semantic("color", "colour"),
-  link: semantic("color", "colour"),
-  success: semantic("color", "colour"),
-  warning: semantic("color", "colour"),
-  danger: semantic("color", "colour"),
-  info: semantic("color", "colour"),
-  identity: semantic("color", "colour"),
-  presence: semantic("color", "colour"),
-  scrim: semantic("color", "colour"),
-  skeleton: semantic("color", "colour"),
-  tag: semantic("color", "colour"),
-  banner: semantic("color", "colour"),
-  tabs: semantic("color", "colour"),
   // The colours an operating system draws its own chrome in, for the components that imitate it.
   os: semantic((_key, path) => (path === "os.wallpaper" ? "gradient" : "color"), "colour", { visibility: "internal" }),
 
-  // Data: the charts' own palette and geometry, the data status colours, the table
-  // Text and its phone files are families; a colour has one of these names; everything else is a size (a dash is a length).
-  chart: component((key) => (/^(font|file)/.test(key) ? "fontFamily" : CHART_COLOUR.test(key) ? "color" : "dimension"), CHARTS, { section: "data" }),
-  data: semantic("color", "data"),
-  table: component((key) => (/^(header|rowHover|rowSelected|divider)$/.test(key) ? "color" : "dimension"), ["table"], { section: "data" }),
+  // Data: the charts' own palette and geometry, and the table
+  chart: component(byKey, CHARTS, { section: "data" }),
+  table: component(byKey, ["table"], { section: "data" }),
 
   // Components: families several components share
-  dot: semantic("dimension", "components"),
-  phone: semantic("dimension", "components"),
-  sheet: component("dimension", ["bottom-sheet", "context-menu", "dialog", "in-app-banner", "notification-schedule", "permission-prompt", "select", "sheet", "tab-bar", "update-banner", "workspace-switcher"]),
-  choice: component("dimension", ["checkbox", "radio-group", "select", "switch"]),
-  checkbox: component("dimension", ["checkbox", "composer", "list-item", "menu"]),
-  textField: component("dimension", ["form-field", "text-area", "text-field"]),
-  menu: component("dimension", ["context-menu", "menu"]),
-  kpi: component("dimension", ["kpi-card", "meter", "metric-tabs", "period-compare", "progress-ring", "spark-bars", "stat-tile"]),
-  navRail: component("dimension", ["nav-rail", "workspace-switcher"]),
-  sidebar: component("dimension", ["sidebar-item", "sidebar-section"]),
+  sheet: component(byKey, ["bottom-sheet", "context-menu", "dialog", "in-app-banner", "notification-schedule", "permission-prompt", "select", "sheet", "tab-bar", "update-banner", "workspace-switcher"]),
+  choice: component(byKey, ["checkbox", "radio-group", "select", "switch"]),
+  checkbox: component(byKey, ["checkbox", "composer", "list-item", "menu"]),
+  textField: component(byKey, ["form-field", "text-area", "text-field"]),
+  menu: component(byKey, ["context-menu", "menu"]),
+  kpi: component(byKey, ["kpi-card", "meter", "metric-tabs", "period-compare", "progress-ring", "spark-bars", "stat-tile"]),
+  navRail: component(byKey, ["nav-rail", "workspace-switcher"]),
+  sidebarSection: component(byKey, ["sidebar-item", "sidebar-section"]),
 
   // Components: one component's own
-  button: component("dimension", ["button"]),
-  fab: component("dimension", ["fab"]),
-  iconButton: component("dimension", ["icon-button"]),
-  segmentedControl: component("dimension", ["segmented-control"]),
-  radioGroup: component("dimension", ["radio-group"]),
-  chip: component("dimension", ["chip"]),
-  select: component("dimension", ["select"]),
-  switch: component((key) => (key === "thumbShadow" ? "shadow" : key === "trackOff" || key === "thumb" ? "color" : "dimension"), ["switch"]),
-  inAppBanner: component("dimension", ["in-app-banner"]),
-  notificationItem: component("dimension", ["notification-item"]),
-  notificationSchedule: component("dimension", ["notification-schedule"]),
-  permissionPrompt: component("dimension", ["permission-prompt"]),
-  breadcrumbs: component("dimension", ["breadcrumbs"]),
-  tab: component("dimension", ["tabs"]),
-  workspace: component("dimension", ["workspace-switcher"]),
-  mobileHeader: component("dimension", ["mobile-header"]),
-  tabBar: component("dimension", ["tab-bar"]),
-  palette: component("dimension", ["command-palette"]),
-  emoji: component("dimension", ["context-menu"]),
-  contextMenu: component("dimension", ["context-menu"]),
-  dialog: component("dimension", ["dialog"]),
-  hoverCard: component("dimension", ["hover-card"]),
-  tooltip: component("dimension", ["tooltip"]),
-  connectionBanner: component("dimension", ["connection-banner"]),
-  sessionState: component("dimension", ["session-state"]),
-  updateBanner: component("dimension", ["update-banner"]),
-  questionPanel: component("dimension", ["question-panel"]),
-  thinking: component("dimension", ["thinking-indicator"]),
-  agentSteps: component("dimension", ["agent-steps"]),
+  button: component(byKey, ["button"]),
+  fab: component(byKey, ["fab"]),
+  iconButton: component(byKey, ["icon-button"]),
+  segmentedControl: component(byKey, ["segmented-control"]),
+  radioGroup: component(byKey, ["radio-group"]),
+  chip: component(byKey, ["chip"]),
+  select: component(byKey, ["select"]),
+  switch: component(byKey, ["switch"]),
+  inAppBanner: component(byKey, ["in-app-banner"]),
+  notificationItem: component(byKey, ["notification-item"]),
+  notificationSchedule: component(byKey, ["notification-schedule"]),
+  permissionPrompt: component(byKey, ["permission-prompt"]),
+  breadcrumbs: component(byKey, ["breadcrumbs"]),
+  tabs: component(byKey, ["tabs"]),
+  workspaceSwitcher: component(byKey, ["workspace-switcher"]),
+  mobileHeader: component(byKey, ["mobile-header"]),
+  tabBar: component(byKey, ["tab-bar"]),
+  commandPalette: component(byKey, ["command-palette"]),
+  contextMenu: component(byKey, ["context-menu"]),
+  dialog: component(byKey, ["dialog"]),
+  hoverCard: component(byKey, ["hover-card"]),
+  tooltip: component(byKey, ["tooltip"]),
+  connectionBanner: component(byKey, ["connection-banner"]),
+  sessionState: component(byKey, ["session-state"]),
+  updateBanner: component(byKey, ["update-banner"]),
+  questionPanel: component(byKey, ["question-panel"]),
+  thinkingIndicator: component(byKey, ["thinking-indicator"]),
+  agentSteps: component(byKey, ["agent-steps"]),
 
   // Components: pictures of what an operating system draws
   osBadge: picture("dimension", ["app-badge"]),

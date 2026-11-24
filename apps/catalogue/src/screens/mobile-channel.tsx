@@ -8,7 +8,7 @@ import { composerTools, messageBar } from "@antfabric/ui-docs/samples";
 export default function MobileChannel() {
   const { t } = useTheme();
   return (
-    <View style={{ flex: 1, backgroundColor: t.surface.app }}>
+    <View style={{ flex: 1, backgroundColor: t.color.background.app }}>
       <MobileHeader variant="pushed" title="platform-eng" titleGlyph="hash" subtitle="24 members" statusBar={false} actions={[{ key: "details", icon: "info", label: "Channel details" }]} />
 
       <ScrollView style={{ flex: 1, minHeight: 0 }} contentContainerStyle={{ flexGrow: 1, justifyContent: "flex-end", paddingVertical: t.space.sm }} showsVerticalScrollIndicator={false}>

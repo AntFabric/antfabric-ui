@@ -372,7 +372,7 @@ const docs: ComponentDocs = {
             el: "view",
             style: {
               width: 375,
-              paddingX: "$gutter.pane",
+              paddingX: "$space.gutter.pane",
               gap: "$space.xs",
             },
             children: [
@@ -427,7 +427,7 @@ const docs: ComponentDocs = {
             el: "view",
             style: {
               width: 375,
-              paddingX: "$gutter.pane",
+              paddingX: "$space.gutter.pane",
               gap: "$space.xs",
             },
             children: [
@@ -481,7 +481,7 @@ const docs: ComponentDocs = {
             el: "view",
             style: {
               width: 375,
-              paddingX: "$gutter.pane",
+              paddingX: "$space.gutter.pane",
               gap: "$space.xs",
             },
             children: [

@@ -54,11 +54,11 @@ const docs: ComponentDocs = {
       base: "The kit's Card (pad none) around a <section>: the title, the total as a headline (MetricValue, Delta) and \"View as table\" (Button); a ChartFrame holding a flex row of <span> segments (flex set to each part's value, `chart.splitGap` apart) and a <ul> of <button> rows (aria-pressed) laid out in columns",
       import: "import { Breakdown } from \"@antfabric/ui-react/data\"",
       notes: [
-        "No chart library: the bar is views, so it reads the same on every platform and costs nothing. Each segment's width is its share of the whole; a part that is a sliver of it is held to `chart.splitMinW` so it still shows, and a part of 0 is in the list only.",
+        "No chart library: the bar is views, so it reads the same on every platform and costs nothing. Each segment's width is its share of the whole; a part that is a sliver of it is held to `chart.splitMinWidth` so it still shows, and a part of 0 is in the list only.",
         "The first and last segments are rounded at the bar's outer ends (`radius.pill`) and the ones between are square, so the gaps read as cuts in one bar. One part is a whole rounded bar; all zero is the empty track in grey.",
         "Pointing at a segment or a row, or tabbing to a row, lights that part: the other segments fade to 38% over 150ms on the kit's ease-out, and its row takes the hover fill. The states come from the kit's interaction hook and pointer events, never `:hover`. A click picks it and keeps it lit.",
         "The bar wipes in once from the left (the kit's `grow-x` entrance, 280ms on ease-out). Reduced motion turns it off.",
-        "The list lays out in as many columns as fit, each at least `chart.partMinW` wide. Past eight parts the rest fold into \"Other\", in a grey that is no colour of the palette (core's `segmentsOf`, as DonutChart).",
+        "The list lays out in as many columns as fit, each at least `chart.partMinWidth` wide. Past eight parts the rest fold into \"Other\", in a grey that is no colour of the palette (core's `segmentsOf`, as DonutChart).",
       ],
       keyboard: [
         { keys: "Tab", action: "Moves through the parts in the list, then to \"View as table\". A part that has focus is lit, with its segment" },
@@ -129,13 +129,13 @@ const docs: ComponentDocs = {
     {
       title: "More than eight parts",
       platforms: ["web", "desktop", "mobile"],
-      handling: "The palette has eight colours, and a ninth would wrap onto the first, so the first eight keep their own and every row after them is summed into one more, labelled \"Other\", in a neutral grey (`chart.other`) that is no colour of the palette. Pass the rows largest first so what is folded is what is smallest. It is one row in the list and one segment on the bar, and the summary says how many it holds (\"Other, 3 more, 47 (6.1%)\"). \"View as table\" shows every row.",
+      handling: "The palette has eight colours, and a ninth would wrap onto the first, so the first eight keep their own and every row after them is summed into one more, labelled \"Other\", in a neutral grey (`chart.otherColor`) that is no colour of the palette. Pass the rows largest first so what is folded is what is smallest. It is one row in the list and one segment on the bar, and the summary says how many it holds (\"Other, 3 more, 47 (6.1%)\"). \"View as table\" shows every row.",
       example: { name: "Eleven channels", props: { ...channels, data: CHANNELS_MANY, subtitle: "Eleven channels, October 2026" }, width: 560 },
     },
     {
       title: "A part that is a sliver",
       platforms: ["web", "desktop", "mobile"],
-      handling: "A segment is never narrower than `chart.splitMinW`, so a part that is a fraction of a percent of the whole still shows; its row says the real share, and a part of 0 has no segment at all but is in the list at 0%.",
+      handling: "A segment is never narrower than `chart.splitMinWidth`, so a part that is a fraction of a percent of the whole still shows; its row says the real share, and a part of 0 has no segment at all but is in the list at 0%.",
       example: { name: "A sliver", props: { data: [{ channel: "#support", tickets: 312 }, { channel: "#billing", tickets: 158 }, { channel: "Phone", tickets: 1 }, { channel: "Fax", tickets: 0 }], name: "channel", value: "tickets", title: "Where October's tickets came from", subtitle: "Two channels barely used", valueLabel: "Tickets" }, width: 560 },
     },
     {

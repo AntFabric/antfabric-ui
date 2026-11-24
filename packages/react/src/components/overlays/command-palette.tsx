@@ -80,7 +80,7 @@ export interface CommandPaletteProps extends RootProps<HTMLDivElement> {
   style?: CSSProperties;
 }
 
-const line = `${t.border.wHairline} solid ${t.border.subtle}`;
+const line = `${t.border.width.hairline} solid ${t.color.border.subtle}`;
 
 /** The layout no token decides; what the tokens decide is the recipe's. */
 const optionLook: CSSProperties = { ...pressable, flexDirection: "row", alignItems: "center", gap: t.space.md, paddingBlock: t.space.smMd, textAlign: "left" };
@@ -123,7 +123,7 @@ function Pill({ label, on, styles, onPress }: { label: string; on: boolean; styl
       aria-label={label}
       onClick={() => onPress()}
       {...ui.handlers}
-      style={css(pressable, row, { paddingInline: t.space.md, border: `${t.border.wHairline} solid ${on ? t.fg.strong : t.border.subtle}`, transition: `background ${t.duration.fast}, border-color ${t.duration.fast}` }, r.pill)}
+      style={css(pressable, row, { paddingInline: t.space.md, border: `${t.border.width.hairline} solid ${on ? t.color.text.strong : t.color.border.subtle}`, transition: `background ${t.motion.duration.fast}, border-color ${t.motion.duration.fast}` }, r.pill)}
     >
       <span style={{ whiteSpace: "nowrap" }}>{label}</span>
     </button>
@@ -298,7 +298,7 @@ export function CommandPalette({
                   <Option key={item.key} id={optionId(item)} label={item.hint ? s("option", { label: item.label, hint: item.hint }) : item.label} selected={item === current} styles={styles} onPress={() => choose(item)}>
                     <span aria-hidden data-af-part="slot" style={css(slotLook, r.slot)}>
                       {item.avatar ? (
-                        <Avatar name={item.label} identity={item.identity ?? "indigo"} presence={item.presence ?? "none"} agent={item.agent ?? false} style={{ width: t.palette.slot, height: t.palette.slot, fontSize: t.text.micro }} />
+                        <Avatar name={item.label} identity={item.identity ?? "indigo"} presence={item.presence ?? "none"} agent={item.agent ?? false} style={{ width: t.commandPalette.slotSize, height: t.commandPalette.slotSize, fontSize: t.font.size.micro }} />
                       ) : item.icon ? (
                         <Icon part="slotIcon" name={item.icon} style={r.slotIcon} />
                       ) : null}
@@ -328,7 +328,7 @@ export function CommandPalette({
               {q && ask && (
                 <Option id={`${id}-ask`} label={s("askLabel", { name: agentName, query: q })} selected styles={styles} onPress={() => onAsk?.(q)}>
                   <span aria-hidden data-af-part="slot" style={css(slotLook, r.slot)}>
-                    <Avatar name={agentName} identity="agent" agent style={{ width: t.palette.slot, height: t.palette.slot, fontSize: t.text.micro }} />
+                    <Avatar name={agentName} identity="agent" agent style={{ width: t.commandPalette.slotSize, height: t.commandPalette.slotSize, fontSize: t.font.size.micro }} />
                   </span>
                   <span style={css(row, { flex: 1, gap: t.space.sm })}>
                     <span data-af-part="label" style={css(text, truncate(1), { flexShrink: 0, maxWidth: "100%" }, r.label)}>

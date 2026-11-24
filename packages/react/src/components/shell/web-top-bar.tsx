@@ -80,7 +80,7 @@ const search: CSSProperties = {
   width: "100%",
   paddingLeft: t.space.md,
   paddingRight: t.space["2xs"],
-  transition: `border-color ${t.duration.fast}, background ${t.duration.fast}`,
+  transition: `border-color ${t.motion.duration.fast}, background ${t.motion.duration.fast}`,
 };
 
 /** The ⋯ trigger and what it opens: a positioning box only while there is something to open. */

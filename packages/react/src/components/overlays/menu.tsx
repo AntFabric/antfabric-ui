@@ -74,7 +74,7 @@ const rowLook: CSSProperties = {
   paddingBlock: t.space.xs,
   paddingInline: t.space.sm,
   textAlign: "left",
-  transition: `background ${t.duration.fast}`,
+  transition: `background ${t.motion.duration.fast}`,
 };
 
 const tickBox: CSSProperties = {
@@ -83,7 +83,7 @@ const tickBox: CSSProperties = {
   justifyContent: "center",
   boxSizing: "border-box",
   flexShrink: 0,
-  transition: `background ${t.duration.base}, border-color ${t.duration.base}`,
+  transition: `background ${t.motion.duration.base}, border-color ${t.motion.duration.base}`,
 };
 
 /**
@@ -152,7 +152,7 @@ function MenuRow({ item, checked, coarse, tabbable, styles, onPress }: { item: M
           : undefined
       }
       {...ui.handlers}
-      style={css(rtl(rowLook, dir), partStyle(r, part, { alignItems: item.sublabel ? "flex-start" : "center" }, coarse && { minHeight: t.menu.rowHCoarse }, ui.disabled && { cursor: "default" }))}
+      style={css(rtl(rowLook, dir), partStyle(r, part, { alignItems: item.sublabel ? "flex-start" : "center" }, coarse && { minHeight: t.menu.rowHeightCoarse }, ui.disabled && { cursor: "default" }))}
     >
       {item.icon && <Icon part="icon" name={item.icon} style={partStyle(r, "icon", { marginTop: item.sublabel ? 1 : 0 })} />}
       <span data-af-part="text" style={css(box, { flex: 1, minWidth: 0 }, r.text)}>
@@ -173,7 +173,7 @@ function MenuRow({ item, checked, coarse, tabbable, styles, onPress }: { item: M
       {keys && <Kbd keys={keys} tone="bare" style={rtl({ marginLeft: t.space.sm }, dir)} />}
       {toggle && (
         <span aria-hidden data-af-part="tick" style={css(tickBox, r.tick)}>
-          {checked && <Icon part="tickIcon" name="check" style={partStyle(r, "tickIcon", { strokeWidth: t.icon.strokeTick, ...enter("pop"), transformOrigin: "center" })} />}
+          {checked && <Icon part="tickIcon" name="check" style={partStyle(r, "tickIcon", { strokeWidth: t.size.stroke.tick, ...enter("pop"), transformOrigin: "center" })} />}
         </span>
       )}
     </Row>

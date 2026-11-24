@@ -2,7 +2,7 @@
  * Tokens → the values React Native styles take: numbers for sizes and durations, strings for colours.
  *
  * The React Native kit's `useTheme().t` is this, for the mobile profile and the current scheme, so a
- * component reads `t.control.hMd` and `t.brand.default` exactly as the React kit does.
+ * component reads `t.size.control.md` and `t.color.background.brand.default` exactly as the React kit does.
  */
 
 import { followAliases } from "./alias";
@@ -134,7 +134,7 @@ export function resolveTokens(profile: keyof Tokens["profiles"], scheme: keyof T
     if (base) merge(merged, base);
     for (const [path, v] of Object.entries(over ?? {})) putLeaf(merged, path, v, theme!, profile === "mobile");
   }
-  // An alias the theme left alone follows its target, as it does in the web's sheet: a theme that sets `border.subtle` moves `chart.grid` too.
+  // An alias the theme left alone follows its target, as it does in the web's sheet: a theme that sets `color.border.subtle` moves `chart.gridColor` too.
   if (sets) {
     const node = (path: string): [Record<string, unknown> | undefined, string] => {
       const keys = path.split(".");

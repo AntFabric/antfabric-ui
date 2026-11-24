@@ -33,6 +33,20 @@ export function warnDeprecated(path: string, where: string) {
   if (env !== "production") console.warn(`@antfabric/ui: ${where} uses the token "${path}", renamed to "${map[path]}" in ${DEPRECATED_SINCE}. The old name leaves in the next major version; \`npx af-tokens-codemod\` rewrites it.`);
 }
 
+const back: Readonly<Record<string, string>> = Object.fromEntries(Object.entries(map).map(([old, now]) => [now, old]));
+/**
+ * A value with every renamed path written as it was before the rename: object keys, and strings that are a path or a `$path`. A theme's
+ * id is a hash of what the theme sets, and a product's stored themes and scoped sheets carry that id, so the hash is taken over the names
+ * the tokens had when ids were first made. Renaming a token then moves no theme's id.
+ */
+export function legacyNames<T>(value: T): T {
+  const name = (s: string) => (s.startsWith("$") ? (back[s.slice(1)] !== undefined ? `$${back[s.slice(1)]}` : s) : (back[s] ?? s));
+  if (typeof value === "string") return name(value) as T;
+  if (Array.isArray(value)) return value.map(legacyNames) as T;
+  if (typeof value === "object" && value !== null) return Object.fromEntries(Object.entries(value).map(([k, v]) => [name(k), legacyNames(v)])) as T;
+  return value;
+}
+
 type Bag = Record<string, unknown>;
 const node = (tree: Bag, keys: string[], make: boolean): Bag | undefined => {
   let at: Bag | undefined = tree;

@@ -54,12 +54,12 @@ export function SparkBars({ data, y, width = 96, height = 36, animate = false, t
   const root = partStyle(r, "root", { view: { width, height } });
   const frame = [s.root, root.view, style];
   if (!values.length) return <View testID={partId(testID, "spark-bars", "root")} {...rootProps(rest)} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={frame} />;
-  const color = tone === "positive" ? t.data.positive : tone === "negative" ? t.data.negative : t.chart.series1;
+  const color = tone === "positive" ? t.color.background.data.positive : tone === "negative" ? t.color.background.data.negative : t.chart.series1Color;
   const [lo, hi] = valueDomain(values.map((v) => ({ v })), ["v"]);
   const last = values.length - 1;
   const layout = barLayout(width, values.length, t.chart.barGap);
   const { gap } = layout;
-  const barWidth = Math.min(layout.barWidth, t.kpi.sparkBarMaxW);
+  const barWidth = Math.min(layout.barWidth, t.kpi.sparkBarMaxWidth);
   const said = label || str("summary", { count: values.length, latest: fmt(format, values[last], formatWords, locale) });
   // gifted-charts measures bars up from zero to `maxValue`, and what is under zero in sections of its own below the axis. So the domain is laid out as
   // the web's is: all at or above zero, as it is; all at or below, the same bars drawn by their size and turned over, so they hang from the top; both,

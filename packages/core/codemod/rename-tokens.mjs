@@ -5,11 +5,12 @@
  *   npx af-tokens-codemod <dir|file>… [--dry] [--strings] [--prose] [--ext ts,tsx,css]
  *
  * What it rewrites, from the list the packages ship (`@antfabric/ui-core/renames.json`, old path → new path):
- *   t.fg.muted                 → t.color.text.muted            (also `theme.t.…`, `tokens.…`: any chain that starts at `t` or ends in `.t`)
+ *   t.fg.muted                 → t.color.text.muted            (also `theme.t.…` and `tokens.themes.light.…`: any chain through `t`, `tokens` or `tokenSource`)
  *   "$fg.muted"                → "$color.text.muted"           (a token reference in a recipe override or a prop)
  *   --af-fg-muted              → --af-color-text-muted         (CSS variables, in any file)
  *   --strings: "fg.muted"      → "color.text.muted"            (a quoted string that is exactly an old path: keys of a flat override map)
- *   --prose:   fg.muted        → color.text.muted              (a bare path in comments and docs)
+ *   --prose:   fg.muted        → color.text.muted              (a bare path in prose: for Markdown and comments only. In code it would
+ *                                                                rewrite a variable of your own that happens to be called `brand.soft`)
  *
  * What it does not: a nested theme override (`tokens: { schemes: { light: { fg: { muted: … } } } }`). Those keep working until the next
  * major version (`defineTheme` warns once and names the new path); it lists the files where it sees one so you can move them by hand.
@@ -36,11 +37,16 @@ export function rewrite(text, { strings = false, prose = false } = {}) {
   let count = 0;
   const hit = (now) => (count++, now);
   // t.fg.muted, theme.t.fg.muted, tokens.fg.muted: the longest prefix of the chain that is an old path.
-  text = text.replace(/(?<![\w$])((?:[\w$]+\.)*?(?:t|tokens))((?:\.[A-Za-z_$][\w$]*)+)/g, (all, root, chain) => {
+  // The path may start after a set's name (`tokens.themes.light.fg.muted`), so every start is tried, earliest first.
+  text = text.replace(/(?<![\w$])((?:[\w$]+\.)*?(?:t|tokens|tokenSource))((?:\.[A-Za-z_$][\w$]*)+)/g, (all, root, chain) => {
     const keys = chain.slice(1).split(".");
-    for (let n = keys.length; n >= 2; n--) {
-      const path = keys.slice(0, n).join(".");
-      if (Object.prototype.hasOwnProperty.call(renames, path)) return hit(`${root}.${renames[path]}${n < keys.length ? `.${keys.slice(n).join(".")}` : ""}`);
+    for (let from = 0; from < keys.length - 1; from++) {
+      // Past the start, only after a set's name on the token tree itself: anywhere else a new path would be read as holding an old one.
+      if (from > 0 && !(/(^|\.)(tokens|tokenSource)$/.test(root) && /^(shared|themes\.\w+|profiles\.\w+|os\.\w+)$/.test(keys.slice(0, from).join(".")))) continue;
+      for (let n = keys.length - from; n >= 2; n--) {
+        const path = keys.slice(from, from + n).join(".");
+        if (Object.prototype.hasOwnProperty.call(renames, path)) return hit([root, ...keys.slice(0, from), renames[path], ...keys.slice(from + n)].join("."));
+      }
     }
     return all;
   });
@@ -76,7 +82,7 @@ if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith
     const before = readFileSync(file, "utf8");
     const { text, count } = rewrite(before, { strings: flag("--strings"), prose: flag("--prose") });
     if (nested(text)) byHand.push(file);
-    if (!count) continue;
+    if (!count || text === before) continue;
     total += count;
     console.log(`${flag("--dry") ? "would rewrite" : "rewrote"} ${count} in ${file}`);
     if (!flag("--dry")) writeFileSync(file, text);

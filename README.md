@@ -67,8 +67,8 @@ scripts/                build-packages.mjs, verify-packages.mjs and publish-pack
 
 ## Tenant branding
 
-A white-label tenant retints the brand family (`brand.*`, `accent.*`, `fg.onBrandSoft`, `link.default`,
-`border.brand`, `surface.unread`) with one input, `Partial<BrandTokens>` from `@antfabric/ui-core`:
+A white-label tenant retints the brand family (`brand.*`, `accent.*`, `color.text.onBrandSoft`, `color.text.link`,
+`color.border.brand`, `color.background.unread`) with one input, `Partial<BrandTokens>` from `@antfabric/ui-core`:
 a `primary`, an `accent`, and optionally a hand-picked `soft`, `softHover`, `onSoft` or `tint` per
 theme. Hover, pressed, the soft tints, the link and the unread tint derive from `primary` the way the
 product's phone derives them (`packages/core/src/brand.ts`). A brand is part of a theme:

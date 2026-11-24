@@ -44,7 +44,7 @@ export const slug = (s: string) =>
 // A section's page weighs little: "notif" shouldn't list every section of Notifications, but "notifications edge cases" finds one.
 const WEIGHT: Record<"name" | "description" | SearchField, number> = { name: 1, id: 0.8, category: 0.5, page: 0.3, prop: 0.6, flow: 0.6, description: 0.25 };
 const KIND_ORDER: SearchKind[] = ["component", "page", "screen", "token"];
-// A token is the last thing someone means by a word they might also mean a component or a page by: "button" is Button, not `button.labelSm`.
+// A token is the last thing someone means by a word they might also mean a component or a page by: "button" is Button, not `button.labelFontSizeSm`.
 const KIND_WEIGHT: Partial<Record<SearchKind, number>> = { token: 0.5 };
 
 /** The docs write British English; people search in both. */

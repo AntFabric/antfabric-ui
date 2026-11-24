@@ -2,7 +2,7 @@
  * How much of the library is tokens and how much is literals: the scan behind `pnpm report`, the
  * literal ratchet (`pnpm check literals`) and the catalogue's Architecture page. Read-only.
  *
- * Per kit and per component file: the token paths it reads (`t.brand.default`), the colour
+ * Per kit and per component file: the token paths it reads (`t.color.background.brand.default`), the colour
  * literals, the dimension literals, the ratios and the platform branches. Repo-wide: the token leaves
  * and what is wrong with them (no entry in `descriptions`, read by no component, identical in light
  * and dark, shared but overridden by one profile).
@@ -30,7 +30,7 @@
  *                identity or "hidden", so structural. Decided: reported and listed on the Architecture
  *                page, never banned, because the tokens have `opacity.*` but no scale or line-height ratio.
  *
- * A token a recipe names (`packages/core/src/recipes`, `"$fg.body"`) counts as read, as if each kit wrote `t.fg.body` itself: the kits read
+ * A token a recipe names (`packages/core/src/recipes`, `"$color.text.body"`) counts as read, as if each kit wrote `t.color.text.body` itself: the kits read
  * those through `useRecipe`, so the files that moved their styles into a recipe do not make their tokens look unread.
  *
  * A computed token key (`t.avatar[size]`, `t.tag[`${tone}Bg`]`, `t[accent].default`) may read any
@@ -50,7 +50,7 @@ import { descriptions as tokenDescriptions, isReference, primitiveMeta, recipeEn
 
 // --- What is counted -------------------------------------------------------------------------
 
-/** `t.brand.default`, `t.control.hIconSm`. `t.space[size]` stops at `t.space`. */
+/** `t.color.background.brand.default`, `t.size.control.iconSm`. `t.space[size]` stops at `t.space`. */
 const TOKEN_REF = /(?<![\w.$])t(?:\.\w+|\["[^"]+"\])+/g;
 const HEX = /(?<![\w&])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})(?![\w-])/g;
 /** The whole call; one built from a template (`rgba(${r}, …)`) is a computed colour, not a literal. */
@@ -308,7 +308,7 @@ const groupPaths = new Set<string>();
   for (const t of Object.values(tokens.profiles)) add(t);
 }
 
-/** `t.control.hIconSm` → `control.hIconSm`; the longest prefix that is a leaf, else the whole path. */
+/** `t.size.control.iconSm` → `size.control.iconSm`; the longest prefix that is a leaf, else the whole path. */
 function refPath(ref: string) {
   const segs = [...ref.matchAll(/\.(\w+)|\["([^"]+)"\]/g)].map((m) => (m[1] ?? m[2])!);
   for (let n = segs.length; n > 0; n--) {

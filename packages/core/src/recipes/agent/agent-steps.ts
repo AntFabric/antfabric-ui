@@ -10,19 +10,19 @@ export const agentSteps = defineRecipe({
   parts: ["root", "more", "row", "marker", "dot", "done", "failed", "label", "source"],
   styles: {
     root: {
-      base: { gap: "$space.xs", font: "$font.sans", size: "$text.caption", line: "$text.captionLine" },
+      base: { gap: "$space.xs", font: "$font.family.sans", size: "$font.size.caption", line: "$font.lineHeight.caption" },
       platforms: { mobile: { base: { gap: "$space.2xs" } } },
     },
-    more: { base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint", weight: "$font.weightNormal" } },
+    more: { base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint", weight: "$font.weight.normal" } },
     row: { base: { gap: "$space.sm" } },
-    marker: { base: { square: "$agentSteps.marker" } },
-    dot: { base: { square: "$dot.sizeSm", radius: "$radius.circle", bg: "$brand.default" } },
-    done: { base: { square: "$agentSteps.icon", fg: "$fg.faint" } },
-    failed: { base: { square: "$agentSteps.icon", fg: "$fg.muted" } },
+    marker: { base: { square: "$agentSteps.markerSize" } },
+    dot: { base: { square: "$size.dot.sm", radius: "$radius.circle", bg: "$color.background.brand.default" } },
+    done: { base: { square: "$agentSteps.iconSize", fg: "$color.text.faint" } },
+    failed: { base: { square: "$agentSteps.iconSize", fg: "$color.text.muted" } },
     label: {
-      base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.muted", weight: "$font.weightNormal" },
-      states: { on: { fg: "$fg.body" } },
+      base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.muted", weight: "$font.weight.normal" },
+      states: { on: { fg: "$color.text.body" } },
     },
-    source: { base: { size: "$text.caption", line: "$text.captionLine", fg: "$fg.faint", weight: "$font.weightNormal" } },
+    source: { base: { size: "$font.size.caption", line: "$font.lineHeight.caption", fg: "$color.text.faint", weight: "$font.weight.normal" } },
   },
 });

@@ -8,9 +8,9 @@ export const sidebarSection = defineRecipe({
   parts: ["root", "header", "toggle", "chevron", "starIcon", "label", "list", "emptyText"],
   styles: {
     root: {
-      base: { font: "$font.sans" },
+      base: { font: "$font.family.sans" },
       // The hairline above a divided section, parting it from the one before; the web also leaves a space above it.
-      variants: { divided: { true: { borderTopWidth: "$border.wHairline", borderTopColor: "$border.subtle" } } },
+      variants: { divided: { true: { borderTopWidth: "$border.width.hairline", borderTopColor: "$color.border.subtle" } } },
       platforms: {
         web: { variants: { divided: { true: { marginTop: "$space.md" } } } },
         desktop: { variants: { divided: { true: { marginTop: "$space.md" } } } },
@@ -18,29 +18,29 @@ export const sidebarSection = defineRecipe({
     },
     header: {
       platforms: {
-        web: { base: { paddingTop: "$sidebar.sectionPadTop" } },
-        desktop: { base: { paddingTop: "$sidebar.sectionPadTop" } },
-        mobile: { base: { minHeight: "$control.hit", paddingLeft: "$gutter.pane" } },
+        web: { base: { paddingTop: "$sidebarSection.sectionPaddingTop" } },
+        desktop: { base: { paddingTop: "$sidebarSection.sectionPaddingTop" } },
+        mobile: { base: { minHeight: "$size.target.min", paddingLeft: "$space.gutter.pane" } },
       },
     },
     toggle: {
-      base: { gap: "$sidebar.sectionGap", radius: "$radius.tag", fg: "$fg.subtle" },
-      states: { hover: { fg: "$fg.strong" }, focus: { shadow: "$shadow.focus" } },
+      base: { gap: "$sidebarSection.sectionGap", radius: "$radius.tag", fg: "$color.text.subtle" },
+      states: { hover: { fg: "$color.text.strong" }, focus: { shadow: "$elevation.shadow.focus" } },
       platforms: {
-        web: { base: { minHeight: "$sidebar.sectionHeaderH", size: "$text.body", weight: "$font.weightSemibold" } },
-        desktop: { base: { minHeight: "$sidebar.sectionHeaderH", size: "$text.body", weight: "$font.weightSemibold" } },
+        web: { base: { minHeight: "$sidebarSection.sectionHeaderHeight", size: "$font.size.body", weight: "$font.weight.semibold" } },
+        desktop: { base: { minHeight: "$sidebarSection.sectionHeaderHeight", size: "$font.size.body", weight: "$font.weight.semibold" } },
         // A phone has no hover; its label carries the colour (`label`).
-        mobile: { base: { minHeight: "$control.hit" } },
+        mobile: { base: { minHeight: "$size.target.min" } },
       },
     },
-    chevron: { base: { square: "$icon.sizeMd" }, platforms: { mobile: { base: { fg: "$fg.subtle" } } } },
-    starIcon: { base: { square: "$icon.sizeMd", fg: "$fg.faint" } },
+    chevron: { base: { square: "$size.icon.md" }, platforms: { mobile: { base: { fg: "$color.text.subtle" } } } },
+    starIcon: { base: { square: "$size.icon.md", fg: "$color.text.faint" } },
     // The rows are a hairline apart.
-    list: { on: ["web", "desktop"], base: { gap: "$border.wHairline" } },
-    label: { on: ["mobile"], base: { size: "$text.bodySm", weight: "$font.weightSemibold", fg: "$fg.subtle" } },
+    list: { on: ["web", "desktop"], base: { gap: "$border.width.hairline" } },
+    label: { on: ["mobile"], base: { size: "$font.size.bodySm", weight: "$font.weight.semibold", fg: "$color.text.subtle" } },
     emptyText: {
-      base: { size: "$text.bodySm", fg: "$fg.faint" },
-      platforms: { mobile: { base: { line: "$text.bodySmLine", weight: "$font.weightNormal", paddingX: "$gutter.pane" } } },
+      base: { size: "$font.size.bodySm", fg: "$color.text.faint" },
+      platforms: { mobile: { base: { line: "$font.lineHeight.bodySm", weight: "$font.weight.normal", paddingX: "$space.gutter.pane" } } },
     },
   },
 });

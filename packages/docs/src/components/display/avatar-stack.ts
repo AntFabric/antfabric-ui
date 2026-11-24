@@ -655,17 +655,17 @@ const docs: ComponentDocs = {
                       el: "text",
                       text: "Weekly sync",
                       style: {
-                        fontSize: "$text.body",
-                        fontWeight: "$font.weightMedium",
-                        color: "$fg.strong",
+                        fontSize: "$font.size.body",
+                        fontWeight: "$font.weight.medium",
+                        color: "$color.text.strong",
                       },
                     },
                     {
                       el: "text",
                       text: "Today · 10:00 · 32 min",
                       style: {
-                        fontSize: "$text.bodySm",
-                        color: "$fg.muted",
+                        fontSize: "$font.size.bodySm",
+                        color: "$color.text.muted",
                       },
                     },
                     {
@@ -703,17 +703,17 @@ const docs: ComponentDocs = {
                       el: "text",
                       text: "Weekly sync",
                       style: {
-                        fontSize: "$text.body",
-                        fontWeight: "$font.weightMedium",
-                        color: "$fg.strong",
+                        fontSize: "$font.size.body",
+                        fontWeight: "$font.weight.medium",
+                        color: "$color.text.strong",
                       },
                     },
                     {
                       el: "text",
                       text: "Today · 10:00 · 32 min",
                       style: {
-                        fontSize: "$text.bodySm",
-                        color: "$fg.muted",
+                        fontSize: "$font.size.bodySm",
+                        color: "$color.text.muted",
                       },
                     },
                     {
@@ -762,8 +762,8 @@ const docs: ComponentDocs = {
                           el: "text",
                           text: "6",
                           style: {
-                            fontSize: "$text.bodySm",
-                            color: "$fg.faint",
+                            fontSize: "$font.size.bodySm",
+                            color: "$color.text.faint",
                           },
                         },
                       ],

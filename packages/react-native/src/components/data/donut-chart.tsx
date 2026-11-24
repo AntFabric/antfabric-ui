@@ -102,7 +102,7 @@ function Item({ label, value, share, color, shareW, on, active, onPick, onToggle
   const amount = partStyle(r, "value", { text: [chartFont(tk, "semibold"), { fontVariant: ["tabular-nums"] }] });
   const part = partStyle(r, "share", { view: { minWidth: shareW }, text: [chartFont(tk), { fontVariant: ["tabular-nums"] }] });
   // The switch sits beside the row's button, not inside it: a control nested in an accessible Pressable is folded into it, so a screen reader
-  // never reaches it. It is drawn over the swatch, `control.hit` wide and the row's height, the swatch's centre on its centre.
+  // never reaches it. It is drawn over the swatch, `size.target.min` wide and the row's height, the swatch's centre on its centre.
   const inset = StyleSheet.flatten(r.item.view);
   const left = Number(inset.paddingLeft ?? inset.paddingHorizontal ?? inset.padding ?? 0) + (tk.space.smMd - tk.control.hit) / 2;
   return (

@@ -44,8 +44,8 @@ const surfaceIcon: Record<string, string> = { os: "bell-ring", "in-app": "panel-
       {
         n.principles.map((p, i) => (
           <div class="card">
-            <div class="eyebrow" style="color:var(--af-fg-faint)">0{i + 1}</div>
-            <b style="display:block;margin-top:8px;color:var(--af-fg-strong)">{p.title}</b>
+            <div class="eyebrow" style="color:var(--af-color-text-faint)">0{i + 1}</div>
+            <b style="display:block;margin-top:8px;color:var(--af-color-text-strong)">{p.title}</b>
             <p class="muted" style="margin-top:6px;font-size:13px">{p.body}</p>
           </div>
         ))
@@ -102,12 +102,12 @@ const surfaceIcon: Record<string, string> = { os: "bell-ring", "in-app": "panel-
             n.surfaces.map((s) => (
               <tr>
                 <td>
-                  <b style="display:flex;gap:8px;align-items:center;color:var(--af-fg-strong)">
+                  <b style="display:flex;gap:8px;align-items:center;color:var(--af-color-text-strong)">
                     <Fragment set:html={iconSvg(surfaceIcon[s.id] ?? "bell", 15)} />
                     {s.name}
                   </b>
                   {s.component && has(s.component) && (
-                    <a class="mono" style="font-size:11.5px;color:var(--af-link-default)" href={`/components/${s.component}`}>
+                    <a class="mono" style="font-size:11.5px;color:var(--af-color-text-link)" href={`/components/${s.component}`}>
                       {s.component}
                     </a>
                   )}
@@ -187,7 +187,7 @@ const surfaceIcon: Record<string, string> = { os: "bell-ring", "in-app": "panel-
             n.kinds.map((k) => (
               <tr>
                 <td>
-                  <b style="color:var(--af-fg-strong)">{k.kind}</b>
+                  <b style="color:var(--af-color-text-strong)">{k.kind}</b>
                 </td>
                 <td>{k.default}</td>
                 <td>
@@ -245,7 +245,7 @@ const surfaceIcon: Record<string, string> = { os: "bell-ring", "in-app": "panel-
           const preview = prompts.find((x) => x.p === p.platform);
           return (
             <div class="card">
-              <b style="color:var(--af-fg-strong);display:flex;gap:8px;align-items:center">
+              <b style="color:var(--af-color-text-strong);display:flex;gap:8px;align-items:center">
                 <Fragment set:html={iconSvg(PLATFORM_META[p.platform as Platform].icon, 15)} />
                 {PLATFORM_META[p.platform as Platform].label}
               </b>
@@ -292,7 +292,7 @@ const surfaceIcon: Record<string, string> = { os: "bell-ring", "in-app": "panel-
       {
         n.edgeCases.map((e) => (
           <div class="card">
-            <b style="color:var(--af-fg-strong)">{e.title}</b>
+            <b style="color:var(--af-color-text-strong)">{e.title}</b>
             <p class="muted" style="margin-top:6px;font-size:13px">{e.handling}</p>
           </div>
         ))

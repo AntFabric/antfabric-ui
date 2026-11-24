@@ -63,7 +63,7 @@ export function Button({ label, variant = "primary", size = "md", iconLeading, i
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled: press.disabled, busy: loading }}
-      hitSlop={drawn ? hitSlopTo(t.control.hit, drawn) : undefined}
+      hitSlop={drawn ? hitSlopTo(t.size.target.min, drawn) : undefined}
       disabled={press.disabled}
       onPress={() => onPress?.()}
       {...press.handlers}

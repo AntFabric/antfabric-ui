@@ -25,7 +25,7 @@ const docs: ComponentDocs = {
     },
     x: { type: "string", sample: "day", required: true, description: "The field of each row that is the category: a day, a date or a word." },
     current: { type: "string", sample: "thisWeek", required: true, description: "The field that holds this period's values. Its line is solid, in the first series colour, with a flat fill under it." },
-    previous: { type: "string", sample: "lastWeek", required: true, description: "The field that holds the last period's values. Its line is dashed and thinner (`chart.previousW`), in `chart.previous`, with no fill." },
+    previous: { type: "string", sample: "lastWeek", required: true, description: "The field that holds the last period's values. Its line is dashed and thinner (`chart.previousWidth`), in `chart.previousColor`, with no fill." },
     title,
     subtitle,
     format: { ...format, description: "A format name, its options or a function: what core's `fmt` takes. The two totals, the axis, the tooltip, the summary and \"View as table\" print through it, so they agree." },
@@ -49,7 +49,7 @@ const docs: ComponentDocs = {
         "The two periods share one value axis, which does not start at zero (a line's height is not its value), so a gap between them is the gap in the numbers.",
         "The change is worked out from the two totals: (this less last) over last, printed as a signed percent in a Delta badge. A last period of nothing has no change to say, so the badge reads \"Change unavailable\".",
         "The lines draw in once over 600ms on the kit's ease-out, and the totals ease to new numbers (MetricValue). Reduced motion turns both off.",
-        "The column of totals is `chart.sideW` wide with a rule on its right; below that width the card is narrower than the chart needs and the plot gives way first.",
+        "The column of totals is `chart.sideWidth` wide with a rule on its right; below that width the card is narrower than the chart needs and the plot gives way first.",
       ],
       keyboard: [
         { keys: "Tab", action: "Moves into the plot, then on to \"View as table\"" },

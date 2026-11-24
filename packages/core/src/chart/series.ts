@@ -9,7 +9,7 @@ export const FLAT_FILL = 0.2;
 export const EARLIER_BARS = 0.45;
 
 /** The eight categorical series colours, in order, from the resolved tokens of either kit. A ninth series folds into "Other" rather than wrapping the palette. */
-export const seriesColors = ({ chart: c }: { chart: Record<`series${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8}`, string> }): string[] => [c.series1, c.series2, c.series3, c.series4, c.series5, c.series6, c.series7, c.series8];
+export const seriesColors = ({ chart: c }: { chart: Record<`series${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8}Color`, string> }): string[] => [c.series1Color, c.series2Color, c.series3Color, c.series4Color, c.series5Color, c.series6Color, c.series7Color, c.series8Color];
 
 export interface Series {
   /** Every series, in order. */
@@ -32,7 +32,7 @@ export interface SeriesState {
   onHiddenChange?: (hidden: string[]) => void;
 }
 
-/** `colors` is the palette (`chart.series1`…`series8`), read by the kit from its tokens. */
+/** `colors` is the palette (`chart.series1Color`…`series8`), read by the kit from its tokens. */
 export function useSeries(fields: string[], colors: readonly string[], { hidden: given, onHiddenChange }: SeriesState = {}): Series {
   const [list, setList] = useControllable(given as string[] | undefined, onHiddenChange);
   const off = new Set(list ?? []);

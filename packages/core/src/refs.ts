@@ -6,7 +6,7 @@
  * primitive's value, so the kits, the catalogue and every script that reads a value read a value. The stylesheet and
  * `tokens.json` read the source, because for them the reference is the point.
  *
- * The type of a reference is the type of the primitive it names (`Resolved`), so `t.control.hMd` is as much a `number` in
+ * The type of a reference is the type of the primitive it names (`Resolved`), so `t.size.control.md` is as much a `number` in
  * React Native with `"{primitives.raw.44}"` behind it as it was with `44`.
  */
 
@@ -31,19 +31,19 @@ export const isReference = (v: unknown): v is Reference => typeof v === "string"
 
 /**
  * `"{border.subtle}"`: a token that is another token, so the two cannot drift apart (a component token that is a semantic role:
- * `chart.grid` is `border.subtle`). The W3C format's alias, as a primitive reference is. Its target is a leaf of the set the alias is in
+ * `chart.gridColor` is `color.border.subtle`). The W3C format's alias, as a primitive reference is. Its target is a leaf of the set the alias is in
  * or of a set under it: a theme's in that theme, a profile's in the profile or shared, an OS's in its profile or shared (`pnpm check
  * tokens` holds that, the tiers' direction and that the two have one type), which is what lets `tokens` resolve it once and the
- * stylesheet write it as `var(--af-border-subtle)`.
+ * stylesheet write it as `var(--af-color-border-subtle)`.
  */
 export type TokenReference = `{${string}}`;
 export const isTokenReference = (v: unknown): v is TokenReference => typeof v === "string" && /^\{[A-Za-z0-9_.-]+\}$/.test(v) && !v.startsWith(PREFIX);
-/** `"{border.subtle}"` → `"border.subtle"`. */
+/** `"{border.subtle}"` → `"color.border.subtle"`. */
 export const tokenReferencePath = (ref: string): string => ref.slice(1, -1);
 
 /**
  * How `tokens.ts` writes an alias, typed as what it resolves to (a set cannot name its own type while it is being written):
- * `ref.number("control.hMd")` for a size, a weight or anything else the phone reads as a number, `ref.text("border.subtle")` for a
+ * `ref.number("size.control.md")` for a size, a weight or anything else the phone reads as a number, `ref.text("color.border.subtle")` for a
  * colour, a shadow or a family.
  */
 export const ref = {

@@ -9,15 +9,15 @@ export const kpiCard = defineRecipe({
   parts: ["root", "top", "label", "foot", "moved", "note", "trend"],
   styles: {
     root: {
-      base: { padding: "$space.lg", gap: "$space.smMd", font: "$font.sans", fg: "$fg.body" },
+      base: { padding: "$space.lg", gap: "$space.smMd", font: "$font.family.sans", fg: "$color.text.body" },
       platforms: { mobile: { base: { padding: "$space.md" } } },
     },
     top: { base: { gap: "$space.sm" } },
-    label: { base: { size: "$text.bodySm", weight: "$font.weightMedium", fg: "$fg.muted" } },
+    label: { base: { size: "$font.size.bodySm", weight: "$font.weight.medium", fg: "$color.text.muted" } },
     foot: { base: { gap: "$space.3xs" } },
-    moved: { base: { gap: "$space.xs", size: "$text.caption", weight: "$font.weightSemibold", fg: "$fg.body" } },
-    note: { base: { size: "$text.caption", fg: "$fg.faint" } },
-    trend: { base: { height: "$kpi.cardTrendH" } },
+    moved: { base: { gap: "$space.xs", size: "$font.size.caption", weight: "$font.weight.semibold", fg: "$color.text.body" } },
+    note: { base: { size: "$font.size.caption", fg: "$color.text.faint" } },
+    trend: { base: { height: "$kpi.cardTrendHeight" } },
   },
-  reads: ["$icon.sizeMd", "$kpi.loadM", "$kpi.loadL", "$kpi.loadXl", "$kpi.loadLineH", "$kpi.loadValueH"],
+  reads: ["$size.icon.md", "$kpi.loadWidthMd", "$kpi.loadWidthLg", "$kpi.loadWidthXl", "$kpi.loadLineHeight", "$kpi.loadValueHeight"],
 });

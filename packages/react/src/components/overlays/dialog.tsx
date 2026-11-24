@@ -99,7 +99,7 @@ export function Dialog(props: DialogProps) {
     <>
       <span ref={marker} hidden />
       {layer.host ? (
-        <OverlayLayer host={layer.host} zIndex={t.z.modal} modal near={marker}>
+        <OverlayLayer host={layer.host} zIndex={t.zIndex.modal} modal near={marker}>
           <DialogView {...props} floating />
         </OverlayLayer>
       ) : null}
@@ -269,7 +269,7 @@ function DialogView({
             partStyle(r, "actions", { marginTop: form ? 0 : t.space.xl }, form && { paddingInline: t.space.lg, paddingBlock: t.space.mdLg }),
           )}
         >
-          <Button label={cancelLabel ?? s("cancel")} variant="secondary" size="lg" onPress={() => cancel()} style={{ minWidth: t.dialog.actionMinW }} />
+          <Button label={cancelLabel ?? s("cancel")} variant="secondary" size="lg" onPress={() => cancel()} style={{ minWidth: t.dialog.actionMinWidth }} />
           <Button
             label={confirmLabel ?? s("confirm")}
             variant={tone === "danger" ? "danger" : "primary"}
@@ -277,7 +277,7 @@ function DialogView({
             loading={busy}
             shortcut={form ? "Mod+Enter" : undefined}
             onPress={() => confirm()}
-            style={{ minWidth: t.dialog.actionMinW }}
+            style={{ minWidth: t.dialog.actionMinWidth }}
           />
         </div>
       </div>

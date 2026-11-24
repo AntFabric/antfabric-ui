@@ -15,12 +15,12 @@ export const delta = defineRecipe({
       },
     },
     icon: {
-      variants: { size: { sm: { square: "$icon.sizeSm" }, md: { square: "$icon.sizeMd" }, lg: { square: "$icon.size" } } },
+      variants: { size: { sm: { square: "$size.icon.sm" }, md: { square: "$size.icon.md" }, lg: { square: "$size.icon.default" } } },
     },
     value: {
-      base: { font: "$font.sans", weight: "$font.weightSemibold" },
-      variants: { size: { sm: { size: "$text.micro" }, md: { size: "$text.caption" }, lg: { size: "$text.body" } } },
+      base: { font: "$font.family.sans", weight: "$font.weight.semibold" },
+      variants: { size: { sm: { size: "$font.size.micro" }, md: { size: "$font.size.caption" }, lg: { size: "$font.size.body" } } },
     },
   },
-  reads: ["$data.onPositive", "$data.onNegative", "$data.positiveSoft", "$data.negativeSoft", "$fg.muted", "$surface.muted"],
+  reads: ["$color.text.data.onPositive", "$color.text.data.onNegative", "$color.background.data.positiveSoft", "$color.background.data.negativeSoft", "$color.text.muted", "$color.background.muted"],
 });

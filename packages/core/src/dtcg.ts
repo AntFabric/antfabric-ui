@@ -6,7 +6,7 @@
  * Import it as `@antfabric/ui-core/dtcg`, not from the package index: it reads `tokens.map.json`, which
  * the kits (one of them bundled by Metro) have no reason to carry.
  *
- * One token per leaf path, groups nested by path (`fg.muted` is `fg` → `muted`).
+ * One token per leaf path, groups nested by path (`color.text.muted` is `fg` → `muted`).
  * A token is `{ $type, $value, $description, $extensions }`; `$type` moves up to the group when every
  * token in it shares one. `$value` is the light theme's colour or shadow and the desktop profile's size
  * and type (a shared token has one value). A token that varies by mode lists every mode under

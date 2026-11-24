@@ -39,8 +39,8 @@ export type InspectorData = InspectedComponent[];
 const MAX_TEXT = 140;
 
 /**
- * The group a token path belongs to: the path without its last segment (`fg.body` → `fg`,
- * `control.hMd` → `control`). A path of one segment is its own group.
+ * The group a token path belongs to: the path without its last segment (`color.text.body` → `fg`,
+ * `size.control.md` → `control`). A path of one segment is its own group.
  */
 export function tokenGroup(path: string): string {
   const i = path.lastIndexOf(".");

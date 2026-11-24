@@ -43,12 +43,12 @@ export interface InlineBannerProps extends RootProps<HTMLDivElement> {
 
 /** The rim of a warning or danger banner: its ink at 24%. A `color-mix`, which the recipe cannot say; the other tones' rims are the recipe's. */
 const RIM: Partial<Record<InlineBannerTone, CSSProperties>> = {
-  warning: { borderColor: `color-mix(in srgb, ${t.warning.default} 24%, transparent)` },
-  danger: { borderColor: `color-mix(in srgb, ${t.danger.default} 24%, transparent)` },
+  warning: { borderColor: `color-mix(in srgb, ${t.color.text.warning} 24%, transparent)` },
+  danger: { borderColor: `color-mix(in srgb, ${t.color.text.danger} 24%, transparent)` },
 };
 
 /** The layout and the motion no token decides; what the tokens decide (fill, rim, ink, type) is the recipe's. */
-const root: CSSProperties = { ...row, alignSelf: "stretch", paddingBlock: 13, paddingInline: 15, transition: `opacity ${t.duration.base}` };
+const root: CSSProperties = { ...row, alignSelf: "stretch", paddingBlock: 13, paddingInline: 15, transition: `opacity ${t.motion.duration.base}` };
 
 export function InlineBanner({
   tone = "neutral",

@@ -33,7 +33,7 @@ export interface ProgressRingProps extends RootProps<HTMLSpanElement> {
   style?: CSSProperties;
 }
 
-/* The stroke is this share of the ring's size, with a floor of `kpi.ringMinW`. */
+/* The stroke is this share of the ring's size, with a floor of `kpi.ringMinWidth`. */
 const STROKE = 0.12;
 
 export function ProgressRing({ value, max = 1, size, thickness = 0, tone = "default", center = "", animate = false, label, styles, strings, style, ...rest }: ProgressRingProps) {
@@ -46,8 +46,8 @@ export function ProgressRing({ value, max = 1, size, thickness = 0, tone = "defa
   const diameter = size ?? t.kpi.ringSize;
   const known = Number.isFinite(value) && Number.isFinite(max) && max > 0;
   const share = known ? Math.min(1, Math.max(0, value / max)) : 0;
-  const color = tone === "positive" ? t.data.positive : tone === "negative" ? t.data.negative : tone === "warning" ? t.data.warning : t.chart.series1;
-  const stroke = thickness || Math.max(t.kpi.ringMinW, Math.round(diameter * STROKE));
+  const color = tone === "positive" ? t.color.background.data.positive : tone === "negative" ? t.color.background.data.negative : tone === "warning" ? t.color.background.data.warning : t.chart.series1Color;
+  const stroke = thickness || Math.max(t.kpi.ringMinWidth, Math.round(diameter * STROKE));
   const outer = diameter / 2;
   const inner = outer - stroke;
   const percent = known ? fmt({ type: "percent", digits: 0 }, share, formatWords, locale) : s("unavailable");
@@ -68,14 +68,14 @@ export function ProgressRing({ value, max = 1, size, thickness = 0, tone = "defa
       <PieChart accessibilityLayer={false} width={diameter} height={diameter} style={{ display: "block" }}>
         {/* The track: a whole ring under the value's, so the round ends of the value sit on it. */}
         <Pie data={[{ v: 1 }]} dataKey="v" cx="50%" cy="50%" innerRadius={inner} outerRadius={outer} stroke="none" isAnimationActive={false} tooltipType="none" rootTabIndex={-1}>
-          <Cell fill={t.chart.track} />
+          <Cell fill={t.chart.trackColor} />
         </Pie>
         <Pie data={[{ v: share }, { v: 1 - share }]} dataKey="v" cx="50%" cy="50%" innerRadius={inner} outerRadius={outer} startAngle={90} endAngle={-270} cornerRadius={stroke / 2} stroke="none" tooltipType="none" rootTabIndex={-1} {...rechartsMotion(animate, reduced)}>
           <Cell fill={share > 0 ? color : "none"} />
           <Cell fill="none" />
         </Pie>
       </PieChart>
-      <span data-af-part="center" style={css(text, { position: "absolute", inset: 0, display: "grid", placeItems: "center", pointerEvents: "none", fontVariantNumeric: "tabular-nums", fontFamily: t.chart.font }, r.center)}>
+      <span data-af-part="center" style={css(text, { position: "absolute", inset: 0, display: "grid", placeItems: "center", pointerEvents: "none", fontVariantNumeric: "tabular-nums", fontFamily: t.chart.fontFamily }, r.center)}>
         {center || percent}
       </span>
     </span>

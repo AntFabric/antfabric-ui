@@ -2240,10 +2240,10 @@
   "problems": []
  },
  "tabBar.badgeX": {
-  "new": "tabBar.badgePaddingX",
+  "new": "tabBar.badgeOffsetX",
   "tier": "component",
   "status": "rename",
-  "note": "",
+  "note": "chosen by hand: the old name had no property word",
   "problems": []
  },
  "tabBar.labelLine": {
@@ -3682,9 +3682,9 @@
   "problems": []
  },
  "switch.thumbShadow": {
-  "new": "switch.thumbShadowShadow",
+  "new": "switch.thumbShadow",
   "tier": "component",
-  "status": "rename",
+  "status": "same",
   "note": "",
   "problems": []
  },

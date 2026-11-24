@@ -8,9 +8,9 @@ import { defineRecipe } from "../../recipe";
 export const pagination = defineRecipe({
   parts: ["root", "summary", "pages", "gap"],
   styles: {
-    root: { base: { gap: "$space.md", font: "$font.sans" } },
-    summary: { base: { size: "$text.caption", weight: "$font.weightRegular", fg: "$fg.muted" } },
+    root: { base: { gap: "$space.md", font: "$font.family.sans" } },
+    summary: { base: { size: "$font.size.caption", weight: "$font.weight.regular", fg: "$color.text.muted" } },
     pages: { base: { gap: "$space.2xs" } },
-    gap: { base: { size: "$text.caption", weight: "$font.weightRegular", fg: "$fg.faint", paddingX: "$space.xs" } },
+    gap: { base: { size: "$font.size.caption", weight: "$font.weight.regular", fg: "$color.text.faint", paddingX: "$space.xs" } },
   },
 });

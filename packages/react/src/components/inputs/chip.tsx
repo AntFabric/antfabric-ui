@@ -41,7 +41,7 @@ export interface ChipProps extends RootProps<HTMLButtonElement> {
 const root: CSSProperties = {
   ...row,
   alignSelf: "flex-start",
-  transition: `background ${t.duration.base}, border-color ${t.duration.base}, color ${t.duration.base}, transform ${t.duration.fast} ${t.ease.out}`,
+  transition: `background ${t.motion.duration.base}, border-color ${t.motion.duration.base}, color ${t.motion.duration.base}, transform ${t.motion.duration.fast} ${t.motion.easing.out}`,
 };
 
 const main: CSSProperties = {
