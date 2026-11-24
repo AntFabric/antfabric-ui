@@ -2633,15 +2633,37 @@ function parityBase() {
   return { was: JSON.parse(then.stdout) as Record<string, SnapshotEntry> };
 }
 
-/** Every `{ $value }` leaf of a tokens.json, by dotted path, with its value and its modes. */
-function dtcgLeaves(node: object, out = new Map<string, { value: unknown; modes: unknown }>(), path = "") {
+/** Every `{ $value }` leaf of a tokens.json, by dotted path, with its value and its modes as written (a reference stays `{a.b}`). */
+type DtcgLeaf = { value: unknown; modes?: Record<string, unknown> };
+function dtcgLeaves(node: object, out = new Map<string, DtcgLeaf>(), path = "") {
   for (const [k, v] of Object.entries(node)) {
     if (k.startsWith("$") || !v || typeof v !== "object") continue;
     const p = path ? `${path}.${k}` : k;
-    if ("$value" in v) out.set(p, { value: v.$value, modes: (v as { $extensions?: Record<string, { modes?: unknown }> }).$extensions?.[EXTENSION]?.modes });
+    if ("$value" in v) out.set(p, { value: v.$value, modes: (v as { $extensions?: Record<string, { modes?: Record<string, unknown> }> }).$extensions?.[EXTENSION]?.modes });
     else dtcgLeaves(v, out, p);
   }
   return out;
+}
+
+const DTCG_REFERENCE = /^\{([A-Za-z0-9_.-]+)\}$/;
+/**
+ * A value with every `{a.b}` reference replaced by what it points at in the same document, followed to the end of the chain. `mode` picks the
+ * target's value for that mode (android falls back to mobile, as the OS set extends that profile), so an alias of a token that differs by mode
+ * resolves per mode. Parity holds what a token resolves to, not how it is written: a literal that becomes an alias of the same value has not changed.
+ */
+function dtcgResolve(leaves: Map<string, DtcgLeaf>, v: unknown, mode?: string, seen: string[] = []): unknown {
+  if (Array.isArray(v)) return v.map((x) => dtcgResolve(leaves, x, mode, seen));
+  if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, dtcgResolve(leaves, x, mode, seen)]));
+  if (typeof v !== "string") return v;
+  const to = DTCG_REFERENCE.exec(v)?.[1];
+  const target = to === undefined || seen.includes(to) ? undefined : leaves.get(to);
+  if (!target || to === undefined) return v;
+  const key = mode !== undefined && target.modes ? (mode in target.modes ? mode : mode === "android" && "mobile" in target.modes ? "mobile" : undefined) : undefined;
+  return dtcgResolve(leaves, key === undefined ? target.value : target.modes![key], mode, [...seen, to]);
+}
+/** A leaf as it resolves: its default value, and each mode's. */
+function dtcgResolved(leaves: Map<string, DtcgLeaf>, leaf: DtcgLeaf) {
+  return { value: dtcgResolve(leaves, leaf.value), modes: leaf.modes && Object.fromEntries(Object.entries(leaf.modes).map(([m, v]) => [m, dtcgResolve(leaves, v, m)])) };
 }
 
 function checkParity() {
@@ -2678,12 +2700,20 @@ function checkParity() {
     const want = id.slice(TOKEN_ACCEPT.length);
     if (![...before.keys()].some((p) => p === want || p.startsWith(`${want}.`))) warn("reports/parity.json", `accepted: ${id} names no token leaf or group the commit ${paritySha()} had`);
   }
-  for (const [path, was] of before) {
+  // Compared as resolved: both files' references are followed in their own document, so a literal turned into an alias of the same value, or an
+  // alias retargeted at a token of the same value, is no change. The `primitives` group lists only the primitives some token points at, so one
+  // that is no longer listed is not a token that went away; one still listed keeps its value.
+  for (const [path, wasRaw] of before) {
     if (tokenAccepted(path)) continue;
-    const is = after.get(path);
-    if (!is) err(tokensFile, `${path}: a token the parity commit ${paritySha()} had is gone`);
-    else if (canon(is.value) !== canon(was.value)) err(tokensFile, `${path}: $value changed since ${paritySha()} (${canon(was.value)} → ${canon(is.value)}); accept token:${path} in reports/parity.json if that is meant`);
-    else if (canon(is.modes) !== canon(was.modes)) err(tokensFile, `${path}: $extensions modes changed since ${paritySha()} (${canon(was.modes)} → ${canon(is.modes)})`);
+    const isRaw = after.get(path);
+    if (!isRaw) {
+      if (!path.startsWith("primitives.")) err(tokensFile, `${path}: a token the parity commit ${paritySha()} had is gone`);
+      continue;
+    }
+    const was = dtcgResolved(before, wasRaw);
+    const is = dtcgResolved(after, isRaw);
+    if (canon(is.value) !== canon(was.value)) err(tokensFile, `${path}: $value resolves differently since ${paritySha()} (${canon(was.value)} → ${canon(is.value)}); accept token:${path} in reports/parity.json if that is meant`);
+    else if (canon(is.modes) !== canon(was.modes)) err(tokensFile, `${path}: $extensions modes resolve differently since ${paritySha()} (${canon(was.modes)} → ${canon(is.modes)})`);
   }
 }
 
