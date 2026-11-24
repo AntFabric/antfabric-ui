@@ -31,7 +31,11 @@
     "./antfabric": "./src/antfabric.ts",
     "./tokens.json": "./tokens.json",
     "./fonts.css": "./fonts/fonts.css",
-    "./fonts/*": "./fonts/*"
+    "./fonts/*": "./fonts/*",
+    "./renames.json": "./renames.json"
+  },
+  "bin": {
+    "af-tokens-codemod": "./codemod/rename-tokens.mjs"
   },
   "files": [
     "dist",
@@ -41,7 +45,9 @@
     "fonts/Geist-*",
     "README.md",
     "CHANGELOG.md",
-    "LICENSE"
+    "LICENSE",
+    "codemod",
+    "renames.json"
   ],
   "publishConfig": {
     "access": "public",
@@ -70,7 +76,8 @@
       },
       "./tokens.json": "./tokens.json",
       "./fonts.css": "./fonts/fonts.css",
-      "./fonts/*": "./fonts/*"
+      "./fonts/*": "./fonts/*",
+      "./renames.json": "./renames.json"
     }
   },
   "peerDependencies": {

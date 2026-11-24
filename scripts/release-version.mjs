@@ -83,7 +83,8 @@ else {
 function surface(text) {
   const lock = JSON.parse(text);
   const out = new Map();
-  for (const [path, what] of Object.entries(lock.tokens)) out.set(`token ${path}`, what.replace(/ internal$/, ""));
+  // A token that became internal, or was renamed and kept as a deprecated name, still works: neither is a change here.
+  for (const [path, what] of Object.entries(lock.tokens)) out.set(`token ${path}`, what.startsWith("deprecated") ? "" : what.replace(/ internal$/, ""));
   for (const [entry, names] of Object.entries(lock.exports)) for (const name of names) out.set(`export ${entry} ${name}`, "");
   return out;
 }

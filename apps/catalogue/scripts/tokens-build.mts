@@ -12,11 +12,13 @@ import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { tokensJson } from "@antfabric/ui-core/dtcg";
 import { componentsJson, llmsTxt } from "./agent-surface";
+import { DEPRECATED_GEN, deprecatedGen } from "./deprecated-gen";
 
 const root = (p: string) => fileURLToPath(new URL(`../../../${p}`, import.meta.url));
 const kb = (s: string) => `${(s.length / 1024).toFixed(0)} KB`;
 
 for (const [path, text] of [
+  [DEPRECATED_GEN, deprecatedGen()],
   ["packages/core/tokens.json", tokensJson()],
   ["packages/docs/components.json", componentsJson()],
   ["llms.txt", llmsTxt()],

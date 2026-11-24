@@ -33,6 +33,7 @@ import { isReference, isTokenReference, primitiveValue } from "./refs";
 import { platformOf, tokenSource, tokens as resolvedTokens } from "./tokens";
 import { descriptions, type TokenNote, type TokenPath } from "./descriptions";
 import { tokenMeta, type DtcgType } from "./token-registry";
+import { DEPRECATED_SINCE, renames } from "./deprecated";
 import tokenMap from "../tokens.map.json";
 
 type Raw = string | number;
@@ -392,6 +393,28 @@ export function tokensDtcg(): object {
     const last = keys[keys.length - 1]!;
     if (last in at) throw new Error(`tokens.json: ${leaf.path} is defined twice`);
     at[last] = tokenOf(leaf);
+  }
+  // A renamed token's old path stays, an alias of the new one in every mode it has, marked deprecated (the format's own `$deprecated`).
+  for (const [old, now] of Object.entries(renames as Record<string, string>)) {
+    const target = now.split(".").reduce<Node | undefined>((at, k) => at?.[k] as Node | undefined, root);
+    if (!target || !isToken(target)) throw new Error(`tokens.json: ${old} was renamed to ${now}, which is not a token`);
+    const keys = old.split(".");
+    let at = root;
+    for (const k of keys.slice(0, -1)) {
+      const next = (at[k] ??= {}) as Node;
+      if (isToken(next)) throw new Error(`tokens.json: the old name ${old} sits under the token ${k}`);
+      at = next;
+    }
+    const last = keys[keys.length - 1]!;
+    if (last in at) throw new Error(`tokens.json: the old name ${old} is still a token or a group`);
+    const ext = (target.$extensions as Record<string, Node>)[EXTENSION]!;
+    at[last] = {
+      $type: target.$type,
+      $value: `{${now}}`,
+      $description: `Renamed to ${now} in ${DEPRECATED_SINCE}. ${target.$description as string}`,
+      $deprecated: `Use ${now}. The old name leaves in the next major version.`,
+      $extensions: { [EXTENSION]: { tier: ext.tier, renamedTo: now, since: DEPRECATED_SINCE, ...(ext.modes ? { modes: Object.fromEntries(Object.keys(ext.modes as object).map((m) => [m, `{${now}}`])) } : {}) } },
+    };
   }
   const profiles = Object.fromEntries(Object.entries(tokenSource.profiles).map(([name, p]) => [name, (p as { $description: string }).$description]));
   const os = Object.fromEntries(Object.entries(tokenSource.os).map(([name, set]) => [name, { extends: platformOf(name as never), $description: (set as { $description: string }).$description }]));

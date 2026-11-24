@@ -31,10 +31,12 @@
  */
 
 import type { TokenPath } from "./descriptions";
+import type { DeprecatedTokenPath } from "./deprecated";
 import type { OS, Platform } from "./types";
 
 /** `"$fg.body"`: a token by its path, as `descriptions.ts` and the Foundations page name it. */
-export type TokenRef = `$${TokenPath}`;
+/** A renamed token's old path is still a reference until the next major version (`deprecated.ts`). */
+export type TokenRef = `$${TokenPath | DeprecatedTokenPath}`;
 export type StyleValue = TokenRef | "transparent" | "none";
 
 /**

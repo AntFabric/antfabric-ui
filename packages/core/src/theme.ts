@@ -46,6 +46,7 @@ import { platformOf, tokens, tokenSource, type TokenSource } from "./tokens";
 import { neutralInput } from "./themes/neutral";
 import { PLATFORM_OS, PLATFORMS, type OS, type Platform, type Scheme } from "./types";
 import { cssVarName } from "./vars";
+import { canonicalPath, warnDeprecated } from "./deprecated";
 
 /** Any leaf of a token subtree may be given, as a literal (`"#18181b"`, `6`, `"6px"`) or a primitive reference (`"{primitives.color.neutral.900}"`). */
 export type TokenOverrides<T> = { [K in keyof T]?: T[K] extends string | number ? string | number : TokenOverrides<T[K]> };
@@ -257,7 +258,10 @@ export function defineTheme(input: ThemeInput): Theme {
   const sets = new Map<SetName, Record<string, Value>>();
   /** The layer that last wrote each `<set>|<path>`, so `fg.onBrand` can follow a `brand.default` this theme set. */
   const by = new Map<string, string>();
-  const put = (layer: string, set: SetName, path: string, v: unknown) => {
+  const put = (layer: string, set: SetName, given: string, v: unknown) => {
+    // A renamed token's old path sets the new one (`deprecated.ts`).
+    const path = canonicalPath(given);
+    if (path !== given) warnDeprecated(given, `defineTheme("${name}")`);
     const [schema, schemaName] = schemaOf(set);
     if (!path || !isLeaf(schema, path)) fail(layer, `"${path}" is not a token of ${schemaName}`);
     if (typeof v === "number") {

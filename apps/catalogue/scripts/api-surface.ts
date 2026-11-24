@@ -9,7 +9,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
-import { tokenMeta } from "@antfabric/ui-core";
+import { renames, tokenMeta } from "@antfabric/ui-core";
 import { tokenPaths } from "./token-leaves";
 
 export interface ApiSurface {
@@ -54,7 +54,9 @@ export function apiSurface(): ApiSurface {
     const m = tokenMeta(path);
     tokens[path] = `${m.type} ${m.tier}${m.visibility === "public" ? "" : ` ${m.visibility}`}`;
   }
-  return { version: packageJson("core").version, tokens, exports: Object.assign({}, ...PACKAGES.map(exportsOf)) };
+  // A renamed token's old path is still part of the surface until it is removed: it reads `deprecated → <new path>`.
+  for (const [old, now] of Object.entries(renames as Record<string, string>)) tokens[old] = `deprecated → ${now}`;
+  return { version: packageJson("core").version, tokens: Object.fromEntries(Object.entries(tokens).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))), exports: Object.assign({}, ...PACKAGES.map(exportsOf)) };
 }
 
 /** One line per entry: `token fg.muted = color semantic`, `export @antfabric/ui-core tokensCss`. */
@@ -81,8 +83,8 @@ export function apiDiff(was: Pick<ApiSurface, "tokens" | "exports">, now: Pick<A
   };
 }
 
-/** Whether a change breaks the people on the locked version: something left, or a token is no longer what it was. A token that only became internal still works, so it does not. */
-export const breaking = (d: ApiDiff): string[] => [...d.removed, ...d.changed.filter((c) => !/^token \S+: (\S+ \S+) → \1 internal$/.test(c))];
+/** Whether a change breaks the people on the locked version: something left, or a token is no longer what it was. A token that only became internal, or that was renamed and kept as a deprecated name, still works, so it does not. */
+export const breaking = (d: ApiDiff): string[] => [...d.removed, ...d.changed.filter((c) => !/^token \S+: (\S+ \S+) → \1 internal$/.test(c) && !/^token \S+: .* → deprecated → \S+$/.test(c))];
 
 export const major = (version: string) => Number(version.split(".")[0]);
 export const readLock = (): ApiSurface | null => {

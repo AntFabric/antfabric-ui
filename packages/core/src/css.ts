@@ -18,6 +18,7 @@
 
 import { primitiveMeta } from "./primitives";
 import { followAliases } from "./alias";
+import { renames } from "./deprecated";
 import { isReference, isTokenReference, primitiveValue, primitiveVar, referencePath, tokenReferencePath } from "./refs";
 import type { Theme } from "./theme";
 import { assertBuilt } from "./theme-built";
@@ -72,7 +73,7 @@ const block = (selector: string, vars: [string, string][]) => `${selector}{${var
  * emitted on any element that carries either attribute, because a `var()` is substituted where the property is declared,
  * so a primitive must be visible there.
  */
-export function tokensCss(): string {
+export function tokensCss(options: { deprecated?: boolean } = {}): string {
   const used = new Set<string>();
   const parts: string[] = [];
   parts.push(block("[data-af-platform]", flatten(tokenSource.shared, "", [], used)));
@@ -94,7 +95,18 @@ export function tokensCss(): string {
       const v = primitiveValue(path);
       return [primitiveVar(path), typeof v === "number" ? String(v) : v];
     });
-  return [block("[data-af-platform],[data-af-theme],[data-af-os]", primitives), ...parts].join("\n");
+  const old = options.deprecated === false ? "" : deprecatedCss();
+  return [block("[data-af-platform],[data-af-theme],[data-af-os]", primitives), ...parts, ...(old ? [old] : [])].join("\n");
+}
+
+/**
+ * The renamed tokens' old variables, each the new one's: `--af-fg-muted:var(--af-color-text-muted)`. On every element that carries one
+ * of the attributes, as the primitives are, so it follows the theme and the platform there. `tokensCss()` ends with it unless told
+ * `{ deprecated: false }`; `""` when nothing is renamed. It leaves in the next major version.
+ */
+export function deprecatedCss(): string {
+  const vars = Object.entries(renames as Record<string, string>).map(([old, now]): [string, string] => [cssVarName(old), `var(${cssVarName(now)})`]);
+  return vars.length ? block("[data-af-platform],[data-af-theme],[data-af-os]", vars) : "";
 }
 
 /** The primitives some token points at, by dotted path: the ones `tokensCss()` emits. */

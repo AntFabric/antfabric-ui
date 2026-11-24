@@ -15,6 +15,7 @@
  */
 
 import { descriptions } from "./descriptions";
+import { canonicalPath } from "./deprecated";
 import { STATE_KEYS, STYLE_KEYS, type Recipe, type StateKey } from "./recipe";
 import { recipes } from "./recipes";
 import type { Theme } from "./theme";
@@ -119,7 +120,7 @@ export function checkOverrides(overrides: unknown, bad: (where: string, message:
         if (v === undefined) continue;
         if (k === "states" && states) stateStyles(v, `${where}.states`);
         else if (!(STYLE_KEYS as readonly string[]).includes(k)) bad(`${where}.${k}`, `"${k}" is not a style key`);
-        else if (!(v === "transparent" || v === "none" || (typeof v === "string" && v.startsWith("$") && has(descriptions, v.slice(1)))))
+        else if (!(v === "transparent" || v === "none" || (typeof v === "string" && v.startsWith("$") && has(descriptions, canonicalPath(v.slice(1))))))
           bad(`${where}.${k}`, `${describe(v)} is not a $token the tokens have, "transparent" or "none"`);
       }
     };

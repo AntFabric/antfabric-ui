@@ -170,6 +170,8 @@ import { tokensJson, EXTENSION, REFERENCE } from "@antfabric/ui-core/dtcg";
 import { tokenLeaves, tokenPaths } from "./token-leaves";
 import { aliasTable, followAliases } from "../../../packages/core/src/alias";
 import { flatten as flattenCss } from "../../../packages/core/src/css";
+import { DEPRECATED_GEN, RENAMES_FILE, deprecatedGen, readRenames } from "./deprecated-gen";
+import { rewrite as rewriteRenames } from "../../../packages/core/codemod/rename-tokens.mjs";
 import { API_LOCK, apiDiff, apiSurface, breaking, major, readLock, type ApiSurface } from "./api-surface";
 import { barLayout, barScale, bySign, chartTable, clampScore, easeFn, cellText as coreCellText, fitLabel, fmt as coreFmt, gaugeState, labelWidth, lineScale, goalsOf, lttb, meterReading as coreMeterReading, meterShown, meterTone, moved as coreMoved, nearestAxis, niceScale, onHalfRing, pickState, prepare as corePrepare, rowIds, segmentAt, segmentsOf, shareOf, sortRows, sparseLabels, summarize as coreSummarize, summarizeCompare as coreSummarizeCompare, summarizeGauge as coreSummarizeGauge, summarizeGoals as coreSummarizeGoals, summarizeSegments as coreSummarizeSegments, tipRows as coreTipRows, toggleRow, totalOf, valueDomain, valueParts as coreValueParts, whenOf, withAlpha, withoutSign, type CompareWords, type FormatSpec, type FormatWords, type GaugeWords, type GoalWords, type SegmentWords, type SummaryWords } from "@antfabric/ui-core/chart";
 import { exceptZero, radarPoint, seriesMark, shortNumber, texturePath } from "@antfabric/ui-core/chart";
@@ -397,6 +399,57 @@ function checkAliases() {
     if (!themeCss(moved).includes("--af-border-subtle:#123456") || themeCss(moved).includes("--af-chart-grid")) err(eng, `themeCss sets the target and leaves the alias to follow: ${themeCss(moved)}`);
   }
   if (!quiet) console.log(`  aliases: ${count} in tokens.ts`);
+}
+
+/**
+ * Renamed tokens (`packages/core/renames.json`, `packages/core/src/deprecated.ts`):
+ *   - the generated file is what the list gives; each old path is gone from `tokens.ts` and each new one is a token there; no new path is
+ *     itself an old one (a chain); an old path and a current one never need the same key to be a value and a group at once, so `t` can hold both;
+ *   - no two names, old or new, become one CSS variable;
+ *   - the old name still works where a consumer can have written it: the sheet declares its variable as the new one's, `t` holds it in
+ *     both kits, a theme may set it, and `tokens.json` lists it as a deprecated alias;
+ *   - nothing in this repository still reads one: the codemod, run dry over the packages, the catalogue and the docs, finds nothing.
+ */
+function checkDeprecated() {
+  const at = RENAMES_FILE;
+  const map = readRenames();
+  if (readFileSync(join(repoRoot(), DEPRECATED_GEN), "utf8") !== deprecatedGen(map)) err(DEPRECATED_GEN, "is not what packages/core/renames.json gives: run `pnpm tokens:build`");
+  const live = new Set(tokenPaths());
+  const groupsOf = (paths: Iterable<string>) => new Set([...paths].flatMap((p) => p.split(".").slice(0, -1).map((_, i, a) => a.slice(0, i + 1).join("."))));
+  const [liveGroups, oldGroups] = [groupsOf(live), groupsOf(Object.keys(map))];
+  const vars = new Map<string, string>([...live].map((p) => [cssVarName(p), p]));
+  for (const [old, now] of Object.entries(map)) {
+    if (live.has(old)) err(at, `${old} is renamed and is still a token in tokens.ts`);
+    if (!live.has(now)) err(at, `${old} is renamed to ${now}, which is not a token`);
+    if (now in map) err(at, `${old} is renamed to ${now}, which is itself renamed: name the last one`);
+    if (liveGroups.has(old)) err(at, `the old name ${old} is a group of current tokens, so t.${old} cannot be a value`);
+    if (oldGroups.has(now)) err(at, `${now} is a group of old names, so t.${now} cannot be a value while they are kept`);
+    const name = cssVarName(old);
+    if (vars.has(name)) err(at, `${old} and ${vars.get(name)} are both ${name}`);
+    vars.set(name, old);
+  }
+  const n = Object.keys(map).length;
+  if (n) {
+    const [old, now] = Object.entries(map)[0]!;
+    const sheet = tokensCss();
+    if (!sheet.includes(`${cssVarName(old)}:var(${cssVarName(now)})`)) err(at, `tokensCss() does not declare ${cssVarName(old)} as ${cssVarName(now)}`);
+    if (tokensCss({ deprecated: false }).includes(`${cssVarName(old)}:`)) err(at, "tokensCss({ deprecated: false }) still declares an old variable");
+    const read = (tree: unknown, path: string) => path.split(".").reduce<unknown>((x, k) => (x as Record<string, unknown> | undefined)?.[k], tree);
+    for (const [o, w] of Object.entries(map)) {
+      if (read(ReactKit.t, w) !== undefined && read(ReactKit.t, o) !== read(ReactKit.t, w)) err(at, `t.${o} is not t.${w} in the React kit`);
+      const phone = resolveTokens("mobile", "light");
+      if (read(phone, w) !== undefined && read(phone, o) !== read(phone, w)) err(at, `t.${o} is not t.${w} on the phone`);
+    }
+  }
+  // Nothing here reads an old name. The files that are about the old names are left out.
+  const SKIP = /(^|\/)(node_modules|dist|\.astro)\/|deprecated(\.gen)?\.ts$|renames\.json$|CHANGELOG\.md$|MIGRATION\.md$|codemod\/|\.snapshot\.json$|components\.json$|tokens\.json$|tokens\.map\.json$/;
+  const walk = (dir: string): string[] => readdirSync(dir).flatMap((f) => { const p = `${dir}/${f}`; return SKIP.test(p) ? [] : statSync(p).isDirectory() ? walk(p) : /\.(tsx?|mts|mjs|astro|css|md)$/.test(f) ? [p] : []; });
+  if (n)
+    for (const dir of ["packages/core/src", "packages/react/src", "packages/react-native/src", "packages/docs/src", "apps/catalogue/src"])
+      for (const file of walk(join(repoRoot(), dir))) {
+        const { count } = rewriteRenames(readFileSync(file, "utf8"));
+        if (count) err(file.slice(repoRoot().length + 1), `reads ${count} renamed token name(s): run \`node packages/core/codemod/rename-tokens.mjs ${dir}\``);
+      }
 }
 
 function checkPrimitives() {
@@ -3575,6 +3628,7 @@ if (!only.length || only.includes("tokens")) {
 }
 if (!only.length || only.includes("agent")) checkAgent();
 if (!only.length || only.includes("api")) checkApi();
+if (!only.length || only.includes("tokens") || only.includes("deprecated")) checkDeprecated();
 if (!only.length || only.includes("architecture")) checkArchitecture();
 if (!only.length || only.includes("literals")) checkLiterals();
 if (!only.length || only.includes("helpers")) checkHelpers();
