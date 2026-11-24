@@ -401,7 +401,11 @@ function setsOf(theme: Theme): Map<SetName, Readonly<Record<string, Value>>> {
 /* ---------- themeCss ---------- */
 
 /** One variable in one layer: its value as the browser resolves it, and as the sheet writes it (a reference is its primitive's variable). */
-type Decl = { value: string; css: string; primitive?: string };
+/**
+ * `alias` marks a base token that is another token (`var(--af-border-subtle)`): under a theme it is whatever the target is there, so
+ * its `value` (the base's) says nothing about what the browser gives, and it is the same as another declaration only when both write the same thing.
+ */
+type Decl = { value: string; css: string; primitive?: string; alias?: true };
 type Layer = ReadonlyMap<string, Decl>;
 type Context = { platform: Platform; scheme: Scheme; os?: OS };
 
@@ -412,7 +416,7 @@ function base() {
   if (baseLayers) return baseLayers;
   const layer = (source: Tree, resolved: Tree): Layer => {
     const values = new Map(flatten(resolved, "", []));
-    return new Map(flatten(source, "", [], new Set()).map(([k, css]) => [k, { value: values.get(k)!, css }]));
+    return new Map(flatten(source, "", [], new Set()).map(([k, css]) => [k, { value: values.get(k)!, css, ...(/^var\(--af-(?!p-)/.test(css) ? { alias: true as const } : {}) }]));
   };
   const os: Partial<Record<OS, Layer>> = {};
   for (const [name, set] of Object.entries(tokenSource.os)) os[name as OS] = layer(set as Tree, (tokens.os as Record<string, Tree>)[name]!);
@@ -494,7 +498,7 @@ export function themeCss(theme: Theme): string {
     for (let i = blocks.length - 1; i >= 0; i--) if (blocks[i]!.matches(c) && blocks[i]!.decls.has(name)) return blocks[i]!.decls.get(name);
     return baseGives(c, name);
   };
-  const same = (a: Decl | undefined, b: Decl | undefined) => a?.value === b?.value;
+  const same = (a: Decl | undefined, b: Decl | undefined) => (a?.alias || b?.alias ? a?.css === b?.css : a?.value === b?.value);
   /**
    * A block that declares each name the contexts it stands for need and do not get, when every one of them has the name and
    * needs the same value for it. Anything else is left to a later, narrower block (the phone's font files are the mobile

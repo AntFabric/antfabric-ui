@@ -42,6 +42,10 @@ export const neutralInput: ThemeInput = {
     },
     schemes: {
       light: {
+        // The chart neutrals and the table's divider are aliases of the kit's roles (`chart.grid` is `border.subtle`), and would follow
+        // this theme's zinc. They are held at the values this preset has always drawn, so adding the aliases changed nothing here; letting
+        // them follow is the owner's call.
+        chart: { grid: "#e7e7e7", axis: "#0e1828", label: "#6b6b6b", crosshair: "#0e1828", reference: "#5c5c5c", track: "#f0f0f0" },
         // The agent's coral under white initials was 3.42:1; one step deeper is 4.98:1 (WCAG 1.4.3).
         identity: { agent: "#d2321e" },
         surface: {
@@ -82,7 +86,7 @@ export const neutralInput: ThemeInput = {
         tag: { neutralBg: "#f4f4f5", neutralFg: "#52525b", brandBg: "#18181b", brandFg: "#fafafa" },
         // Danger moves from AntFabric's crimson to a plain red, which sits beside zinc without a pink cast; success, warning and info stay.
         danger: { default: "#c81e1e", soft: "#fef2f2", hover: "#991b1b", solid: "#dc2626", solidHover: "#b91c1c" },
-        table: { header: "#fafafa", rowHover: "#f4f4f5" },
+        table: { header: "#fafafa", rowHover: "#f4f4f5", divider: "#e7e7e7" }, // the divider is held, as the chart neutrals above
         shadow: {
           hairline: "0 1px 2px rgba(0,0,0,.05)",
           card: "0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04)",
@@ -99,6 +103,10 @@ export const neutralInput: ThemeInput = {
         },
       },
       dark: {
+        // The chart neutrals and the table's divider are aliases of the kit's roles (`chart.grid` is `border.subtle`), and would follow
+        // this theme's zinc. They are held at the values this preset has always drawn, so adding the aliases changed nothing here; letting
+        // them follow is the owner's call.
+        chart: { grid: "#2c2c2f", axis: "#e4e4e7", label: "#909098", crosshair: "#e4e4e7", reference: "#a1a1a9", track: "#2a2a2c" },
         // The agent's coral under white initials was 3.42:1; one step deeper is 4.98:1 (WCAG 1.4.3).
         identity: { agent: "#d2321e" },
         surface: {
@@ -137,7 +145,7 @@ export const neutralInput: ThemeInput = {
         tabs: { track: "#27272a" },
         tag: { neutralBg: "#27272a", neutralFg: "#d4d4d8", brandBg: "#fafafa", brandFg: "#18181b" },
         danger: { default: "#f87171", soft: "#2a1415", hover: "#fca5a5", solid: "#dc2626", solidHover: "#b91c1c" },
-        table: { header: "#111113", rowHover: "#27272a" },
+        table: { header: "#111113", rowHover: "#27272a", divider: "#2c2c2f" }, // the divider is held, as the chart neutrals above
         shadow: {
           focus: "0 0 0 1px #09090b, 0 0 0 3px #a1a1aa",
         },

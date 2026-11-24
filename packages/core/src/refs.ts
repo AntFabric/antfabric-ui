@@ -30,10 +30,11 @@ const PREFIX = "{primitives.";
 export const isReference = (v: unknown): v is Reference => typeof v === "string" && v.startsWith(PREFIX) && v.endsWith("}") && !v.slice(PREFIX.length, -1).match(/[{}\s]/);
 
 /**
- * `"{border.subtle}"`: a token that is another token of the same set, so the two cannot drift apart (a component token that is a
- * semantic role: `chart.grid` is `border.subtle`). The W3C format's alias, as a primitive reference is. Its target is a leaf of the
- * set the alias is in (`pnpm check tokens` holds that, the tiers' direction and that the two have one type), which is what lets
- * `tokens` resolve it once and the stylesheet write it as `var(--af-border-subtle)`.
+ * `"{border.subtle}"`: a token that is another token, so the two cannot drift apart (a component token that is a semantic role:
+ * `chart.grid` is `border.subtle`). The W3C format's alias, as a primitive reference is. Its target is a leaf of the set the alias is in
+ * or of a set under it: a theme's in that theme, a profile's in the profile or shared, an OS's in its profile or shared (`pnpm check
+ * tokens` holds that, the tiers' direction and that the two have one type), which is what lets `tokens` resolve it once and the
+ * stylesheet write it as `var(--af-border-subtle)`.
  */
 export type TokenReference = `{${string}}`;
 export const isTokenReference = (v: unknown): v is TokenReference => typeof v === "string" && /^\{[A-Za-z0-9_.-]+\}$/.test(v) && !v.startsWith(PREFIX);
@@ -122,17 +123,19 @@ export function resolveTree<T extends Tree>(tree: T): Resolved<T> {
 }
 
 /**
- * One set (`shared`, a theme, a profile, an OS's set) with each alias replaced by the value of the token it names in that set, followed to
- * the end of a chain. Throws on a target the set does not have and on a cycle, naming the leaf.
+ * One set (`shared`, a theme, a profile, an OS's set) with each alias replaced by the value of the token it names, followed to the end of a
+ * chain. The target is looked up in the set and then in the sets `under` it. Throws on a target none of them has and on a cycle, naming the leaf.
  */
-export function resolveAliases<T extends Tree>(set: T, where: string): T {
-  const at = (path: string): string | number | Tree | undefined => path.split(".").reduce<string | number | Tree | undefined>((node, k) => (typeof node === "object" ? node[k] : undefined), set);
+export function resolveAliases<T extends Tree>(set: T, where: string, under: readonly Tree[] = []): T {
+  const inSet = (tree: Tree, path: string): string | number | Tree | undefined => path.split(".").reduce<string | number | Tree | undefined>((node, k) => (typeof node === "object" ? node[k] : undefined), tree);
+  // The set's own value first, then the sets it is laid over (a profile over shared, an OS over its profile and shared), as the layers resolve a name.
+  const at = (path: string) => [set, ...under].map((tree) => inSet(tree, path)).find((v) => typeof v === "string" || typeof v === "number");
   const value = (v: string | number, from: string, seen: string[]): string | number => {
     if (!isTokenReference(v)) return v;
     const to = tokenReferencePath(v);
     if (seen.includes(to)) throw new Error(`tokens: ${where}.${from} is an alias that comes back to itself (${[...seen, to].join(" → ")})`);
     const target = at(to);
-    if (typeof target !== "string" && typeof target !== "number") throw new Error(`tokens: ${where}.${from} is "${v}", and ${where} has no token ${to}: an alias names a token of its own set`);
+    if (typeof target !== "string" && typeof target !== "number") throw new Error(`tokens: ${where}.${from} is "${v}", and ${where} has no token ${to}: an alias names a token of its own set, or of a set under it`);
     return value(target, from, [...seen, to]);
   };
   const walk = (node: Tree, prefix: string): Tree =>

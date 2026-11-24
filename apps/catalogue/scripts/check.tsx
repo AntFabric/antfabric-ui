@@ -385,6 +385,17 @@ function checkAliases() {
   expect("a theme that sets the alias itself has said what it is", under({ platform: "desktop", scheme: "light" }, { ...none, shared: { "edge.soft": 3, "grid.line": 7 } }, desktop), { ...desktop, "edge.soft": 3, "grid.line": 7, "grid.rule": 7 });
   expect("a later base layer's own value beats the alias under it", under({ platform: "mobile", scheme: "light" }, { ...none, shared: { "edge.soft": 3 } }, phone), { ...phone, "edge.soft": 3 });
   expect("a scheme's alias follows that scheme's target", under({ platform: "desktop", scheme: "dark" }, { ...none, schemes: { dark: { "ink.body": "#fff" } } }, { ...desktop, "ink.chart": "#eee", "ink.body": "#eee" }), { ...desktop, "ink.chart": "#fff", "ink.body": "#fff" });
+
+  // And through the real readers: a theme that sets a target and not its alias moves both, on the web and on the phone, in that scheme only.
+  if (count) {
+    const moved = defineTheme({ name: "alias follows", extends: null, tokens: { schemes: { light: { border: { subtle: "#123456" } } } } });
+    expect("tokenValues follows a theme's target", tokenValues("web", "light", undefined, moved)[cssVarName("chart.grid")], "#123456");
+    expect("resolveTokens follows a theme's target", resolveTokens("mobile", "light", { theme: moved }).chart.grid, "#123456");
+    expect("the other scheme is left alone", tokenValues("web", "dark", undefined, moved)[cssVarName("chart.grid")], tokenValues("web", "dark")[cssVarName("border.subtle")]);
+    const held = defineTheme({ name: "alias held", extends: null, tokens: { schemes: { light: { border: { subtle: "#123456" }, chart: { grid: "#654321" } } } } });
+    expect("a theme that sets the alias too keeps it", [tokenValues("web", "light", undefined, held)[cssVarName("chart.grid")], resolveTokens("mobile", "light", { theme: held }).chart.grid], ["#654321", "#654321"]);
+    if (!themeCss(moved).includes("--af-border-subtle:#123456") || themeCss(moved).includes("--af-chart-grid")) err(eng, `themeCss sets the target and leaves the alias to follow: ${themeCss(moved)}`);
+  }
   if (!quiet) console.log(`  aliases: ${count} in tokens.ts`);
 }
 

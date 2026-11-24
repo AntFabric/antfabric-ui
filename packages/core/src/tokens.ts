@@ -43,7 +43,7 @@
  * `--af-fg-on-brand` as a variable (see `vars.ts`).
  */
 
-import { resolveAliases, resolveTree, type Resolved } from "./refs";
+import { ref, resolveAliases, resolveTree, type Resolved } from "./refs";
 import { PLATFORM_OS, type OS, type Platform } from "./types";
 
 export const tokenSource = {
@@ -541,7 +541,7 @@ export const tokenSource = {
       loadValueH: 26,
     },
     table: {
-      cellX: "{primitives.raw.12}",
+      cellX: ref.number("space.md"),
       headH: 36,
       headRadius: 0,
       denseRowH: 36,
@@ -677,7 +677,7 @@ export const tokenSource = {
         muted: "{primitives.color.neutral.700}",
         subtle: "{primitives.other.ash-500}",
         faint: "{primitives.other.ash-450}",
-        placeholder: "{primitives.other.ash-450}",
+        placeholder: ref.text("fg.faint"),
         onBrand: "{primitives.color.neutral.950}",
         onInverse: "{primitives.color.neutral.50}",
         onBrandSoft: "{primitives.color.coral.800}",
@@ -734,16 +734,16 @@ export const tokenSource = {
         series8: "#e8488a",
         previous: "#7b94b0",
         other: "{primitives.color.charcoal.450}",
-        grid: "{primitives.other.ash-150}",
-        axis: "{primitives.color.neutral.950}",
-        label: "{primitives.other.ash-450}",
-        crosshair: "{primitives.color.neutral.950}",
-        reference: "{primitives.other.ash-500}",
+        grid: ref.text("border.subtle"),
+        axis: ref.text("border.strong"),
+        label: ref.text("fg.faint"),
+        crosshair: ref.text("border.strong"),
+        reference: ref.text("fg.subtle"),
         tooltip: "#0f1424",
         tooltipText: "#ffffff",
         tooltipMuted: "#a6abbd",
         tooltipRule: "#2a3042",
-        track: "{primitives.other.ash-90}",
+        track: ref.text("surface.muted"),
       },
       data: {
         accent: "#0177ff",
@@ -760,10 +760,10 @@ export const tokenSource = {
         onWarning: "#b54708",
       },
       table: {
-        header: "{primitives.color.neutral.50}",
-        rowHover: "{primitives.other.ash-25}",
-        rowSelected: "#e6f1ff",
-        divider: "{primitives.other.ash-150}",
+        header: ref.text("surface.recessed"),
+        rowHover: ref.text("hover.surface"),
+        rowSelected: ref.text("data.accentSoft"),
+        divider: ref.text("border.subtle"),
       },
     },
     dark: {
@@ -885,7 +885,7 @@ export const tokenSource = {
         muted: "{primitives.color.charcoal.300}",
         subtle: "{primitives.color.charcoal.400}",
         faint: "{primitives.color.charcoal.450}",
-        placeholder: "{primitives.color.charcoal.450}",
+        placeholder: ref.text("fg.faint"),
         onBrand: "{primitives.color.neutral.950}",
         onInverse: "{primitives.color.charcoal.950}",
         onBrandSoft: "{primitives.color.coral.100}",
@@ -942,16 +942,16 @@ export const tokenSource = {
         series8: "#d6467f",
         previous: "#506f9b",
         other: "#6c6f77",
-        grid: "{primitives.color.charcoal.700}",
-        axis: "{primitives.color.charcoal.100}",
-        label: "{primitives.color.charcoal.450}",
-        crosshair: "{primitives.color.charcoal.100}",
-        reference: "{primitives.color.charcoal.400}",
+        grid: ref.text("border.subtle"),
+        axis: ref.text("border.strong"),
+        label: ref.text("fg.faint"),
+        crosshair: ref.text("border.strong"),
+        reference: ref.text("fg.subtle"),
         tooltip: "{primitives.color.charcoal.750}",
         tooltipText: "#ffffff",
         tooltipMuted: "#b4b4bb",
         tooltipRule: "{primitives.color.charcoal.700}",
-        track: "{primitives.color.charcoal.750}",
+        track: ref.text("surface.muted"),
       },
       data: {
         accent: "#3d8bff",
@@ -968,10 +968,10 @@ export const tokenSource = {
         onWarning: "#fec84b",
       },
       table: {
-        header: "{primitives.color.charcoal.850}",
-        rowHover: "{primitives.color.charcoal.775}",
-        rowSelected: "#142640",
-        divider: "{primitives.color.charcoal.700}",
+        header: ref.text("surface.recessed"),
+        rowHover: ref.text("hover.surface"),
+        rowSelected: ref.text("data.accentSoft"),
+        divider: ref.text("border.subtle"),
       },
     },
   },
@@ -1103,7 +1103,7 @@ export const tokenSource = {
         labelLg: "{primitives.fontSize.raw-13}",
         iconSm: "{primitives.raw.12}",
         iconMd: "{primitives.raw.14}",
-        iconLg: "{primitives.raw.14}",
+        iconLg: ref.number("button.iconMd"),
       },
       inAppBanner: {
         w: 380,
@@ -1126,7 +1126,7 @@ export const tokenSource = {
         tile: "{primitives.raw.56}",
       },
       chart: {
-        labelSize: "{primitives.fontSize.raw-11}",
+        labelSize: ref.number("text.micro"),
         lineW: 2.25,
         sparkW: 1.75,
         pointR: 4,
@@ -1276,7 +1276,7 @@ export const tokenSource = {
         labelLg: "{primitives.fontSize.raw-13}",
         iconSm: "{primitives.raw.12}",
         iconMd: "{primitives.raw.14}",
-        iconLg: "{primitives.raw.14}",
+        iconLg: ref.number("button.iconMd"),
       },
       inAppBanner: {
         w: 380,
@@ -1299,7 +1299,7 @@ export const tokenSource = {
         tile: "{primitives.raw.56}",
       },
       chart: {
-        labelSize: "{primitives.fontSize.raw-11}",
+        labelSize: ref.number("text.micro"),
         lineW: 2.25,
         sparkW: 1.75,
         pointR: 4,
@@ -1449,7 +1449,7 @@ export const tokenSource = {
         labelLg: "{primitives.fontSize.raw-16}",
         iconSm: "{primitives.raw.20}",
         iconMd: "{primitives.raw.20}",
-        iconLg: "{primitives.raw.20}",
+        iconLg: ref.number("button.iconMd"),
       },
       font: {
         fileSansRegular: "Figtree-Regular",
@@ -1487,7 +1487,7 @@ export const tokenSource = {
         tile: 84,
       },
       chart: {
-        labelSize: "{primitives.fontSize.raw-11}",
+        labelSize: ref.number("text.micro"),
         lineW: 2.5,
         sparkW: 2,
         pointR: 4.5,
@@ -1541,8 +1541,18 @@ export const tokens = aliasesResolved(resolveTree(tokenSource));
 
 /** Each set with its aliases (`"{border.subtle}"`) replaced by the value of the token they name in that set, so no reader of `tokens` meets one. */
 function aliasesResolved(tree: Resolved<typeof tokenSource>): Resolved<typeof tokenSource> {
-  const each = <T extends object>(sets: T, name: string): T => Object.fromEntries(Object.entries(sets).map(([k, set]) => [k, resolveAliases(set as never, `${name}.${k}`)])) as T;
-  return { shared: resolveAliases(tree.shared as never, "shared"), themes: each(tree.themes, "themes"), profiles: each(tree.profiles, "profiles"), os: each(tree.os, "os") } as Resolved<typeof tokenSource>;
+  type Set = Parameters<typeof resolveAliases>[0];
+  const shared = tree.shared as Set;
+  const profiles = tree.profiles as unknown as Record<string, Set>;
+  // An alias is looked up in its own set, then in the sets under it. A theme stands alone: a colour is never a size.
+  const each = (sets: object, name: string, under: (key: string) => Set[]) => Object.fromEntries(Object.entries(sets).map(([k, set]) => [k, resolveAliases(set as Set, `${name}.${k}`, under(k))]));
+  const platform = (os: string) => (Object.keys(PLATFORM_OS) as Platform[]).find((p) => PLATFORM_OS[p].includes(os as OS))!;
+  return {
+    shared: resolveAliases(shared, "shared"),
+    themes: each(tree.themes, "themes", () => []),
+    profiles: each(tree.profiles, "profiles", () => [shared]),
+    os: each(tree.os, "os", (os) => [profiles[platform(os)]!, shared]),
+  } as unknown as Resolved<typeof tokenSource>;
 }
 
 /** `tokenSource` with each reference resolved, at the type level too: a reference is the literal type of its primitive. */
