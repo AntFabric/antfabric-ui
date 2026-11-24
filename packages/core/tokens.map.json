@@ -134,296 +134,296 @@
     "note": "the product's buttons (--button-*) have colour tokens and no sizes; the label size is the kit's per button size, 12/12/13 on desktop and web and 16 on the phone"
   },
   "chart.activeRingWidth": {
-    "source": "proposal",
-    "note": "prototype WebLine active dot (section 4)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype WebLine active dot (section 4)"
   },
   "chart.axisColor": {
-    "source": "proposal",
-    "note": "proposal: the value of border.strong in each theme (a neutral, so it follows the kit); the prototype's --af-chart-axis-color"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the value of border.strong in each theme (a neutral, so it follows the kit); the prototype's --af-chart-axis-color"
   },
   "chart.axisHeight": {
-    "source": "proposal",
-    "note": "prototype LineChart and BarChart axes"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype LineChart and BarChart axes"
   },
   "chart.barGap": {
-    "source": "proposal",
-    "note": "the reference dashboard's thin, round-topped bars (10 November 2026); desktop and web share one set, the phone has its own"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's thin, round-topped bars (10 November 2026); desktop and web share one set, the phone has its own"
   },
   "chart.barHeight": {
-    "source": "proposal",
-    "note": "the chart prototype's geometry; desktop and web share one set, the phone has its own"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the chart prototype's geometry; desktop and web share one set, the phone has its own"
   },
   "chart.barMaxWidth": {
-    "source": "proposal",
-    "note": "the reference dashboard's round-topped bars, then a little wider at the user's ask (10 November 2026): the radius is half the width; desktop and web share one set, the phone has its own"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's round-topped bars, then a little wider at the user's ask (10 November 2026): the radius is half the width; desktop and web share one set, the phone has its own"
   },
   "chart.barMinWidth": {
-    "source": "proposal",
-    "note": "prototype PhoneBars (section 5)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype PhoneBars (section 5)"
   },
   "chart.barRadius": {
-    "source": "proposal",
-    "note": "the reference dashboard's round-topped bars, then a little wider at the user's ask (10 November 2026): the radius is half the width; desktop and web share one set, the phone has its own"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's round-topped bars, then a little wider at the user's ask (10 November 2026): the radius is half the width; desktop and web share one set, the phone has its own"
   },
   "chart.barSoloWidth": {
-    "source": "proposal",
-    "note": "the user's ask (10 November 2026): a bar alone in its category grows wider than a grouped one; desktop and web share one set, the phone has its own"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the user's ask (10 November 2026): a bar alone in its category grows wider than a grouped one; desktop and web share one set, the phone has its own"
   },
   "chart.crosshairColor": {
-    "source": "proposal",
-    "note": "proposal: the value of border.strong in each theme (a neutral, so it follows the kit); the prototype's --af-chart-crosshair-color"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the value of border.strong in each theme (a neutral, so it follows the kit); the prototype's --af-chart-crosshair-color"
   },
   "chart.donutSize": {
-    "source": "proposal",
-    "note": "prototype DonutChart: size 200"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype DonutChart: size 200"
   },
   "chart.edgeInset": {
-    "source": "proposal",
-    "note": "prototype PhoneLine (section 5)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype PhoneLine (section 5)"
   },
   "chart.endLabelWidth": {
-    "source": "proposal",
-    "note": "prototype BarChart, horizontal with value labels (section 4)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype BarChart, horizontal with value labels (section 4)"
   },
   "chart.fontFileBold": {
-    "source": "proposal",
-    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
   },
   "chart.fontFileMedium": {
-    "source": "proposal",
-    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
   },
   "chart.fontFileRegular": {
-    "source": "proposal",
-    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
   },
   "chart.fontFileSemibold": {
-    "source": "proposal",
-    "note": "proposal: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: Geist's file per weight for the phone (expo-font), shipped in @antfabric/ui-core/fonts"
   },
   "chart.fontFamily": {
-    "source": "proposal",
-    "note": "proposal: Geist for chart text (the user, 6 November 2026), then font.sans"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: Geist for chart text (the user, 6 November 2026), then font.sans"
   },
   "chart.gaugeCapRadius": {
-    "source": "proposal",
-    "note": "prototype GaugeChart, cornerRadius 8 (section 6)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype GaugeChart, cornerRadius 8 (section 6)"
   },
   "chart.gaugeWidth": {
-    "source": "proposal",
-    "note": "prototype GaugeChart: 280 on desktop and web, 220 on the phone (section 6)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype GaugeChart: 280 on desktop and web, 220 on the phone (section 6)"
   },
   "chart.gridColor": {
-    "source": "proposal",
-    "note": "proposal: the value of border.subtle in each theme (a neutral, so it follows the kit); the prototype's --af-chart-grid-color"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the value of border.subtle in each theme (a neutral, so it follows the kit); the prototype's --af-chart-grid-color"
   },
   "chart.gridDash": {
-    "source": "proposal",
-    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
   },
   "chart.gridGap": {
-    "source": "proposal",
-    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
   },
   "chart.keyWidth": {
-    "source": "proposal",
-    "note": "prototype PeriodCompare, .key width 14px (section 7)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype PeriodCompare, .key width 14px (section 7)"
   },
   "chart.labelColor": {
-    "source": "proposal",
-    "note": "proposal: the value of fg.faint in each theme (a neutral, so it follows the kit; it was fg.muted until the chart type pass of 10 November 2026); the prototype's --af-chart-label-color"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the value of fg.faint in each theme (a neutral, so it follows the kit; it was fg.muted until the chart type pass of 10 November 2026); the prototype's --af-chart-label-color"
   },
   "chart.labelBandHeight": {
-    "source": "proposal",
-    "note": "prototype PhoneLine and PhoneBars (section 5)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype PhoneLine and PhoneBars (section 5)"
   },
   "chart.labelSize": {
-    "source": "proposal",
-    "note": "the chart prototype's geometry; desktop and web share one set, the phone has its own"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the chart prototype's geometry; desktop and web share one set, the phone has its own"
   },
   "chart.lineWidth": {
-    "source": "proposal",
-    "note": "the chart prototype's geometry; desktop and web share one set, the phone has its own"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the chart prototype's geometry; desktop and web share one set, the phone has its own"
   },
   "chart.listMinWidth": {
-    "source": "proposal",
-    "note": "proposal: the least the donut's list needs beside the ring, so it wraps under it on a narrow card"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the least the donut's list needs beside the ring, so it wraps under it on a narrow card"
   },
   "chart.otherColor": {
-    "source": "proposal",
-    "note": "B10: a grey that holds 3:1 on the card: primitives charcoal.450 in light (was #b9bec7, 1.87:1); the dark grey already held it"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: B10: a grey that holds 3:1 on the card: primitives charcoal.450 in light (was #b9bec7, 1.87:1); the dark grey already held it"
   },
   "chart.partMinWidth": {
-    "source": "proposal",
-    "note": "prototype Breakdown, .split-list minmax(150px, 1fr) (section 7)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Breakdown, .split-list minmax(150px, 1fr) (section 7)"
   },
   "chart.plotMinWidth": {
-    "source": "proposal",
-    "note": "prototype PhoneLine and PhoneBars (section 5)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype PhoneLine and PhoneBars (section 5)"
   },
   "chart.pointRadius": {
-    "source": "proposal",
-    "note": "the chart prototype's geometry; desktop and web share one set, the phone has its own"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the chart prototype's geometry; desktop and web share one set, the phone has its own"
   },
   "chart.previousColor": {
-    "source": "proposal",
-    "note": "B10: the reference's last-period blue, deepened (light, was #c6e1ff, 1.34:1) and lightened (dark, was #33507a, 1.96:1) in OKLCH to 3:1 on the card; low chroma on purpose, beside series1"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: B10: the reference's last-period blue, deepened (light, was #c6e1ff, 1.34:1) and lightened (dark, was #33507a, 1.96:1) in OKLCH to 3:1 on the card; low chroma on purpose, beside series1"
   },
   "chart.previousWidth": {
-    "source": "proposal",
-    "note": "prototype PeriodCompare: the previous period's line is the chart's line less 0.75 (section 7)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype PeriodCompare: the previous period's line is the chart's line less 0.75 (section 7)"
   },
   "chart.referenceColor": {
-    "source": "proposal",
-    "note": "proposal: the value of fg.subtle in each theme (a neutral, so it follows the kit); the prototype's --af-chart-reference-color"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the value of fg.subtle in each theme (a neutral, so it follows the kit); the prototype's --af-chart-reference-color"
   },
   "chart.referenceDash": {
-    "source": "proposal",
-    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
   },
   "chart.referenceGap": {
-    "source": "proposal",
-    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
   },
   "chart.ringGap": {
-    "source": "proposal",
-    "note": "prototype GoalRings: 5 between bands (section 7)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype GoalRings: 5 between bands (section 7)"
   },
   "chart.ringSize": {
-    "source": "proposal",
-    "note": "prototype GoalRings: 188 on desktop and web, 200 on the phone"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype GoalRings: 188 on desktop and web, 200 on the phone"
   },
   "chart.ringWidth": {
-    "source": "proposal",
-    "note": "prototype GoalRings: a band 14 wide, 15 on the phone (section 7)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype GoalRings: a band 14 wide, 15 on the phone (section 7)"
   },
   "chart.ruleHeight": {
-    "source": "proposal",
-    "note": "prototype MetricTabs, the selected tab's 2px rule, and PeriodCompare's .key line (section 7)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype MetricTabs, the selected tab's 2px rule, and PeriodCompare's .key line (section 7)"
   },
   "chart.series1Color": {
-    "source": "proposal",
-    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
   },
   "chart.series2Color": {
-    "source": "proposal",
-    "note": "B10: the reference's orange darkened in OKLCH (same hue) to 3:1 on the light card (was #ee8a0a, 2.54:1); the dark value is the reference's"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: B10: the reference's orange darkened in OKLCH (same hue) to 3:1 on the light card (was #ee8a0a, 2.54:1); the dark value is the reference's"
   },
   "chart.series3Color": {
-    "source": "proposal",
-    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
   },
   "chart.series4Color": {
-    "source": "proposal",
-    "note": "B10: the reference's teal darkened in OKLCH (same hue) to 3:1 on the light card (was #00b48a, 2.66:1); the dark value is the reference's"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: B10: the reference's teal darkened in OKLCH (same hue) to 3:1 on the light card (was #00b48a, 2.66:1); the dark value is the reference's"
   },
   "chart.series5Color": {
-    "source": "proposal",
-    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
   },
   "chart.series6Color": {
-    "source": "proposal",
-    "note": "B10: the reference's amber darkened in OKLCH (same hue) to 3:1 on the light card (was #c99a00, 2.59:1); the dark value is the reference's"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: B10: the reference's amber darkened in OKLCH (same hue) to 3:1 on the light card (was #c99a00, 2.59:1); the dark value is the reference's"
   },
   "chart.series7Color": {
-    "source": "proposal",
-    "note": "B10: the reference's sky blue darkened in OKLCH (same hue) to 3:1 on the light card (was #4aa3ff, 2.63:1); the dark value is the reference's"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: B10: the reference's sky blue darkened in OKLCH (same hue) to 3:1 on the light card (was #4aa3ff, 2.63:1); the dark value is the reference's"
   },
   "chart.series8Color": {
-    "source": "proposal",
-    "note": "the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard the user gave on 10 November 2026 (Sleebou), sampled and ordered so neighbours pass the palette check in both themes; it replaced the data plan's pastels"
   },
   "chart.seriesDash": {
-    "source": "proposal",
-    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
   },
   "chart.seriesGap": {
-    "source": "proposal",
-    "note": "prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype: the dash pattern recharts and gifted-charts draw, the same on every platform"
   },
   "chart.sideWidth": {
-    "source": "proposal",
-    "note": "prototype PeriodCompare, .compare's 180px column of totals (section 7)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype PeriodCompare, .compare's 180px column of totals (section 7)"
   },
   "chart.signedRadius": {
-    "source": "proposal",
-    "note": "prototype BarChart with negatives (sections 4 and 5)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype BarChart with negatives (sections 4 and 5)"
   },
   "chart.sliceGap": {
-    "source": "proposal",
-    "note": "prototype DonutChart, the phone's strokeWidth 2.5 (section 6)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype DonutChart, the phone's strokeWidth 2.5 (section 6)"
   },
   "chart.sliceInset": {
-    "source": "proposal",
-    "note": "prototype DonutChart, extraRadius 4 and the 4px the outer radius is held in (section 6)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype DonutChart, extraRadius 4 and the 4px the outer radius is held in (section 6)"
   },
   "chart.sliceRadius": {
-    "source": "proposal",
-    "note": "prototype DonutChart, cornerRadius 5 (section 6)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype DonutChart, cornerRadius 5 (section 6)"
   },
   "chart.sparkWidth": {
-    "source": "proposal",
-    "note": "the chart prototype's geometry; desktop and web share one set, the phone has its own"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the chart prototype's geometry; desktop and web share one set, the phone has its own"
   },
   "chart.splitGap": {
-    "source": "proposal",
-    "note": "prototype Breakdown, .split gap 2px (section 7)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Breakdown, .split gap 2px (section 7)"
   },
   "chart.splitHeight": {
-    "source": "proposal",
-    "note": "prototype Breakdown, .split height 12 (section 7)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Breakdown, .split height 12 (section 7)"
   },
   "chart.splitMinWidth": {
-    "source": "proposal",
-    "note": "prototype Breakdown, .split i min-width 4px (section 7)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Breakdown, .split i min-width 4px (section 7)"
   },
   "chart.stackGap": {
-    "source": "proposal",
-    "note": "prototype WebBars and PhoneBars stacks (sections 4 and 5)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype WebBars and PhoneBars stacks (sections 4 and 5)"
   },
   "chart.tabMinWidth": {
-    "source": "proposal",
-    "note": "prototype MetricTabs, .mtab min-width 140px (section 7)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype MetricTabs, .mtab min-width 140px (section 7)"
   },
   "chart.tickOverhang": {
-    "source": "proposal",
-    "note": "prototype GaugeChart target tick, 4 past the ring (section 6)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype GaugeChart target tick, 4 past the ring (section 6)"
   },
   "chart.tickWidth": {
-    "source": "proposal",
-    "note": "prototype GaugeChart target tick, strokeWidth 2.5 (section 6)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype GaugeChart target tick, strokeWidth 2.5 (section 6)"
   },
   "chart.tipBaseHeight": {
-    "source": "proposal",
-    "note": "prototype PhoneLine pointerConfig (section 5)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype PhoneLine pointerConfig (section 5)"
   },
   "chart.tipRowHeight": {
-    "source": "proposal",
-    "note": "prototype PhoneLine pointerConfig (section 5)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype PhoneLine pointerConfig (section 5)"
   },
   "chart.tipWidth": {
-    "source": "proposal",
-    "note": "prototype PhoneLine pointerConfig (section 5)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype PhoneLine pointerConfig (section 5)"
   },
   "chart.tooltipColor": {
-    "source": "proposal",
-    "note": "the reference dashboard's dark tooltip (10 November 2026); dark keeps the raised charcoal it had"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's dark tooltip (10 November 2026); dark keeps the raised charcoal it had"
   },
   "chart.tooltipMutedColor": {
-    "source": "proposal",
-    "note": "the reference dashboard's dark tooltip (10 November 2026): its text and edge, light on the dark card"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's dark tooltip (10 November 2026): its text and edge, light on the dark card"
   },
   "chart.tooltipRuleColor": {
-    "source": "proposal",
-    "note": "the reference dashboard's dark tooltip (10 November 2026): its text and edge, light on the dark card"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's dark tooltip (10 November 2026): its text and edge, light on the dark card"
   },
   "chart.tooltipTextColor": {
-    "source": "proposal",
-    "note": "the reference dashboard's dark tooltip (10 November 2026): its text and edge, light on the dark card"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's dark tooltip (10 November 2026): its text and edge, light on the dark card"
   },
   "chart.trackColor": {
-    "source": "proposal",
-    "note": "proposal: the value of surface.muted in each theme (a neutral, so it follows the kit); the prototype's --af-chart-track-color"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the value of surface.muted in each theme (a neutral, so it follows the kit); the prototype's --af-chart-track-color"
   },
   "checkbox.radius": {
     "source": "unmapped",
@@ -556,52 +556,52 @@
     "source": "--danger-hover"
   },
   "color.background.data.accent": {
-    "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
   },
   "color.background.data.accentSoft": {
-    "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
   },
   "color.background.data.negative": {
-    "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
   },
   "color.background.data.negativeSoft": {
-    "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
   },
   "color.text.data.onAccentSoft": {
-    "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
   },
   "color.text.data.onNegative": {
-    "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
   },
   "color.text.data.onPositive": {
-    "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
   },
   "color.text.data.onWarning": {
-    "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
   },
   "color.background.data.positive": {
-    "source": "proposal",
-    "note": "B10: the reference's change-badge green darkened in OKLCH to 3:1 on the light card (was #12b76a, 2.62:1); the soft fill and ink are unchanged"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: B10: the reference's change-badge green darkened in OKLCH to 3:1 on the light card (was #12b76a, 2.62:1); the soft fill and ink are unchanged"
   },
   "color.background.data.positiveSoft": {
-    "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
   },
   "color.background.data.warning": {
-    "source": "proposal",
-    "note": "B10: the reference's amber darkened in OKLCH to 3:1 on the light card (was #f79009, 2.35:1); the soft fill and ink are unchanged"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: B10: the reference's amber darkened in OKLCH to 3:1 on the light card (was #f79009, 2.35:1); the soft fill and ink are unchanged"
   },
   "color.background.data.warningSoft": {
-    "source": "proposal",
-    "note": "the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's blue and its change badges' green and red (10 November 2026); the soft fills and inks hold 4.5:1"
   },
   "dialog.actionMinWidth": {
     "source": "unmapped",
@@ -685,8 +685,8 @@
     "mobile": "mobile:palette.textMuted"
   },
   "color.text.onBrand": {
-    "source": "proposal",
-    "note": "B10 (owner decision): picked by contrast on brand.default (onBrandFor in brand.ts): ink on AntFabric's coral, where the product's --fg-on-brand is white (3.42:1, under WCAG 1.4.3's 4.5:1)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: B10 (owner decision): picked by contrast on brand.default (onBrandFor in brand.ts): ink on AntFabric's coral, where the product's --fg-on-brand is white (3.42:1, under WCAG 1.4.3's 4.5:1)"
   },
   "color.text.onBrandSoft": {
     "source": "--fg-on-brand-soft",
@@ -929,76 +929,76 @@
     "note": "the phone's soft status fill is its tag background (our tag.infoBg), a different value from the desktop's"
   },
   "kpi.cardTrendHeight": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.chipSize": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.loadWidthLg": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.loadLineHeight": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.loadWidthMd": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.loadWidthSm": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.loadValueHeight": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.loadWidthXl": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.meterCompactWidth": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.meterHeight": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.meterMinWidth": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.ringMinWidth": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.ringSize": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.sparkBarMaxWidth": {
-    "source": "proposal",
-    "note": "the reference dashboard's thin KPI bars (10 November 2026): chart.barMaxW's value before BarChart's bars were widened, kept for SparkBars alone"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the reference dashboard's thin KPI bars (10 November 2026): chart.barMaxW's value before BarChart's bars were widened, kept for SparkBars alone"
   },
   "kpi.sparkBarRadius": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.tileBarsWidth": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.tileTrendHeight": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "kpi.tileTrendWidth": {
-    "source": "proposal",
-    "note": "prototype KPI pieces"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype KPI pieces"
   },
   "color.text.link": {
     "source": "--link"
@@ -1096,8 +1096,8 @@
     "note": "no opacity tokens in the product's tokens.json"
   },
   "opacity.secondary": {
-    "source": "proposal",
-    "note": "the 0.7 the kits wrote inline on Chip's count and Button's shortcut, named so a theme can lift it"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the 0.7 the kits wrote inline on Chip's count and Button's shortcut, named so a theme can lift it"
   },
   "os.badge": {
     "source": "unmapped",
@@ -1828,8 +1828,8 @@
     "note": "the product clamps it between 680 and 880 over 34vw; ours holds the laptop value, 680"
   },
   "radioGroup.cardMinWidth": {
-    "source": "proposal",
-    "note": "proposal: 220, a card wide enough for a small preview picture and a label with a tag"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: 220, a card wide enough for a small preview picture and a label with a tag"
   },
   "radius.card": {
     "source": "--radius-card",
@@ -2254,80 +2254,80 @@
     "note": "56, the V2 bottom bar; the V1 tabBar.height was 58. Zero on desktop and web"
   },
   "table.cellPaddingX": {
-    "source": "proposal",
-    "note": "proposal: space.md's value"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: space.md's value"
   },
   "table.checkWidth": {
-    "source": "proposal",
-    "note": "prototype Table"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Table"
   },
   "table.denseRowHeight": {
-    "source": "proposal",
-    "note": "prototype Table"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Table"
   },
   "table.dividerColor": {
-    "source": "proposal",
-    "note": "proposal: the value of border.subtle in each theme"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the value of border.subtle in each theme"
   },
   "table.headHeight": {
-    "source": "proposal",
-    "note": "prototype Table"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Table"
   },
   "table.cardsBreakpoint": {
-    "source": "proposal",
-    "note": "proposal: 600, the width a grid of five or more columns stops fitting; the phone's card per row below it"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: 600, the width a grid of five or more columns stops fitting; the phone's card per row below it"
   },
   "table.headRadius": {
-    "source": "proposal",
-    "note": "proposal: 0, square ends; a product's theme rounds the header bar"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: 0, square ends; a product's theme rounds the header bar"
   },
   "table.headerColor": {
-    "source": "proposal",
-    "note": "proposal: the value of surface.recessed in each theme"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the value of surface.recessed in each theme"
   },
   "table.loadCardWidthLg": {
-    "source": "proposal",
-    "note": "prototype Table"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Table"
   },
   "table.loadCardWidthSm": {
-    "source": "proposal",
-    "note": "prototype Table"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Table"
   },
   "table.loadHeight": {
-    "source": "proposal",
-    "note": "prototype Table"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Table"
   },
   "table.loadWidthLg": {
-    "source": "proposal",
-    "note": "prototype Table"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Table"
   },
   "table.loadWidthMd": {
-    "source": "proposal",
-    "note": "prototype Table"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Table"
   },
   "table.loadWidthSm": {
-    "source": "proposal",
-    "note": "prototype Table"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Table"
   },
   "table.rowHeight": {
-    "source": "proposal",
-    "note": "proposal: 44 on desktop and web, 52 on the phone (the prototype's --af-table-row-height)"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: 44 on desktop and web, 52 on the phone (the prototype's --af-table-row-height)"
   },
   "table.rowHoverColor": {
-    "source": "proposal",
-    "note": "proposal: the value of hover.surface in each theme"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: the value of hover.surface in each theme"
   },
   "table.rowSelectedColor": {
-    "source": "proposal",
-    "note": "data.accentSoft's value: a selected row in the data accent's soft fill"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: data.accentSoft's value: a selected row in the data accent's soft fill"
   },
   "table.sparkHeight": {
-    "source": "proposal",
-    "note": "prototype Table"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Table"
   },
   "table.sparkWidth": {
-    "source": "proposal",
-    "note": "prototype Table"
+    "source": "unmapped",
+    "note": "ours, confirmed by design on 24 November 2026: prototype Table"
   },
   "color.background.track": {
     "source": "--tabs-track",

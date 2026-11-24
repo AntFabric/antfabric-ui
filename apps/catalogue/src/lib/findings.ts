@@ -77,7 +77,7 @@ export const FINDINGS: Finding[] = [
     id: "desktop-web-one-kit",
     topic: "kits",
     tag: "verified",
-    text: "Desktop and web share one kit, @antfabric/ui-react. The data-af-platform attribute picks profiles.desktop or profiles.web, and the web profile's own description calls its values a proposal.",
+    text: "Desktop and web share one kit, @antfabric/ui-react. The data-af-platform attribute picks profiles.desktop or profiles.web, and the web profile's own description says its values are the library's own, confirmed by design, with no web app to copy from.",
     refs: ["packages/react/src/platform.tsx:20", "packages/core/src/tokens.ts:427"],
   },
   {

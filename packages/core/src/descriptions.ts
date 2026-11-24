@@ -38,7 +38,7 @@ export interface TokenNote {
   text: string;
   /** Only where the mobile profile's value or use differs from desktop's. */
   mobile?: string;
-  /** Only where the web profile's value or use differs from desktop's. The web profile is a proposal, so this says what the proposal changes. */
+  /** Only where the web profile's value or use differs from desktop's. The web profile has no app to copy from; its values were confirmed by design on 24 November 2026, and this says what it changes. */
   web?: string;
   /** The same value in light and dark, on purpose (the brand, a person's colour, the OS's own chrome); `text` says why. */
   sameInDark?: true;
@@ -205,7 +205,7 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "size.stroke.default": {
     text: "Line weight of every icon, so a set stays one weight at any size.",
     mobile: "1.5 instead of 2.25, the phone app's weight.",
-    web: "Proposal: 2, a step lighter than desktop's 2.25.",
+    web: "2, a step lighter than desktop's 2.25.",
   },
 
   "motion.duration.base": "General-purpose transition, 150ms, for a property settling on rows, tags, banners and fields.",
@@ -259,12 +259,12 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "size.avatar.md": {
     text: "Default avatar beside messages and notification rows.",
     mobile: "40pt, not 36.",
-    web: "Proposal: 32, smaller than desktop's 36.",
+    web: "32, smaller than desktop's 36.",
   },
   "size.avatar.sm": {
     text: "Small avatar for dense rows: the workspace switcher and avatar stacks.",
     mobile: "28pt, not 22.",
-    web: "Proposal: 24, rounded up to the minimum target.",
+    web: "24, rounded up to the minimum target.",
   },
   "size.avatar.xl": {
     text: "Largest avatar, for a person shown on their own.",
@@ -274,22 +274,22 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "size.control.xl": {
     text: "Prominent action: the primary call to action.",
     mobile: "56pt, not 42: the phone's full-width call to action.",
-    web: "Proposal: 44, one step above desktop's 42.",
+    web: "44, one step above desktop's 42.",
   },
   "size.control.md": {
     text: "The default button and chip height.",
     mobile: "44pt, not 34, so it meets Apple's minimum touch target.",
-    web: "Proposal: 36, one step above desktop's 34, for touch laptops and 90% zoom.",
+    web: "36, one step above desktop's 34, for touch laptops and 90% zoom.",
   },
   "size.control.xs": {
     text: "Dense-row buttons: the small button, title-bar and menu-bar controls, breadcrumb items.",
     mobile: "34pt, not 26.",
-    web: "Proposal: 28, two above desktop's 26.",
+    web: "28, two above desktop's 26.",
   },
   "size.control.xxs": {
     text: "Compact controls: reaction pills and schedule chips. The smallest control height.",
     mobile: "28pt, not 22.",
-    web: "Proposal: 24, the WCAG 2.2 AA minimum target, over desktop's 22.",
+    web: "24, the WCAG 2.2 AA minimum target, over desktop's 22.",
   },
   "size.target.min": {
     text: "Minimum size of a clickable or tappable target, whatever the control looks like: WCAG 2.5.8 on desktop and web, Apple's guideline on the phone.",
@@ -302,7 +302,7 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "size.control.icon": {
     text: "Square icon-only button, with no border and no resting fill.",
     mobile: "40pt, not 28.",
-    web: "Proposal: 32, over desktop's 28.",
+    web: "32, over desktop's 28.",
   },
   "size.control.iconSm": {
     text: "Small round icon button: a toast's dismiss, IconButton's sm. 24 on web and desktop, WCAG 2.2's minimum target (the product's desktop draws 20).",
@@ -336,7 +336,7 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "size.row.default": {
     text: "List row height: sidebar items, menu items, list items.",
     mobile: "52pt, not 30: touch rows are taller.",
-    web: "Proposal: 32, over desktop's 30.",
+    web: "32, over desktop's 30.",
   },
   "size.row.lg": {
     text: "Tall list row that carries a second line. Read by no component yet.",
@@ -349,7 +349,7 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "size.layout.sidebar": {
     text: "Width of the channels sidebar column. The product lets it grow with the window; this is its minimum. Read by no component yet.",
     mobile: "0; the phone has no sidebar.",
-    web: "Proposal: 260, over desktop's 248.",
+    web: "260, over desktop's 248.",
   },
   "size.layout.statusBar": {
     text: "Height of the iOS status bar that the mobile header sits below. Zero where there is none.",
@@ -372,7 +372,7 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "space.5xl": "56px: vertical room around the phone's empty state.",
   "space.gutter.pane": {
     text: "Gap between floating panes and the edge padding of a screen or sheet.",
-    web: "Proposal: 16, over desktop's 12.",
+    web: "16, over desktop's 12.",
   },
   "space.lg": "16px: the standard padding inside cards, dialogs and sheets, and between sections.",
   "space.md": "12px: padding inside banners, list items and toasts, and the gap between groups of controls.",
@@ -757,7 +757,7 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "font.lineHeight.body": {
     text: "Line height of body text, to set with font.size.body.",
     mobile: "22px, not 21.",
-    web: "Proposal: 20px, a tighter 1.43 ratio.",
+    web: "20px, a tighter 1.43 ratio.",
   },
   "font.size.body": {
     text: "Message text, the composer, menus: the default reading size.",
@@ -772,7 +772,7 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "font.lineHeight.display": {
     text: "Line height of display text, to set with font.size.display. Read by no component yet.",
     mobile: "44px, not 46.",
-    web: "Proposal: 44px, not 46.",
+    web: "44px, not 46.",
   },
   "font.size.display": {
     text: "The home greeting, once per screen. Read by no component yet.",
@@ -789,7 +789,7 @@ export const descriptions: { readonly [P in TokenPath]: string | TokenNote } = {
   "font.lineHeight.h2": {
     text: "Line height of h2 text, to set with font.size.h2.",
     mobile: "32px, not 26.",
-    web: "Proposal: 28px, not 26.",
+    web: "28px, not 26.",
   },
   "font.size.h2": {
     text: "Dialog and wizard titles.",

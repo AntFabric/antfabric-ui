@@ -1,7 +1,7 @@
 /**
  * AntFabric tokens. Colours are shared by every platform and switch by theme; sizes, type and density
- * switch by platform. Values come from AntFabric's desktop app and mobile app. The web profile has no app to copy from yet, so its values are a proposal and say
- * so. The glass.* colours, shadow.glass and the shared glass.blur and glass.saturate are the Liquid Glass material, used only where a
+ * switch by platform. Values come from AntFabric's desktop app and mobile app. The web profile has no app to copy from yet; its values were confirmed by
+ * design on 24 November 2026. The glass.* colours, shadow.glass and the shared glass.blur and glass.saturate are the Liquid Glass material, used only where a
  * component's `glass` layer applies (iOS 26+ and macOS 26+). glass.tinted / .solid and
  * shadow.glassContrast are what it becomes under the device's Tinted, Reduce Transparency and
  * Increase Contrast settings.
@@ -34,7 +34,7 @@
  * steps (`raw.44`, `fontSize.raw-16`) wherever the phone's number is one. `tokenSource` is this file's tree; `tokens`, exported below
  * it, is the same tree with each reference replaced by its value, which is what the kits and the catalogue read.
  *
- * The data components' groups (`chart`, `data`, `table`) are ours, not the product's (`proposal` in `tokens.map.json`). `data.*` is a flat pastel palette of
+ * The data components' groups (`chart`, `data`, `table`) are ours, not the product's (`unmapped` in `tokens.map.json`, confirmed by design on 24 November 2026). `data.*` is a flat pastel palette of
  * its own so no chart or KPI reads the brand or a status colour; `chart.*` and `table.*` point at the neutrals they share (`color.border.subtle` is
  * `chart.gridColor` in each theme) and hold the plot's geometry per platform.
  *
@@ -979,7 +979,7 @@ export const tokenSource = {
   },
   profiles: {
     web: {
-      $description: "TanStack Start + Base UI. No AntFabric web app exists to copy from; these are the desktop values with a 24px minimum target (WCAG 2.2 AA 2.5.8) and one step more height on controls, because a browser is also used on touch laptops and at 90% zoom. Proposal — confirm with design.",
+      $description: "TanStack Start + Base UI. No AntFabric web app exists to copy from; these are the desktop values with a 24px minimum target (WCAG 2.2 AA 2.5.8) and one step more height on controls, because a browser is also used on touch laptops and at 90% zoom. Confirmed by design on 24 November 2026.",
       size: {
         control: {
           xxs: 24,

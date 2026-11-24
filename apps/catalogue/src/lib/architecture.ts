@@ -650,7 +650,7 @@ export function ecosystemSvg(f: EcosystemFacts): string {
   const nodes: Record<string, N> = {
     desktopApp: { x: 12, y: 16, w: 250, h: 70, cls: "ext", t: "AntFabric desktop app", s: "Tauri · other repository", m: "its own component layer" },
     productTokens: { x: 287, y: 16, w: 250, h: 70, cls: "ext", t: "@antfabric/design-tokens", s: "the product's token layer", m: "generated/tokens.json" },
-    webApp: { x: 562, y: 16, w: 250, h: 70, cls: "ext", t: "AI Console / web app", s: "no app exists yet", m: "web profile is a proposal" },
+    webApp: { x: 562, y: 16, w: 250, h: 70, cls: "ext", t: "AI Console / web app", s: "no app exists yet", m: "web profile is our own, confirmed" },
     mobileApp: { x: 837, y: 16, w: 250, h: 70, cls: "ext", t: "AntFabric mobile app", s: "Expo · other repository", m: "theme/tokens.ts" },
     core: { x: 330, y: 170, w: 440, h: 86, cls: "core", href: "#tokens", t: "@antfabric/ui-core", s: "tokens.ts · css.ts · native.ts · motion.ts", m: `${f.tokenLeaves} token leaves · ${f.themes} themes · ${f.profiles} profiles` },
     react: { x: 20, y: 340, w: 390, h: 86, cls: "react", href: "#packages", t: "@antfabric/ui-react", s: "web + desktop · inline styles over t", m: `${f.react.components} components · ${f.react.refs} token reads` },
@@ -662,7 +662,7 @@ export function ecosystemSvg(f: EcosystemFacts): string {
   const edges: [string, string, string, boolean, number, number][] = [
     ["desktopApp", "core", "values copied by hand", true, 0.5, 0.1],
     ["productTokens", "core", "mirrored by hand", true, 0.5, 0.35],
-    ["webApp", "core", "no source: proposal", true, 0.5, 0.65],
+    ["webApp", "core", "no source: our own values", true, 0.5, 0.65],
     ["mobileApp", "core", "values copied by hand", true, 0.5, 0.9],
     ["desktopApp", "react", "no import yet", true, 0.2, 0.2],
     ["mobileApp", "native", "no import yet", true, 0.8, 0.8],

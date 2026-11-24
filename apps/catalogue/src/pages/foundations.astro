@@ -81,7 +81,7 @@ const weight = (r: string) => (r.startsWith("h") || r === "display" ? "bold" : r
     </p>
     <ul class="how">
       <li><b>Modes.</b> Colours and shadows switch by theme, so they have a Light and a Dark value on every platform. Sizes and type switch by platform, so they have a Web, Desktop and Mobile value; a token only one platform reads (the phone's font files) has just that one, and where an OS changes a platform's value (Android's switch) a line under it says so. A scale has one value; where the phone has its own, a line under the value says so.</li>
-      <li><b>Highlighted rows</b> have a value that differs between platforms. The web profile is a proposal: there is no AntFabric web app to copy values from yet.</li>
+      <li><b>Highlighted rows</b> have a value that differs between platforms. The web profile's values are this library's own, confirmed by design: there is no AntFabric web app to copy values from yet.</li>
       <li><b>Aliases.</b> A value with an arrow, like <code class="mono">→ {"{primitives.color.neutral.900}"}</code>, is a token that points at another one; the value beside it is what it resolves to.{refs === 0 ? " No token is an alias yet." : ` ${refs} tokens are aliases.`}</li>
       <li><b>Descriptions</b> say when to use a token, not what it is. Where a platform's use differs, a Mobile or Web note follows.</li>
     </ul>
